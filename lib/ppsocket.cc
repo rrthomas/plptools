@@ -283,74 +283,64 @@ bool ppsocket::dataToGet() const {
 }
 
 int ppsocket::getBufferStore(bufferStore &a, bool wait) {
-  /* Returns a 0 for for no message, 1 for message OK, and -1 for socket problem */
-  if (!wait && !dataToGet()) return 0;
-  a.init();
-  bool hadEscape = false;
-  do {
-    char data;
-    int j = readTimeout(&data, 1, 0);
-    if (j == SOCKET_ERROR || j == 0) {
-      return -1;
-    }
-    if (hadEscape) {
-      a.addByte(data);
-      hadEscape = false;
-    }
-    else {
-      if (data == '\\')
-	hadEscape = true;
-      else if (data == '\0')
-	break;
-      else
-	a.addByte(data);
-    }
-  } while (true);
+	/* Returns a 0 for for no message,
+	 * 1 for message OK, and -1 for socket problem
+	 */
+
+	long l;
+	long count = 0;
+	unsigned char *buff;
+	unsigned char *bp;
+	if (!wait && !dataToGet()) return 0;
+	a.init();
+
+	if (readTimeout((char *)&l, sizeof(l), 0) != sizeof(l))
+		return -1;
+	l = ntohl(l);
+	bp = buff = new unsigned char[l];
+	while (l > 0) {
+		int j = readTimeout((char *)bp, l, 0);
+		if (j == SOCKET_ERROR || j == 0) {
+			delete [] buff;
+			return -1;
+		}
+		count += j;
+		l -= j;
+		bp += j;
+	};
+	a.init(buff, count);
+	delete [] buff;
 #ifdef SOCKET_DIAGNOSTICS
-  cout << "ppsocket got " << a << endl;
+	cout << "ppsocket got " << a << endl;
 #endif
-  return (a.getLen() == 0) ? 0 : 1;
+	return (a.getLen() == 0) ? 0 : 1;
 }
 
 bool ppsocket::sendBufferStore(const bufferStore &a) {
 #ifdef SOCKET_DIAGNOSTICS
-  cout << "ppsocket sending " << a << endl;
+	cout << "ppsocket sending " << a << endl;
 #endif
-  bufferStore s;
-  long l = a.getLen();
-  for (long i = 0; i<l; i++) {
-    unsigned char cc = a.getByte(i);
-    if (cc == '\0' || cc == '\\') {
-      s.addByte('\\');
-    }
-    s.addByte(cc);
-  }
-  s.addByte('\0');
-  
-  {
-    int tosend, sent, retries, i;
+	long l = a.getLen();
+	long hl = htonl(l);
+	long sent = 0;
+	int  retries = 0;
+	int i;
 
-    tosend = s.getLen();
-    sent = retries = 0;
-
-    while (tosend > 0)
-      { 
-	i = writeTimeout(s.getString(sent), tosend, 0);
-	
-	if (i == SOCKET_ERROR || i == 0)
-	  return( false);
-	
-	sent += i;
-	tosend -= i;
-	
-	if (++retries > 5)
-	  { 
-	    m_LastError = 0;
-	    return(false);
-	  }
-      }
-  }
-  return true;
+	i = writeTimeout((char *)&hl, sizeof(hl), 0);
+	if (i != sizeof(hl))
+		return false;
+	while (l > 0) { 
+		i = writeTimeout(a.getString(sent), l, 0);
+		if (i == SOCKET_ERROR || i == 0)
+			return(false);
+		sent += i;
+		l -= i;
+		if (++retries > 5) { 
+			m_LastError = 0;
+			return(false);
+		}
+	}
+	return true;
 }
 
 int ppsocket::readEx(char* Data, int cTerm, int MaxLen)

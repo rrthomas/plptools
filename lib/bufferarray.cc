@@ -25,44 +25,52 @@
 #include "bufferstore.h"
 #include "bufferarray.h"
 
-bufferArray::bufferArray() {
-  len = 0;
-  lenAllocd = 5;
-  buff = new bufferStore [lenAllocd];
+bufferArray::bufferArray()
+{
+	len = 0;
+	lenAllocd = 5;
+	buff = new bufferStore[lenAllocd];
 }
 
-bufferArray::bufferArray(const bufferArray &a) {
-  len = a.len;
-  lenAllocd = a.lenAllocd;
-  buff = new bufferStore [lenAllocd];
-  for (int i=0; i < len; i++) buff[i] = a.buff[i];
+bufferArray::bufferArray(const bufferArray & a)
+{
+	len = a.len;
+	lenAllocd = a.lenAllocd;
+	buff = new bufferStore[lenAllocd];
+	for (int i = 0; i < len; i++)
+		buff[i] = a.buff[i];
 }
 
-bufferArray::~bufferArray() {
-  delete [] buff;
+bufferArray::~bufferArray()
+{
+	delete[]buff;
 }
 
-bufferStore bufferArray::popBuffer() {
-  bufferStore ret;
-  if (len > 0) {
-    ret = buff[0];
-    len--;
-    for (long i=0; i<len; i++) {
-      buff[i] = buff[i+1];
-    }
-  }
-  return ret;
+bufferStore bufferArray::
+popBuffer()
+{
+	bufferStore ret;
+	if (len > 0) {
+		ret = buff[0];
+		len--;
+		for (long i = 0; i < len; i++) {
+			buff[i] = buff[i + 1];
+		}
+	}
+	return ret;
 }
 
-void bufferArray::pushBuffer(const bufferStore &b) {
-  if (len == lenAllocd) {
-    lenAllocd += 5;
-    bufferStore* nb = new bufferStore [lenAllocd];
-    for (long i=0; i<len; i++) {
-      nb[i] = buff[i];
-    }
-    delete [] buff;
-    buff = nb;
-  }
-  buff[len++] = b;
+void bufferArray::
+pushBuffer(const bufferStore & b)
+{
+	if (len == lenAllocd) {
+		lenAllocd += 5;
+		bufferStore *nb = new bufferStore[lenAllocd];
+		for (long i = 0; i < len; i++) {
+			nb[i] = buff[i];
+		}
+		delete[]buff;
+		buff = nb;
+	}
+	buff[len++] = b;
 }
