@@ -63,7 +63,7 @@ PsiTime::PsiTime(const u_int32_t _ptvHi, const u_int32_t _ptvLo) {
     psi2unix();
 }
 
-PsiTime::PsiTime(struct timeval *_utv = 0L, struct timezone *_utz = 0L) {
+PsiTime::PsiTime(struct timeval *_utv, struct timezone *_utz = 0L) {
     if (_utv != 0L)
 	utv = *_utv;
     if (_utz != 0L)
