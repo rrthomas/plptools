@@ -154,9 +154,18 @@ help()
 	"                           all - All of the above\n"
 	" -s, --serial=DEV        Use serial device DEV.\n"
 	" -b, --baudrate=RATE     Set serial speed to BAUD.\n"
+	);
+    cout <<
+#if DSPEED > 0
+#define SPEEDSTR(x) #x
+	_("                         Default: ") << DSPEED << ".\n";
+#else
+    _("                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n");
+#endif
+    cout << _(
 	" -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
-	"                         Default for HOST is 127.0.0.1\n"
-	"                         Default for PORT is "
+	"                         Default for HOST: 127.0.0.1\n"
+	"                         Default for PORT: "
 	) << DPORT << "\n\n";
 }
 
