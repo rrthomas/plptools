@@ -61,7 +61,7 @@ ENUM_DEFINITION(rfsv::errs, rfsv::E_PSI_GEN_NONE) {
     stringRep.add(rfsv::E_PSI_FILE_FULL,       N_("disk/serial read buffer full"));
     stringRep.add(rfsv::E_PSI_FILE_NAME,       N_("invalid name"));
     stringRep.add(rfsv::E_PSI_FILE_ACCESS,     N_("access denied"));
-    stringRep.add(rfsv::E_PSI_FILE_LOCKED,     N_("ressource locked"));
+    stringRep.add(rfsv::E_PSI_FILE_LOCKED,     N_("resource locked"));
     stringRep.add(rfsv::E_PSI_FILE_DEVICE,     N_("no such device"));
     stringRep.add(rfsv::E_PSI_FILE_DIR,        N_("no such directory"));
     stringRep.add(rfsv::E_PSI_FILE_RECORD,     N_("no such record"));

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-17 02:59+0200\n"
+"POT-Creation-Date: 2002-07-17 14:35+0200\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.6\n"
 
-#: lib/rfsv.cc:33 lib/rfsvfactory.cc:45 lib/rpcsfactory.cc:43
+#: lib/rfsv.cc:33 lib/rpcsfactory.cc:43 lib/rfsvfactory.cc:45
 msgid "no error"
 msgstr "kein Fehler"
 
@@ -139,7 +139,7 @@ msgid "access denied"
 msgstr "Zugriff verweigert"
 
 #: lib/rfsv.cc:64
-msgid "ressource locked"
+msgid "resource locked"
 msgstr "Ressource gesperrt"
 
 #: lib/rfsv.cc:65
@@ -528,23 +528,23 @@ msgstr " Sekunden"
 msgid " second"
 msgstr " Sekunde"
 
-#: lib/rfsvfactory.cc:46 lib/rpcsfactory.cc:44
+#: lib/rpcsfactory.cc:44 lib/rfsvfactory.cc:46
 msgid "could not send version request"
 msgstr "Konnte Versions-Anforderung nicht versenden"
 
-#: lib/rfsvfactory.cc:47 lib/rpcsfactory.cc:45
+#: lib/rpcsfactory.cc:45 lib/rfsvfactory.cc:47
 msgid "try again"
 msgstr "Erneut versuchen"
 
-#: lib/rfsvfactory.cc:48 lib/rpcsfactory.cc:46
+#: lib/rpcsfactory.cc:46 lib/rfsvfactory.cc:48
 msgid "no psion connected"
 msgstr "Kein Psion angeschlossen"
 
-#: lib/rfsvfactory.cc:49 lib/rpcsfactory.cc:47
+#: lib/rpcsfactory.cc:47 lib/rfsvfactory.cc:49
 msgid "wrong protocol version"
 msgstr "Falsche Protokoll-Version"
 
-#: lib/rfsvfactory.cc:50 lib/rpcsfactory.cc:48
+#: lib/rpcsfactory.cc:48 lib/rfsvfactory.cc:50
 msgid "no response from ncpd"
 msgstr "Keine Antwort vom ncpd"
 
@@ -1034,7 +1034,7 @@ msgstr "Behalte ursprünglichen Ordner \""
 msgid "Transfer complete, ("
 msgstr "Übertragung abgeschlossen, ("
 
-#: plpbackup/plpbackup.cc:1202 plpftp/ftp.cc:578 plpftp/ftp.cc:669
+#: plpftp/ftp.cc:578 plpftp/ftp.cc:669 plpbackup/plpbackup.cc:1202
 msgid " bytes in "
 msgstr " Bytes in "
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-17 02:59+0200\n"
+"POT-Creation-Date: 2002-07-17 14:35+0200\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: lib/rfsv.cc:33 lib/rfsvfactory.cc:45 lib/rpcsfactory.cc:43
+#: lib/rfsv.cc:33 lib/rpcsfactory.cc:43 lib/rfsvfactory.cc:45
 msgid "no error"
 msgstr "inget fel"
 
@@ -103,7 +103,7 @@ msgstr "för bred"
 
 #: lib/rfsv.cc:55
 msgid "too many"
-msgstr "för mnga"
+msgstr "för många"
 
 #: lib/rfsv.cc:56
 msgid "file already exists"
@@ -138,7 +138,7 @@ msgid "access denied"
 msgstr "inget tillstånd"
 
 #: lib/rfsv.cc:64
-msgid "ressource locked"
+msgid "resource locked"
 msgstr "resursen låst"
 
 #: lib/rfsv.cc:65
@@ -527,23 +527,23 @@ msgstr " sekunder"
 msgid " second"
 msgstr " sekund"
 
-#: lib/rfsvfactory.cc:46 lib/rpcsfactory.cc:44
+#: lib/rpcsfactory.cc:44 lib/rfsvfactory.cc:46
 msgid "could not send version request"
-msgstr "kunde inte skicka versionsfrga"
+msgstr "kunde inte skicka versionsfråga"
 
-#: lib/rfsvfactory.cc:47 lib/rpcsfactory.cc:45
+#: lib/rpcsfactory.cc:45 lib/rfsvfactory.cc:47
 msgid "try again"
 msgstr "försök igen"
 
-#: lib/rfsvfactory.cc:48 lib/rpcsfactory.cc:46
+#: lib/rpcsfactory.cc:46 lib/rfsvfactory.cc:48
 msgid "no psion connected"
 msgstr "ingen psion ikopplad"
 
-#: lib/rfsvfactory.cc:49 lib/rpcsfactory.cc:47
+#: lib/rpcsfactory.cc:47 lib/rfsvfactory.cc:49
 msgid "wrong protocol version"
 msgstr "fel protokollversion"
 
-#: lib/rfsvfactory.cc:50 lib/rpcsfactory.cc:48
+#: lib/rpcsfactory.cc:48 lib/rfsvfactory.cc:50
 msgid "no response from ncpd"
 msgstr "inget svar från ncpd"
 
@@ -1033,9 +1033,9 @@ msgstr "Behåller ursprungsmappen \""
 
 #: plpftp/ftp.cc:577 plpftp/ftp.cc:668
 msgid "Transfer complete, ("
-msgstr "Äverfringen klar, ("
+msgstr "Överfringen klar, ("
 
-#: plpbackup/plpbackup.cc:1202 plpftp/ftp.cc:578 plpftp/ftp.cc:669
+#: plpftp/ftp.cc:578 plpftp/ftp.cc:669 plpbackup/plpbackup.cc:1202
 msgid " bytes in "
 msgstr " bytes på "
 
@@ -1433,11 +1433,11 @@ msgstr ""
 
 #: plpbackup/plpbackup.cc:838
 msgid "(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) "
-msgstr ""
+msgstr "(S)kriv över, skriv över (A)lla, (H)oppa över (S/A/H) "
 
 #: plpbackup/plpbackup.cc:839
 msgid "OAS"
-msgstr ""
+msgstr "SAH"
 
 #: plpbackup/plpbackup.cc:880
 msgid "Could not get backup index"
@@ -1464,9 +1464,8 @@ msgid "Execution of "
 msgstr "Körning av "
 
 #: plpbackup/plpbackup.cc:936
-#, fuzzy
 msgid " failed."
-msgstr " filer."
+msgstr " misslyckades."
 
 #: plpbackup/plpbackup.cc:945 plpbackup/plpbackup.cc:1032
 #: plpbackup/plpbackup.cc:1080
@@ -1511,7 +1510,7 @@ msgstr "HDAF"
 
 #: plpbackup/plpbackup.cc:1055 plpbackup/plpbackup.cc:1257
 msgid "(S)kip all, Skip (t)his, (A)bort, (R)etry: "
-msgstr "(H)oppa över alla, Hoppa över (d)en här, (A)vbryt, (F)örsök igen: "
+msgstr "(H)oppa över alla, hoppa över (D)en här, (A)vbryt, (F)örsök igen: "
 
 #: plpbackup/plpbackup.cc:1106 plpbackup/plpbackup.cc:1394
 msgid "Total time elapsed:     "
@@ -1772,15 +1771,13 @@ msgstr ""
 
 #: ncpd/main.cc:358
 msgid "daemon started. Listening at "
-msgstr ""
+msgstr "daemon startad. Lyssnar på "
 
 #: ncpd/main.cc:359
-#, fuzzy
 msgid " using device "
-msgstr "enheten finns inte"
+msgstr " använder enhet "
 
 #: ncpd/main.cc:391
-#, fuzzy
 msgid "terminating"
 msgstr "avbruten"
 
