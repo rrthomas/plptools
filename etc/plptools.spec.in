@@ -1,3 +1,21 @@
+%define srel /etc/SuSE-release
+%define rrel /etc/redhat-release
+%define isSUSE %(test -f %{srel} && echo 1 || echo 0)
+%define isRH %(test -f %{rrel} && echo 1 || echo 0)
+
+%if "%{isSUSE}" > "0"
+%define REL %(grep VERSION %{srel} | sed -e 's/VERSION = //')
+%if "%{REL}" >= "8.0"
+# Bug in SuSE8.0's rpm setup: _initrddir has wrong value
+%_initrddir %{_sysconfdir}/init.d
+%else
+%_initrddir %{_sysconfdir}/init.d
+%endif
+%endif
+%if "%{isRH}" > "0"
+%define REL %(rpm -q --queryformat '%%{version}' redhat-release)
+%endif
+
 Summary: Connectivity for psion series 5.
 Name: plptools
 %define version @VERSION@
@@ -10,7 +28,7 @@ Source0: http://download.sourceforge.net/plptools/plptools-%{version}.tar.gz
 Copyright: GPL
 Group: Networking/Utilities
 Requires: chkconfig >= 0.9
-Buildrequires: readline-devel kdelibs-devel >= 2.1 qt-devel >= 2.2.4
+Buildrequires: readline-devel newt-devel kdelibs-devel >= 2.1 qt-devel >= 2.2.4
 BuildRoot: /tmp/plputils-buildroot
 
 %package devel
@@ -125,14 +143,48 @@ zwischen Psion und Rechner.
 %setup -q
 
 %build
-%configure --enable-kde
+%if "%{isSUSE}" > "0"
+%if "%{REL}" >= "8.0"
+%configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde3
+%else
+%configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde2
+%endif
+%endif
+%if "%{isRH}" > "0"
+%configure --enable-kde --with-initdir=%{_initrddir}
+%endif
 make
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr $RPM_BUILD_ROOT/etc/rc.d/init.d
+mkdir -p $RPM_BUILD_ROOT/%{_prefix} $RPM_BUILD_ROOT%{_initrddir} \
 # rpm's makeinstall doesn't work here!
 make DESTDIR=$RPM_BUILD_ROOT install
-install -m755 etc/psion $RPM_BUILD_ROOT/etc/rc.d/init.d
+%if "%{isSUSE}" > "0"
+%if "%{REL}" >= "8.0"
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+cat>$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/psion<<EOF
+NCPD_ARGS=
+START_PLPNFSD=yes
+PLPNFSD_ARGS=
+START_PLPPRINTD=yes
+PLPPRINTD_ARGS=
+EOF
+install -m755 etc/psion.SuSE8 $RPM_BUILD_ROOT%{_initrddir}/psion
+%else
+install -m755 etc/psion.SuSE $RPM_BUILD_ROOT%{_initrddir}/psion
+%endif
+%endif
+%if "%{isRH}" > "0"
+install -m755 etc/psion $RPM_BUILD_ROOT%{_initrddir}/psion
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+cat>$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/psion<<EOF
+NCPD_ARGS=
+START_PLPNFSD=yes
+PLPNFSD_ARGS=
+START_PLPPRINTD=yes
+PLPPRINTD_ARGS=
+EOF
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -140,8 +192,23 @@ rm -rf $RPM_BUILD_ROOT
 %post
 ldconfig
 test ! -d /mnt/psion && mkdir -p /mnt/psion
+%if "%{isRH}" > "0"
 /sbin/chkconfig --add psion
-/etc/rc.d/init.d/psion condrestart
+%endif
+%if "%{isSUSE}" > "0"
+%if "%{REL}" >= "8.0"
+/sbin/chkconfig --add psion
+%else
+(
+	grep -v START_PSION /etc/rc.config
+	echo '# Set START_PSION to yes to start Psion support'
+	echo 'START_PSION=yes'
+) > /etc/rc.config.$$
+cp /etc/rc.config /etc/rc.config.old && mv /etc/rc.config.$$ /etc/rc.config
+/sbin/insserv -d psion
+%endif
+%endif
+%{_initrddir}/psion condrestart
 KONQRC=`kde-config --expandvars --install config`/konquerorrc
 if grep -q '\[Notification Messages\]' $KONQRC ; then
 (
@@ -161,20 +228,39 @@ fi
 %preun
 if [ "$1" = 0 ]
 then
-	/etc/rc.d/init.d/psion stop >&2
+	%{_initrddir}/psion stop >/dev/null 2>&1
+%if "%{isSUSE}" > "0"
+%if "%{REL}" >= "8.0"
 	/sbin/chkconfig --del psion
+%else
+	/sbin/insserv -r -d psion
+%endif
+%endif
+%if "%{isRH}" > "0"
+	/sbin/chkconfig --del psion
+%endif
 fi
 
 %files
 %doc COPYING INSTALL CHANGES README* TODO etc/*magic patches
 %{_bindir}/plpftp
 %{_bindir}/plpbackup
+%{_bindir}/sisinstall
 %{_sbindir}/*
 %{_mandir}/*/*
 %{_libdir}/libplp.so*
 %{_libdir}/libplp.la
 %{_datadir}/locale/*/LC_MESSAGES/plptools.mo
-%config /etc/rc.d/init.d/psion
+%{_datadir}/%{name}/*
+%config %{_initrddir}/psion
+%if "%{isSUSE}" > "0"
+%if "%{REL}" >= "8.0"
+%{_sysconfdir}/sysconfig/psion
+%endif
+%endif
+%if "%{isRH}" > "0"
+%{_sysconfdir}/sysconfig/psion
+%endif
 
 %files devel
 %doc doc/api etc/*.spec
@@ -206,6 +292,7 @@ fi
 %files -n klipsi
 %{_bindir}/klipsi
 %{_libdir}/klipsi.*
+%{_datadir}/applnk/*/klipsi*
 %{_datadir}/apps/klipsi/*
 %{_datadir}/icons/*/*/apps/klipsi*
 %{_datadir}/icons/*/*/actions/klipsi*

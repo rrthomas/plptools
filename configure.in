@@ -5,7 +5,7 @@ AC_CONFIG_AUX_DIR(conf)
 AC_AIX
 AC_CANONICAL_SYSTEM
 AM_CONFIG_HEADER(include/config.h)
-AM_INIT_AUTOMAKE(plptools, 0.10)
+AM_INIT_AUTOMAKE(plptools, 0.11)
 AM_PROG_LIBTOOL
 PLP_SET_LIBVERSION
 
@@ -257,6 +257,16 @@ test "x$prefix" = xNONE && prefix="$ac_default_prefix"
 eval PKGDATA="${datadir}/${PACKAGE}"
 AC_DEFINE_UNQUOTED(PKGDATA,"$PKGDATA",[This defines the dir for support files])
 
+AC_ARG_WITH(initdir,
+    [  --with-initdir=DIR      override default init dir [/etc/rc.d/init.d]],
+    [ initdir="$withval"
+      AC_MSG_RESULT(Overriding initdir: $initdir) ],
+    [ initdir="/etc/rc.d/init.d"
+      AC_MSG_RESULT(Using default init dir: $initdir)
+    ]
+)
+AC_SUBST(initdir)
+
 dnl KDE stuff
 PLP_HELP_MSG([Options for activating sub packages:])
 ac_enable_kde=no
@@ -330,6 +340,8 @@ AC_OUTPUT(
 	doc/Makefile
 	doc/api/Makefile
 	etc/psion
+	etc/psion.SuSE
+	etc/psion.SuSE8
 	etc/plptools.spec
 	doc/ncpd.man
 	doc/plpnfsd.man

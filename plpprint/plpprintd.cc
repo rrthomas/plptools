@@ -174,7 +174,7 @@ init_fontmap() {
 		*p = '\0';
 	    if ((p = strchr(buf, '\n')))
 		*p = '\0';
-	    
+
 	    psifont = strsep(&bp, ":");
 	    if (!psifont || !(*psifont))
 		continue;

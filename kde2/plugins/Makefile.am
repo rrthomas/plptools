@@ -12,7 +12,7 @@ lib_LTLIBRARIES = libplpprops.la
 
 libplpprops_la_SOURCES = plpprops.cc plppropsFactory.cc pie3dpiece.cpp \
 	pie3dwidget.cpp
-libplpprops_la_LIBADD = -L$(top_srcdir)/lib -lplp $(LIB_KIO) $(LIB_KFILE)
+libplpprops_la_LIBADD = -L$(top_srcdir)/lib/.libs $(top_srcdir)/lib/libplp.la $(LIB_KIO) $(LIB_KFILE)
 noinst_HEADERS = plpprops.h plppropsFactory.h pie3dpiece.h pie3dwidget.h
 
 services_DATA = plpprops.desktop

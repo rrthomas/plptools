@@ -6,4 +6,3 @@ Icon=klipsi
 Type=Application
 DocPath=klipsi/index.html
 Terminal=0
-X-KDE-autostart-after=panel

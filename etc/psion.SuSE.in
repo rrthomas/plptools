@@ -32,13 +32,23 @@ start() {
 		exit 0
 	fi
 	echo -n "Starting Psion support (ncpd): "
-	/sbin/startproc @prefix@/sbin/ncpd
+	/sbin/startproc @prefix@/sbin/ncpd $NCPD_ARGS
 	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
-		echo -e "$return"
-		echo -n "Starting Psion support (plpnfsd): "
-		/sbin/startproc @prefix@/sbin/plpnfsd
-		RETVAL=$?
+	if test "$START_PLPNFSD" = "yes" ; then
+		if [ $RETVAL -eq 0 ] ; then
+			echo -e "$return"
+			echo -n "Starting Psion support (plpnfsd): "
+			/sbin/startproc @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
+			RETVAL=$?
+		fi
+	fi
+	if test "$START_PLPPRINTD" = "yes" ; then
+		if [ $RETVAL -eq 0 ] ; then
+			echo -e "$return"
+			echo -n "Starting Psion support (plpprintd): "
+			/sbin/startproc @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
+			RETVAL=$?
+		fi
 	fi
 	test $RETVAL -eq 0 || return=$rc_failed
 	echo -e "$return"
@@ -47,11 +57,19 @@ start() {
 
 stop() {
 	echo -n "Stopping Psion support: "
-	/bin/killproc -HUP plpnfsd
-	while true ; do
-		test -z "`pidof plpnfsd`" && break;
-		sleep 1 # allow plpnfsd flushing it's cache
-	done
+	if test "$START_PLPNFSD" = "yes" ; then
+		/bin/killproc -HUP plpnfsd
+		WAIT=5
+		while test $WAIT -gt 0 ; do
+			test -z "`pidof plpnfsd`" && break;
+			sleep 1 # allow plpnfsd flushing it's cache
+			WAIT=`expr $WAIT - 1`
+		done
+		test -n "`pidof plpnfsd`" && killproc plpnfsd
+	fi
+	if test "$START_PLPPRINTD" = "yes" ; then
+		/sbin/killproc -TERM plpprintd
+	fi
 	/sbin/killproc -TERM ncpd
 	RETVAL=$?
 	test $RETVAL -eq 0 || return=$rc_failed

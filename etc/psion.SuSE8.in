@@ -1,15 +1,20 @@
 #!/bin/sh
 #
-# psion        Starts ncpd/plpnfsd.
-#
-# chkconfig: 2345 45 10
-# description: This facility enables connectivity to a Psion series 5.
+### BEGIN INIT INFO
+# Provides:       psion
+# Required-Start: $syslog
+# Required-Stop:
+# Default-Start:  3 5
+# Default-Stop:   0 1 2 6
+# Description:    Start Psion support
+### END INIT INFO
 
 # Source function library.
-. /etc/rc.d/init.d/functions
+. /etc/rc.status
 
 [ -f @prefix@/sbin/ncpd ] || exit 0
 [ -f @prefix@/sbin/plpnfsd ] || exit 0
+[ -f @prefix@/sbin/plpprintd ] || exit 0
 [ -f /etc/sysconfig/psion ] || exit 0
 . /etc/sysconfig/psion
 
@@ -20,53 +25,50 @@ if grep -qs ^/PLP/ /etc/mgetty+sendfax/login.config ; then
 	test -n "$mrun" && MGETTY_HASPLP=true
 fi
 
+rc_reset
+
 start() {
   	if $MGETTY_HASPLP ; then
 		echo "NOT Starting ncpd because mgetty configured for PLP"
 		exit 0
 	fi
 	echo -n "Starting Psion support (ncpd): "
-	daemon @prefix@/sbin/ncpd $NCPD_ARGS
-	RETVAL=$?
-	echo
-	if [ $RETVAL -eq 0 ] ; then
-		if test "$START_PLPNFSD" = "yes" ; then
+	startproc -f @prefix@/sbin/ncpd $NCPD_ARGS
+	if rc_status -v ; then
+		if [ "$START_PLPNFSD" = "yes" ] ; then
 			echo -n "Starting Psion support (plpnfsd): "
-			daemon @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
-			RETVAL=$?
-			echo
+			startproc -f @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
+			rc_status -v
 		fi
-		if test "$START_PLPPRINTD" = "yes" ; then
+		if [ "$START_PLPPRINTD" = "yes" ] ; then
 			echo -n "Starting Psion support (plpprintd): "
-			daemon @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
-			RETVAL=$?
-			echo
+			startproc -f @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
+			rc_status -v
 		fi
 	fi
-	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/psion
-	return $RETVAL
+	rc_status && touch /var/lock/subsys/psion
 }
 
 stop() {
 	echo -n "Stopping Psion support: "
-	if test "$START_PLPNFSD" = "yes" ; then
-		killproc plpnfsd -HUP
+	if [ "$START_PLPNFSD" = "yes" ] ; then
+		killproc -HUP @prefix@/sbin/plpnfsd
 		WAIT=5
 		while test $WAIT -gt 0 ; do
 			test -z "`pidofproc plpnfsd`" && break;
 			sleep 1 # allow plpnfsd flushing it's cache
 			WAIT=`expr $WAIT - 1`
 		done
-		test -n "`pidofproc plpnfsd`" && killproc plpnfsd
+		test -n "`pidofproc plpnfsd`" && \
+			killproc -TERM @prefix@/sbin/plpnfsd
+		rc_status
 	fi
-	if test "$START_PLPPRINTD" = "yes" ; then
-		killproc plpprintd
+	if [ "$START_PLPPRINTD" = "yes" ] ; then
+		killproc -TERM @prefix@/sbin/plpprintd
+		rc_status
 	fi
-	killproc ncpd
-	RETVAL=$?
-	echo
-	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/psion
-	return $RETVAL
+	killproc -TERM @prefix@/sbin/ncpd
+	rc_status -v && rm -f /var/lock/subsys/psion
 }
 
 restart() {
@@ -83,8 +85,11 @@ case "$1" in
   	stop
 	;;
   status)
-	status plpnfsd
-	status ncpd
+	echo -n "Checking for service psion: "
+	checkproc @prefix@/sbin/plpnfsd && \
+		checkproc @prefix@/sbin/plpprintd && \
+		checkproc @prefix@/sbin/ncpd
+	rc_status -v
 	;;
   restart|reload)
   	restart
@@ -97,5 +102,4 @@ case "$1" in
 	exit 1
 esac
 
-exit $?
-
+rc_exit

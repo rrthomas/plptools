@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-08 00:00+0200\n"
+"POT-Creation-Date: 2002-07-10 19:55+0200\n"
 "PO-Revision-Date: 2002-07-08 00:06CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -1644,7 +1644,17 @@ msgstr "Die Sicherung kann nur jeweils ein Archiv zu einer Zeit anlegen."
 msgid "plpbackup: could not connect to ncpd"
 msgstr "plpbackup: Konnte ncpd nicht kontaktieren"
 
-#: sisinstall/sismain.cpp:43
+#: sisinstall/sismain.cpp:31
+#, fuzzy
+msgid "Got an error, Press any key to exit."
+msgstr "Installation beendet. Beenden mit beliebiger Taste."
+
+#: sisinstall/sismain.cpp:36
+#, c-format
+msgid "Error %d on line %d: %s\n"
+msgstr ""
+
+#: sisinstall/sismain.cpp:55
 msgid ""
 "Usage: sisinstall [OPTIONS]... SISFILE\n"
 "\n"
@@ -1666,33 +1676,37 @@ msgstr ""
 " -n, --dry-run           Nur parsen; keine Installation.\n"
 " -w, --newt              Benutze NEWT Oberfläche.\n"
 
-#: sisinstall/sismain.cpp:98
+#: sisinstall/sismain.cpp:109
 msgid "sisinstall version 0.1\n"
 msgstr "Installationsprogramm, Version 0.1\n"
 
-#: sisinstall/sismain.cpp:117 sisinstall/sismain.cpp:125
+#: sisinstall/sismain.cpp:128 sisinstall/sismain.cpp:136
 #, c-format
 msgid "Installing sis file %s%s.\n"
 msgstr "Installiere SIS-Datei %s%s.\n"
 
-#: sisinstall/sismain.cpp:119 sisinstall/sismain.cpp:126
+#: sisinstall/sismain.cpp:130 sisinstall/sismain.cpp:137
 msgid ", not really"
 msgstr ", nicht wirklich"
 
-#: sisinstall/sismain.cpp:133
+#: sisinstall/sismain.cpp:145
+msgid "Missing SIS filename\n"
+msgstr ""
+
+#: sisinstall/sismain.cpp:153
 #, c-format
 msgid "File is %d bytes long\n"
 msgstr "Datei ist %d bytes lang\n"
 
-#: sisinstall/sismain.cpp:148
+#: sisinstall/sismain.cpp:168
 msgid "Couldn't connect with the Psion\n"
 msgstr "Konnte nicht mit dem Psion verbinden\n"
 
-#: sisinstall/sismain.cpp:169
+#: sisinstall/sismain.cpp:189
 msgid "Could not parse the sis file.\n"
 msgstr "Konnte SIS-Datei nicht parsen.\n"
 
-#: sisinstall/sismain.cpp:178
+#: sisinstall/sismain.cpp:198
 msgid "Installation complete. Press any key to exit."
 msgstr "Installation beendet. Beenden mit beliebiger Taste."
 
@@ -1816,6 +1830,6 @@ msgstr "Versuchen Sie `plpnfsd --help' für weitere Informationen."
 msgid "plpnfsd Version "
 msgstr "ncpd Version "
 
-#: plpprint/plpprintd.cc:795
+#: plpprint/plpprintd.cc:1011
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: Konnte ncpd nicht kontaktieren."

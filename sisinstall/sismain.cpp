@@ -20,9 +20,21 @@
 #define _GNU_SOURCE
 #include <getopt.h>
 
+bool usenewt = false;
+
 static void error(int line)
 {
-	fprintf(stderr, "Got errno = %d on line %d\n", errno, line);
+#if HAVE_LIBNEWT
+	if (usenewt)
+		{
+		newtPopHelpLine();
+		newtPushHelpLine(_("Got an error, Press any key to exit."));
+		newtWaitForKey();
+		newtFinished();
+		}
+#endif
+	fprintf(stderr, _("Error %d on line %d: %s\n"), errno, line,
+		strerror(errno));
 	exit(1);
 }
 
@@ -59,7 +71,6 @@ void main(int argc, char* argv[])
 	char* filename = 0;
 	char option;
 	bool dryrun = false;
-	bool usenewt = false;
 
 #ifdef LC_ALL
 	setlocale(LC_ALL, "");
@@ -107,7 +118,7 @@ void main(int argc, char* argv[])
 		}
 #endif
 	if (optind < argc)
-		{
+	{
 		filename = argv[optind];
 #if HAVE_LIBNEWT
 		if (usenewt)
@@ -124,7 +135,16 @@ void main(int argc, char* argv[])
 #endif
 			printf(_("Installing sis file %s%s.\n"), filename,
 				   dryrun ? _(", not really") : "");
-		}
+	}
+	else
+	{
+#if HAVE_LIBNEWT
+	    if (usenewt)
+		newtFinished();
+#endif
+	    fprintf(stderr, _("Missing SIS filename\n"));
+	    exit(1);
+	}
 	struct stat st;
 	if (-1 == stat(filename, &st))
 		error(__LINE__);
