@@ -231,12 +231,10 @@ cp /etc/rc.config /etc/rc.config.old && mv /etc/rc.config.$$ /etc/rc.config
 %{_initrddir}/psion condrestart
 KONQRC=`kde-config --expandvars --install config`/konquerorrc
 if grep -q '\[Notification Messages\]' $KONQRC ; then
-(
-	sed -n -e '1,/\[Notification Messages\]/p'
-	echo askSaveinode/x-psion-drive=No
-	sed -n -e '/\[Notification Messages\]/,$p' | tail +1
-) > /tmp/$$
-mv /tmp/$$ $KONQRC
+	cat $KONQRC | grep -v "askSaveinode/x-psion-drive=No" | sed \
+		-e '/\[Notification Messages\]/a\' \
+		-e 'askSaveinode/x-psion-drive=No' > /tmp/$$
+	mv /tmp/$$ $KONQRC
 else
 cat>>$KONQRC<<EOF
 
