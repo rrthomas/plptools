@@ -1,5 +1,6 @@
 
 #include "fakepsion.h"
+#include "sistypes.h"
 
 #include <stdio.h>
 
@@ -17,7 +18,8 @@ Enum<rfsv::errs>
 FakePsion::copyToPsion(const char * const from, const char * const to,
 				   void *, cpCallback_t func)
 {
-	printf(" -- Not really copying %s to %s\n", from, to);
+	if (logLevel >= 1)
+		printf(" -- Not really copying %s to %s\n", from, to);
 	return rfsv::E_PSI_GEN_NONE;
 }
 
@@ -53,7 +55,8 @@ FakePsion::disconnect()
 Enum<rfsv::errs>
 FakePsion::mkdir(const char* dir)
 {
-	printf(" -- Not really creating dir %s\n", dir);
+	if (logLevel >= 1)
+		printf(" -- Not really creating dir %s\n", dir);
 	return rfsv::E_PSI_GEN_NONE;
 }
 
