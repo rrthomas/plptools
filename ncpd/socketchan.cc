@@ -156,48 +156,57 @@ ncpConnectNak()
 void socketChan::
 socketPoll()
 {
+    int res;
+
     if (connectName == 0) {
 	bufferStore a;
-	if (skt->getBufferStore(a, false) == 1) {
-	    // A client has connected, and is announcing who it
-	    // is...  e.g.  "SYS$RFSV.*"
-	    //
-	    // An NCP Channel can be in 'Control' or 'Data' mode.
-	    // Initially, it is in 'Control' mode, and can accept
-	    // certain commands.
-	    //
-	    // When a command is received that ncpd does not
-	    // understand, this is assumed to be a request to
-	    // connect to the remote service of that name, and enter
-	    // 'data' mode.
-	    //
-	    // Later, there might be an explicit command to enter
-	    // 'data' mode, and also a challenge-response protocol
-	    // before any connection can be made.
-	    //
-	    // All commands begin with "NCP$".
+	res = skt->getBufferStore(a, false);
+	switch (res) {
+	    case 1:
+		// A client has connected, and is announcing who it
+		// is...  e.g.  "SYS$RFSV.*"
+		//
+		// An NCP Channel can be in 'Control' or 'Data' mode.
+		// Initially, it is in 'Control' mode, and can accept
+		// certain commands.
+		//
+		// When a command is received that ncpd does not
+		// understand, this is assumed to be a request to
+		// connect to the remote service of that name, and enter
+		// 'data' mode.
+		//
+		// Later, there might be an explicit command to enter
+		// 'data' mode, and also a challenge-response protocol
+		// before any connection can be made.
+		//
+		// All commands begin with "NCP$".
+		
+		// There is a magic process name called "NCP$INFO.*"
+		// which is announced by the rfsvfactory. This causes a
+		// response to be issued containing the NCP version
+		// number. The rfsvfactory will create the correct type
+		// of RFSV protocol handler, which will then announce
+		// itself. So, first time in here, we might get the
+		// NCP$INFO.*
+		if (a.getLen() > 8 && !strncmp(a.getString(), "NCP$", 4)) {
+		    if (!ncpCommand(a))
+			cerr << "ncpd: command " << a << " unrecognized."
+			     << endl;
+		    return;
+		}
 
-	    // There is a magic process name called "NCP$INFO.*"
-	    // which is announced by the rfsvfactory. This causes a
-	    // response to be issued containing the NCP version
-	    // number. The rfsvfactory will create the correct type
-	    // of RFSV protocol handler, which will then announce
-	    // itself. So, first time in here, we might get the
-	    // NCP$INFO.*
-	    if (a.getLen() > 8 && !strncmp(a.getString(), "NCP$", 4)) {
-		if (!ncpCommand(a))
-		    cerr << "ncpd: command " << a << " unrecognized." << endl;
-		return;
-	    }
-
-	    // This isn't a command, it's a remote process. Connect.
-	    connectName = strdup(a.getString());
-	    connectTry++;
-	    ncpConnect();
+		// This isn't a command, it's a remote process. Connect.
+		connectName = strdup(a.getString());
+		connectTry++;
+		ncpConnect();
+		break;
+	    case -1:
+		ncpConnectTerminate();
+	       break;
 	}
     } else if (connected) {
 	bufferStore a;
-	int res = skt->getBufferStore(a, false);
+	res = skt->getBufferStore(a, false);
 	if (res == -1) {
 	    ncpDisconnect();
 	    skt->closeSocket();
