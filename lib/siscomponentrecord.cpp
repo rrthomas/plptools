@@ -35,12 +35,15 @@ SISComponentNameRecord::~SISComponentNameRecord()
 }
 
 SisRC
-SISComponentNameRecord::fillFrom(uint8_t* buf, int base, off_t len,
+SISComponentNameRecord::fillFrom(uint8_t* buf, int* basePos, off_t len,
 								 SISFile* sisFile)
 {
 	int n = sisFile->m_header.m_nlangs;
-	if (base + 8 + n * 4 * 2 > len)
+	int base = *basePos;
+	int entrySize = 8 + n * 4 * 2;
+	if (base + entrySize > len)
 		return SIS_TRUNCATED;
+	*basePos += entrySize;
 
 	uint8_t* p = buf + base;
 	int size = 0;
@@ -88,6 +91,19 @@ SISComponentNameRecord::fillFrom(uint8_t* buf, int base, off_t len,
 	if (logLevel >= 1)
 		printf(_("%d .. %d (%d bytes): Name records\n"), base, base + size, size);
 	return SIS_OK;
+}
+
+uint32_t
+SISComponentNameRecord::getLastEnd()
+{
+	uint32_t last = 0;
+	for (int i = 0; i < m_nameCount; ++i)
+		{
+		uint32_t pos = m_namePtrs[i] + m_nameLengths[i];
+		if (last < pos)
+			last = pos;
+		}
+	return last;
 }
 
 uint8_t*

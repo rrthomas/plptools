@@ -49,6 +49,7 @@ SISFile::compareApp(SISFile* other)
 SisRC
 SISFile::fillFrom(uint8_t* buf, off_t len)
 {
+	m_end = 0;
 	int ix = 0;
 	m_buf = buf;
 	SisRC rc = m_header.fillFrom(buf, &ix, len);
@@ -77,6 +78,7 @@ SISFile::fillFrom(uint8_t* buf, off_t len)
 			return rc;
 			}
 		}
+	updateEnd(ix);
 
 	// Read requisites.
 	//
@@ -94,11 +96,14 @@ SISFile::fillFrom(uint8_t* buf, off_t len)
 			return rc;
 			}
 		}
+	updateEnd(ix);
 
 	// Read component names, by language.
 	//
 	ix = m_header.m_componentPtr;
-	rc = m_componentRecord.fillFrom(buf, ix, len, this);
+	rc = m_componentRecord.fillFrom(buf, &ix, len, this);
+	updateEnd(ix);
+	updateEnd(m_componentRecord.getLastEnd());
 	if (rc != SIS_OK)
 		{
 		printf(_("Problem reading the name record, rc = %d.\n"), rc);
@@ -125,6 +130,7 @@ SISFile::fillFrom(uint8_t* buf, off_t len)
 				return rc;
 			}
 		}
+	updateEnd(ix);
 
 	return SIS_OK;
 }
@@ -163,5 +169,12 @@ void
 SISFile::setLanguage(int lang)
 {
 	m_header.m_installationLanguage = lang;
+}
+
+void
+SISFile::updateEnd(uint32_t pos)
+{
+	if (m_end < pos)
+		m_end = pos;
 }
 

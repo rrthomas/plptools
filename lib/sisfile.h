@@ -74,6 +74,15 @@ public:
 	 */
 	uint8_t* getName();
 
+	/**
+	 * Get the number of bytes that should be copied to the residual sis
+	 * file on the psion.
+	 */
+	uint32_t getResidualEnd()
+		{
+		return m_end;
+		}
+
 	void ownBuffer()
 		{
 		m_ownBuffer = true;
@@ -111,6 +120,10 @@ private:
 	bool m_ownBuffer;
 
 	uint8_t* m_buf;
+
+	uint32_t m_end;
+
+	void updateEnd(uint32_t pos);
 
 };
 

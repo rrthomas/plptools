@@ -654,7 +654,6 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 		fprintf(stderr, "Found %d files.\n", n);
 	m_drive = (parent == 0) ? 0 : parent->m_header.m_installationDrive;
 	int nCopiedFiles = 0;
-	int firstFile = -1;
 	m_lastSisFile = 0;
 	bool skipnext = false;
 	bool aborted = false;
@@ -662,19 +661,6 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 		{
 		SISFileRecord* fileRecord = &m_file->m_fileRecords[n];
 		m_fileNo = (fileRecord->m_flags & 1) ? lang : 0;
-		char ch;
-#if 0
-		printf("FirstFile = %d, ptr = %d, length = %d\n",
-			   firstFile,
-			   fileRecord->m_filePtrs[m_fileNo],
-			   fileRecord->m_fileLengths[m_fileNo]);
-#endif
-		int fileIx = fileRecord->getFilePtr(m_fileNo) - m_buf;
-		if ((firstFile == -1) || (firstFile >= fileIx))
-			firstFile = fileIx;
-
-//		 We can only do this if we search all files...
-//		 fileRecord->m_filePtrs[m_fileNo] + fileRecord->m_fileLengths[m_fileNo]
 
 		if (skipnext)
 			{
@@ -700,13 +686,10 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	m_file->setFiles(nCopiedFiles);
 	if (logLevel >= 1)
 		fprintf(stderr,
-				"Installed %d files of %d, cutting at offset max(%d,%d)\n",
+				"Installed %d files of %d, cutting at offset %d.\n",
 				m_file->m_header.m_installationFiles,
 				m_file->m_header.m_nfiles,
-				firstFile,
-				m_lastSisFile);
-	if (firstFile < m_lastSisFile)
-		firstFile = m_lastSisFile;
+				m_file->getResidualEnd());
 	if (nCopiedFiles == 0)
 		{
 		// There is no need to copy any uninstall information to the
@@ -728,7 +711,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	sprintf(resname, "C:\\System\\Install\\%.*s.sis", namelen, compName);
 	if (logLevel >= 1)
 		fprintf(stderr, "Creating residual sis file %s\n", resname);
-	copyBuf(buf, firstFile, resname);
+	copyBuf(buf, m_file->getResidualEnd(), resname);
 #if HAVE_LIBNEWT
 	if (m_useNewt)
 		{

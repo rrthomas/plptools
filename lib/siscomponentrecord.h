@@ -50,7 +50,12 @@ public:
 	 * @param len The length of the buffer, for range checking.
 	 * @param sisFile The container sis file.
 	 */
-	SisRC fillFrom(uint8_t* buf, int base, off_t len, SISFile* sisFile);
+	SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile);
+
+	/**
+	 * Find out the end position for the last name in the file.
+	 */
+	uint32_t getLastEnd();
 
 	/**
 	 * Return the name for the given language.
