@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-16 19:30+0200\n"
+"POT-Creation-Date: 2002-07-16 20:42+0200\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -1315,7 +1315,7 @@ msgstr "Kunde inte hämta maskinens UID"
 
 #: plpbackup/plpbackup.cc:140
 msgid "Could not read SIBO UID file"
-msgstr "Kunde inte parsa uid-filen.\n"
+msgstr "Kunde inte parsa uid-filen."
 
 #: plpbackup/plpbackup.cc:145
 msgid "Could not get Psion owner info"
@@ -1427,8 +1427,13 @@ msgstr "Kunde inte starta externa editorn"
 #: plpbackup/plpbackup.cc:794
 msgid ""
 "Archive skipped, because it does not contain any files on selected drives"
-msgstr "Arkivet hoppas över, eftersom det inte innehåller några filer"
-" från den valda enheten"
+msgstr ""
+"Arkivet hoppas över, eftersom det inte innehåller några filer från den valda "
+"enheten"
+
+#: plpbackup/plpbackup.cc:838
+msgid "(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) "
+msgstr ""
 
 #: plpbackup/plpbackup.cc:839
 msgid "OAS"
@@ -1457,6 +1462,11 @@ msgstr "Skapar tar-arkiv ..."
 #: plpbackup/plpbackup.cc:936
 msgid "Execution of "
 msgstr "Körning av "
+
+#: plpbackup/plpbackup.cc:936
+#, fuzzy
+msgid " failed."
+msgstr " filer."
 
 #: plpbackup/plpbackup.cc:945 plpbackup/plpbackup.cc:1032
 #: plpbackup/plpbackup.cc:1080
@@ -1788,4 +1798,3 @@ msgstr ""
 #: plpprint/plpprintd.cc:1016
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: kunde inte få kontakt med ncpd"
-
