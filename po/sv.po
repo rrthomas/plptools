@@ -1,8 +1,7 @@
 # Swedish texts for PLPTools.
-# Copyright (C) YEAR Free Software Foundation, Inc.
+# Copyright (C) 2002 Free Software Foundation, Inc.
 # Daniel Brahneborg <basic@chello.se>, 2002.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
@@ -853,9 +852,9 @@ msgid "Got namelength %d\n"
 msgstr ""
 
 #: lib/sisreqrecord.cpp:66
-#, fuzzy, c-format
+#, c-format
 msgid "Got namepos %d\n"
-msgstr "Hittade källnamn %.*s\n"
+msgstr "Hittade namnposition %d\n"
 
 #: lib/sisreqrecord.cpp:69
 #, c-format
@@ -863,14 +862,14 @@ msgid "Position/length too large for req record %d.\n"
 msgstr "Position/längd för stor för kravpost %d.\n"
 
 #: lib/sisreqrecord.cpp:74
-#, fuzzy, c-format
+#, c-format
 msgid "Name of requisite for %s is %.*s\n"
-msgstr "Namn %d (för %s) är %.*s\n"
+msgstr "Namn på krav för %s är %.*s\n"
 
 #: lib/sisreqrecord.cpp:80
-#, fuzzy, c-format
+#, c-format
 msgid "%d .. %d (%d bytes): Req record for uid %08x\n"
-msgstr "%d .. %d (%d bytes): Kravpost\n"
+msgstr "%d .. %d (%d bytes): Kravpost för uid %08x\n"
 
 #: plpftp/main.cc:52
 msgid ""
@@ -930,7 +929,7 @@ msgstr "PLPFTP har INGEN SOM HELST GARANTI."
 
 #: plpftp/main.cc:89
 msgid "This is free software, and you are welcome to redistribute it"
-msgstr "Det hr r fri mjukvara, och du fr grna distribuera den"
+msgstr "Det här är fri mjukvara, och du får gärna distribuera den"
 
 #: plpftp/main.cc:90
 msgid "under GPL conditions; see the COPYING file in the distribution."
@@ -938,7 +937,7 @@ msgstr "enligt villkoren i GPL; se filen COPYING i distributionen."
 
 #: plpftp/main.cc:92
 msgid "FTP like interface started. Type \"?\" for help."
-msgstr "FTP-liknande interface startat.  Skriv \"?\" fr hjlp."
+msgstr "FTP-liknande interface startat.  Skriv \"?\" för hjälp."
 
 #: plpftp/main.cc:155
 msgid "plpftp Version "
@@ -946,7 +945,7 @@ msgstr ""
 
 #: plpftp/main.cc:170 plpftp/main.cc:175
 msgid "plpftp: could not connect to ncpd"
-msgstr "plpftp: kunde inte f kontakt med ncpd"
+msgstr "plpftp: kunde inte få kontakt med ncpd"
 
 #: plpftp/ftp.cc:86
 msgid "Known FTP commands:"
@@ -961,34 +960,32 @@ msgid "Connected to a "
 msgstr "Kopplad till en "
 
 #: plpftp/ftp.cc:230
-#, fuzzy
 msgid " at "
 msgstr " dag "
 
 #: plpftp/ftp.cc:231
-#, fuzzy
 msgid " baud, OwnerInfo:"
-msgstr ", garInformation:"
+msgstr " baud, ÄgarInformation:"
 
 #: plpftp/ftp.cc:237
 msgid "OwnerInfo returned error "
-msgstr "garInformation returnerade fel "
+msgstr "ÄgarInformation returnerade fel "
 
 #: plpftp/ftp.cc:257
 msgid "FATAL: Couldn't find default Drive"
-msgstr "FATALT: Kunde inte hitta ngon Enhet"
+msgstr "FATALT: Kunde inte hitta någon enhet"
 
 #: plpftp/ftp.cc:266
 msgid "Psion dir is: \""
-msgstr "Psion-mappen r: \""
+msgstr "Psion-mappen är: \""
 
 #: plpftp/ftp.cc:281
 msgid "Prompting now "
-msgstr "Promptning r nu "
+msgstr "Promptning är nu "
 
 #: plpftp/ftp.cc:281 plpftp/ftp.cc:286
 msgid "on"
-msgstr "p"
+msgstr "på"
 
 #: plpftp/ftp.cc:281 plpftp/ftp.cc:286 plpftp/ftp.cc:798 plpftp/ftp.cc:801
 #: plpftp/ftp.cc:804
@@ -997,7 +994,7 @@ msgstr "av"
 
 #: plpftp/ftp.cc:286
 msgid "Hash printing now "
-msgstr "Brdgrdsmarkering r nu "
+msgstr "Brädgårdsmarkering är nu "
 
 #: plpftp/ftp.cc:291
 msgid "Local dir: \""
@@ -1032,15 +1029,15 @@ msgstr "Mappen finns inte"
 
 #: plpftp/ftp.cc:497 plpftp/ftp.cc:538
 msgid "Keeping original directory \""
-msgstr "Behller ursprungsmappen \""
+msgstr "Behåller ursprungsmappen \""
 
 #: plpftp/ftp.cc:577 plpftp/ftp.cc:668
 msgid "Transfer complete, ("
-msgstr "verfringen klar, ("
+msgstr "Äverfringen klar, ("
 
 #: plpbackup/plpbackup.cc:1202 plpftp/ftp.cc:578 plpftp/ftp.cc:669
 msgid " bytes in "
-msgstr " bytes p "
+msgstr " bytes på "
 
 #: plpftp/ftp.cc:579 plpftp/ftp.cc:670
 msgid " secs = "
@@ -1048,11 +1045,11 @@ msgstr " sekunder = "
 
 #: plpftp/ftp.cc:599
 msgid "Get \""
-msgstr "Hmta \""
+msgstr "Hämta \""
 
 #: plpftp/ftp.cc:628 plpftp/ftp.cc:717
 msgid "Transfer complete\n"
-msgstr "verfringen klar\n"
+msgstr "Överfringen klar\n"
 
 #: plpftp/ftp.cc:694
 msgid "Put \""
@@ -1076,56 +1073,55 @@ msgstr ""
 
 #: plpftp/ftp.cc:794
 msgid "  Screen contrast:                  "
-msgstr ""
+msgstr "  Skärmkontrast:                    "
 
 #: plpftp/ftp.cc:796
 msgid "  Keyboard click:                   "
-msgstr ""
+msgstr "  Tangentbordsklick:                "
 
 #: plpftp/ftp.cc:798 plpftp/ftp.cc:801 plpftp/ftp.cc:804
 msgid "high"
-msgstr ""
+msgstr "hög"
 
 #: plpftp/ftp.cc:798 plpftp/ftp.cc:801 plpftp/ftp.cc:804
-#, fuzzy
 msgid "low"
-msgstr "Låg"
+msgstr "låg"
 
 #: plpftp/ftp.cc:799
 msgid "  Screen click:                     "
-msgstr ""
+msgstr "  Skärmklick:                       "
 
 #: plpftp/ftp.cc:802
 msgid "  Error sound:                      "
-msgstr ""
+msgstr "  Felljud:                          "
 
 #: plpftp/ftp.cc:805
 msgid "  Auto-switch off:                  "
-msgstr ""
+msgstr "  Automatisk avstängning:           "
 
 #: plpftp/ftp.cc:808 plpftp/ftp.cc:834
 msgid "never"
-msgstr ""
+msgstr "aldrig"
 
 #: plpftp/ftp.cc:811
 msgid "if running on battery power"
-msgstr ""
+msgstr "om maskinen går på batteri"
 
 #: plpftp/ftp.cc:814 plpftp/ftp.cc:840
 msgid "always"
-msgstr ""
+msgstr "alltid"
 
 #: plpftp/ftp.cc:819
 msgid "  Switch off after:                 "
-msgstr ""
+msgstr "  Stäng av efter:                   "
 
 #: plpftp/ftp.cc:821
 msgid "  Backlight off after:              "
-msgstr ""
+msgstr "  Släck bakgrundsbelysningen efter: "
 
 #: plpftp/ftp.cc:823
 msgid "  Switch on when tapping on screen: "
-msgstr ""
+msgstr "  Starta när man klickar på skärmen:"
 
 #: plpftp/ftp.cc:824 plpftp/ftp.cc:826 plpftp/ftp.cc:828 plpftp/ftp.cc:830
 #: plpftp/ftp.cc:893 plpftp/ftp.cc:907 plpftp/ftp.cc:925
@@ -1139,27 +1135,27 @@ msgstr "nej"
 
 #: plpftp/ftp.cc:825
 msgid "  Switch on when opening:           "
-msgstr ""
+msgstr "  Sätt på när maskinen öppnas:      "
 
 #: plpftp/ftp.cc:827
 msgid "  Switch off when closing:          "
-msgstr ""
+msgstr "  Stäng av när maskinen stängs:     "
 
 #: plpftp/ftp.cc:829
 msgid "  Ask for password on startup:      "
-msgstr ""
+msgstr "  Fråga efter lösenord vid start:   "
 
 #: plpftp/ftp.cc:831
 msgid "  Show Owner info on startup:       "
-msgstr ""
+msgstr "  Visa ägarinformation vid start:   "
 
 #: plpftp/ftp.cc:837
 msgid "once a day"
-msgstr ""
+msgstr "en gång om dagen"
 
 #: plpftp/ftp.cc:883
 msgid "General:"
-msgstr "Allmnt:"
+msgstr "Allmänt:"
 
 #: plpftp/ftp.cc:884
 msgid "  Machine Type: "
@@ -1175,7 +1171,7 @@ msgstr "  Maskin UID:   "
 
 #: plpftp/ftp.cc:887
 msgid "  UI Language:  "
-msgstr "  Anvndarsprk:"
+msgstr "  Användarspråk:"
 
 #: plpftp/ftp.cc:888
 msgid "ROM:"
@@ -1211,11 +1207,11 @@ msgstr "RAM-disk:       "
 
 #: plpftp/ftp.cc:899
 msgid "Registry size:  "
-msgstr "Instllningar:  "
+msgstr "Inställningar:  "
 
 #: plpftp/ftp.cc:900
 msgid "Display size:   "
-msgstr "Bildskrm:      "
+msgstr "Bildskärm:      "
 
 #: plpftp/ftp.cc:902
 msgid "Time:"
@@ -1251,27 +1247,27 @@ msgstr "  Bytt:         "
 
 #: plpftp/ftp.cc:913 plpftp/ftp.cc:926
 msgid "  Used for:     "
-msgstr "  Anvnt i:     "
+msgstr "  Använt i:     "
 
 #: plpftp/ftp.cc:914 plpftp/ftp.cc:920
 msgid "  Status:       "
-msgstr "  Tillstnd:    "
+msgstr "  Tillstånd:    "
 
 #: plpftp/ftp.cc:915
 msgid "  Current:      "
-msgstr " Aktuell tgng:"
+msgstr " Aktuell åtgång:"
 
 #: plpftp/ftp.cc:916
 msgid "  UsedPower:    "
-msgstr "  Anvnt:       "
+msgstr "  Använt:       "
 
 #: plpftp/ftp.cc:917 plpftp/ftp.cc:921
 msgid "  Voltage:      "
-msgstr "  Spnning:     "
+msgstr "  Spänning:     "
 
 #: plpftp/ftp.cc:918 plpftp/ftp.cc:922
 msgid "  Max. voltage: "
-msgstr "  Max spnning: "
+msgstr "  Max spänning: "
 
 #: plpftp/ftp.cc:919
 msgid "Backup battery:"
@@ -1279,20 +1275,19 @@ msgstr "Backupbatteri: "
 
 #: plpftp/ftp.cc:923
 msgid "External power:"
-msgstr "Extern strm:  "
+msgstr "Extern ström:  "
 
 #: plpftp/ftp.cc:924
-#, fuzzy
 msgid "  Supplied:     "
-msgstr "  Storlek:      "
+msgstr "  Ikopplad:     "
 
 #: plpftp/ftp.cc:935
 msgid "Could not read processlist "
-msgstr "Kunde inte lsa processlistan "
+msgstr "Kunde inte läsa processlistan "
 
 #: plpftp/ftp.cc:943
 msgid " is not a process list saved with killsave"
-msgstr " r inte en processlista som killsave har skapat"
+msgstr " är inte en processlista som killsave har skapat"
 
 #: plpftp/ftp.cc:983
 msgid "Could not start "
@@ -1304,7 +1299,7 @@ msgstr "Kunde inte skriva processlistan "
 
 #: plpftp/ftp.cc:1034
 msgid "no such process"
-msgstr "ingen sdan process"
+msgstr "ingen sådan process"
 
 #: plpftp/ftp.cc:1050
 msgid "syntax error. Try \"help\""
@@ -1312,26 +1307,23 @@ msgstr "syntax error. Prova \"help\""
 
 #: plpbackup/plpbackup.cc:100
 msgid "Could not get user's home directory from /etc/passwd"
-msgstr "Kunde inte hitta anvndarens hemdirectory frn /etc/passwd"
+msgstr "Kunde inte hitta användarens hemdirectory från /etc/passwd"
 
 #: plpbackup/plpbackup.cc:120
 msgid "Could not get machine UID"
-msgstr "Kunde inte hmta maskinens UID"
-
-#: plpbackup/plpbackup.cc:140
-#, fuzzy
-msgid "Could not read SIBO UID file"
-msgstr "Kunde inte parsa sisfilen.\n"
-
-#: plpbackup/plpbackup.cc:145
-#, fuzzy
-msgid "Could not get Psion owner info"
 msgstr "Kunde inte hämta maskinens UID"
 
+#: plpbackup/plpbackup.cc:140
+msgid "Could not read SIBO UID file"
+msgstr "Kunde inte parsa uid-filen.\n"
+
+#: plpbackup/plpbackup.cc:145
+msgid "Could not get Psion owner info"
+msgstr "Kunde inte hämta ägarinformationen"
+
 #: plpbackup/plpbackup.cc:172
-#, fuzzy
 msgid "Could not write SIBO UID file "
-msgstr "Kunde inte parsa sisfilen.\n"
+msgstr "Kunde inte skriva uid-filen "
 
 #: plpbackup/plpbackup.cc:202
 msgid "Got signal "
@@ -1351,174 +1343,157 @@ msgstr "Avslutar program ..."
 
 #: plpbackup/plpbackup.cc:233
 msgid "plpbackup: Could not get process list: "
-msgstr "plpbackup: Kunde inte hmta processlistan: "
+msgstr "plpbackup: Kunde inte hämta processlistan: "
 
 #: plpbackup/plpbackup.cc:253
 msgid ""
 "Could not stop all processes. Please stop running\n"
 "programs manually on the Psion, then hit return."
 msgstr ""
-"Kunde inte avsluta alla processer. Var vnlig avsluta\n"
-"programmen manuellt p Psionen, tryck sedan p return."
+"Kunde inte avsluta alla processer. Var vänlig avsluta\n"
+"programmen manuellt på Psionen, tryck sedan på return."
 
 #: plpbackup/plpbackup.cc:268
 msgid "Restarting programs ..."
 msgstr "Startar om programmen ..."
 
 #: plpbackup/plpbackup.cc:487
-#, fuzzy
 msgid "Performing "
-msgstr "Promptning är nu "
+msgstr "Utför "
 
 #: plpbackup/plpbackup.cc:489
-#, fuzzy
 msgid "format"
-msgstr "formatterbar"
+msgstr "formattering"
 
 #: plpbackup/plpbackup.cc:492 plpbackup/plpbackup.cc:507
 #: plpbackup/plpbackup.cc:722
-#, fuzzy
 msgid " and "
-msgstr " dag "
+msgstr " och "
 
 #: plpbackup/plpbackup.cc:493
 msgid "restore"
-msgstr ""
+msgstr "återställning"
 
 #: plpbackup/plpbackup.cc:495
 msgid "full"
-msgstr ""
+msgstr "fullständig"
 
 #: plpbackup/plpbackup.cc:495
-#, fuzzy
 msgid "incremental"
-msgstr "intern"
+msgstr "inkrementell"
 
 #: plpbackup/plpbackup.cc:495
-#, fuzzy
 msgid " backup"
-msgstr "Backupens storlek: "
+msgstr " backup"
 
 #: plpbackup/plpbackup.cc:496
-#, fuzzy
 msgid " of "
-msgstr " timme "
+msgstr " av "
 
 #: plpbackup/plpbackup.cc:498
-#, fuzzy
 msgid "all drives"
-msgstr "fel drivrutin"
+msgstr "alla enheter"
 
 #: plpbackup/plpbackup.cc:500
 msgid "Drive "
-msgstr ""
+msgstr "Enhet "
 
 #: plpbackup/plpbackup.cc:513
-#, fuzzy
 msgid " to "
-msgstr " dag "
+msgstr " till "
 
 #: plpbackup/plpbackup.cc:515
 msgid " from "
-msgstr ""
+msgstr " från "
 
 #: plpbackup/plpbackup.cc:715
 msgid "It contains Backups of drive "
-msgstr ""
+msgstr "Den innehåller backuper från enhet "
 
 #: plpbackup/plpbackup.cc:735
 msgid ""
 "Select (I)ndividual files, (W)hole archive, (N)one from this archive? (I/W/"
 "N) "
-msgstr ""
+msgstr "Välj (E)nstaka fil, (H)ela arkivet, (I)ngenting? (E/H/I) "
 
 #: plpbackup/plpbackup.cc:737
 msgid "IWA"
-msgstr ""
+msgstr "EHI"
 
 #: plpbackup/plpbackup.cc:761
-#, fuzzy
 msgid "Could not run external editor"
-msgstr "Kunde inte läsa processlistan "
+msgstr "Kunde inte starta externa editorn"
 
 #: plpbackup/plpbackup.cc:794
 msgid ""
 "Archive skipped, because it does not contain any files on selected drives"
-msgstr ""
+msgstr "Arkivet hoppas över, eftersom det inte innehåller några filer"
+" från den valda enheten"
 
 #: plpbackup/plpbackup.cc:839
 msgid "OAS"
 msgstr ""
 
 #: plpbackup/plpbackup.cc:880
-#, fuzzy
 msgid "Could not get backup index"
-msgstr "Kunde inte hämta maskinens UID"
+msgstr "Kunde inte hitta backupens index"
 
 #: plpbackup/plpbackup.cc:888
 msgid "' is a full backup"
-msgstr ""
+msgstr "' är en full backup"
 
 #: plpbackup/plpbackup.cc:892
 msgid "' is an incremental backup"
-msgstr ""
+msgstr "' är en inkrementell backup"
 
 #: plpbackup/plpbackup.cc:897
 msgid "' is NOT a plpbackup"
-msgstr ""
+msgstr "' är INTE en plpbackup"
 
 #: plpbackup/plpbackup.cc:934
-#, fuzzy
 msgid "Extracting tar archive ..."
 msgstr "Skapar tar-arkiv ..."
 
 #: plpbackup/plpbackup.cc:936
 msgid "Execution of "
-msgstr ""
+msgstr "Körning av "
 
 #: plpbackup/plpbackup.cc:945 plpbackup/plpbackup.cc:1032
 #: plpbackup/plpbackup.cc:1080
-#, fuzzy
 msgid "Restore aborted by user"
-msgstr "Backup avbruten av anvndaren"
+msgstr "Backup avbruten av användaren"
 
 #: plpbackup/plpbackup.cc:953 plpbackup/plpbackup.cc:1072
 msgid "Restore "
-msgstr ""
+msgstr "Återställ "
 
 #: plpbackup/plpbackup.cc:966
-#, fuzzy
 msgid "Could not create directory "
-msgstr "Kunde inte läsa processlistan "
+msgstr "Kunde inte skapa mapp "
 
 #: plpbackup/plpbackup.cc:982
-#, fuzzy
 msgid "Could not create "
-msgstr "Kunde inte starta "
+msgstr "Kunde inte skapa "
 
 #: plpbackup/plpbackup.cc:992
-#, fuzzy
 msgid "Could not get attributes of "
-msgstr "Kunde inte starta "
+msgstr "Kunde inte läsa attributen för "
 
 #: plpbackup/plpbackup.cc:1009
-#, fuzzy
 msgid "Could not set attributes of"
-msgstr "Kunde inte starta "
+msgstr "Kunde inte sätta attributen för"
 
 #: plpbackup/plpbackup.cc:1021
-#, fuzzy
 msgid "Could not set modification time of "
-msgstr "Kunde inte hämta maskinens UID"
+msgstr "Kunde inte sätta tiden för modifiering för "
 
 #: plpbackup/plpbackup.cc:1044 plpbackup/plpbackup.cc:1246
 msgid "Skipping "
-msgstr "Hoppar ver "
+msgstr "Hoppar över "
 
 #: plpbackup/plpbackup.cc:1047 plpbackup/plpbackup.cc:1087
-#, fuzzy
 msgid "Error during restore of "
-msgstr "Fel under kopiering av "
+msgstr "Fel under återställning av "
 
 #: plpbackup/plpbackup.cc:1053 plpbackup/plpbackup.cc:1255
 msgid "STAR"
@@ -1526,7 +1501,7 @@ msgstr "HDAF"
 
 #: plpbackup/plpbackup.cc:1055 plpbackup/plpbackup.cc:1257
 msgid "(S)kip all, Skip (t)his, (A)bort, (R)etry: "
-msgstr "(H)oppa ver alla, Hoppa ver (d)en hr, (A)vbryt, (F)rsk igen: "
+msgstr "(H)oppa över alla, Hoppa över (d)en här, (A)vbryt, (F)örsök igen: "
 
 #: plpbackup/plpbackup.cc:1106 plpbackup/plpbackup.cc:1394
 msgid "Total time elapsed:     "
@@ -1539,11 +1514,11 @@ msgstr "Backup avbruten av användaren"
 
 #: plpbackup/plpbackup.cc:1159 plpbackup/plpbackup.cc:1177
 msgid "Scanning Drive "
-msgstr "Gr igenom Enhet "
+msgstr "Går igenom enhet "
 
 #: plpbackup/plpbackup.cc:1172
 msgid "plpbackup: Couldn't get Drive list"
-msgstr "plpbackup: Kunde inte hmta listan p Enheter"
+msgstr "plpbackup: Kunde inte hämta listan på enheter"
 
 #: plpbackup/plpbackup.cc:1202
 msgid "Size of backup: "
@@ -1567,11 +1542,11 @@ msgstr "Fel under kopiering av "
 
 #: plpbackup/plpbackup.cc:1309
 msgid "Writing index ..."
-msgstr "Skriver innehllslista ..."
+msgstr "Skriver innehållslista ..."
 
 #: plpbackup/plpbackup.cc:1336
 msgid "plpbackup: Could not write index "
-msgstr "plpbackup: Kunde inte skriva innehllslista "
+msgstr "plpbackup: Kunde inte skriva innehållslista "
 
 #: plpbackup/plpbackup.cc:1346
 msgid "Creating tar archive ..."
@@ -1579,27 +1554,27 @@ msgstr "Skapar tar-arkiv ..."
 
 #: plpbackup/plpbackup.cc:1359
 msgid "plpbackup: Error during execution of "
-msgstr "plpbackup: Fel under krning av "
+msgstr "plpbackup: Fel under körning av "
 
 #: plpbackup/plpbackup.cc:1369
 msgid "Resetting archive attributes ..."
-msgstr "terstller arkiveringsattribut ..."
+msgstr "Återställer arkiveringsattribut ..."
 
 #: plpbackup/plpbackup.cc:1388
 msgid "Backup aborted due to error"
-msgstr "Kopiering avbruten p grund av fel"
+msgstr "Kopiering avbruten på grund av fel"
 
 #: plpbackup/plpbackup.cc:1396
 msgid "Time for scanning:      "
-msgstr "Tid fr genomgng:      "
+msgstr "Tid för genomgång:      "
 
 #: plpbackup/plpbackup.cc:1399
 msgid "Time for transfer:      "
-msgstr "Tid fr verfring:     "
+msgstr "Tid för överföring:     "
 
 #: plpbackup/plpbackup.cc:1401
 msgid "Average transfer speed: "
-msgstr "verfringshastighet:   "
+msgstr "Överföringshastighet:   "
 
 #: plpbackup/plpbackup.cc:1412
 msgid ""
@@ -1619,25 +1594,25 @@ msgid ""
 "  <drive> A drive character. If none given, scan all drives.\n"
 "\n"
 msgstr ""
-"Anvndning: plpbackup OPTIONER [<enhet>:] [<enhet>:] ...\n"
+"Användning: plpbackup OPTIONER [<enhet>:] [<enhet>:] ...\n"
 "\n"
 "  Optioner:\n"
-"    -h, --help             Skriv en hr texten och avsluta.\n"
+"    -h, --help             Skriv den här texten och avsluta.\n"
 "    -V, --version          Skriv versionsnummer och avsluta.\n"
-"    -p, --port=[VRD:]PORT Ta kontakt med ncpd p VRD, PORT.\n"
-"    -v, --verbose          ka mngden utskrifter.\n"
-"    -q, --quiet            Minska mngden utskrifter.\n"
-"    -f, --full             Kopiera allt (annars bara det som ndrats).\n"
+"    -p, --port=[VÄRD:]PORT Ta kontakt med ncpd på VÄRD, PORT.\n"
+"    -v, --verbose          Öka mängden utskrifter.\n"
+"    -q, --quiet            Minska mängden utskrifter.\n"
+"    -f, --full             Kopiera allt (annars bara det som ändrats).\n"
 "    -b, --backup[=TGZ]     Kopiera till arkivet TGZ.\n"
-"    -r, --restore=TGZ      terstll frn arkivet TGZ.\n"
+"    -r, --restore=TGZ      Återställ från arkivet TGZ.\n"
 "    -F, --format           Formattera enheterna (tillsammans med restore).\n"
 "\n"
-"  <enhet> En enhetsbokstav. Om ingen anges, g igenom alla enheter.\n"
+"  <enhet> En enhetsbokstav. Om ingen anges, gå igenom alla enheter.\n"
 "\n"
 
 #: plpbackup/plpbackup.cc:1429
 msgid "Try 'plpbackup --help' for more information."
-msgstr "Prova 'plpbackup --help' fr mer information."
+msgstr "Prova 'plpbackup --help' för mer information."
 
 #: plpbackup/plpbackup.cc:1500
 msgid "plpbackup version "
@@ -1649,11 +1624,11 @@ msgstr "Ogiltig enhetsbokstav "
 
 #: plpbackup/plpbackup.cc:1544
 msgid "Backup mode can not be combined with format or restore."
-msgstr "Backup-lget kan inte kombineras med formattering eller terstllning."
+msgstr "Backup-läget kan inte kombineras med formattering eller återställning."
 
 #: plpbackup/plpbackup.cc:1549
 msgid "Format mode needs at least one drive specified."
-msgstr "Formatlget krver minst en enhetsbokstav."
+msgstr "Formatläget kräver minst en enhetsbokstav."
 
 #: plpbackup/plpbackup.cc:1553
 msgid "Backup can only create one archive at a time."
@@ -1665,12 +1640,12 @@ msgstr "plpbackup: fick ingen kontakt med ncpd"
 
 #: sisinstall/sismain.cpp:33
 msgid "Got an error, Press any key to exit."
-msgstr ""
+msgstr "Fick ett fel, Tryck en tangent för att avsluta."
 
 #: sisinstall/sismain.cpp:38
 #, c-format
 msgid "Error %d on line %d: %s\n"
-msgstr ""
+msgstr "Fel %d på rad %d: %s\n"
 
 #: sisinstall/sismain.cpp:57
 msgid ""
@@ -1681,9 +1656,18 @@ msgid ""
 " -h, --help              Display this text.\n"
 " -V, --version           Print version and exit.\n"
 " -v, --verbose=LEVEL     Set the verbosity level, by default 0.\n"
-" -n, --dry-run           Just parse file file.\n"
+" -n, --dry-run           Just parse the file.\n"
 " -w, --newt              Use the Newt interface.\n"
 msgstr ""
+"Användning: sisinstall [OPTIONS]... SISFILE\n"
+"\n"
+"Optioner:\n"
+"\n"
+" -h, --help              Visa den här texten.\n"
+" -V, --version           Skriv versionsnummer och avsluta.\n"
+" -v, --verbose=NIVÅ      Sätt utskriftsnivån, 0 om inget annat anges.\n"
+" -n, --dry-run           Läs bara igenom filen.\n"
+" -w, --newt              Använd Newt-gränssnittet.\n"
 
 #: sisinstall/sismain.cpp:111
 msgid "sisinstall version 0.1\n"
@@ -1700,16 +1684,16 @@ msgstr ", inte egentligen"
 
 #: sisinstall/sismain.cpp:147
 msgid "Missing SIS filename\n"
-msgstr ""
+msgstr "Saknar SIS-filnamn\n"
 
 #: sisinstall/sismain.cpp:155
 #, c-format
 msgid "File is %d bytes long\n"
-msgstr "Filen r %d bytes lng\n"
+msgstr "Filen är %d bytes lång\n"
 
 #: sisinstall/sismain.cpp:170
 msgid "Couldn't connect with the Psion\n"
-msgstr "Kunde inte f kontakt med Psionen\n"
+msgstr "Kunde inte få kontakt med Psionen\n"
 
 #: sisinstall/sismain.cpp:191
 msgid "Could not parse the sis file.\n"
@@ -1717,7 +1701,7 @@ msgstr "Kunde inte parsa sisfilen.\n"
 
 #: sisinstall/sismain.cpp:200
 msgid "Installation complete. Press any key to exit."
-msgstr ""
+msgstr "Installationen klar. Tryck valfri tangent för att avsluta."
 
 #: ncpd/main.cc:147
 msgid ""
@@ -1761,9 +1745,8 @@ msgid ""
 msgstr ""
 
 #: ncpd/main.cc:185
-#, fuzzy
 msgid "Try `ncpd --help' for more information"
-msgstr "Prova 'plpftp --help' för mer information"
+msgstr "Prova `ncpd --help' för mer information"
 
 #: ncpd/main.cc:277
 msgid "ncpd Version "
@@ -1778,7 +1761,6 @@ msgid "EPOC"
 msgstr ""
 
 #: plpnfsd/main.cc:477
-#, fuzzy
 msgid ""
 "Usage: plpnfsd [OPTIONS]...\n"
 "\n"
@@ -1794,31 +1776,16 @@ msgid ""
 "                         Default for HOST is 127.0.0.1\n"
 "                         Default for PORT is "
 msgstr ""
-"Användning: plpftp [OPTIONER]... [FTPKOMMANDO]\n"
-"\n"
-"Om FTPKOMMANDO är angivet, koppla upp; kör FTPKOMMANDO och\n"
-"avsluta efteråt. Om inget FTPKOMMANDO är angivet, starta\n"
-"i interaktivt läge. För mer information om tillgängliga\n"
-"FTPKOMMANDOn, använd `?' eller `help' som FTPKOMMANDO.\n"
-"\n"
-"Tillgängliga optioner:\n"
-"\n"
-" -h, --help          Visa den här texten.\n"
-" -V, --version       Visa versionsnummer och avsluta.\n"
-" -p, --port=[VÄRD:]PORT Ta kontakt med port PORT på maskin VÄRD.\n"
-"                        Om inget är angivet är VÄRD 127.0.0.1\n"
-"                        och PORT är "
 
 #: plpnfsd/main.cc:495
-#, fuzzy
 msgid "Try `plpnfsd --help' for more information"
-msgstr "Prova 'plpftp --help' för mer information"
+msgstr "Prova 'plpnfsd --help' för mer information"
 
 #: plpnfsd/main.cc:562
 msgid "plpnfsd Version "
 msgstr ""
 
 #: plpprint/plpprintd.cc:1016
-#, fuzzy
 msgid "plpprintd: could not connect to ncpd"
-msgstr "plpftp: kunde inte få kontakt med ncpd"
+msgstr "plpprintd: kunde inte få kontakt med ncpd"
+
