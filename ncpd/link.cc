@@ -268,12 +268,12 @@ receive(bufferStore buff)
 		else
 		    lout << " len=" << buff.getLen() << endl;
 	    }
-	    sendAck((rxSequence+1) & seqMask);
 
 	    if (((rxSequence + 1) & seqMask) == seq) {
 		rxSequence++;
 		rxSequence &= seqMask;
 
+	    	sendAck(rxSequence);
 		// Must check for XOFF/XON ncp frames HERE!
 		if ((buff.getLen() == 3) && (buff.getByte(0) == 0)) {
 		    switch (buff.getByte(2)) {
@@ -300,6 +300,7 @@ receive(bufferStore buff)
 		    theNCP->receive(buff);
 
 	    } else {
+	    	sendAck(rxSequence);
 		if (verbose & LNK_DEBUG_LOG)
 		    lout << "Link: DUP\n";
 	    }

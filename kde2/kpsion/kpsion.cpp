@@ -842,7 +842,7 @@ findTarEntry(const KTarEntry *te, QString path, QString rpath) {
 	    if (tmp.length())
 		tmp += "/";
 	    tmp += *f;
-	    fte = findTarEntry(td->entry(*f), path, unix2psion(tmp));
+	    fte = findTarEntry(td->entry(*f), path, tmp);
 	    if (fte != 0L)
 		break;
 	}
