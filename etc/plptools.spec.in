@@ -432,7 +432,7 @@ fi
 
 %files -n kpsion
 %{_kdebindir}/kpsion
-%{_kdelibdir}/libkpsion.so
+%{_kdelibdir}/libkpsion.so*
 %{_kdelibdir}/libkpsion.la
 %if "%{isMDK}" > "0"
 %{_kdedatadir}/applnk-mdk/Office/PDA/kpsion*
@@ -448,7 +448,7 @@ fi
 
 %files -n klipsi
 %{_kdebindir}/klipsi
-%{_kdelibdir}/klipsi.so
+%{_kdelibdir}/klipsi.so*
 %{_kdelibdir}/klipsi.la
 %if "%{isMDK}" > "0"
 %{_kdedatadir}/applnk-mdk/Office/PDA/klipsi*
