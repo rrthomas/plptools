@@ -2,7 +2,7 @@
 #
 # psion        Starts ncpd/plpnfsd.
 #
-# chkconfig: 2345 45 70
+# chkconfig: 2345 45 10
 # description: This facility enables connectivity to a Psion series 5.
 
 # Source function library.
