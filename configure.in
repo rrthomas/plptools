@@ -92,6 +92,7 @@ AC_OUTPUT(
 	ncpd/Makefile
 	plpftp/Makefile
 	plpnfsd/Makefile
+	etc/Makefile
 	include/config.h
 	include/defs.h
 )
