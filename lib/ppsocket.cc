@@ -327,7 +327,7 @@ sendBufferStore(const bufferStore & a)
     int i;
 
     bufferStore b;
-    b.addDWord(hl);
+    b.addBytes(reinterpret_cast<const unsigned char *>(&hl), sizeof(hl));
     b.addBuff(a);
     l += 4;
     while (l > 0) {
