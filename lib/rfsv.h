@@ -208,8 +208,6 @@ class rfsv {
 
 		virtual long attr2std(long) = 0;
 		virtual long std2attr(long) = 0;
-		
-		char *opErr(long);
 };
 
 #endif
