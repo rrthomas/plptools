@@ -40,7 +40,7 @@ class rpcs32 : public rpcs {
     friend class rpcsfactory;
 
  public:
-    Enum<rfsv::errs> getCmdLine(const char *, string &);
+    Enum<rfsv::errs> getCmdLine(const char *, std::string &);
     Enum<rfsv::errs> getMachineInfo(machineInfo &);
     Enum<rfsv::errs> configRead(u_int32_t, bufferStore &);
     Enum<rfsv::errs> configWrite(bufferStore);

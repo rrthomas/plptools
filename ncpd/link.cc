@@ -50,6 +50,11 @@ extern "C" {
     }
 };
 
+using namespace std;
+
+extern ostream lout;
+extern ostream lerr;
+
 ENUM_DEFINITION(Link::link_type, Link::LINK_TYPE_UNKNOWN) {
     stringRep.add(Link::LINK_TYPE_UNKNOWN, N_("Unknown"));
     stringRep.add(Link::LINK_TYPE_SIBO,    N_("SIBO"));
@@ -169,7 +174,7 @@ sendAck(int seq)
 	return;
     bufferStore tmp;
     if (verbose & LNK_DEBUG_LOG)
-	cout << "Link: >> ack seq=" << seq << endl;
+	lout << "Link: >> ack seq=" << seq << endl;
     if (seq > 7) {
 	int hseq = seq >> 3;
 	int lseq = (seq & 7) | 8;
@@ -187,7 +192,7 @@ sendReqCon()
 	return;
     bufferStore tmp;
     if (verbose & LNK_DEBUG_LOG)
-	cout << "Link: >> con seq=4" << endl;
+	lout << "Link: >> con seq=4" << endl;
     tmp.addByte(0x24);
     tmp.addDWord(conMagic);
     ackWaitQueueElement e;
@@ -208,7 +213,7 @@ sendReqReq()
 	return;
     bufferStore tmp;
     if (verbose & LNK_DEBUG_LOG)
-	cout << "Link: >> con seq=1" << endl;
+	lout << "Link: >> con seq=1" << endl;
     tmp.addByte(0x21);
     ackWaitQueueElement e;
     e.seq = 0; // expected response is Ack with seq=0 or ReqCon
@@ -228,7 +233,7 @@ sendReq()
 	return;
     bufferStore tmp;
     if (verbose & LNK_DEBUG_LOG)
-	cout << "Link: >> con seq=1" << endl;
+	lout << "Link: >> con seq=1" << endl;
     tmp.addByte(0x20);
     // No Ack expected for this, so no new entry in ackWaitQueue
     p->send(tmp);
@@ -259,11 +264,11 @@ receive(bufferStore buff)
 	case 0x30:
 	    // Normal data
 	    if (verbose & LNK_DEBUG_LOG) {
-		cout << "Link: << dat seq=" << seq ;
+		lout << "Link: << dat seq=" << seq ;
 		if (verbose & LNK_DEBUG_DUMP)
-		    cout << " " << buff << endl;
+		    lout << " " << buff << endl;
 		else
-		    cout << " len=" << buff.getLen() << endl;
+		    lout << " len=" << buff.getLen() << endl;
 	    }
 	    sendAck((rxSequence+1) & seqMask);
 
@@ -278,14 +283,14 @@ receive(bufferStore buff)
 			    // XOFF
 			    xoff[buff.getByte(1)] = true;
 			    if (verbose & LNK_DEBUG_LOG)
-				cout << "Link: got XOFF for channel "
+				lout << "Link: got XOFF for channel "
 				     << buff.getByte(1) << endl;
 			    break;
 			case 2:
 			    // XON
 			    xoff[buff.getByte(1)] = false;
 			    if (verbose & LNK_DEBUG_LOG)
-				cout << "Link: got XON for channel "
+				lout << "Link: got XON for channel "
 				     << buff.getByte(1) << endl;
 			    // Transmit packets on hold queue
 			    transmitHoldQueue(buff.getByte(1));
@@ -298,7 +303,7 @@ receive(bufferStore buff)
 
 	    } else {
 		if (verbose & LNK_DEBUG_LOG)
-		    cout << "Link: DUP\n";
+		    lout << "Link: DUP\n";
 	    }
 	    break;
 
@@ -314,10 +319,10 @@ receive(bufferStore buff)
 		    refstamp = i->stamp;
 		    ackWaitQueue.erase(i);
 		    if (verbose & LNK_DEBUG_LOG) {
-			cout << "Link: << ack seq=" << seq ;
+			lout << "Link: << ack seq=" << seq ;
 			if (verbose & LNK_DEBUG_DUMP)
-			    cout << " " << buff;
-			cout << endl;
+			    lout << " " << buff;
+			lout << endl;
 		    }
 		    break;
 		}
@@ -336,7 +341,7 @@ receive(bufferStore buff)
 		    purgeAllQueues();
 		    p->setEpoc(false);
 		    if (verbose & LNK_DEBUG_LOG)
-			cout << "Link: 1-linkType set to " << linkType << endl;
+			lout << "Link: 1-linkType set to " << linkType << endl;
 		}
 		// Older packets implicitely ack'ed
 		multiAck(refstamp);
@@ -357,7 +362,7 @@ receive(bufferStore buff)
 			if (i->txcount-- == 0) {
 			    // timeout, remove packet
 			    if (verbose & LNK_DEBUG_LOG)
-				cout << "Link: >> TRANSMIT timeout seq=" <<
+				lout << "Link: >> TRANSMIT timeout seq=" <<
 				    i->seq << endl;
 			    ackWaitQueue.erase(i);
 			    i--;
@@ -365,7 +370,7 @@ receive(bufferStore buff)
 			    // retransmit it
 			    i->stamp = now;
 			    if (verbose & LNK_DEBUG_LOG)
-				cout << "Link: >> RETRANSMIT seq=" << i->seq
+				lout << "Link: >> RETRANSMIT seq=" << i->seq
 				     << endl;
 			    p->send(i->data);
 			}
@@ -373,10 +378,10 @@ receive(bufferStore buff)
 		    }
 		pthread_mutex_unlock(&queueMutex);
 		if ((verbose & LNK_DEBUG_LOG) && (!nextFound)) {
-		    cout << "Link: << UNMATCHED ack seq=" << seq;
+		    lout << "Link: << UNMATCHED ack seq=" << seq;
 		    if (verbose & LNK_DEBUG_DUMP)
-			cout << " " << buff;
-		    cout << endl;
+			lout << " " << buff;
+		    lout << endl;
 		}
 	    }
 	    break;
@@ -392,7 +397,7 @@ receive(bufferStore buff)
 			ackWaitQueue.erase(i);
 			linkType = LINK_TYPE_EPOC;
 			if (verbose & LNK_DEBUG_LOG)
-			    cout << "Link: 2-linkType set to " << linkType << endl;
+			    lout << "Link: 2-linkType set to " << linkType << endl;
 			conFound = true;
 			failed = false;
 			// EPOC can handle extended sequence numbers
@@ -401,10 +406,10 @@ receive(bufferStore buff)
 			maxOutstanding = 8;
 			p->setEpoc(true);
 			if (verbose & LNK_DEBUG_LOG) {
-			    cout << "Link: << con seq=" << seq ;
+			    lout << "Link: << con seq=" << seq ;
 			    if (verbose & LNK_DEBUG_DUMP)
-				cout << " " << buff;
-			    cout << endl;
+				lout << " " << buff;
+			    lout << endl;
 			}
 			break;
 		    }
@@ -416,16 +421,16 @@ receive(bufferStore buff)
 		sendAck(rxSequence);
 	    } else {
 		if (verbose & LNK_DEBUG_LOG) {
-		    cout << "Link: << req seq=" << seq;
+		    lout << "Link: << req seq=" << seq;
 		    if (verbose & LNK_DEBUG_DUMP)
-			cout << " " << buff;
-		    cout << endl;
+			lout << " " << buff;
+		    lout << endl;
 		}
 		rxSequence = txSequence = 0;
 		if (seq > 0) {
 		    linkType = LINK_TYPE_EPOC;
 		    if (verbose & LNK_DEBUG_LOG)
-			cout << "Link: 3-linkType set to " << linkType << endl;
+			lout << "Link: 3-linkType set to " << linkType << endl;
 		    // EPOC can handle extended sequence numbers
 		    seqMask = 0x7ff;
 		    // EPOC can handle up to 8 unacknowledged packets
@@ -440,7 +445,7 @@ receive(bufferStore buff)
 		    seqMask = 7;
 		    maxOutstanding = 1;
 		    if (verbose & LNK_DEBUG_LOG)
-			cout << "Link: 4-linkType set to " << linkType << endl;
+			lout << "Link: 4-linkType set to " << linkType << endl;
 		    rxSequence = 0;
 		    txSequence = 1; // Our ReqReq was seq 0
 		    purgeAllQueues();
@@ -453,12 +458,12 @@ receive(bufferStore buff)
 	case 0x10:
 	    // Disconnect
 	    if (verbose & LNK_DEBUG_LOG)
-		cout << "Link: << DISC" << endl;
+		lout << "Link: << DISC" << endl;
 	    failed = true;
 	    break;
 
 	default:
-	    cerr << "Link: FATAL: Unknown packet type " << type << endl;
+	    lerr << "Link: FATAL: Unknown packet type " << type << endl;
     }
 }
 
@@ -531,15 +536,15 @@ transmit(bufferStore buf)
 	    // Request for new link
 	    e.txcount = 4;
 	    if (verbose & LNK_DEBUG_LOG)
-		cout << "Link: >> req seq=" << e.seq << endl;
+		lout << "Link: >> req seq=" << e.seq << endl;
 	    buf.prependByte(0x20 + e.seq);
 	} else {
 	    e.txcount = 8;
 	    if (verbose & LNK_DEBUG_LOG) {
-		cout << "Link: >> dat seq=" << e.seq;
+		lout << "Link: >> dat seq=" << e.seq;
 		if (verbose & LNK_DEBUG_DUMP)
-		    cout << " " << buf;
-		cout << endl;
+		    lout << " " << buf;
+		lout << endl;
 	    }
 	    if (e.seq > 7) {
 		int hseq = e.seq >> 3;
@@ -615,7 +620,7 @@ retransmit()
 	    if (i->txcount-- == 0) {
 		// timeout, remove packet
 		if (verbose & LNK_DEBUG_LOG)
-		    cout << "Link: >> TRANSMIT timeout seq=" << i->seq << endl;
+		    lout << "Link: >> TRANSMIT timeout seq=" << i->seq << endl;
 		ackWaitQueue.erase(i);
 		failed = true;
 		i--;
@@ -623,7 +628,7 @@ retransmit()
 		// retransmit it
 		i->stamp = now;
 		if (verbose & LNK_DEBUG_LOG)
-		    cout << "Link: >> RETRANSMIT seq=" << i->seq << endl;
+		    lout << "Link: >> RETRANSMIT seq=" << i->seq << endl;
 		p->send(i->data);
 	    }
 	}
@@ -648,7 +653,7 @@ hasFailed()
     bool lfailed = p->linkFailed();
     if (failed || lfailed) {
 	if (verbose & LNK_DEBUG_LOG)
-	    cout << "Link: hasFailed: " << failed << ", " << lfailed << endl;
+	    lout << "Link: hasFailed: " << failed << ", " << lfailed << endl;
     }
     failed |= lfailed;
     return failed;

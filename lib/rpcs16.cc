@@ -38,6 +38,8 @@
 #include "bufferarray.h"
 #include "ppsocket.h"
 
+using namespace std;
+
 rpcs16::rpcs16(ppsocket * _skt)
 {
     skt = _skt;

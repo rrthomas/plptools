@@ -45,6 +45,8 @@
 #define  INVALID_SOCKET	-1
 #define  SOCKET_ERROR	-1
 
+using namespace std;
+
 ppsocket::ppsocket(const ppsocket & another)
 {
     m_Socket = another.m_Socket;

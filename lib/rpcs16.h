@@ -41,7 +41,7 @@ class rpcs16 : public rpcs {
     friend class rpcsfactory;
 
  public:
-    Enum<rfsv::errs> getCmdLine(const char *, string &);
+    Enum<rfsv::errs> getCmdLine(const char *, std::string &);
 
  private:
     rpcs16(ppsocket *);

@@ -40,6 +40,11 @@
 #define MAX_CHANNELS_SIBO  8
 #define NCP_SENDLEN 250
 
+using namespace std;
+
+extern ostream lout;
+extern ostream lerr;
+
 ncp::ncp(const char *fname, int baud, unsigned short _verbose)
 {
     channelPtr = new channel*[MAX_CHANNELS_PSION + 1];
@@ -133,19 +138,19 @@ receive(bufferStore s) {
 	    int allData = s.getByte(1);
 	    s.discardFirstBytes(2);
 	    if (!isValidChannel(channel)) {
-		cerr << "ncp: Got message for unknown channel\n";
+		lerr << "ncp: Got message for unknown channel\n";
 	    } else {
 		messageList[channel].addBuff(s);
 		if (allData == LAST_MESS) {
 		    channelPtr[channel]->ncpDataCallback(messageList[channel]);
 		    messageList[channel].init();
 		} else if (allData != NOT_LAST_MESS) {
-		    cerr << "ncp: bizarre third byte!\n";
+		    lerr << "ncp: bizarre third byte!\n";
 		}
 	    }
 	}
     } else
-	cerr << "Got null message\n";
+	lerr << "Got null message\n";
 }
 
 void ncp::
@@ -158,7 +163,7 @@ controlChannel(int chan, enum interControllerMessageType t, bufferStore & comman
     open.addByte(t);
     open.addBuff(command);
     if (verbose & NCP_DEBUG_LOG)
-	cout << "ncp: >> " << ctrlMsgName(t) << " " << chan << endl;
+	lout << "ncp: >> " << ctrlMsgName(t) << " " << chan << endl;
     l->send(open);
 }
 
@@ -169,7 +174,7 @@ findPcServer(const char *name)
 	vector<PcServer>::iterator i;
 	for (i = pcServers.begin(); i != pcServers.end(); i++)
 	    if (i->getName() == name)
-		return i;
+		    return i->self();
     }
     return NULL;
 }
@@ -184,7 +189,7 @@ unregisterPcServer(PcServer *server) {
     if (server) {
 	vector<PcServer>::iterator i;
 	for (i = pcServers.begin(); i != pcServers.end(); i++)
-	    if (i == server) {
+	    if (i->self() == server) {
 		pcServers.erase(i);
 		return;
 	    }
@@ -199,7 +204,7 @@ decodeControlMessage(bufferStore & buff)
     interControllerMessageType imt = (interControllerMessageType)buff.getByte(1);
     buff.discardFirstBytes(2);
     if (verbose & NCP_DEBUG_LOG)
-	cout << "ncp: << " << ctrlMsgName(imt) << " " << remoteChan;
+	lout << "ncp: << " << ctrlMsgName(imt) << " " << remoteChan;
 
     bufferStore b;
     int localChan;
@@ -208,8 +213,8 @@ decodeControlMessage(bufferStore & buff)
 	case NCON_MSG_CONNECT_TO_SERVER:
 	    if (verbose & NCP_DEBUG_LOG) {
 		if (verbose & NCP_DEBUG_DUMP)
-		    cout << " [" << buff << "]";
-		cout << endl;
+		    lout << " [" << buff << "]";
+		lout << endl;
 	    }
 
 	    failed = false;
@@ -224,11 +229,11 @@ decodeControlMessage(bufferStore & buff)
 		b.addByte(0);
 		controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
 		if (verbose & NCP_DEBUG_LOG)
-		    cout << "ncp: Link UP" << endl;
+		    lout << "ncp: Link UP" << endl;
 		// Create linkchan if it does not yet exist
 		if (!lChan) {
 		    if (verbose & NCP_DEBUG_LOG)
-			cout << "ncp: new passive linkChan" << endl;
+			lout << "ncp: new passive linkChan" << endl;
 		    channelPtr[localChan] =
 			lChan = new linkChan(this, localChan);
 		    lChan->setVerbose(verbose);
@@ -249,19 +254,19 @@ decodeControlMessage(bufferStore & buff)
 		if (ok) {
 		    b.addByte(rfsv::E_PSI_GEN_NONE);
 		    if (verbose & NCP_DEBUG_LOG)
-			cout << "ncp: ACCEPT client connect" << endl;
+			lout << "ncp: ACCEPT client connect" << endl;
 		} else {
 		    localChan = 0;
 		    b.addByte(rfsv::E_PSI_FILE_NXIST);
 		    if (verbose & NCP_DEBUG_LOG)
-			cout << "ncp: REJECT client connect" << endl;
+			lout << "ncp: REJECT client connect" << endl;
 		}
 		controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
 
 		// Create linkchan if it does not yet exist
 		if (!lChan) {
 		    if (verbose & NCP_DEBUG_LOG)
-			cout << "ncp: new active linkChan" << endl;
+			lout << "ncp: new active linkChan" << endl;
 		    channelPtr[localChan] =
 			lChan = new linkChan(this, -1);
 		    lChan->setVerbose(verbose);
@@ -277,20 +282,20 @@ decodeControlMessage(bufferStore & buff)
 	    failed = false;
 	    forChan = buff.getByte(0);
 	    if (verbose & NCP_DEBUG_LOG)
-		cout << " ch=" << forChan << " stat=";
+		lout << " ch=" << forChan << " stat=";
 	    if (buff.getByte(1) == 0) {
 		if (verbose & NCP_DEBUG_LOG)
-		    cout << "OK" << endl;
+		    lout << "OK" << endl;
 		if (isValidChannel(forChan)) {
 		    remoteChanList[forChan] = remoteChan;
 		    channelPtr[forChan]->ncpConnectAck();
 		} else {
 		    if (verbose & NCP_DEBUG_LOG)
-			cout << "ncp: message for unknown channel" << endl;
+			lout << "ncp: message for unknown channel" << endl;
 		}
 	    } else {
 		if (verbose & NCP_DEBUG_LOG)
-		    cout << "Unknown " << (int) buff.getByte(1) << endl;
+		    lout << "Unknown " << (int) buff.getByte(1) << endl;
 		if (isValidChannel(forChan))
 		    channelPtr[forChan]->ncpConnectNak();
 	    }
@@ -313,8 +318,8 @@ decodeControlMessage(bufferStore & buff)
 		protocolVersion = ver;
 		if (verbose & NCP_DEBUG_LOG) {
 		    if (verbose & NCP_DEBUG_DUMP)
-			cout << " [" << buff << "]";
-		    cout << endl;
+			lout << " [" << buff << "]";
+		    lout << endl;
 		}
 		// Fake NCP version 2 for a Series 3 (behave like PsiWin 1.1)
 		if (ver == PV_SERIES_3) {
@@ -330,14 +335,14 @@ decodeControlMessage(bufferStore & buff)
 		b.addDWord(time(NULL));
 		controlChannel(0, NCON_MSG_NCP_INFO, b);
 	    } else {
-		cout << "ALERT!!!! Unexpected Protocol Version!! (No Series 5/3?)!" << endl;
+		lout << "ALERT!!!! Unexpected Protocol Version!! (No Series 5/3?)!" << endl;
 		failed = true;
 	    }
 	    break;
 
 	case NCON_MSG_CHANNEL_DISCONNECT:
 	    if (verbose & NCP_DEBUG_LOG)
-		cout << " ch=" << (int) buff.getByte(0) << endl;
+		lout << " ch=" << (int) buff.getByte(0) << endl;
 	    disconnect(buff.getByte(0));
 	    l->purgeQueue(remoteChan);
 	    break;
@@ -349,8 +354,8 @@ decodeControlMessage(bufferStore & buff)
 	default:
 	    if (verbose & NCP_DEBUG_LOG) {
 		if (verbose & NCP_DEBUG_DUMP)
-		    cout << " [" << buff << "]";
-		cout << endl;
+		    lout << " [" << buff << "]";
+		lout << endl;
 	    }
 
     }
@@ -362,7 +367,7 @@ getFirstUnusedChan()
     for (int cNum = 1; cNum < maxLinks(); cNum++) {
 	if (channelPtr[cNum] == NULL) {
 	    if (verbose & NCP_DEBUG_LOG)
-		cout << "ncp: getFirstUnusedChan=" << cNum << endl;
+		lout << "ncp: getFirstUnusedChan=" << cNum << endl;
 	    channelPtr[cNum] = (channel *)0xdeadbeef;
 	    return cNum;
 	}
@@ -380,7 +385,7 @@ void ncp::
 RegisterAck(int chan, const char *name)
 {
     if (verbose & NCP_DEBUG_LOG)
-	cout << "ncp: RegisterAck: chan=" << chan << endl;
+	lout << "ncp: RegisterAck: chan=" << chan << endl;
     for (int cNum = 1; cNum < maxLinks(); cNum++) {
 	channel *ch = channelPtr[cNum];
 	if (isValidChannel(cNum) && ch->getNcpChannel() == chan) {
@@ -389,7 +394,7 @@ RegisterAck(int chan, const char *name)
 	    return;
 	}
     }
-    cerr << "ncp: RegisterAck: no channel to deliver" << endl;
+    lerr << "ncp: RegisterAck: no channel to deliver" << endl;
 }
 
 void ncp::
@@ -404,9 +409,9 @@ Register(channel * ch)
 	    ch->setNcpChannel(cNum);
 	    lChan->Register(ch);
 	} else
-	    cerr << "ncp: Out of channels in register" << endl;
+	    lerr << "ncp: Out of channels in register" << endl;
     } else
-	cerr << "ncp: Register without established lChan" << endl;
+	lerr << "ncp: Register without established lChan" << endl;
 }
 
 int ncp::
@@ -464,12 +469,12 @@ void ncp::
 disconnect(int channel)
 {
     if (!isValidChannel(channel)) {
-	cerr << "ncp: Ignored disconnect for unknown channel #" << channel << endl;
+	lerr << "ncp: Ignored disconnect for unknown channel #" << channel << endl;
 	return;
     }
     channelPtr[channel]->terminateWhenAsked();
     if (verbose & NCP_DEBUG_LOG)
-	cout << "ncp: disconnect: channel=" << channel << endl;
+	lout << "ncp: disconnect: channel=" << channel << endl;
     channelPtr[channel] = NULL;
     bufferStore b;
     b.addByte(remoteChanList[channel]);
@@ -488,7 +493,7 @@ hasFailed()
     bool lfailed = l->hasFailed();
     if (failed || lfailed) {
 	if (verbose & NCP_DEBUG_LOG)
-	    cout << "ncp: hasFailed: " << failed << ", " << lfailed << endl;
+	    lout << "ncp: hasFailed: " << failed << ", " << lfailed << endl;
     }
     failed |= lfailed;
     if (failed) {

@@ -34,6 +34,8 @@
 #include <ppsocket.h>
 #include <rfsv.h>
 
+extern std::ostream lerr;
+
 socketChan:: socketChan(ppsocket * _skt, ncp * _ncpController):
     channel(_ncpController)
 {
@@ -58,7 +60,7 @@ ncpDataCallback(bufferStore & a)
     if (registerName != 0) {
 	skt->sendBufferStore(a);
     } else
-	cerr << "socketchan: Connect without name!!!\n";
+	lerr << "socketchan: Connect without name!!!\n";
 }
 
 char *socketChan::
@@ -88,7 +90,7 @@ ncpCommand(bufferStore & a)
 		a.addStringT("Series 5");
 		break;
 	    default:
-		cerr << "ncpd: protocol version not known" << endl;
+		lerr << "ncpd: protocol version not known" << endl;
 		a.addStringT("Unknown!");
 		break;
 	}
@@ -132,7 +134,7 @@ ncpCommand(bufferStore & a)
 	ok = true;
     }
     if (!ok) {
-	cerr << "socketChan:: received unknown NCP command (" << a << ")" << endl;
+	lerr << "socketChan:: received unknown NCP command (" << a << ")" << endl;
 	a.init();
 	a.addByte(rfsv::E_PSI_GEN_NSUP);
 	skt->sendBufferStore(a);
@@ -209,7 +211,7 @@ socketPoll()
 
 		if (memchr(a.getString(), 0, a.getLen()) == 0) {
 			// Not 0 terminated, -> invalid
-			cerr << "ncpd: command " << a << " unrecognized."
+			lerr << "ncpd: command " << a << " unrecognized."
 			     << endl;
 			return;
 		}
@@ -223,7 +225,7 @@ socketPoll()
 		// NCP$INFO.*
 		if (a.getLen() > 8 && !strncmp(a.getString(), "NCP$", 4)) {
 		    if (!ncpCommand(a))
-			cerr << "ncpd: command " << a << " unrecognized."
+			lerr << "ncpd: command " << a << " unrecognized."
 			     << endl;
 		    return;
 		}
@@ -255,7 +257,7 @@ socketPoll()
 	} else if (res == 1) {
 	    if (a.getLen() > 8 && !strncmp(a.getString(), "NCP$", 4)) {
 		if (!ncpCommand(a))
-		    cerr << "ncpd: command " << a << " unrecognized."
+		    lerr << "ncpd: command " << a << " unrecognized."
 			 << endl;
 		return;
 	    }

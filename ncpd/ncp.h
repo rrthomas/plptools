@@ -46,12 +46,13 @@ class channel;
  */
 class PcServer {
 public:
-    PcServer(ppsocket *, string _name) { name = _name; }
+    PcServer(ppsocket *, std::string _name) { name = _name; }
     ~PcServer() {}
     bool clientConnect(int, int) { return false; }
-    string getName() { return name; }
+    std::string getName() { return name; }
+    PcServer *self() { return this; }
 private:
-    string name;
+    std::string name;
 };
 
 class ncp {
@@ -111,7 +112,7 @@ private:
     short int protocolVersion;
     linkChan *lChan;
     int maxChannels;
-    vector<PcServer> pcServers;
+    std::vector<PcServer> pcServers;
 };
 
 #endif

@@ -55,6 +55,8 @@
 #include <bufferstore.h>
 #include <bufferarray.h>
 
+using namespace std;
+
 bool full = false;
 bool S5mx = false;
 bool doRestore = false;

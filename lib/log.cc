@@ -22,18 +22,24 @@
  *
  */
 #include "log.h"
+#include <unistd.h>
 
-logbuf::logbuf(int _level) {
+logbuf::logbuf(int level, int fd) {
     ptr = buf;
     len = 0;
-    level = _level;
+    _on = true;
+    _level = level;
+    _fd = fd;
 }
 
 int logbuf::overflow(int c) {
     if (c == '\n') {
 	*ptr++ = '\n';
 	*ptr = '\0';
-	syslog(level, buf);
+	if (_on)
+	    syslog(_level, buf);
+	else if (_fd != -1)
+	    write(_fd, buf, len + 1);
 	ptr = buf;
 	len = 0;
 	return 0;

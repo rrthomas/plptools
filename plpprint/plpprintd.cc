@@ -27,6 +27,7 @@
 #include <stream.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <syslog.h>
 #include <unistd.h>
@@ -38,13 +39,17 @@
 #include <wprt.h>
 #include <psibitmap.h>
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <getopt.h>
 
 #define TEMPLATE "plpprint_XXXXXX"
 #define PRINTCMD "lpr -Ppsion"
 #define SPOOLDIR "/var/spool/plpprint"
 #define PSDICT   "/prolog.ps"
+
+using namespace std;
 
 char *spooldir = SPOOLDIR;
 char *printcmd = PRINTCMD;

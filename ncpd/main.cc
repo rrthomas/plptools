@@ -47,7 +47,9 @@
 #include "packet.h"
 #include "log.h"
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <getopt.h>
 
 using namespace std;
@@ -64,10 +66,15 @@ static int numScp = 0;
 static socketChan *scp[257]; // MAX_CHANNELS_PSION + 1
 
 
+logbuf dlog(LOG_DEBUG, STDOUT_FILENO);
+logbuf elog(LOG_ERR, STDERR_FILENO);
+ostream lout(&dlog);
+ostream lerr(&elog);
+
 static RETSIGTYPE
 term_handler(int)
 {
-    cout << "Got SIGTERM" << endl;
+    lout << "Got SIGTERM" << endl;
     signal(SIGTERM, term_handler);
     active = false;
 };
@@ -75,7 +82,7 @@ term_handler(int)
 static RETSIGTYPE
 int_handler(int)
 {
-    cout << "Got SIGINT" << endl;
+    lout << "Got SIGINT" << endl;
     signal(SIGINT, int_handler);
     active = false;
 };
@@ -92,7 +99,7 @@ checkForNewSocketConnection()
 	next->setWatch(&iow);
 	// New connect
 	if (verbose)
-	    cout << "New socket connection from " << peer << endl;
+	    lout << "New socket connection from " << peer << endl;
 	if ((numScp >= theNCP->maxLinks()) || (!theNCP->gotLinkChannel())) {
 	    bufferStore a;
 
@@ -105,7 +112,7 @@ checkForNewSocketConnection()
 	    next->sendBufferStore(a);
 	    next->closeSocket();
 	    if (verbose)
-		cout << "rejected" << endl;
+		lout << "rejected" << endl;
 	} else
 	    scp[numScp++] = new socketChan(next, theNCP);
     }
@@ -230,7 +237,7 @@ link_thread(void *arg)
 	    }
             iow.watch(5, 0);
             if (verbose)
-                cout << "ncp: restarting\n";
+                lout << "ncp: restarting\n";
             theNCP->reset();
         }
     }
@@ -250,6 +257,8 @@ main(int argc, char **argv)
     unsigned short nverbose = 0;
 
     struct servent *se = getservbyname("psion", "tcp");
+    dlog.setOn(false);
+    elog.setOn(false);
     endservent();
     if (se != 0L)
 	sockNum = ntohs(se->s_port);
@@ -340,13 +349,9 @@ main(int argc, char **argv)
 		     << strerror(errno) << endl;
 	    else {
 		if (dofork || autoexit) {
-		    logbuf dlog(LOG_DEBUG);
-		    logbuf elog(LOG_ERR);
-		    ostream lout(&dlog);
-		    ostream lerr(&elog);
-		    cout = lout;
-		    cerr = lerr;
 		    openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
+		    dlog.setOn(true);
+		    elog.setOn(true);
 		    syslog(LOG_INFO,
 			   "daemon started. Listening at %s:%d, "
 			   "using device %s\n", host, sockNum, serialDevice);
@@ -365,17 +370,17 @@ main(int argc, char **argv)
 		memset(scp, 0, sizeof(scp));
 		theNCP = new ncp(serialDevice, baudRate, nverbose);
 		if (!theNCP) {
-		    cerr << "Could not create NCP object" << endl;
+		    lerr << "Could not create NCP object" << endl;
 		    exit(-1);
 		}
 		pthread_t thr_a, thr_b;
 		if (pthread_create(&thr_a, NULL, link_thread, NULL) != 0) {
-		    cerr << "Could not create Link thread" << endl;
+		    lerr << "Could not create Link thread" << endl;
 		    exit(-1);
 		}
 		if (pthread_create(&thr_a, NULL,
 				   pollSocketConnections, NULL) != 0) {
-		    cerr << "Could not create Socket thread" << endl;
+		    lerr << "Could not create Socket thread" << endl;
 		    exit(-1);
 		}
 		while (active)
@@ -388,7 +393,7 @@ main(int argc, char **argv)
 	    skt.closeSocket();
 	    break;
 	case -1:
-	    cerr << "fork: " << strerror(errno) << endl;
+	    lerr << "fork: " << strerror(errno) << endl;
 	    break;
 	default:
 	    exit(0);

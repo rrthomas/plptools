@@ -266,7 +266,7 @@ public:
     *
     * @param ret The string is returned here.
     */
-    void getDriveAttribute(string &ret);
+    void getDriveAttribute(std::string &ret);
 
     /**
     * Retrieve the attributes of the media.

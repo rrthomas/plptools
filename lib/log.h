@@ -38,13 +38,18 @@
  *
  * <PRE>
  *	openlog("myDaemon", LOG_CONS|LOG_PID, LOG_DAEMON);
- *	logbuf ebuf(LOG_ERR);
+ *	logbuf ebuf(LOG_ERR, 2);
  *	ostream lerr(&ebuf);
  *
  *	... some code ...
  *
  *	lerr << "Whoops, got an error" << endl;
  * </PRE>
+ *
+ * The second optional argument of the constructor can be used
+ * to switch the output destination between syslog and some
+ * file. If it is omitted or set to -1, logging can be switched on
+ * or off. The initial state is on.
  */
 class logbuf : public streambuf {
 public:
@@ -54,8 +59,38 @@ public:
     *
     * @param level The log level for this instance.
     * 	see syslog(3) for symbolic names to use.
+    * @param fd An optional file descriptor to use
+    *   if switched off.
     */
-    logbuf(int level);
+    logbuf(int level, int fd = -1);
+
+    /**
+    * Switches loggin on or off.
+    *
+    * @param on The desired state.
+    */
+    void setOn(bool on) { _on = on; }
+
+    /**
+    * Modifies the loglevel of this instance.
+    * 
+    * @param level The new loglevel.
+    */
+    void setLevel(int level) { _level = level; }
+
+    /**
+    * Retrieve the current state.
+    *
+    * @returns The current state.
+    */
+    bool on() { return _on; }
+
+    /**
+    * Retrieves the current loglevel.
+    * 
+    * @returns The current loglevel.
+    */
+    int level() { return _level; }
 
     /**
     * Called by the associated
@@ -81,7 +116,18 @@ private:
     /**
     * The log level to use with syslog.
     */
-    int level;
+    int _level;
+
+    /**
+    * File descriptor to use when switched off.
+    * If this is -1, don't output anything.
+    */
+    int _fd;
+
+    /**
+    * Log flag.
+    */
+    bool _on;
 
     /**
     * The internal buffer for holding

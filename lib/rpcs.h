@@ -33,7 +33,7 @@ class ppsocket;
 class bufferStore;
 class bufferArray;
 
-typedef vector<PsiProcess> processList;
+typedef std::vector<PsiProcess> processList;
 
 /**
  * Remote procedure call services via PLP
@@ -340,7 +340,7 @@ public:
     *
     * @return Psion error code. 0 = Ok.
     */
-    virtual Enum<rfsv::errs> getCmdLine(const char *process, string &ret) = 0;
+    virtual Enum<rfsv::errs> getCmdLine(const char *process, std::string &ret) = 0;
 
     /**
     * Retrieve general Information about the connected

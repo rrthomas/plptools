@@ -149,6 +149,11 @@ static const int baud_table[] = {
 };
 #define BAUD_TABLE_SIZE (sizeof(baud_table) / sizeof(int))
 
+using namespace std;
+
+extern ostream lout;
+extern ostream lerr;
+
 packet::
 packet(const char *fname, int _baud, Link *_link, unsigned short _verbose)
 {
@@ -227,7 +232,7 @@ void packet::
 internalReset()
 {
     if (verbose & PKT_DEBUG_LOG)
-	cout << "resetting serial connection" << endl;
+	lout << "resetting serial connection" << endl;
     if (fd != -1) {
 	ser_exit(fd);
 	fd = -1;
@@ -249,7 +254,7 @@ internalReset()
 
     fd = init_serial(devname, realBaud, 0);
     if (verbose & PKT_DEBUG_LOG)
-	cout << "serial connection set to " << dec << realBaud
+	lout << "serial connection set to " << dec << realBaud
 	     << " baud, fd=" << fd << endl;
     if (fd != -1) {
 	lastFatal = false;
@@ -292,12 +297,12 @@ send(bufferStore &b)
     long len = b.getLen();
 
     if (verbose & PKT_DEBUG_LOG) {
-	cout << "packet: >> ";
+	lout << "packet: >> ";
 	if (verbose & PKT_DEBUG_DUMP)
-	    cout << b;
+	    lout << b;
 	else
-	    cout << " len=" << dec << len;
-	cout << endl;
+	    lout << " len=" << dec << len;
+	lout << endl;
     }
 
     for (int i = 0; i < len; i++) {
@@ -432,15 +437,15 @@ findSync()
 		    inCRCstate = 0;
 		    if (receivedCRC != crcIn) {
 			if (verbose & PKT_DEBUG_LOG)
-			    cout << "packet: BAD CRC" << endl;
+			    lout << "packet: BAD CRC" << endl;
 		    } else {
 			if (verbose & PKT_DEBUG_LOG) {
-			    cout << "packet: << ";
+			    lout << "packet: << ";
 			    if (verbose & PKT_DEBUG_DUMP)
-				cout << rcv;
+				lout << rcv;
 			    else
-				cout << "len=" << dec << rcv.getLen();
-			    cout << endl;
+				lout << "len=" << dec << rcv.getLen();
+			    lout << endl;
 			}
 			theLINK->receive(rcv);
 		    }
@@ -481,7 +486,7 @@ linkFailed()
 	lastFatal = true;
     if ((serialStatus == -1) || (arg != serialStatus)) {
 	if (verbose & PKT_DEBUG_HANDSHAKE)
-	    cout << "packet: < DTR:" << ((arg & TIOCM_DTR)?1:0)
+	    lout << "packet: < DTR:" << ((arg & TIOCM_DTR)?1:0)
 		 << " RTS:" << ((arg & TIOCM_RTS)?1:0)
 		 << " DCD:" << ((arg & TIOCM_CAR)?1:0)
 		 << " DSR:" << ((arg & TIOCM_DSR)?1:0)
@@ -492,7 +497,7 @@ linkFailed()
 	    if (res < 0)
 		lastFatal = true;
 	    if (verbose & PKT_DEBUG_HANDSHAKE)
-		cout << "packet: > DTR:" << ((arg & TIOCM_DTR)?1:0)
+		lout << "packet: > DTR:" << ((arg & TIOCM_DTR)?1:0)
 		     << " RTS:" << ((arg & TIOCM_RTS)?1:0)
 		     << " DCD:" << ((arg & TIOCM_CAR)?1:0)
 		     << " DSR:" << ((arg & TIOCM_DSR)?1:0)
@@ -505,9 +510,9 @@ linkFailed()
 	failed = true;
     }
     if ((verbose & PKT_DEBUG_LOG) && lastFatal)
-	cout << "packet: linkFATAL\n";
+	lout << "packet: linkFATAL\n";
     if ((verbose & PKT_DEBUG_LOG) && failed)
-	cout << "packet: linkFAILED\n";
+	lout << "packet: linkFAILED\n";
     return (lastFatal || failed);
 }
 

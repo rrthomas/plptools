@@ -32,6 +32,9 @@
 
 using namespace std;
 
+extern ostream lout;
+extern ostream lerr;
+
 linkChan::linkChan(ncp * _ncpController, int _ncpChannel):channel(_ncpController)
 {
     registerSer = 0x1234;
@@ -45,11 +48,11 @@ ncpDataCallback(bufferStore & a)
 {
     int len = a.getLen();
     if (verbose & LINKCHAN_DEBUG_LOG) {
-	cout << "linkchan: << msg ";
+	lout << "linkchan: << msg ";
 	if (verbose & LINKCHAN_DEBUG_DUMP)
-	    cout << a << endl;
+	    lout << a << endl;
 	else
-	    cout << len << endl;
+	    lout << len << endl;
     }
 
     if ((len >= 5) && (a.getByte(0) == 1)) {
@@ -63,16 +66,16 @@ ncpDataCallback(bufferStore & a)
 
 	strncpy(srvName, a.getString(7), 17);
 	if (verbose & LINKCHAN_DEBUG_LOG)
-	    cout << "linkchan: received registerAck: ser=0x" << hex << setw(4)
-		 << setfill(0) << ser << " res=" << res << " srvName=\""
+	    lout << "linkchan: received registerAck: ser=0x" << hex << setw(4)
+		 << setfill('0') << ser << " res=" << res << " srvName=\""
 		 << srvName << "\"" << endl;
 
 	while (!registerStack.empty()) {
 	    se = registerStack.pop();
 	    if (se.getWord(0) == ser) {
 		if (verbose & LINKCHAN_DEBUG_LOG)
-		    cout << "linkchan: found ser=0x" << hex << setw(4) <<
-			setfill(0) << se.getWord(0) <<
+		    lout << "linkchan: found ser=0x" << hex << setw(4) <<
+			setfill('0') << se.getWord(0) <<
 			" on stack -> callBack to waiting chan" << endl;
 		if (strlen(srvName) < 4)
 		    strcat(srvName, ".*");
@@ -83,7 +86,7 @@ ncpDataCallback(bufferStore & a)
 	registerStack = newStack;
 	return;
     }
-    cerr << "linkchan: unknown message " << a.getByte(0) << endl;
+    lerr << "linkchan: unknown message " << a.getByte(0) << endl;
 }
 
 char *linkChan::
@@ -96,14 +99,14 @@ void linkChan::
 ncpConnectAck()
 {
     if (verbose & LINKCHAN_DEBUG_LOG)
-	cout << "linkchan: << cack" << endl;
+	lout << "linkchan: << cack" << endl;
 }
 
 void linkChan::
 ncpConnectTerminate()
 {
     if (verbose & LINKCHAN_DEBUG_LOG)
-	cout << "linkchan: << ctrm" << endl;
+	lout << "linkchan: << ctrm" << endl;
     terminateWhenAsked();
 }
 

@@ -17,7 +17,9 @@
 # include <newt.h>
 #endif
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <getopt.h>
 
 bool usenewt = false;
@@ -66,7 +68,7 @@ void printHelp()
 	));
 }
 
-void main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	char* filename = 0;
 	char option;
@@ -200,6 +202,6 @@ void main(int argc, char* argv[])
 		newtFinished();
 		}
 #endif
-	exit(0);
+	return 0;
 }
 

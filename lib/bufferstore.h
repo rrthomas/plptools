@@ -25,8 +25,7 @@
 #define _BUFFERSTORE_H_
 
 #include <sys/types.h>
-
-class ostream;
+#include <stream.h>
 
 /**
  * A generic container for an array of bytes.
@@ -130,7 +129,7 @@ public:
     *
     * @returns The stream.
     */
-    friend ostream &operator<<(ostream &, const bufferStore &);
+    friend class std::ostream &operator<<(std::ostream &, const bufferStore &);
 
     /**
     * Tests if the bufferStore is empty.

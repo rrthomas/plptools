@@ -312,7 +312,7 @@ name(#EnumName),defaultValue(initWith)
  * Writes enumeration's string representation.
  */
 template <typename E>
-inline std::ostream& operator << (ostream& out, const Enum<E> &e) {
+inline std::ostream& operator << (std::ostream& out, const Enum<E> &e) {
     return out << _(e.toString().c_str());
 }
 

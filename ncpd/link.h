@@ -193,9 +193,9 @@ private:
     bool failed;
     Enum<link_type> linkType;
 
-    vector<ackWaitQueueElement> ackWaitQueue;
-    vector<bufferStore> holdQueue;
-    vector<bufferStore> waitQueue;
+    std::vector<ackWaitQueueElement> ackWaitQueue;
+    std::vector<bufferStore> holdQueue;
+    std::vector<bufferStore> waitQueue;
     bool xoff[256];
 };
 

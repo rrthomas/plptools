@@ -24,6 +24,7 @@
 #define _PSIPROCESS_H_
 
 #include <string>
+#include <stream.h>
 
 class rpcs;
 
@@ -104,16 +105,16 @@ public:
     * The output is in human readable similar to the
     * output of a "ls" command.
     */
-    friend ostream &operator<<(ostream &o, const PsiProcess &p);
+    friend class std::ostream &operator<<(std::ostream &o, const PsiProcess &p);
 
 private:
     friend class rpcs;
 
-    void setArgs(string _args);
+    void setArgs(std::string _args);
 
     int pid;
-    string  name;
-    string  args;
+    std::string  name;
+    std::string  args;
     bool s5mx;
 };
 
