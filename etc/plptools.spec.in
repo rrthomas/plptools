@@ -248,7 +248,7 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 cat>$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/psion<<EOF
 START_NCPD=yes
 NCPD_ARGS=
-START_PLPNFSD=yes
+START_PLPNFSD=no
 PLPNFSD_ARGS=
 START_PLPPRINTD=yes
 PLPPRINTD_ARGS=
@@ -264,7 +264,7 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 cat>$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/psion<<EOF
 START_NCPD=yes
 NCPD_ARGS=
-START_PLPNFSD=yes
+START_PLPNFSD=no
 PLPNFSD_ARGS=
 START_PLPPRINTD=yes
 PLPPRINTD_ARGS=
@@ -303,7 +303,7 @@ test ! -d /mnt/psion && mkdir -p /mnt/psion
 	# Specify parameters for ncpd in NCPD_ARGS (if any)
 	NCPD_ARGS=
 	# Set START_PLPNFSD to yes to start plpnfsd
-	START_PLPNFSD=yes
+	START_PLPNFSD=no
 	# Specify parameters for plpnfsd in PLPNFSD_ARGS (if any)
 	PLPNFSD_ARGS=
 	# Set START_PLPPRINTD to yes to start plpprintd

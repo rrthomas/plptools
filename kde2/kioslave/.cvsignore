@@ -2,5 +2,6 @@ Makefile.in
 Makefile
 *.la
 *.lo
+*.closure
 .libs
 .deps
