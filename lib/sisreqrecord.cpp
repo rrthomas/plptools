@@ -29,7 +29,7 @@
 SisRC
 SISReqRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 {
-	int n = sisFile->m_header.m_nreqs;
+	int n = sisFile->m_header.m_nlangs;
 	if (*base + 12 + n * 4 * 2 > len)
 		return SIS_TRUNCATED;
 
@@ -42,6 +42,9 @@ SISReqRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 	m_variant = read32(p + 8);
 	m_nameLengths = new uint32_t[n];
 	m_namePtrs = new uint32_t[n];
+	if (logLevel >= 2)
+		printf(_("Requisite: uid=%08x, version=%d.%d-%d.\n"),
+			   m_uid, m_major, m_minor, m_variant);
 
 	// First read lengths.
 	//
@@ -49,6 +52,8 @@ SISReqRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 	for (int i = 0; i < n; ++i)
 		{
 		m_nameLengths[i] = read32(p + size);
+		if (logLevel >= 2)
+			printf(_("Got namelength %d\n"), m_nameLengths[i]);
 		size += 4;
 		}
 
@@ -57,6 +62,8 @@ SISReqRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 	for (int i = 0; i < n; ++i)
 		{
 		m_namePtrs[i] = read32(p + size);
+		if (logLevel >= 2)
+			printf(_("Got namepos %d\n"), m_namePtrs[i]);
 		if (m_namePtrs[i] + m_nameLengths[i] > len)
 			{
 			printf(_("Position/length too large for req record %d.\n"), i);
@@ -64,15 +71,14 @@ SISReqRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 			}
 		size += 4;
 		if (logLevel >= 2)
-			printf(_("Name %d (for %s) is %.*s\n"),
-				   i,
+			printf(_("Name of requisite for %s is %.*s\n"),
 				   sisFile->getLanguage(i)->m_name,
 				   m_nameLengths[i],
 				   buf + m_namePtrs[i]);
 		}
 	if (logLevel >= 1)
-		printf(_("%d .. %d (%d bytes): Req record\n"),
-			   *base, *base + size, size);
+		printf(_("%d .. %d (%d bytes): Req record for uid %08x\n"),
+			   *base, *base + size, size, m_uid);
 	*base += size;
 	return SIS_OK;
 }
