@@ -111,7 +111,7 @@ main(int argc, char **argv)
 	delete skt;
 	delete skt2;
     } else {
-	cerr << "plpftp: " << gettext(rf->getError()) << endl;
+	cerr << "plpftp: " << X_(rf->getError()) << endl;
 	status = 1;
     }
     delete rf;

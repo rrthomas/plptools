@@ -19,9 +19,11 @@ extern inline char * stpcpy(char *dest, const char *src) {
 
 #if defined(ENABLE_NLS) && defined(HAVE_GETTEXT)
 #  include <libintl.h>
+#  define X_(x) gettext(x)
 #  define N_(x) (x)
 #  define _(x) gettext(x)
 #else
+#  define X_(x) (x)
 #  define N_(x) (x)
 #  define _(x) (x)
 #  define textdomain(x)
