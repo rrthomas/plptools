@@ -112,6 +112,7 @@ void ftp::usage() {
 	cout << "  killsave <unixfile>" << endl;
 	cout << "  runrestore <unixfile>" << endl;
 	cout << "  machinfo" << endl;
+	cout << "  ownerinfo" << endl;
 }
 
 static int Wildmat(const char *s, char *p);

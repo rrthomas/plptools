@@ -3,14 +3,14 @@ Name: plptools
 %define version _VERSION_
 Version: %{version}
 Release: 1
-Vendor: Thinking Objects Software GmbH
+Vendor: The plptools project
 Packager: Fritz Elfert <fritz.elfert@to.com>
 URL: http://sourceforge.net/projects/plptools
 Source0: http://download.sourceforge.net/plptools/plptools-%{version}.tar.gz
 Copyright: GPL
 Group: Networking/Utilities
 Requires: chkconfig >= 0.9
-Buildrequires: readline
+Buildrequires: readline-devel
 BuildRoot: /tmp/plputils-buildroot
 
 %package devel
@@ -24,7 +24,8 @@ be automatically mounted under /mnt/psion at the time it is
 connected to your computer. If the psion is shut down or
 disconnected, the contents of /mnt/psion will automatically
 disappear. A second program (plpftp) allows you to transfer
-files in a ftp-like manner.
+files in a ftp-like manner, view and modifiy processes on your
+psion and some other useful stuff.
 
 %description devel
 This package contains the static library and include files for building
@@ -44,6 +45,10 @@ Dieses Packet enthält die statische Bibliothek und include-Dateien
 zur Programm-Entwicklung von Kommunikations-software für den Psion 5.
 
 %changelog
+* Sat Jan 20 2001 Fritz Elfert <fritz.elfert@to.com>
+- Updated to latest version
+- Using RPM 4 (RH 7.0)
+
 * Mon Jan 17 2000 Fritz Elfert <fritz.elfert@to.com>
 - New version 0.5 with lots of bugfixes and additions.
 
@@ -52,7 +57,7 @@ zur Programm-Entwicklung von Kommunikations-software für den Psion 5.
 - corrected BLOCKSIZE in mp.h to fix behaviour of "du" program.
 
 %prep
-%setup
+%setup -q
 
 %build
 %configure
@@ -68,6 +73,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 ldconfig
+test ! -d /mnt/psion && mkdir -p /mnt/psion
 /sbin/chkconfig --add psion
 /etc/rc.d/init.d/psion restart
 
