@@ -85,22 +85,25 @@ getConnectName()
 	return "SYS$RFSV.*";
 }
 
-void rfsv32::
+char *rfsv32::
 convertSlash(const char *name)
 {
-	for (char *p = (char *)name; *p; p++)
+	char *n = strdup(name);
+	for (char *p = n; *p; p++)
 		if (*p == '/')
 			*p = '\\';
+	return n;
 }
 
 long rfsv32::
 fopen(long attr, const char *name, long &handle)
 {
 	bufferStore a;
+	char *n = convertSlash(name);
 	a.addDWord(attr);
-	convertSlash(name);
-	a.addWord(strlen(name));
-	a.addString(name);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(OPEN_FILE, a))
 		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
@@ -129,10 +132,11 @@ long rfsv32::
 fcreatefile(long attr, const char *name, long &handle)
 {
 	bufferStore a;
+	char *n = convertSlash(name);
 	a.addDWord(attr);
-	convertSlash(name);
-	a.addWord(strlen(name));
-	a.addString(name);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(CREATE_FILE, a))
 		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
@@ -145,10 +149,11 @@ long rfsv32::
 freplacefile(long attr, const char *name, long &handle)
 {
 	bufferStore a;
-	convertSlash(name);
+	char *n = convertSlash(name);
 	a.addDWord(attr);
-	a.addWord(strlen(name));
-	a.addString(name);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(REPLACE_FILE, a))
 		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
@@ -161,10 +166,11 @@ long rfsv32::
 fopendir(long attr, const char *name, long &handle)
 {
 	bufferStore a;
-	convertSlash(name);
+	char *n = convertSlash(name);
 	a.addDWord(attr);
-	a.addWord(strlen(name));
-	a.addString(name);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(OPEN_DIR, a))
 		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
@@ -274,9 +280,10 @@ long rfsv32::
 fgetmtime(const char *name, long *mtime)
 {
 	bufferStore a;
-	convertSlash(name);
-	a.addWord(strlen(name));
-	a.addString(name);
+	char *n = convertSlash(name);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(MODIFIED, a))
 		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
@@ -291,12 +298,13 @@ fsetmtime(const char *name, long mtime)
 {
 	bufferStore a;
 	unsigned long microLo, microHi;
+	char *n = convertSlash(name);
 	time2micro(mtime, microHi, microLo);
-	convertSlash(name);
 	a.addDWord(microLo);
 	a.addDWord(microHi);
-	a.addWord(strlen(name));
-	a.addString(name);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(SET_MODIFIED, a))
 		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
@@ -309,9 +317,10 @@ long rfsv32::
 fgetattr(const char *name, long *attr)
 {
 	bufferStore a;
-	convertSlash(name);
-	a.addWord(strlen(name));
-	a.addString(name);
+	char *n = convertSlash(name);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(ATT, a))
 		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
@@ -325,9 +334,10 @@ long rfsv32::
 fgeteattr(const char *name, long *attr, long *size, long *time)
 {
 	bufferStore a;
-	convertSlash(name);
-	a.addWord(strlen(name));
-	a.addString(name);
+	char *n = convertSlash(name);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(REMOTE_ENTRY, a))
 		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
@@ -350,11 +360,12 @@ long rfsv32::
 fsetattr(const char *name, long seta, long unseta)
 {
 	bufferStore a;
-	convertSlash(name);
+	char *n = convertSlash(name);
 	a.addDWord(seta);
 	a.addDWord(unseta);
-	a.addWord(strlen(name));
-	a.addString(name);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(SET_ATT, a))
 		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
@@ -364,7 +375,6 @@ long rfsv32::
 dircount(const char *name, long *count)
 {
 	long handle;
-	convertSlash(name);
 	long res = fopendir(PSI_ATTR_HIDDEN | PSI_ATTR_SYSTEM | PSI_ATTR_DIRECTORY, name, handle);
 	*count = 0;
 	if (res != 0)
@@ -850,15 +860,16 @@ long rfsv32::
 mkdir(const char *name)
 {
 	bufferStore a;
-	convertSlash(name);
-	if (strlen(name) && (name[strlen(name) - 1] != '\\')) {
-		a.addWord(strlen(name) + 1);
-		a.addString(name);
+	char *n = convertSlash(name);
+	if (strlen(n) && (n[strlen(n) - 1] != '\\')) {
+		a.addWord(strlen(n) + 1);
+		a.addString(n);
 		a.addByte('\\');
 	} else {
-		a.addWord(strlen(name));
-		a.addString(name);
+		a.addWord(strlen(n));
+		a.addString(n);
 	}
+	free(n);
 	if (!sendCommand(MK_DIR_ALL, a))
 		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
@@ -868,15 +879,16 @@ long rfsv32::
 rmdir(const char *name)
 {
 	bufferStore a;
-	convertSlash(name);
-	if (strlen(name) && (name[strlen(name) - 1] != '\\')) {
-		a.addWord(strlen(name) + 1);
-		a.addString(name);
+	char *n = convertSlash(name);
+	if (strlen(n) && (n[strlen(n) - 1] != '\\')) {
+		a.addWord(strlen(n) + 1);
+		a.addString(n);
 		a.addByte('\\');
 	} else {
-		a.addWord(strlen(name));
-		a.addString(name);
+		a.addWord(strlen(n));
+		a.addString(n);
 	}
+	free(n);
 	if (!sendCommand(RM_DIR, a))
 		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
@@ -886,12 +898,14 @@ long rfsv32::
 rename(const char *oldname, const char *newname)
 {
 	bufferStore a;
-	convertSlash(oldname);
-	convertSlash(newname);
-	a.addWord(strlen(oldname));
-	a.addString(oldname);
-	a.addWord(strlen(newname));
-	a.addString(newname);
+	char *on = convertSlash(oldname);
+	char *nn = convertSlash(newname);
+	a.addWord(strlen(on));
+	a.addString(on);
+	a.addWord(strlen(nn));
+	a.addString(nn);
+	free(on);
+	free(nn);
 	if (!sendCommand(RENAME, a))
 		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
@@ -901,9 +915,10 @@ long rfsv32::
 remove(const char *name)
 {
 	bufferStore a;
-	convertSlash(name);
-	a.addWord(strlen(name));
-	a.addString(name);
+	char *n = convertSlash(oldname);
+	a.addWord(strlen(n));
+	a.addString(n);
+	free(n);
 	if (!sendCommand(DELETE, a))
 		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);

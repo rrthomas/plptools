@@ -158,7 +158,7 @@ class rfsv32 {
 	// Communication
 	bool sendCommand(enum commands c, bufferStore & data);
 	long getResponse(bufferStore & data);
-	void convertSlash(const char *name);
+	char *convertSlash(const char *name);
 
 	// time-conversion
 	unsigned long micro2time(unsigned long microHi, unsigned long microLo);
