@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-04-09 00:43+0200\n"
+"POT-Creation-Date: 2001-05-21 23:57+0200\n"
 "PO-Revision-Date: 2001-02-28 02:44CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -620,47 +620,47 @@ msgstr "Formatierbar"
 msgid "write protected"
 msgstr "Schreibgeschützt"
 
-#: plpftp/main.cc:45
+#: plpftp/main.cc:46
 msgid "Version "
 msgstr "Version"
 
-#: plpftp/main.cc:46
+#: plpftp/main.cc:47
 msgid "Usage : plpftp -p <port> [ftpcommand parameters]"
 msgstr "Anwendung : plpftp -p <port> [FTP-Kommando Parameter]"
 
-#: plpftp/main.cc:52
+#: plpftp/main.cc:53
 msgid "PLPFTP Version "
 msgstr "PLPFTP Version "
 
-#: plpftp/main.cc:53
+#: plpftp/main.cc:54
 msgid " Copyright (C) 1999  Philip Proudman"
 msgstr " Copyright (C) 1999  Philip Proudman"
 
-#: plpftp/main.cc:54
+#: plpftp/main.cc:55
 msgid " Additions Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>"
 msgstr " Erweiterungen Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>"
 
-#: plpftp/main.cc:55
+#: plpftp/main.cc:56
 msgid "                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>"
 msgstr "                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>"
 
-#: plpftp/main.cc:56
+#: plpftp/main.cc:57
 msgid "PLPFTP comes with ABSOLUTELY NO WARRANTY."
 msgstr "PLPFTP kommt mit ABSOLUT KEINER GARANTIE"
 
-#: plpftp/main.cc:57
+#: plpftp/main.cc:58
 msgid "This is free software, and you are welcome to redistribute it"
 msgstr "Dies ist freie Software. Sie können Sie unter den Bedingungen"
 
-#: plpftp/main.cc:58
+#: plpftp/main.cc:59
 msgid "under GPL conditions; see the COPYING file in the distribution."
 msgstr "der GPL weitergeben. Siehe die Datei COPYING im Packet."
 
-#: plpftp/main.cc:60
+#: plpftp/main.cc:61
 msgid "FTP like interface started. Type \"?\" for help."
 msgstr "FTP Oberfläche gestartet. Geben Sie \"?\" ein, um Hilfe zu bekommen."
 
-#: plpftp/main.cc:94 plpftp/main.cc:99
+#: plpftp/main.cc:95 plpftp/main.cc:100
 msgid "plpftp: could not connect to ncpd"
 msgstr "plpftp: Konnte ncpd nicht kontaktieren."
 
