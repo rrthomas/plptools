@@ -53,6 +53,7 @@ private:
   char* registerName;
   bool connected;
   int connectTry;
+  int tryStamp;
 };
 
 #endif

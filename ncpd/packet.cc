@@ -197,113 +197,113 @@ realWrite()
 bool packet::
 get(unsigned char &type, bufferStore & ret)
 {
-	while (!terminated()) {
-		if (linkFailed())
-			return false;
-		int res = read(fd, inPtr, BUFFERLEN - inLen);
-		if (res > 0) {
-			if (verbose & PKT_DEBUG_LOG)
-				cout << "packet: rcv " << dec << res << endl;
-			inPtr += res;
-			inLen += res;
-		}
-		if (res < 0)
-			return false;
-		// XXX Solaris returns 0 on non blocking TTY lines
-		// even when VMIN > 0
-		if( res == 0 && inLen == 0 )
-			return false;
-		if (inLen >= BUFFERLEN) {
-			cerr << "packet: input buffer overflow!!!!" << endl;
-			inLen = 0;
-			inPtr = inBuffer;
-			return false;
-		}
+    while (!terminated()) {
+	if (linkFailed())
+	    return false;
+	int res = read(fd, inPtr, BUFFERLEN - inLen);
+	if (res > 0) {
+	    if (verbose & PKT_DEBUG_LOG)
+		cout << "packet: rcv " << dec << res << endl;
+	    inPtr += res;
+	    inLen += res;
 	}
-	if (verbose & PKT_DEBUG_LOG) {
-		cout << "packet: get ";
-		if (verbose & PKT_DEBUG_DUMP) {
-			for (int i = foundSync - 3; i < termLen; i++)
-				cout << hex << setw(2) << setfill('0') << (int) inBuffer[i] << " ";
-		} else
-			cout << "len=" << dec << termLen;
-		cout << endl;
+	if (res < 0)
+	    return false;
+	// XXX Solaris returns 0 on non blocking TTY lines
+	// even when VMIN > 0
+	if( res == 0 && inLen == 0 )
+	    return false;
+	if (inLen >= BUFFERLEN) {
+	    cerr << "packet: input buffer overflow!!!!" << endl;
+	    inLen = 0;
+	    inPtr = inBuffer;
+	    return false;
 	}
-	inLen -= termLen;
-	termLen = 0;
-	foundSync = 0;
-	bool crcOk = (endPtr[0] == ((crcIn >> 8) & 0xff) && endPtr[1] == (crcIn & 0xff));
-	if (inLen > 0)
-		memmove(inBuffer, &endPtr[2], inLen);
-	inPtr = inBuffer + inLen;
-	if (crcOk) {
-		type = rcv.getByte(0);
-		ret = rcv;
-		ret.discardFirstBytes(1);
-		return true;
-	} else {
-		if (verbose & PKT_DEBUG_LOG)
-			cout << "packet: BAD CRC" << endl;
-	}
-	return false;
+    }
+    if (verbose & PKT_DEBUG_LOG) {
+	cout << "packet: get ";
+	if (verbose & PKT_DEBUG_DUMP) {
+	    for (int i = foundSync - 3; i < termLen; i++)
+		cout << hex << setw(2) << setfill('0') << (int) inBuffer[i] << " ";
+	} else
+	    cout << "len=" << dec << termLen;
+	cout << endl;
+    }
+    inLen -= termLen;
+    termLen = 0;
+    foundSync = 0;
+    bool crcOk = (endPtr[0] == ((crcIn >> 8) & 0xff) && endPtr[1] == (crcIn & 0xff));
+    if (inLen > 0)
+	memmove(inBuffer, &endPtr[2], inLen);
+    inPtr = inBuffer + inLen;
+    if (crcOk) {
+	type = rcv.getByte(0);
+	ret = rcv;
+	ret.discardFirstBytes(1);
+	return true;
+    } else {
+	if (verbose & PKT_DEBUG_LOG)
+	    cout << "packet: BAD CRC" << endl;
+    }
+    return false;
 }
 
 bool packet::
 terminated()
 {
-	unsigned char *p;
-	int l;
+    unsigned char *p;
+    int l;
 
-	if (inLen < 6)
-		return false;
-	p = inBuffer + termLen;
-	if (!foundSync) {
-	  while (!foundSync && (inLen - termLen >= 6))
-	  {
-		termLen++;
-		if (*p++ != 0x16)
-			continue;
-		termLen++;
-		if (*p++ != 0x10)
-			continue;
-		termLen++;
-		if (*p++ != 0x02)
-			continue;
-		foundSync = termLen;
-	  }
-	  if (!foundSync)
-			return false;
-
-	if (verbose & PKT_DEBUG_LOG) {
-	  if (foundSync != 3)
-	    cout << "packet: terminated found sync at " << foundSync << endl;
-	}
-		esc = false;
-		// termLen = 3;
-		crcIn = 0;
-		rcv.init();
-	}
-	for (l = termLen; l < inLen - 2; p++, l++) {
-		if (esc) {
-			esc = false;
-			if (*p == 0x03) {
-				endPtr = p + 1;
-				termLen = l + 3;
-				return true;
-			}
-			addToCrc(*p, &crcIn);
-			rcv.addByte(*p);
-		} else {
-			if (*p == 0x10)
-				esc = true;
-			else {
-				addToCrc(*p, &crcIn);
-				rcv.addByte(*p);
-			}
-		}
-	}
-	termLen = l;
+    if (inLen < 6)
 	return false;
+    p = inBuffer + termLen;
+    if (!foundSync) {
+	while (!foundSync && (inLen - termLen >= 6))
+	{
+	    termLen++;
+	    if (*p++ != 0x16)
+		continue;
+	    termLen++;
+	    if (*p++ != 0x10)
+		continue;
+	    termLen++;
+	    if (*p++ != 0x02)
+		continue;
+	    foundSync = termLen;
+	}
+	if (!foundSync)
+	    return false;
+	
+	if (verbose & PKT_DEBUG_LOG) {
+	    if (foundSync != 3)
+		cout << "packet: terminated found sync at " << foundSync << endl;
+	}
+	esc = false;
+	// termLen = 3;
+	crcIn = 0;
+	rcv.init();
+    }
+    for (l = termLen; l < inLen - 2; p++, l++) {
+	if (esc) {
+	    esc = false;
+	    if (*p == 0x03) {
+		endPtr = p + 1;
+		termLen = l + 3;
+		return true;
+	    }
+	    addToCrc(*p, &crcIn);
+	    rcv.addByte(*p);
+	} else {
+	    if (*p == 0x10)
+		esc = true;
+	    else {
+		addToCrc(*p, &crcIn);
+		rcv.addByte(*p);
+	    }
+	}
+    }
+    termLen = l;
+    return false;
 }
 
 bool packet::

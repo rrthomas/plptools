@@ -148,6 +148,7 @@ ncpConnectNak()
 	ncpConnectTerminate();
     else {
 	connectTry++;
+	tryStamp = time(0);
 	ncpRegister();
     }
 }
@@ -202,6 +203,7 @@ socketPoll()
 		// other cases, we first perform a registration. Connect
 		// is then triggered by RegisterAck and uses the name
 		// we received from the Psion.
+		tryStamp = time(0);
 		if (strncmp(registerName, "SYS$RFSV", 8) == 0)
 		    ncpConnect();
 		else
@@ -220,7 +222,8 @@ socketPoll()
 	} else if (res == 1) {
 	    ncpSend(a);
 	}
-    }
+    } else if (time(0) > (tryStamp + 15))
+	terminateWhenAsked();
 }
 
 bool socketChan::
