@@ -314,4 +314,5 @@ AC_OUTPUT(
 	doc/ncpd.man
 	doc/plpnfsd.man
 	doc/plpftp.man
+	doc/sisinstall.man
 )
