@@ -127,15 +127,18 @@ sendListen() {
 Enum<rfsv::errs> rclip::
 checkNotify() {
     Enum<rfsv::errs> ret;
-
     bufferStore a;
-    if ((ret = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
-	cerr << "RCLIP ERR:" << a << endl;
-    else {
-	if (a.getLen() != 1)
-	    ret = rfsv::E_PSI_GEN_FAIL;
-	if (a.getByte(0) != 0)
-	    ret = rfsv::E_PSI_GEN_FAIL;
+
+    int r = skt->getBufferStore(a, false);
+    if (r < 0) {
+	ret = status = rfsv::E_PSI_FILE_DISC;
+    } else {
+	if (r == 0)
+	    ret = rfsv::E_PSI_FILE_EOF;
+	else {
+	    if ((a.getLen() != 1) || (a.getByte(0) != 0))
+		ret = rfsv::E_PSI_GEN_FAIL;
+	}
     }
     return ret;
 }
@@ -146,12 +149,8 @@ waitNotify() {
 
     bufferStore a;
     sendCommand(RCLIP_LISTEN);
-    if ((ret = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
-	cerr << "RCLIP ERR:" << a << endl;
-    else {
-	if (a.getLen() != 1)
-	    ret = rfsv::E_PSI_GEN_FAIL;
-	if (a.getByte(0) != 0)
+    if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
+	if ((a.getLen() != 1) || (a.getByte(0) != 0))
 	    ret = rfsv::E_PSI_GEN_FAIL;
     }
     return ret;
@@ -163,24 +162,24 @@ notify() {
     bufferStore a;
 
     sendCommand(RCLIP_NOTIFY);
-    if ((ret = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
-	cerr << "RCLIP ERR:" << a << endl;
-	if (a.getLen() != 1)
+    if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
+	if ((a.getLen() != 1) || (a.getByte(0) != RCLIP_NOTIFY))
 	    ret = rfsv::E_PSI_GEN_FAIL;
-	if (a.getByte(0) != RCLIP_NOTIFY)
-	    ret = rfsv::E_PSI_GEN_FAIL;
+    }
     return ret;
 }
 
 Enum<rfsv::errs> rclip::
 initClipbd() {
-    Enum<rfsv::errs> ret = rfsv::E_PSI_GEN_NONE;
+    Enum<rfsv::errs> ret;
     bufferStore a;
 
     sendCommand(RCLIP_INIT);
-    if ((ret = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
-	cerr << "RCLIP ERR:" << a << endl;
-    cout << "RCLIP RESP: " << a << endl;
+    if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
+	if ((a.getLen() != 3) || (a.getByte(0) != RCLIP_INIT) ||
+	    (a.getWord(1) != 0x100))
+	    ret = rfsv::E_PSI_GEN_FAIL;
+    }
     return ret;
 }
 
