@@ -1,4 +1,3 @@
-#
 # $Id$
 #
 SUBDIRS = lib ncpd plpnfsd plpftp

@@ -1,3 +1,4 @@
+ $Id$
 
  This package is heavily based on two other packages:
 
@@ -8,7 +9,7 @@
 
  I want to thank both authors for their nice packages and for making
  these available under GPL which makes it possible for me to
- create this package (which of course is also distributed under GPL)
+ create this package (which of course is distributed under GPL ass well)
 
  What i did:
 
@@ -18,7 +19,7 @@
  Rudolf's code originally used a homegrown protocol which needs a
  separate program running on the Psion. I changed his code to use
  the socket-based client-code from Philip's rfsv program thus
- eliminating the need for any software beeing run on the Psion. 
+ eliminating the need for any software beeing run on the Psion.
  The rfsv code and some other stuff went into a lib (both shared
  and static available). I also removed all Psion-3 related stuff,
  because a) i can't test it and b) Sibo support is dropped by
@@ -56,17 +57,37 @@
  You will get 3 programs and a shared and static library.
  By default, the install-prefix is /usr/local, so you probably
  should add /usr/local/lib to your /etc/ld.so.conf and then run
- ldconfig after installation.
+ ldconfig after installation. Another option is to run configure
+ with the option --prefix=/usr
 
  The programs:
 
  ncpd is the daemon which handles the serial link to your Psion.
  It listens at port 7501 for local connections and provides
- basic PLP/NCP services for the other two programs.
+ basic PLP/NCP services for the other two programs. It auto-
+ connects to the psion, even after unplugging/switching off
+ therefore it can run always in background (if you have a
+ spare serial-device)
 
  plpftp is a FTP-like program for manipulating files on the Psion.
 
  plpnfsd is a daemon, which provides NFS-like access to your Psion.
+ It automatically makes the psion's filesystems available below
+ an NFS-mounted directory (default /mnt/psion).
+ By default, plpnfsd is installed suid-root, so any normal user
+ can start it and get's the mounted directory owned by himself.
+ As this program is usually used on single-user machines, this
+ does not hurt security. Like the others, this program
+ auto-reconnects after a link-failure, so you can keep the
+ psion mounted all the time, even when it is not connected.
+ Due to Rudol Koenig's clever error-handling, you don't need to
+ worry about blocked io-processes if the psion isn't available.
+ You simply will get an "device not configured" error, when
+ accessing a file on a previously connected psion which has been
+ disconnected. After that, the mount-point will appear empty.
+ As soon as the psion is connected again, the subdirectories
+ will reappear. (possibly with a few secs delay)
 
 Have fun.
+ -Fritz
 
