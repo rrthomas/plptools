@@ -3,12 +3,16 @@
 # GNU copyright 1997 to 1999 by Joey Hess.
 
 # Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
+export DH_VERBOSE=1
 
 # This is the debhelper compatability version to use.
 export DH_COMPAT=3
 
 tmp = $(shell pwd)/debian/tmp
+
+%.1: %.1.in
+	MANDATE=`grep CHECKIN $< | awk '{print $$4}'` ; \
+	sed -e "s%@MANDATE@%$$MANDATE%g" $< > $@
 
 configure: configure-stamp
 configure-stamp:
@@ -24,7 +28,8 @@ configure-stamp:
 	autoconf
 	touch include/stamp-h.in
 	./configure --prefix=/usr --with-mountdir=/var/lib/plptools/mnt \
-		--mandir=/usr/share/man --with-initdir=none --enable-kde
+		--mandir=/usr/share/man --with-initdir=none --enable-kde \
+		--disable-rpath
 	touch configure-stamp
 
 build: configure-stamp build-stamp
@@ -38,20 +43,27 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-	# Add here commands to clean up after the build process.
 	-$(MAKE) maintainer-clean
 	dh_clean
 
-install: build
+man-install: debian/kpsion.1 debian/klipsi.1
+	install -m 644 $^ $(tmp)/usr/share/man/man1
+
+install: build debian/kpsion.1 debian/klipsi.1
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-	# Add here commands to install the package into debian/tmp.
+	# install into debian/tmp.
 	$(MAKE) DESTDIR=$(tmp) install
-	mkdir -p $(tmp)/etc
+	install -d $(tmp)/etc
 	install -m 644 debian/plptools.conf $(tmp)/etc
+	install -m 644 debian/kpsion.1 $(tmp)/usr/share/man/man1
+	install -m 644 debian/klipsi.1 $(tmp)/usr/share/man/man1
+	cp CHANGES obsolete-changes
+	cp ChangeLog changelog
 	# Split into sub-packages
+	cat CHANGES ChangeLog > changelog
 	dh_movefiles -pplptools
 	dh_movefiles -pplptools-dev
 	dh_movefiles -pplptools-kde
@@ -77,7 +89,7 @@ binary-arch: build install
 #	dh_installcron
 	dh_installman -a
 #	dh_installinfo
-#	dh_undocumented
+	dh_undocumented -a
 	dh_installchangelogs 
 	dh_link
 	dh_strip

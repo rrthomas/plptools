@@ -22,11 +22,12 @@ Architecture: any
 Section: devel
 Depends: plptools (= ${Source-Version})
 Description: plptools (development files)
-  You need these files if you want to build programs which use libplp.
+ You need these files if you want to build programs which use libplp.
 
 Package: plptools-kde
 Architecture: any
 Depends: ${shlibs:Depends}, kdebase-libs, konqueror
+Enhances: kdebase
 Description: KDE integration of plptools
  This package provides integrated access to a Psion PDA into KDE
  Using a kioslave, any KDE compliant application can access files on

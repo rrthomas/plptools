@@ -1,0 +1,64 @@
+.\" Manual page for kpsion
+.\" $Id$
+.\" CHECKIN $Date$
+.\"
+.\" Process this file with
+.\" groff -man -Tascii kpsion.1 for ASCII output, or
+.\" groff -man -Tps kpsion.1 for PostScript output
+.\"
+.TH kpsion "1" "@MANDATE@" "plptools @VERSION@" "User Commands"
+.SH NAME
+kpsion \- Psion connectivity utility for KDE.
+.SH SYNOPSIS
+.B kpsion
+[\fIQt-options\fR] [\fIKDE-options\fR] [\fIoptions\fR]
+.SH DESCRIPTION
+kpsion provides a backup, restore and formatting facility for a Psion PDA,
+connected to the local or a remote machine. A full documentation is
+provided via KDEs standard online help.
+.SS "Generic options:"
+.TP
+\fB\-\-help\fR
+Show help about options
+.TP
+\fB\-\-help\-qt\fR
+Show Qt specific options
+.TP
+\fB\-\-help\-kde\fR
+Show KDE specific options
+.TP
+\fB\-\-help\-all\fR
+Show all options
+.TP
+\fB\-\-author\fR
+Show author information
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Show version information
+.TP
+\fB\-\-license\fR
+Show license information
+.TP
+\fB\-\-\fR
+End of options
+.SH OPTIONS
+.TP
+\fB\-\-autobackup\fR
+perform scheduled backup
+.TP
+\fB\-\-backup\fR <drv>
+perform backup
+.TP
+\fB\-\-restore\fR <drv>
+perform restore
+.TP
+\fB\-\-format\fR <drv>
+format drive
+.SH SEE ALSO
+.TP
+ncpd(8), plpnfsd(8), plpprintd(8), plpbackup(1), plpftp(1), sisinstall(1) and klipsi(1)
+.SH AUTHOR
+Fritz Elfert <felfert@users.sourceforge.net>
+.PP
+KDE: 2.2.2
+KPsion: 0.11

@@ -5,3 +5,4 @@ usr/share/apps/klipsi/*
 usr/share/icons/*/*/apps/klipsi*
 usr/share/icons/*/*/actions/klipsi*
 usr/share/locale/*/LC_MESSAGES/klipsi.mo
+usr/share/man/man1/klipsi.1

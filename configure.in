@@ -353,4 +353,6 @@ AC_OUTPUT(
 	doc/sisinstall.man
 	doc/plpprintd.man
 	doc/plpbackup.man
+	debian/kpsion.1.in
+	debian/klipsi.1.in
 )

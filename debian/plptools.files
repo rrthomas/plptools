@@ -5,6 +5,8 @@ usr/bin/sisinstall
 usr/lib/libplp.la
 usr/lib/libplp.so.*
 usr/share/locale/*/LC_MESSAGES/plptools.mo
-usr/share/man
+usr/share/man/man8
+usr/share/man/man1/plp*.1
+usr/share/man/man1/sis*.1
 usr/share/plptools
 etc/plptools.conf
