@@ -27,7 +27,7 @@
 #include <config.h>
 #endif
 
-#include <intl.h>
+#include <plpintl.h>
 
 #include <map>
 #include <string>

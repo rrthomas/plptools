@@ -24,7 +24,7 @@
 #ifndef _RPCS16_H_
 #define _RPCS16_H_
 
-#include "rpcs.h"
+#include <rpcs.h>
 
 class ppsocket;
 class bufferStore;
@@ -42,7 +42,7 @@ class rpcs16 : public rpcs {
 
  public:
     Enum<rfsv::errs> queryDrive(const char, bufferArray &);
-    Enum<rfsv::errs> getCmdLine(const char *, bufferStore &); 
+    Enum<rfsv::errs> getCmdLine(const char *, bufferStore &);
 
  private:
     rpcs16(ppsocket *);

@@ -23,9 +23,9 @@
 #ifndef _RPCS_H_
 #define _RPCS_H_
 
-#include "psitime.h"
-#include "rfsv.h"
-#include "Enum.h"
+#include <psitime.h>
+#include <rfsv.h>
+#include <Enum.h>
 
 class ppsocket;
 class bufferStore;

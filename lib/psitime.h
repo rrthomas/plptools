@@ -42,7 +42,7 @@
 #include <sys/types.h>
 
 #include <ostream.h>
-#include <intl.h>
+#include <plpintl.h>
 
 /**
  * Holds a Psion time value.

@@ -24,7 +24,7 @@
 #ifndef _RPCS32_H_
 #define _RPCS32_H_
 
-#include "rpcs.h"
+#include <rpcs.h>
 
 class ppsocket;
 class rpcsfactory;
@@ -41,7 +41,7 @@ class rpcs32 : public rpcs {
 
  public:
     Enum<rfsv::errs> queryDrive(const char, bufferArray &);
-    Enum<rfsv::errs> getCmdLine(const char *, bufferStore &); 
+    Enum<rfsv::errs> getCmdLine(const char *, bufferStore &);
     Enum<rfsv::errs> getMachineInfo(machineInfo &);
     Enum<rfsv::errs> configOpen(void);
     Enum<rfsv::errs> configRead(void);

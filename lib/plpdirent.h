@@ -24,8 +24,8 @@
 #define _PLPDIRENT_H_
 
 #include <string>
-#include "psitime.h"
-#include "rfsv.h"
+#include <psitime.h>
+#include <rfsv.h>
 
 /**
  * A class, representing the UIDs of a file on the Psion.
@@ -83,7 +83,7 @@ public:
     /**
     * Default constructor
     */
-    PlpDirent(); 
+    PlpDirent();
 
     /**
     * A copy constructor.

@@ -8,11 +8,11 @@
 #ifndef HAVE_STPCPY
 #include <string.h>
 
-extern inline stpcpy(char *dest, const char *src) {
+extern inline char * stpcpy(char *dest, const char *src) {
 	char c;
 	do {
 		c = *dest++ = *src++;
-	} while (c)
+	} while (c);
 	return dest;
 }
 #endif
@@ -21,18 +21,13 @@ extern inline stpcpy(char *dest, const char *src) {
 #  include <libintl.h>
 #  define N_(x) (x)
 #  define _(x) gettext(x)
-#  ifndef HAVE_BINDTEXTDOMAIN_CODESET
-#    define bind_textdomain_codeset(p, c)
-#  endif
 #else
 #  define N_(x) (x)
 #  define _(x) (x)
 #  define textdomain(x)
-#  define bind_textdomain_codeset(p, c)
 #endif
 
 /* Define this, if you have gettext */
 #define HAVE_GETTEXT 1
 
 #endif /* _INTL_H_ */
-
