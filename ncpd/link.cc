@@ -266,10 +266,12 @@ receive(bufferStore buff)
 		    break;
 		}
 	    pthread_mutex_unlock(&queueMutex);
-	    if (ackFound)
+	    if (ackFound) {
 		// Older packets implicitely ack'ed
 		multiAck(refstamp);
-	    else {
+		// Transmit waiting packets
+		transmitWaitQueue();
+	    } else {
 		if (verbose & LNK_DEBUG_LOG) {
 		    cout << "Link: << UNMATCHED ack seq=" << seq ;
 		    if (verbose & LNK_DEBUG_DUMP)
@@ -363,6 +365,22 @@ transmitHoldQueue(int channel)
 }
 
 void Link::
+transmitWaitQueue()
+{
+    vector<bufferStore> tmpQueue;
+    vector<bufferStore>::iterator i;
+
+    // First, move desired packets to a temporary queue
+    for (i = waitQueue.begin(); i != waitQueue.end(); i++)
+	tmpQueue.push_back(*i);
+    waitQueue.clear();
+    // transmit the moved packets. If the backlock gets
+    // full, they are put into waitQueue again.
+    for (i = tmpQueue.begin(); i != tmpQueue.end(); i++)
+	transmit(*i);
+}
+
+void Link::
 transmit(bufferStore buf)
 {
     if (hasFailed())
@@ -375,15 +393,15 @@ transmit(bufferStore buf)
 	pthread_mutex_unlock(&queueMutex);
     } else {
 
-	// Wait, until backlog is drained.
+	// If backlock is full, put on waitQueue
 	int ql;
-	do {
-	    pthread_mutex_lock(&queueMutex);
-	    ql = ackWaitQueue.size();
-	    pthread_mutex_unlock(&queueMutex);
-	    if (ql >= maxOutstanding)
-		usleep(100000);
-	} while (ql >= maxOutstanding);
+	pthread_mutex_lock(&queueMutex);
+	ql = ackWaitQueue.size();
+	pthread_mutex_unlock(&queueMutex);
+	if (ql >= maxOutstanding) {
+	    waitQueue.push_back(buf);
+	    return;
+	}
 
 	ackWaitQueueElement e;
 	e.seq = txSequence++;

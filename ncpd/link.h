@@ -28,6 +28,7 @@
 #include <config.h>
 #endif
 #include <pthread.h>
+#include <sys/time.h>
 
 #include "bufferstore.h"
 #include "bufferarray.h"
@@ -151,6 +152,7 @@ private:
     void multiAck(struct timeval);
     void retransmit();
     void transmitHoldQueue(int channel);
+    void transmitWaitQueue();
 
     pthread_t checkthread;
     pthread_mutex_t queueMutex;
@@ -168,6 +170,7 @@ private:
 
     vector<ackWaitQueueElement> ackWaitQueue;
     vector<bufferStore> holdQueue;
+    vector<bufferStore> waitQueue;
     bool xoff[256];
 };
 
