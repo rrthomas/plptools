@@ -3,6 +3,11 @@
 
 #include "rfsv.h"
 
+/**
+ * This is the implementation of the @rfsv protocol for
+ * Psion series 3 (SIBO) variant.
+ * For a complete documentation, see @ref rfsv .
+ */
 class rfsv16 : public rfsv {
 public:
 	rfsv16(ppsocket *);

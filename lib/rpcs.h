@@ -20,7 +20,7 @@ class bufferArray;
  * variants are implemented in
  * @ref rpcs32 or @ref rpcs16 respectively.
  * These normally are instantiated by using
- * @ref rpcsfactory.
+ * @ref rpcsfactory .
  */
 class rpcs {
 	public:
@@ -202,6 +202,7 @@ class rpcs {
 		 * @returns A psion error code. 0 = Ok.
 		 */
 		Enum<rfsv::errs> stopProgram(const char *);
+
 		Enum<rfsv::errs> queryProgram(const char *);
 		Enum<rfsv::errs> formatOpen(const char *, int &, int &);
 		Enum<rfsv::errs> formatRead(int);
@@ -275,9 +276,6 @@ class rpcs {
 		 * @return Psion error code. 0 = Ok.
 		 */
 		virtual Enum<rfsv::errs> getCmdLine(const char *process, bufferStore &ret) = 0; 
-
-		// API only existent on EPOC
-		// default-methods for SIBO here.
 		/**
 		 * Retrieve general Information about the connected
 		 * machine.

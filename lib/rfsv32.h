@@ -4,6 +4,11 @@
 #include "rfsv.h"
 #include "plpdirent.h"
 
+/**
+ * This is the implementation of the @rfsv protocol for
+ * Psion series 5 (EPOC) variant.
+ * For a complete documentation, see @ref rfsv .
+ */
 class rfsv32 : public rfsv {
 
 public:

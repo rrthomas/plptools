@@ -5,6 +5,11 @@
 
 class ppsocket;
 
+/**
+ * This is the implementation of the @ref rpcs protocol for
+ * Psion series 5 (EPOC) variant.
+ * For a complete documentation, see @ref rpcs .
+ */
 class rpcs32 : public rpcs {
 	public:
 		rpcs32(ppsocket *);
