@@ -30,6 +30,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "defs.h"
 #include "bool.h"
@@ -126,7 +127,6 @@ printPeer()
 bool ppsocket::
 connect(char *Peer, int PeerPort, char *Host, int HostPort)
 {
-
 	//****************************************************
 	//* If we aren't already bound set the host and bind *
 	//****************************************************
@@ -172,13 +172,16 @@ listen(char *Host, int Port)
 		m_LastError = lastErrorCode();
 		return (false);
 	}
+	// Our accept member function relies on non-blocking accepts,
+	// so set the flag here (rather than every time around the loop)
+	fcntl(m_Socket, F_SETFL, O_NONBLOCK);
 	return (true);
 }
 
 ppsocket *ppsocket::
 accept(char *Peer, int MaxLen)
 {
-	unsigned int len;
+	socklen_t len;
 	ppsocket *accepted;
 	char *peer;
 
@@ -197,7 +200,6 @@ accept(char *Peer, int MaxLen)
 	//***********************
 
 	len = sizeof(struct sockaddr);
-	fcntl(m_Socket, F_SETFL, O_NONBLOCK);
 	accepted->m_Socket =::accept(m_Socket, &accepted->m_PeerAddr, &len);
 
 	if (accepted->m_Socket == INVALID_SOCKET) {
@@ -208,6 +210,14 @@ accept(char *Peer, int MaxLen)
 	//****************************************************
 	//* Got a connection so fill in the other attributes *
 	//****************************************************
+
+	// Make sure the new socket hasn't inherited O_NONBLOCK
+	// from the accept socket
+	int flags = fcntl( accepted->m_Socket, F_GETFL, 0 );
+	if( flags >= 0 ) {
+		flags &= ~O_NONBLOCK;
+		fcntl( accepted->m_Socket, F_SETFL, flags);
+	}
 
 	accepted->m_HostAddr = m_HostAddr;
 	accepted->m_Bound = true;
@@ -503,6 +513,11 @@ bindSocket(char *Host, int Port)
 			return (false);
 		}
 	}
+	// Set SO_REUSEADDR
+	int one = 1;
+	if (setsockopt( m_Socket, SOL_SOCKET, SO_REUSEADDR, 
+			(const char *) &one, sizeof(int)) < 0 )
+	  	cerr << "Warning: Unable to set SO_REUSEADDR option\n";
 	// If a host name was supplied then use it
 	if (!setHost(Host, Port)) {
 		return (false);

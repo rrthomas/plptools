@@ -36,6 +36,8 @@
 #define DDEV		"@DDEV@"
 #define DSPEED		@DSPEED@
 #define DPORT		@DPORT@
+#define DDRIVE		"@DDRIVE@"
+#define DBASEDIR	"@DBASEDIR@"
 
 /* Debugging */
 

@@ -6,14 +6,14 @@ devel:
 	autoheader
 	automake
 	autoconf
-	touch stamp-h.in
+	touch include/stamp-h.in
 
 dist:
 	aclocal
 	autoheader
 	automake --include-deps
 	autoconf
-	touch stamp-h.in
+	touch include/stamp-h.in
 	./configure
 	$(MAKE) dist
 

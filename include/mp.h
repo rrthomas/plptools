@@ -122,7 +122,7 @@ extern char *index(), *rindex(), *strdup();
 #endif
 
 /* mp_main.c */
-#if defined(hpux) || defined(__SVR4)
+#if defined(hpux) || defined(__SVR4) && !defined(sun)
 	/* HPUX 10.20 declares int usleep( useconds_t useconds); */
 #  ifndef HPUX10
      extern void usleep __P((int usec));

@@ -27,12 +27,14 @@
 
 #include "bool.h"
 #include "bufferstore.h"
+#include "linkchan.h"
 class link;
 class channel;
 class IOWatch;
 
 #define NCP_DEBUG_LOG  1
 #define NCP_DEBUG_DUMP 2
+#define MAX_CHANNEL 8
 
 class ncp {
 	public:
@@ -40,6 +42,8 @@ class ncp {
 		~ncp();
 
 		int connect(channel *c); // returns channel, or -1 if failure
+		void Register(channel *c);
+		void RegisterAck(int);
 		void disconnect(int channel);
 		void send(int channel, bufferStore &a);
 		void poll();
@@ -53,6 +57,7 @@ class ncp {
 		short int getLinkVerbose();
 		void setPktVerbose(short int);
 		short int getPktVerbose();
+		short int getProtocolVersion();
   
 	private:
 		enum c { MAX_LEN = 200, LAST_MESS = 1, NOT_LAST_MESS = 2 };
@@ -67,6 +72,7 @@ class ncp {
 			NCON_MSG_CHANNEL_DISCONNECT=7,
 			NCON_MSG_NCP_END=8
 		};
+		enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
 		int getFirstUnusedChan();
 		void decodeControlMessage(bufferStore &buff);
 		void controlChannel(int chan, enum interControllerMessageType t, bufferStore &command);
@@ -74,11 +80,12 @@ class ncp {
   
 		link *l;
 		unsigned short verbose;
-		channel *channelPtr[8];
-		bufferStore messageList[8];
-		int remoteChanList[8];
-		bool gotLinkChan;
+		channel *channelPtr[MAX_CHANNEL+1];
+		bufferStore messageList[MAX_CHANNEL+1];
+		int remoteChanList[MAX_CHANNEL+1];
 		bool failed;
+		short int protocolVersion;
+		linkChan *lChan;
 };
 
 #endif

@@ -2,10 +2,12 @@ AC_REVISION($ Revision: 0.1 $)dnl revision of this configure.in script
 
 AC_INIT(acinclude.m4)
 AM_CONFIG_HEADER(include/config.h)
-AM_INIT_AUTOMAKE(plptools, 0.4)
+AM_INIT_AUTOMAKE(plptools, 0.5)
 AM_PROG_LIBTOOL
 
 dnl Enable Mainatiner stuff
+dnl **** NOTE **** Matt had to comment the following line out to get it to
+dnl ************** build, and doesn't know why - YMMV.
 AM_MAINTAINER_MODE
 
 dnl checks for programs
@@ -85,6 +87,26 @@ AC_ARG_WITH(port,
     ]
 )
 AC_SUBST(DPORT)
+
+AC_ARG_WITH(drive,
+    [  --with-drive=DRIVE      override default Psion drive [AUTO]],
+    [ DDRIVE="$withval"
+      AC_MSG_RESULT(Overriding drive: $DDRIVE) ],
+    [ DDRIVE='AUTO'
+      AC_MSG_RESULT(Using default Psion drive: $DDRIVE)
+    ]
+)
+AC_SUBST(DDRIVE)
+
+AC_ARG_WITH(basedir,
+    [  --with-basedir=DIR      override default Psion directory [\\\\]],
+    [ DBASEDIR="$withval"
+      AC_MSG_RESULT(Overriding directory: $DBASEDIR) ],
+    [ DBASEDIR="\\\\"
+      AC_MSG_RESULT(Using default Psion directory: $DBASEDIR)
+    ]
+)
+AC_SUBST(DBASEDIR)
 
 AC_OUTPUT(
 	Makefile

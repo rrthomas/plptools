@@ -3,7 +3,6 @@ Makefile
 aclocal.m4
 configure
 libtool
-stamp-h.in
 config.status
 config.cache
 config.log

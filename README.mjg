@@ -1,0 +1,120 @@
+Retrofitting RFSV 16 to Fritz Elfert's plptools
+===============================================
+
+These notes updated 21/10/99
+
+
+I started modifying Fritz' plptools-0.3 with the intention of adding back the
+RFSV16 support. Fritz then released 0.4, and so I re-patched 0.4, and did lots
+more work, and merged in some patches from Pete Bentley.
+
+The result is this, plptools-0.4-mjg<x>. 
+
+When it's finished, hopefully Fritz will merge it into the next official
+release.
+
+Release Dates:
+plptools-0.4-mjg1 on 23/09/99
+plptools-0.4-mjg2 on 04/10/99
+plptools-0.4-mjg3 on 07/10/99
+plptools-0.4-mjg4 on 10/10/99
+plptools-0.4-mjg5 on 21/10/99 (+ patch against 0.4 original)
+
+The changes to plptools-0.4 are:
+* Now detects which version of the NCP protocol is in use, and records this:
+  this is how we detect whether the Psion is a Series 3 or Series 5.
+* Makefiles updated to include the rfsv16 stuff, the rfsv base class, and the
+  rfsvfactory object.
+* Instantiates either an RFSV32 or RFSV16 object to handle the file server
+  requests, based on the protocol version returned by the INFO command above.
+  There is an rfsvfactory object to make this easier in client programs. 
+  This is used in plpftp and plpnfsd.  This will obtain the NCP version number
+  over the socket, by announcing itself as "NCP$INFO.*". The correct RFSV class
+  will further announce itself as SYS$RFSV.* - this is stored in connectName.
+  RFSV objects have an opAttr method to output a correct attributes flag for each
+  protocol. 
+* Added --with-drive and --with-basedir to the configure.in script, and
+  include/defs.h.in. These are used in RFSV16, and plpftp now uses these,
+  instead of the DEFAULT_DRIVE AND DEFAULT_BASE_DIRECTORY of ftp.h
+* ncpd/packet.h: verbose is now a short int, to allow packet debugging.
+* Pete Bentley's changes. Fixes bogus definition of usleep(); plpftp compiles in
+  the absence of libreadline and libhistory; accept 3rd parameter in ppsocket is
+  signed not unsigned; -v all debugging option; (sun) link detection changes;
+  new PKT_DEBUG_HANDSHAKE debug level added; correct termios.h include for
+  Solaris; Solaris non-blocking fixes; move the fcntl for O_NONBLOCK; remove
+  O_NONBLOCK where needed; set SO_REUSEADDR for ncpd.
+* Peter Cherriman's "1 hour out" fix (doesn't work for me though... could be my
+  PC clock)
+
+Some things to do:
+* Finish rfsv16.cc:
+  fread, fwrite, fseek, copyFromPsion, copyToPsion, fsetsize, mktemp,
+  fcreatefile, freplacefile, fopendir, fsetmtime
+
+* Test everything with plpftp and plpnfsd.
+* Remove read, write fully?
+* Remove unused convertName method in plpftp/ftp.cc,h
+
+Adding RFSV16 back is still a work in progress.... stay tuned!
+
+
+Building plptools for use with a Psion 3
+========================================
+./configure --with-speed=19200 --with-serial=/dev/ttyS1 --with-drive=M:
+# Or whatever port you use. I use ttyS1, since ttyS0 is my mouse.
+# The default speed is 115200 bps, which is only for the Lucky S5 owners.
+# The S3c can take speeds up to 57600, but my RS232 protocol analyser can't -
+# your mileage may vary.
+make
+make install
+plpftp
+# NFS access not finished yet
+
+
+Tip for use with a Psion 3
+==========================
+Turn the Psion's remote link on first, THEN run ncpd. 
+
+Why this seems to help matters
+------------------------------
+This seems to ensure that the Psion will send a request for the LINK.* process,
+which is what we must detect to allow other connections to the NCP daemon. It
+seems there may be a strange bug when you start ncpd, THEN start the Psion link
+- the link request/acknowledge messages are exchanged correctly, followed by
+valid INFO/NCP Protocol Version messages - and then the Psion attempts to
+connect to the PC's SYS$RFSV.* - IMHO, it should start by attempting to connect
+to LINK.* 
+
+Philip Proudman's plp_1.7 always receives the LINK.* connect request, as do
+other protocol implementations. 
+
+I haven't managed to work out why the Psion starts by sending a SYS$RFSV.*
+connect request with plptools, and not with other implementations, but the above
+work-around gets round it.
+
+
+Troubleshooting
+===============
+Q. I can't build it on SuSE Linux.
+A. You need the gppshare and libgpp packages. (Thanks to der.hans)
+
+
+Acknowledgements
+================
+This couldn't have been written without pioneering investigations into the link
+protocol by Olaf Flebbe, Michael Pieper, and others. Philip Proudman beat me to
+producing a decent, working PLP stack (Thanks, Philip ;-) and Fritz Elfert did
+some excellent merging of Rudolf Koenig's p3nfs.  Also thanks to the Majordomo
+maintainers @geekstuff.co.uk, who host the linux-psion list.
+
+Finally, the RFSV16 re-merge would still be in my In-tray if my wife Angela
+hadn't been away for the week, leaving me to code, and fend for myself. 
+
+Thanks to Pete Bentley for ideas on proxying, his patches, suggestions for
+improvement, and a loan Series 5 for testing against.
+
+
+Viola!
+--
+Matt Gumbley
+matt@gumbley.demon.co.uk

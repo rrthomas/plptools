@@ -26,6 +26,7 @@
 #define _linkchan_h_
 
 #include "channel.h"
+#include "bufferarray.h"
 
 #define LINKCHAN_DEBUG_LOG  1
 #define LINKCHAN_DEBUG_DUMP 2
@@ -35,9 +36,15 @@ class linkChan : public channel {
 		linkChan(ncp *ncpController);
   
 		void ncpDataCallback(bufferStore &a);
-		const char *getNcpConnectName();
+		char *getNcpConnectName();
 		void ncpConnectAck();
 		void ncpConnectTerminate();
+		void ncpConnectNak();
+		void ncpRegisterAck() {}
+		void Register(channel *);
+	private:
+		int registerSer;
+		bufferArray registerStack;
 };
 
 #endif

@@ -2,6 +2,7 @@
 //  PLP - An implementation of the PSION link protocol
 //
 //  Copyright (C) 1999  Philip Proudman
+// 		extensions Copyright (C) 2000 Fritz Elfert <felfert@to.com>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -20,7 +21,8 @@
 //  e-mail philip.proudman@btinternet.com
 
 
-#include <stdio.h>
+#include <stream.h>
+#include <iomanip.h>
 
 #include "bufferstore.h"
 #include "bufferarray.h"
@@ -28,7 +30,7 @@
 bufferArray::bufferArray()
 {
 	len = 0;
-	lenAllocd = 5;
+	lenAllocd = ALLOC_MIN;
 	buff = new bufferStore[lenAllocd];
 }
 
@@ -64,7 +66,7 @@ void bufferArray::
 pushBuffer(const bufferStore & b)
 {
 	if (len == lenAllocd) {
-		lenAllocd += 5;
+		lenAllocd += ALLOC_MIN;
 		bufferStore *nb = new bufferStore[lenAllocd];
 		for (long i = 0; i < len; i++) {
 			nb[i] = buff[i];
@@ -73,4 +75,93 @@ pushBuffer(const bufferStore & b)
 		buff = nb;
 	}
 	buff[len++] = b;
+}
+
+void bufferArray::
+push(const bufferStore & b)
+{
+	if (len == lenAllocd)
+		lenAllocd += ALLOC_MIN;
+	bufferStore *nb = new bufferStore[lenAllocd];
+	for (long i = len; i > 0; i--) {
+		nb[i] = buff[i-1];
+	}
+	nb[0] = b;
+	delete[]buff;
+	buff = nb;
+	len++;
+}
+
+bufferStore bufferArray::
+pop()
+{
+	return popBuffer();
+}
+
+void bufferArray::
+append(const bufferStore & b)
+{
+	pushBuffer(b);
+}
+
+long bufferArray::
+length(void)
+{
+	return len;
+}
+
+void bufferArray::
+clear(void)
+{
+	len = 0;
+	lenAllocd = ALLOC_MIN;
+	delete []buff;
+	buff = new bufferStore[lenAllocd];
+}
+
+bufferArray &bufferArray::
+operator =(const bufferArray & a)
+{
+	delete []buff;
+	len = a.len;
+	lenAllocd = a.lenAllocd;
+	buff = new bufferStore[lenAllocd];
+	for (int i = 0; i < len; i++)
+		buff[i] = a.buff[i];
+	return *this;
+}
+
+bufferStore &bufferArray::
+operator [](const unsigned long index)
+{
+	return buff[index];
+}
+
+bufferArray &bufferArray::
+operator +(const bufferStore &a)
+{
+	append(a);
+	return *this;
+}
+
+bufferArray &bufferArray::
+operator +(const bufferArray &a)
+{
+	lenAllocd += a.lenAllocd;
+	bufferStore *nb = new bufferStore[lenAllocd];
+	for (int i = 0; i < len; i++)
+		nb[len + i] = buff[i];
+	for (int i = 0; i < a.len; i++)
+		nb[len + i] = a.buff[i];
+	len += a.len;
+	delete []buff;
+	buff = nb;
+	return *this;
+}
+
+bufferArray &bufferArray::
+operator +=(const bufferStore &a)
+{
+	append(a);
+	return *this;
 }

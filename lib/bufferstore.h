@@ -7,10 +7,10 @@ class ostream;
 class bufferStore {
 public:
   bufferStore();
-  bufferStore(const unsigned char*buff, long len);
+  bufferStore(const unsigned char *, long);
   ~bufferStore();
-  bufferStore(const bufferStore &a);
-  void operator =(const bufferStore &a);
+  bufferStore(const bufferStore &);
+  bufferStore &operator =(const bufferStore &);
 
   // Reading Utils
   unsigned long getLen() const;
@@ -18,19 +18,20 @@ public:
   unsigned int getWord(long pos) const;
   unsigned int getDWord(long pos) const;
   const char* getString(long pos=0) const;
-  void discardFirstBytes(int n);
-  friend ostream &operator<<(ostream &s, const bufferStore &m);
+  void discardFirstBytes(int);
+  friend ostream &operator<<(ostream &, const bufferStore &);
   bool empty() const;
 
   // Writing utils
   void init();
-  void init(const unsigned char*buff, long len);
-  void addByte(unsigned char c);
-  void addWord(int a);
-  void addDWord(long a);
-  void addString(const char* s);
-  void addStringT(const char* s);
-  void addBuff(const bufferStore &s, long maxLen=-1);
+  void init(const unsigned char*, long);
+  void addByte(unsigned char);
+  void addWord(int);
+  void addDWord(long);
+  void addString(const char*);
+  void addStringT(const char*);
+  void addBytes(const unsigned char*, int);
+  void addBuff(const bufferStore &, long maxLen=-1);
   
 private:
   void checkAllocd(long newLen);

@@ -1,9 +1,5 @@
 /* include/config.h.in.  Generated automatically from configure.in by autoheader.  */
 
-#undef VERSION 
-
-#undef PACKAGE
-
 /* Define if you have the <stdlib.h> header file.  */
 #undef HAVE_STDLIB_H
 
@@ -33,3 +29,10 @@
 
 /* Define if you have the socket library (-lsocket).  */
 #undef HAVE_LIBSOCKET
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+

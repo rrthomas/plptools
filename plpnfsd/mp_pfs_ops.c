@@ -729,7 +729,6 @@ nfsproc_read_2(struct readargs *ra)
 	fattr *fp;
 	struct cache *cp;
 	struct dcache *dcp;
-	long phandle;
 	long pattr;
 	long psize;
 	long ptime;
@@ -752,30 +751,34 @@ nfsproc_read_2(struct readargs *ra)
 		res.status = NFS_OK;
 		return &res;
 	}
-	if (rfsv_fopen(1, inode->name, &phandle) != 0) {
-		res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
-		return &res;
-	}
-	if (rfsv_read(rop, ra->offset,
-		ra->count, phandle) < 0) {
-		rfsv_fclose(phandle);
-		res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
-		return &res;
-	}
-	rfsv_fclose(phandle);
-	rfsv_getattr(inode->name, &pattr, &psize, &ptime);
-	fp = &res.readres_u.reply.attributes;
-	pattr2attr(pattr, psize, ptime, fp, (unsigned char *) ra->file.data);
-	if (cp == 0)
-		cp = add_cache(&attrcache, inode->inode, fp);
 
-	len = fp->size - ra->offset;
+	if(rfsv_read(rop, ra->offset,
+		ra->count, inode->name) < 0) {
+		res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
+		return &res;
+	}
+
+	fp = &res.readres_u.reply.attributes;
+	if(!cp)	// Problem: if an epoc process is enlarging the file, we wont recognize it
+	  {
+	    rfsv_getattr(inode->name, &pattr, &psize, &ptime);
+	    pattr2attr(pattr, psize, ptime, fp, (unsigned char *) ra->file.data);
+	    cp = add_cache(&attrcache, inode->inode, fp);
+          }
+	else
+	  {
+	    *fp = cp->attr;
+	  }
+
+	
+
+	len = cp->actual_size - ra->offset;
 	if (len > ra->count)
 		len = ra->count;
-	if (fp->size < ra->offset)
+	if (cp->actual_size < ra->offset)
 		len = 0;
 	if (debug > 1)
-		debuglog("Read: filesize %d read %d @ %d\n", fp->size, len, ra->offset);
+		debuglog("Read: filesize %d read %d @ %d\n", cp->actual_size,len,ra->offset);
 	res.readres_u.reply.data.data_len = len;
 	res.readres_u.reply.data.data_val = (char *) rop;
 
@@ -870,7 +873,6 @@ nfsproc_write_2(writeargs *wa)
 	struct dcache *dcp;
 	fattr *fp;
 	struct attrstat *gres;
-	long phandle;
 	int len, dlen, doff;
 
 	if (!inode) {
@@ -922,18 +924,11 @@ nfsproc_write_2(writeargs *wa)
 		debuglog("writing off: %d, len: %d, act: %d\n",
 			       dcp->offset, dcp->len, cp->actual_size);
 
-		if (rfsv_fopen(0x200, inode->name, &phandle) != 0) {
-			debuglog("write: open failed\n");
-			res.status = rfsv_isalive() ? NFSERR_NOSPC : NO_PSION;
-			return &res;
-		}
-		if (rfsv_write(dcp->data, dcp->offset, dcp->len, phandle) != dcp->len) {
-			rfsv_fclose(phandle);
+		if (rfsv_write(dcp->data, dcp->offset, dcp->len, inode->name) != dcp->len) {
 			debuglog("write: dump failed\n");
 			res.status = rfsv_isalive() ? NFSERR_NOSPC : NO_PSION;
 			return &res;
 		}
-		rfsv_fclose(phandle);
 		dcp->towrite = 0;
 		len = dcp->offset + dcp->len;
 		if (len > cp->actual_size)

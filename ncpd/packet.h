@@ -34,6 +34,7 @@ class IOWatch;
 
 #define PKT_DEBUG_LOG  1
 #define PKT_DEBUG_DUMP 2
+#define PKT_DEBUG_HANDSHAKE 4
 
 class packet {
 	public:
@@ -63,7 +64,7 @@ class packet {
 		int outLen;
 		int termLen;
 		int fd;
-		bool verbose;
+		short int verbose;
 		bool esc;
 		char *devname;
 		int baud;

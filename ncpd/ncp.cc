@@ -41,9 +41,10 @@ ncp::ncp(const char *fname, int baud, IOWatch & iow)
 	l = new link(fname, baud, iow);
 	failed = false;
 	verbose = 0;
+ 	protocolVersion = PV_SERIES_5; // until detected on receipt of INFO
 
 	// init channels
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < MAX_CHANNEL; i++)
 		channelPtr[i] = NULL;
 }
 
@@ -54,13 +55,13 @@ ncp::~ncp()
 
 void ncp::
 reset() {
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < MAX_CHANNEL; i++) {
 		if (channelPtr[i])
 			channelPtr[i]->terminateWhenAsked();
 		channelPtr[i] = NULL;
 	}
 	failed = false;
-	gotLinkChan = false;
+	lChan = NULL;
 	l->reset();
 }
 
@@ -98,6 +99,12 @@ void ncp::
 setPktVerbose(short int _verbose)
 {
 	l->setPktVerbose(_verbose);
+}
+
+short int ncp::
+getProtocolVersion()
+{
+	return protocolVersion;
 }
 
 void ncp::
@@ -153,6 +160,7 @@ void ncp::
 decodeControlMessage(bufferStore & buff)
 {
 	int remoteChan = buff.getByte(0);
+	short int ver;
 	interControllerMessageType imt = (interControllerMessageType) buff.getByte(1);
 	buff.discardFirstBytes(2);
 	if (verbose & NCP_DEBUG_LOG)
@@ -162,7 +170,7 @@ decodeControlMessage(bufferStore & buff)
 			{
 				if (verbose & NCP_DEBUG_LOG) {
 					if (verbose & NCP_DEBUG_DUMP)
-						cout << "  " << buff;
+						cout << " [" << buff << "]";
 					cout << endl;
 				}
 				int localChan;
@@ -174,15 +182,20 @@ decodeControlMessage(bufferStore & buff)
 				b.addByte(0x0);
 				controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
 
+				// NOTE: we don't allow connections from the
+				// Psion to any local "processes" other than
+				// LINK.* - Matt might need to change this for
+				// his NCP<->TCP/IP bridge code...
+
 				if (!strcmp(buff.getString(0), "LINK.*")) {
-					if (gotLinkChan)
+					if (lChan)
 						failed = true;
 					if (verbose & NCP_DEBUG_LOG)
 						cout << "ncp: Link UP" << endl;
-					channelPtr[localChan] = new linkChan(this);
-					channelPtr[localChan]->setNcpChannel(localChan);
-					channelPtr[localChan]->ncpConnectAck();
-					gotLinkChan = true;
+					channelPtr[localChan] = lChan = new linkChan(this);
+					lChan->setNcpChannel(localChan);
+					lChan->ncpConnectAck();
+					lChan->setVerbose(verbose);
 				} else {
 					if (verbose & NCP_DEBUG_LOG)
 						cout << "ncp: Link DOWN" << endl;
@@ -196,7 +209,7 @@ decodeControlMessage(bufferStore & buff)
 			{
 				int forChan = buff.getByte(0);
 				if (verbose & NCP_DEBUG_LOG)
-					cout << "ch=" << forChan << " stat=";
+					cout << " ch=" << forChan << " stat=";
 				if (buff.getByte(1) == 0) {
 					if (verbose & NCP_DEBUG_LOG)
 						cout << "OK" << endl;
@@ -205,28 +218,43 @@ decodeControlMessage(bufferStore & buff)
 						channelPtr[forChan]->ncpConnectAck();
 					} else {
 						if (verbose & NCP_DEBUG_LOG)
-							cout << "ncp: message for unknown channel\n";
+							cout << "ncp: message for unknown channel" << endl;
 					}
 				} else {
 					if (verbose & NCP_DEBUG_LOG)
 						cout << "Unknown " << (int) buff.getByte(1) << endl;
-					channelPtr[forChan]->ncpConnectTerminate();
+					channelPtr[forChan]->ncpConnectNak();
 				}
 			}
 			break;
 		case NCON_MSG_NCP_INFO:
-			if (buff.getByte(0) == 6) {
+			ver = buff.getByte(0);
+			// Series 3c returns '3', as does mclink. PsiWin 1.1
+			// returns version 2. We return whatever version we're
+			// sent, which is rather crude, but works for Series 3
+			// and probably 5. If Symbian have changed EPOC Connect
+			// for the Series 5mx/7, this may need to change.
+			// 
+			if (ver == PV_SERIES_5 || ver == PV_SERIES_3) {
 				bufferStore b;
+				protocolVersion = ver;
 				if (verbose & NCP_DEBUG_LOG) {
 					if (verbose & NCP_DEBUG_DUMP)
-						cout << " " << buff;
+						cout << " [" << buff << "]";
 					cout << endl;
 				}
-				b.addByte(6);
-				b.addDWord(0);
+				// Fake NCP version 2 for a Series 3 (behave like PsiWin 1.1)
+				if (ver == PV_SERIES_3)
+					ver = 2;
+				b.addByte(ver);
+				// Do we send a time of 0 or a real time?
+				// The Psion uses this to determine whether to
+				// restart. (See protocol docs for details)
+				// b.addDWord(0);
+				b.addDWord(time(NULL));
 				controlChannel(0, NCON_MSG_NCP_INFO, b);
 			} else
-				cout << "ALERT!!!! Protocol-Version is NOT 6!! (No Series 5?)!" << endl;
+				cout << "ALERT!!!! Unexpected Protocol Version!! (No Series 5/3?)!" << endl;
 			break;
 		case NCON_MSG_CHANNEL_DISCONNECT:
 			if (verbose & NCP_DEBUG_LOG)
@@ -240,7 +268,7 @@ decodeControlMessage(bufferStore & buff)
 		default:
 			if (verbose & NCP_DEBUG_LOG) {
 				if (verbose & NCP_DEBUG_DUMP)
-					cout << " " << buff;
+					cout << " [" << buff << "]";
 				cout << endl;
 			}
 	}
@@ -249,24 +277,53 @@ decodeControlMessage(bufferStore & buff)
 int ncp::
 getFirstUnusedChan()
 {
-	for (int cNum = 1; cNum < 8; cNum++) {
+	for (int cNum = 1; cNum < MAX_CHANNEL; cNum++) {
 		if (channelPtr[cNum] == NULL) {
+				if (verbose & NCP_DEBUG_LOG)
+					cout << "ncp: getFirstUnusedChan=" << cNum << endl;
 			return cNum;
 		}
 	}
 	return 0;
 }
 
+void ncp::
+RegisterAck(int chan)
+{
+	if (verbose & NCP_DEBUG_LOG)
+		cout << "ncp: RegisterAck: chan=" << chan << endl;
+	for (int cNum = 1; cNum < MAX_CHANNEL; cNum++) {
+		channel *ch = channelPtr[cNum];
+		if (ch->getNcpChannel() == chan) {
+			ch->ncpRegisterAck();
+			return;
+		}
+	}
+	cerr << "ncp: RegisterAck: no channel to deliver" << endl;
+}
+
+void ncp::
+Register(channel * ch)
+{
+	if (lChan)
+		lChan->Register(ch);
+	else
+		cerr << "ncp: Register without established lChan" << endl;
+}
+
 int ncp::
 connect(channel * ch)
 {
 	// look for first unused chan
-	int cNum = getFirstUnusedChan();
+	int cNum = ch->getNcpChannel();
+	if (cNum == 0)
+		cNum = getFirstUnusedChan();
 	if (cNum > 0) {
 		channelPtr[cNum] = ch;
 		ch->setNcpChannel(cNum);
 		bufferStore b;
 		b.addString(ch->getNcpConnectName());
+		b.addString(".*");
 		b.addByte(0);
 		controlChannel(cNum, NCON_MSG_CONNECT_TO_SERVER, b);
 		return cNum;
@@ -304,6 +361,8 @@ void ncp::
 disconnect(int channel)
 {
 	channelPtr[channel]->terminateWhenAsked();
+	if (verbose & NCP_DEBUG_LOG)
+		cout << "ncp: disconnect: channel=" << channel << endl;
 	channelPtr[channel] = NULL;
 	bufferStore b;
 	b.addByte(remoteChanList[channel]);
@@ -327,7 +386,7 @@ hasFailed()
 bool ncp::
 gotLinkChannel()
 {
-	return gotLinkChan;
+	return (lChan != NULL);
 }
 
 char *ncp::

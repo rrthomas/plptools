@@ -33,8 +33,6 @@
 #include "ppsocket.h"
 #include "bufferarray.h"
 
-#define RFSV_SENDLEN 230
-
 rfsv32::rfsv32(ppsocket * _skt) : serNum(0)
 {
 	skt = _skt;
@@ -45,7 +43,7 @@ rfsv32::~rfsv32()
 {
 	bufferStore a;
 	a.addStringT("Close");
-	if (status == PSI_ERR_NONE)
+	if (status == E_PSI_GEN_NONE)
 		skt->sendBufferStore(a);
 	skt->closeSocket();
 }
@@ -63,12 +61,12 @@ void rfsv32::
 reset()
 {
 	bufferStore a;
-	status = PSI_ERR_DISCONNECTED;
+	status = E_PSI_FILE_DISC;
 	a.addStringT(getConnectName());
 	if (skt->sendBufferStore(a)) {
 		if (skt->getBufferStore(a) == 1) {
 			if (!strcmp(a.getString(0), "Ok"))
-				status = PSI_ERR_NONE;
+				status = E_PSI_GEN_NONE;
 		}
 	}
 }
@@ -82,7 +80,7 @@ getStatus()
 const char *rfsv32::
 getConnectName()
 {
-	return "SYS$RFSV.*";
+	return "SYS$RFSV";
 }
 
 char *rfsv32::
@@ -105,7 +103,7 @@ fopen(long attr, const char *name, long &handle)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(OPEN_FILE, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	long res = getResponse(a);
 	if (!res && a.getLen() == 4) {
 		handle = a.getDWord(0);
@@ -119,7 +117,7 @@ mktemp(long *handle, char *tmpname)
 {
 	bufferStore a;
 	if (!sendCommand(TEMP_FILE, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	long res = getResponse(a);
 	if (res == 0) {
 		*handle = a.getDWord(0);
@@ -138,7 +136,7 @@ fcreatefile(long attr, const char *name, long &handle)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(CREATE_FILE, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	long res = getResponse(a);
 	if (!res && a.getLen() == 4)
 		handle = a.getDWord(0);
@@ -155,7 +153,7 @@ freplacefile(long attr, const char *name, long &handle)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(REPLACE_FILE, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	long res = getResponse(a);
 	if (!res && a.getLen() == 4)
 		handle = a.getDWord(0);
@@ -172,7 +170,7 @@ fopendir(long attr, const char *name, long &handle)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(OPEN_DIR, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	long res = getResponse(a);
 	if (!res && a.getLen() == 4)
 		handle = a.getDWord(0);
@@ -185,7 +183,7 @@ fclose(long handle)
 	bufferStore a;
 	a.addDWord(handle);
 	if (!sendCommand(CLOSE_HANDLE, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
@@ -206,6 +204,7 @@ micro2time(unsigned long microHi, unsigned long microLo)
 	micro -= pes;
 	micro += EPOCH_DIFF_SECS;
 	micro -= EPOCH_2H;
+	micro += 3600; /* 1 hour PJC */
 	return (long) micro;
 }
 
@@ -218,6 +217,7 @@ time2micro(unsigned long time, unsigned long &microHi, unsigned long &microLo)
 	micro += pes;
 	micro -= EPOCH_DIFF_SECS;
 	micro += EPOCH_2H;
+	micro -= 3600; /* 1 hour PJC */
 	micro *= (unsigned long long)1000000;
 	microLo = (micro & (unsigned long long)0x0FFFFFFFF);
 	micro >>= 32;
@@ -228,7 +228,7 @@ long rfsv32::
 dir(const char *name, bufferArray * files)
 {
 	long handle;
-	long res = fopendir(PSI_ATTR_HIDDEN | PSI_ATTR_SYSTEM | PSI_ATTR_DIRECTORY, name, handle);
+	long res = fopendir(EPOC_ATTR_HIDDEN | EPOC_ATTR_SYSTEM | EPOC_ATTR_DIRECTORY, name, handle);
 	if (res != 0)
 		return res;
 
@@ -236,7 +236,7 @@ dir(const char *name, bufferArray * files)
 		bufferStore a;
 		a.addDWord(handle);
 		if (!sendCommand(READ_DIR, a))
-			return PSI_ERR_DISCONNECTED;
+			return E_PSI_FILE_DISC;
 		res = getResponse(a);
 		if (res)
 			break;
@@ -270,10 +270,38 @@ dir(const char *name, bufferArray * files)
 			a.discardFirstBytes(d);
 		}
 	}
-	if (res == PSI_ERR_EoF)
+	if (res == E_PSI_FILE_EOF)
 		res = 0;
 	fclose(handle);
 	return res;
+}
+
+// beware this returns static data
+char * rfsv32::
+opAttr(long attr)
+{
+	static char buf[10];
+	buf[0] = ((attr & rfsv32::EPOC_ATTR_DIRECTORY) ? 'd' : '-');
+	buf[1] = ((attr & rfsv32::EPOC_ATTR_RONLY) ? '-' : 'w');
+	buf[2] = ((attr & rfsv32::EPOC_ATTR_HIDDEN) ? 'h' : '-');
+	buf[3] = ((attr & rfsv32::EPOC_ATTR_SYSTEM) ? 's' : '-');
+	buf[4] = ((attr & rfsv32::EPOC_ATTR_ARCHIVE) ? 'a' : '-');
+	buf[5] = ((attr & rfsv32::EPOC_ATTR_VOLUME) ? 'v' : '-');
+	buf[6] = ((attr & rfsv32::EPOC_ATTR_NORMAL) ? 'n' : '-');
+	buf[7] = ((attr & rfsv32::EPOC_ATTR_TEMPORARY) ? 't' : '-');
+	buf[8] = ((attr & rfsv32::EPOC_ATTR_COMPRESSED) ? 'c' : '-');
+	buf[9] = '\0';
+	return (char *) (&buf);
+}
+
+long rfsv32::
+opMode(long mode)
+{
+	long ret = 0;
+
+	ret |= (((mode & 03) == PSI_O_RDONLY) ? 0 : EPOC_OMODE_READ_WRITE);
+	ret |= (mode & PSI_O_EXCL) ? 0 : EPOC_OMODE_SHARE_READERS;
+	return ret;
 }
 
 long rfsv32::
@@ -285,7 +313,7 @@ fgetmtime(const char *name, long *mtime)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(MODIFIED, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	long res = getResponse(a);
 	if (res != 0)
 		return res;
@@ -306,7 +334,7 @@ fsetmtime(const char *name, long mtime)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(SET_MODIFIED, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	long res = getResponse(a);
 	if (res != 0)
 		return res;
@@ -322,7 +350,7 @@ fgetattr(const char *name, long *attr)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(ATT, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	long res = getResponse(a);
 	if (res != 0)
 		return res;
@@ -339,7 +367,7 @@ fgeteattr(const char *name, long *attr, long *size, long *time)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(REMOTE_ENTRY, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	long res = getResponse(a);
 	if (res != 0)
 		return res;
@@ -367,7 +395,7 @@ fsetattr(const char *name, long seta, long unseta)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(SET_ATT, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
@@ -375,7 +403,7 @@ long rfsv32::
 dircount(const char *name, long *count)
 {
 	long handle;
-	long res = fopendir(PSI_ATTR_HIDDEN | PSI_ATTR_SYSTEM | PSI_ATTR_DIRECTORY, name, handle);
+	long res = fopendir(EPOC_ATTR_HIDDEN | EPOC_ATTR_SYSTEM | EPOC_ATTR_DIRECTORY, name, handle);
 	*count = 0;
 	if (res != 0)
 		return res;
@@ -384,7 +412,7 @@ dircount(const char *name, long *count)
 		bufferStore a;
 		a.addDWord(handle);
 		if (!sendCommand(READ_DIR, a))
-			return PSI_ERR_DISCONNECTED;
+			return E_PSI_FILE_DISC;
 		res = getResponse(a);
 		if (res)
 			break;
@@ -400,7 +428,7 @@ dircount(const char *name, long *count)
 		}
 	}
 	fclose(handle);
-	if (res == PSI_ERR_EoF)
+	if (res == E_PSI_FILE_EOF)
 		res = 0;
 	return res;
 }
@@ -412,7 +440,7 @@ devlist(long *devbits)
 	long res;
 
 	if (!sendCommand(GET_DRIVE_LIST, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	res = getResponse(a);
 	*devbits = 0;
 	if ((res == 0) && (a.getLen() == 26)) {
@@ -451,9 +479,9 @@ devinfo(int devnum, long *vfree, long *vtotal, long *vattr,
 bool rfsv32::
 sendCommand(enum commands cc, bufferStore & data)
 {
-	if (status == PSI_ERR_DISCONNECTED) {
+	if (status == E_PSI_FILE_DISC) {
 		reconnect();
-		if (status == PSI_ERR_DISCONNECTED)
+		if (status == E_PSI_FILE_DISC)
 			return false;
 	}
 	bool result;
@@ -467,7 +495,7 @@ sendCommand(enum commands cc, bufferStore & data)
 	a.addBuff(data);
 	result = skt->sendBufferStore(a);
 	if (!result)
-		status = PSI_ERR_DISCONNECTED;
+		status = E_PSI_FILE_DISC;
 	return result;
 }
 
@@ -478,155 +506,14 @@ getResponse(bufferStore & data)
 	    data.getWord(0) == 0x11) {
 		long ret = data.getDWord(4);
 		data.discardFirstBytes(8);
-		return ret;
+		return err2psierr(ret);
 	} else
-		status = PSI_ERR_DISCONNECTED;
+		status = E_PSI_FILE_DISC;
 	return status;
 }
 
-char * rfsv32::
-opErr(long status)
-{
-	enum errs e = (enum errs) status;
-	switch (e) {
-		case PSI_ERR_NONE:
-			return "";
-		case PSI_ERR_NOT_FOUND:
-			return "not found";
-		case PSI_ERR_GENERAL:
-			return "general";
-			break;
-		case PSI_ERR_CANCEL:
-			return "cancelled";
-			break;
-		case PSI_ERR_NO_MEMORY:
-			return "out of memory";
-			break;
-		case PSI_ERR_NOT_SUPPORTED:
-			return "unsupported";
-			break;
-		case PSI_ERR_ARGUMENT:
-			return "bad argument";
-			break;
-		case PSI_ERR_TOTAL_LOSS_OF_PRECISION:
-			return "total loss of precision";
-			break;
-		case PSI_ERR_BAD_HANDLE:
-			return "bad handle";
-			break;
-		case PSI_ERR_OVERFLOW:
-			return "overflow";
-			break;
-		case PSI_ERR_UNDERFLOW:
-			return "underflow";
-			break;
-		case PSI_ERR_ALREADY_EXISTS:
-			return "file already exists";
-			break;
-		case PSI_ERR_PATH_NOT_FOUND:
-			return "path not found";
-			break;
-		case PSI_ERR_DIED:
-			return "DIED";
-			break;
-		case PSI_ERR_IN_USE:
-			return "resource in use";
-			break;
-		case PSI_ERR_SERVER_TERMINATED:
-			return "server terminated";
-			break;
-		case PSI_ERR_SERVER_BUSY:
-			return "server busy";
-			break;
-		case PSI_ERR_COMPLETION:
-			return "completed";
-			break;
-		case PSI_ERR_NOT_READY:
-			return "not ready";
-			break;
-		case PSI_ERR_UNKNOWN:
-			return "unknown";
-			break;
-		case PSI_ERR_CORRUPT:
-			return "corrupt";
-			break;
-		case PSI_ERR_ACCESS_DENIED:
-			return "permission denied";
-			break;
-		case PSI_ERR_LOCKED:
-			return "resource locked";
-			break;
-		case PSI_ERR_WRITE:
-			return "write";
-			break;
-		case PSI_ERR_DISMOUNTED:
-			return "dismounted";
-			break;
-		case PSI_ERR_EoF:
-			return "end of file";
-			break;
-		case PSI_ERR_DISK_FULL:
-			return "disk full";
-			break;
-		case PSI_ERR_BAD_DRIVER:
-			return "bad driver";
-			break;
-		case PSI_ERR_BAD_NAME:
-			return "bad name";
-			break;
-		case PSI_ERR_COMMS_LINE_FAIL:
-			return "comms line failed";
-			break;
-		case PSI_ERR_COMMS_FRAME:
-			return "comms framing error";
-			break;
-		case PSI_ERR_COMMS_OVERRUN:
-			return "comms overrun";
-			break;
-		case PSI_ERR_COMMS_PARITY:
-			return "comms parity error";
-			break;
-		case PSI_ERR_TIMEOUT:
-			return "timed out";
-			break;
-		case PSI_ERR_COULD_NOT_CONNECT:
-			return "could not connect";
-			break;
-		case PSI_ERR_COULD_NOT_DISCONNECT:
-			return "could not disconnect";
-			break;
-		case PSI_ERR_DISCONNECTED:
-			return "unit disconnected";
-			break;
-		case PSI_ERR_BAD_LIBRARY_ENTRY_POINT:
-			return "bad library entry point";
-			break;
-		case PSI_ERR_BAD_DESCRIPTOR:
-			return "bad descriptor";
-			break;
-		case PSI_ERR_ABORT:
-			return "abort";
-			break;
-		case PSI_ERR_TOO_BIG:
-			return "too big";
-			break;
-		case PSI_ERR_DIVIDE_BY_ZERO:
-			return "division by zero";
-			break;
-		case PSI_ERR_BAD_POWER:
-			return "bad power";
-			break;
-		case PSI_ERR_DIR_FULL:
-			return "directory full";
-			break;
-		default:
-			return "Unknown error";
-			break;
-	}
-}
-
 long rfsv32::
-fread(long handle, char *buf, long len)
+fread(long handle, unsigned char *buf, long len)
 {
 	long res;
 	long count = 0;
@@ -634,9 +521,9 @@ fread(long handle, char *buf, long len)
 	do {
 		bufferStore a;
 		a.addDWord(handle);
-		a.addDWord(((len-count) > 2000)?2000:(len-count));
+		a.addDWord(((len-count) > RFSV_SENDLEN)?RFSV_SENDLEN:(len-count));
 		if (!sendCommand(READ_FILE, a))
-			return PSI_ERR_DISCONNECTED;
+			return E_PSI_FILE_DISC;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		res = a.getLen();
@@ -650,20 +537,20 @@ fread(long handle, char *buf, long len)
 }
 
 long rfsv32::
-fwrite(long handle, char *buf, long len)
+fwrite(long handle, unsigned char *buf, long len)
 {
 	long res;
 	long total = 0;
 	long count;
 
 	do {
-		count = ((len - total) > 2000)?2000:(len - total); 
+		count = ((len - total) > RFSV_SENDLEN)?RFSV_SENDLEN:(len - total); 
 		bufferStore a;
 		bufferStore tmp((unsigned char *)buf, count);
 		a.addDWord(handle);
 		a.addBuff(tmp);
 		if (!sendCommand(WRITE_FILE, a))
-			return PSI_ERR_DISCONNECTED;
+			return E_PSI_FILE_DISC;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		total += count;
@@ -673,42 +560,48 @@ fwrite(long handle, char *buf, long len)
 }
 
 long rfsv32::
-copyFromPsion(const char *from, const char *to)
+copyFromPsion(const char *from, const char *to, cpCallback_t cb)
 {
 	long handle;
 	long res;
 	long len;
 
-	if ((res = fopen(PSI_OMODE_SHARE_READERS | PSI_OMODE_BINARY, from, handle)) != 0)
+	if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle)) != 0)
 		return res;
 	ofstream op(to);
 	if (!op) {
 		fclose(handle);
 		return -1;
 	}
+	unsigned char *buff = new unsigned char[RFSV_SENDLEN];
 	do {
-		char buf[2000];
-		if ((len = fread(handle, buf, sizeof(buf))) > 0)
-			op.write(buf, len);
+		if ((len = fread(handle, buff, RFSV_SENDLEN)) > 0)
+			op.write(buff, len);
+		if (cb) {
+			if (!cb(len)) {
+				len = E_PSI_FILE_CANCEL;
+				break;
+			}
+		}
 	} while (len > 0);
-
+	delete[]buff;
 	fclose(handle);
 	op.close();
 	return len;
 }
 
 long rfsv32::
-copyToPsion(const char *from, const char *to)
+copyToPsion(const char *from, const char *to, cpCallback_t cb)
 {
 	long handle;
 	long res;
 
 	ifstream ip(from);
 	if (!ip)
-		return PSI_ERR_NOT_FOUND;
-	res = fcreatefile(PSI_OMODE_BINARY | PSI_OMODE_SHARE_EXCLUSIVE | PSI_OMODE_READ_WRITE, to, handle);
+		return E_PSI_FILE_NXIST;
+	res = fcreatefile(EPOC_OMODE_BINARY | EPOC_OMODE_SHARE_EXCLUSIVE | EPOC_OMODE_READ_WRITE, to, handle);
 	if (res != 0) {
-		res = freplacefile(PSI_OMODE_BINARY | PSI_OMODE_SHARE_EXCLUSIVE | PSI_OMODE_READ_WRITE, to, handle);
+		res = freplacefile(EPOC_OMODE_BINARY | EPOC_OMODE_SHARE_EXCLUSIVE | EPOC_OMODE_READ_WRITE, to, handle);
 		if (res != 0)
 			return res;
 	}
@@ -717,18 +610,32 @@ copyToPsion(const char *from, const char *to)
 	while (ip && !ip.eof()) {
 		ip.read(buff, RFSV_SENDLEN);
 		bufferStore tmp(buff, ip.gcount());
-		total += tmp.getLen();
-		if (tmp.getLen() == 0)
+		int len = tmp.getLen();
+		total += len;
+		if (len == 0)
 			break;
 		bufferStore a;
 		a.addDWord(handle);
 		a.addBuff(tmp);
-		if (!sendCommand(WRITE_FILE, a))
-			return PSI_ERR_DISCONNECTED;
+		if (!sendCommand(WRITE_FILE, a)) {
+			ip.close();
+			delete[]buff;
+			return E_PSI_FILE_DISC;
+		}
 		res = getResponse(a);
 		if (res) {
 			fclose(handle);
+			ip.close();
+			delete[]buff;
 			return res;
+		}
+		if (cb) {
+			if (!cb(len)) {
+				fclose(handle);
+				ip.close();
+				delete[]buff;
+				return E_PSI_FILE_CANCEL;
+			}
 		}
 	}
 	fclose(handle);
@@ -744,7 +651,7 @@ fsetsize(long handle, long size)
 	a.addDWord(handle);
 	a.addDWord(size);
 	if (!sendCommand(SET_SIZE, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
@@ -776,7 +683,7 @@ fseek(long handle, long pos, long mode)
  */
 
 	if ((mode < PSI_SEEK_SET) || (mode > PSI_SEEK_END))
-		return PSI_ERR_ARGUMENT;
+		return E_PSI_GEN_ARG;
 
 	if ((mode == PSI_SEEK_CUR) && (pos >= 0)) {
 		/* get and save current position */
@@ -784,7 +691,7 @@ fseek(long handle, long pos, long mode)
 		a.addDWord(handle);
 		a.addDWord(PSI_SEEK_CUR);
 		if (!sendCommand(SEEK_FILE, a))
-			return PSI_ERR_DISCONNECTED;
+			return E_PSI_FILE_DISC;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		savpos = a.getDWord(0);
@@ -798,7 +705,7 @@ fseek(long handle, long pos, long mode)
 		a.addDWord(handle);
 		a.addDWord(PSI_SEEK_END);
 		if (!sendCommand(SEEK_FILE, a))
-			return PSI_ERR_DISCONNECTED;
+			return E_PSI_FILE_DISC;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		savpos = a.getDWord(0);
@@ -809,7 +716,7 @@ fseek(long handle, long pos, long mode)
 		a.addDWord(handle);
 		a.addDWord(savpos + pos);
 		if (!sendCommand(SET_SIZE, a))
-			return PSI_ERR_DISCONNECTED;
+			return E_PSI_FILE_DISC;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		pos = 0;
@@ -820,7 +727,7 @@ fseek(long handle, long pos, long mode)
 	a.addDWord(handle);
 	a.addDWord(mode);
 	if (!sendCommand(SEEK_FILE, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	if ((res = getResponse(a)) != 0)
 		return res;
 	realpos = a.getDWord(0);
@@ -841,14 +748,14 @@ fseek(long handle, long pos, long mode)
 		a.addDWord(handle);
 		a.addDWord(calcpos);
 		if (!sendCommand(SET_SIZE, a))
-			return PSI_ERR_DISCONNECTED;
+			return E_PSI_FILE_DISC;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		a.addDWord(calcpos);
 		a.addDWord(handle);
 		a.addDWord(PSI_SEEK_SET);
 		if (!sendCommand(SEEK_FILE, a))
-			return PSI_ERR_DISCONNECTED;
+			return E_PSI_FILE_DISC;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		realpos = a.getDWord(0);
@@ -871,7 +778,7 @@ mkdir(const char *name)
 	}
 	free(n);
 	if (!sendCommand(MK_DIR_ALL, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
@@ -890,7 +797,7 @@ rmdir(const char *name)
 	}
 	free(n);
 	if (!sendCommand(RM_DIR, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
@@ -907,7 +814,7 @@ rename(const char *oldname, const char *newname)
 	free(on);
 	free(nn);
 	if (!sendCommand(RENAME, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
@@ -920,6 +827,63 @@ remove(const char *name)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(DELETE, a))
-		return PSI_ERR_DISCONNECTED;
+		return E_PSI_FILE_DISC;
 	return getResponse(a);
+}
+
+static long e2psi[] = {
+	rfsv::E_PSI_FILE_DIRFULL,	// -43
+	rfsv::E_PSI_GEN_POWER,	// -42
+	rfsv::E_PSI_GEN_DIVIDE,	// -41
+	rfsv::E_PSI_FILE_TOOBIG,	// -40
+	rfsv::E_PSI_FILE_ABORT,	// -39
+	rfsv::E_PSI_GEN_DESCR,	// -38
+	rfsv::E_PSI_GEN_LIB,	// -37
+	rfsv::E_PSI_FILE_NDISC,	// -36
+	rfsv::E_PSI_FILE_DISC,	// -35
+	rfsv::E_PSI_FILE_CONNECT,	// -34
+	rfsv::E_PSI_FILE_RETRAN,	// -33
+	rfsv::E_PSI_FILE_PARITY,	// -32
+	rfsv::E_PSI_FILE_OVERRUN,	// -31
+	rfsv::E_PSI_FILE_FRAME,	// -30
+	rfsv::E_PSI_FILE_LINE,	// -29
+	rfsv::E_PSI_FILE_NAME,	// -28
+	rfsv::E_PSI_FILE_DRIVER,	// -27
+	rfsv::E_PSI_FILE_FULL,	// -26
+	rfsv::E_PSI_FILE_EOF,	// -25
+	rfsv::E_PSI_GEN_FSYS,	// -24
+	rfsv::E_PSI_FILE_WRITE,	// -23
+	rfsv::E_PSI_FILE_LOCKED,	// -22
+	rfsv::E_PSI_FILE_ACCESS,	// -21
+	rfsv::E_PSI_FILE_CORRUPT,	// -20
+	rfsv::E_PSI_FILE_UNKNOWN,	// -19
+	rfsv::E_PSI_FILE_NOTREADY,	// -18
+	rfsv::E_PSI_FILE_COMPLETION,	// -17
+	rfsv::E_PSI_GEN_BUSY,	// -16
+	rfsv::E_PSI_GEN_TERMINATED,	// -15
+	rfsv::E_PSI_GEN_INUSE,	// -14
+	rfsv::E_PSI_GEN_DIED,	// -13
+	rfsv::E_PSI_FILE_DIR,	// -12
+	rfsv::E_PSI_FILE_EXIST,	// -11
+	rfsv::E_PSI_GEN_UNDER,	// -10
+	rfsv::E_PSI_GEN_OVER,	// -9
+	rfsv::E_PSI_FILE_HANDLE,	// -8
+	rfsv::E_PSI_GEN_RANGE,	// -7
+	rfsv::E_PSI_GEN_ARG,	// -6
+	rfsv::E_PSI_GEN_NSUP,	// -5
+	rfsv::E_PSI_GEN_NOMEMORY,	// -4
+	rfsv::E_PSI_FILE_CANCEL,	// -3
+	rfsv::E_PSI_GEN_FAIL,	// -2
+	rfsv::E_PSI_FILE_NXIST,	// -1
+	rfsv::E_PSI_GEN_NONE	// 0
+};
+
+long rfsv32::
+err2psierr(long status)
+{
+	if ((status > E_EPOC_NONE) || (status < E_EPOC_DIR_FULL)) {
+		cerr << "FATAL: inavlid error-code" << endl;
+		return -999;
+	}
+	return e2psi[status - E_EPOC_DIR_FULL];
 }

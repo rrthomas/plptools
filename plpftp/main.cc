@@ -31,7 +31,10 @@
 #include "defs.h"
 #include "bool.h"
 #include "ppsocket.h"
-#include "rfsv32.h"
+#include "rfsv.h"
+#include "rfsvfactory.h"
+#include "rpcs.h"
+#include "rpcsfactory.h"
 #include "ftp.h"
 #include "bufferstore.h"
 
@@ -48,6 +51,7 @@ ftpHeader()
 	cout << "PLPFTP Version " << VERSION;
 	cout << " Copyright (C) 1999  Philip Proudman" << endl;
 	cout << " Additions Copyright (C) 1999 Fritz Elfert <felfert@to.com>" << endl;
+	cout << "                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>" << endl;
 	cout << "PLP comes with ABSOLUTELY NO WARRANTY;" << endl;
 	cout << "This is free software, and you are welcome to redistribute it" << endl;
 	cout << "under GPL conditions; see the COPYING file in the distribution." << endl;
@@ -59,7 +63,9 @@ int
 main(int argc, char **argv)
 {
 	ppsocket *skt;
-	rfsv32 *a;
+	ppsocket *skt2;
+	rfsv *a;
+	rpcs *r;
 	ftp f;
 	int status = 0;
 	sigset_t sigset;
@@ -80,10 +86,26 @@ main(int argc, char **argv)
 	if (argc < 2)
 		ftpHeader();
 	skt = new ppsocket();
-	skt->connect(NULL, sockNum);
-	a = new rfsv32(skt);
-	status = f.session(*a, argc, argv);
-
-	delete a;
+	if (!skt->connect(NULL, sockNum)) {
+		cout << "plpftp: could not connect to ncpd" << endl;
+		return 1;
+	}
+	skt2 = new ppsocket();
+	if (!skt2->connect(NULL, sockNum)) {
+		cout << "plpftp: could not connect to ncpd" << endl;
+		return 1;
+	}
+	rfsvfactory *rf = new rfsvfactory(skt);
+	rpcsfactory *rp = new rpcsfactory(skt2);
+	a = rf->create(false);
+	r = rp->create(false);
+	if ((a != NULL) && (r != NULL)) {
+		status = f.session(*a, *r, argc, argv);
+		delete r;
+		delete a;
+	} else {
+		cout << "plpftp: could not create rfsv object" << endl;
+		status = 1;
+	}
 	return status;
 }

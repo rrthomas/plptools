@@ -19,7 +19,8 @@
 //
 //  e-mail philip.proudman@btinternet.com
 
-#include <stream.h>
+#include <stream.h> 
+// That should be iostream.h, but it won't build on Sun WorkShop C++ 5.0
 #include <iomanip.h>
 #include <string.h>
 
@@ -48,7 +49,7 @@ bufferStore::bufferStore(const unsigned char*_buff, long _len) {
 	start = 0;
 }
 
-void bufferStore::operator =(const bufferStore &a) {
+bufferStore &bufferStore::operator =(const bufferStore &a) {
 	checkAllocd(a.getLen());
 	len = a.getLen();
 	memcpy(buff, a.getString(0), len);
@@ -106,7 +107,7 @@ ostream &operator<<(ostream &s, const bufferStore &m) {
 			if (c>=' ' && c <= 'z') s << c;
 		}
 	}
-	s<< ")";
+	s<< ")" << dec << setw(0);
 	return s;
 }
 
@@ -142,6 +143,12 @@ void bufferStore::addString(const char* s) {
 void bufferStore::addStringT(const char* s) {
 	addString(s);
 	addByte(0);
+}
+
+void bufferStore::addBytes(const unsigned char* s, int l) {
+	checkAllocd(len + l);
+	memcpy(&buff[len], s, l);
+	len += l;
 }
 
 void bufferStore::addBuff(const bufferStore &s, long maxLen) {

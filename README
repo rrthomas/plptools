@@ -4,8 +4,7 @@
 
    - p3nfsd-5.4 by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
      an nfs daemon for Psion series 3 and 5
-   - plp_1_7 by Philip Proudman
-	(former email, current address unknown proudman@btinternet.com)
+   - plp_1_7 by Philip Proudman (phil@proudman51.freeserve.co.uk)
 
  I want to thank both authors for their nice packages and for making
  these available under GPL which makes it possible for me to
@@ -24,6 +23,14 @@
  and static available). I also removed all Psion-3 related stuff,
  because a) i can't test it and b) Sibo support is dropped by
  Psion.
+
+ Since version 0.5, there is also starting support for RPC-service
+ on the Psion. Note the new commands "ps", "kill" and "run" in
+ plpftp. This support was only possible because of Alexander Thoukydides'
+ excellent documentation at
+ http://www.btinternet.com/~thouky/software/psifs/plp.html
+ Thanks a lot for that. Also Psion-3 support is now added by Matt Gumbley
+ (matt@gumbley.demon.co.uk)
 
  How to install:
 
@@ -53,6 +60,20 @@
 
        overrides the default port number, where ncpd listens
        and plpftp resp. plpnfsd connects to.
+
+  --with-drive=drivespec
+
+       overrides the default drive for plpftp. The default "AUTO"
+       triggers a drive-scan on the psion and sets the drive to
+       the first drive found. If you don't want that, specify
+       C: for example.
+
+  --with-basedir=dirspec
+
+       overrides the default directory for plpftp. The default is \\
+       which means the root-dir. Note: directory-separators have to
+       be specified as C-like backslashes and if you consider shell's
+       escape-mechanism, these in turn have to be escaped with backslashes ;-)
 
  You will get 3 programs and a shared and static library.
  By default, the install-prefix is /usr/local, so you probably

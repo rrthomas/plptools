@@ -52,7 +52,7 @@ checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp 
 			cout << "New socket connection from " << peer << endl;
 		if ((numScp == 7) || (!a->gotLinkChannel())) {
 			bufferStore a;
-			a.addStringT("No psion");
+			a.addStringT("No Psion Connected\n");
 			next->sendBufferStore(a);
 			next->closeSocket();
 		} else
@@ -119,8 +119,16 @@ main(int argc, char **argv)
 				pverbose |= PKT_DEBUG_LOG;
 			if (!strcmp(argv[i], "pd"))
 				pverbose |= PKT_DEBUG_DUMP;
+			if (!strcmp(argv[i], "ph"))
+				lverbose |= PKT_DEBUG_HANDSHAKE;
 			if (!strcmp(argv[i], "m"))
 				verbose = true;
+			if (!strcmp(argv[i], "all")) {
+				nverbose = NCP_DEBUG_LOG | NCP_DEBUG_DUMP;
+				lverbose = LNK_DEBUG_LOG | LNK_DEBUG_DUMP;
+				pverbose = PKT_DEBUG_LOG | PKT_DEBUG_DUMP;
+				verbose = true;
+			}
 		} else if (!strcmp(argv[i], "-b") && i + 1 < argc) {
 			baudRate = atoi(argv[++i]);
 		} else if (!strcmp(argv[i], "-d")) {
@@ -152,7 +160,7 @@ main(int argc, char **argv)
 				}
 				ncp *a = new ncp(serialDevice, baudRate, iow);
 				int numScp = 0;
-				socketChan *scp[8];
+				socketChan *scp[MAX_CHANNEL+1];
 
 				a->setVerbose(nverbose);
 				a->setLinkVerbose(lverbose);

@@ -1,0 +1,13 @@
+Changes from Version 0.4 to 0.5:
+
+ - merged all stuff from Matt Gumbley's plptools-0.4-mjg5
+   see his README.mjg
+ - Added a speedup-patch for plpnfsd from Rudol Koenig. This
+   should also solve Olaf Flebbe's problems as a side effect.
+ - Added command- and filename-completion to plpftp
+ - Changed plpftp's default-drive to "AUTO". This triggers
+   auto-detection of available drives and selecting the first one.
+ - fixed various bugs in plpftp
+ - added hash printing in plpftp.
+ - Added new commands "ps", "kill" and "run" to plpftp (these should
+   work at least for Series5. For Series3: INCOMPLETE)

@@ -589,6 +589,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 						       get_num(cp->inode)->name, dcp->offset);
 			clean_cache(&attrcache);
 			query_cache = 0;	/* clear the GETDENTS "cache". */
+			rfsv_closecached();
 		}
 	}
 }

@@ -27,33 +27,39 @@
 
 #include "bool.h"
 
-class rfsv32;
+class rfsv;
+class rpcs;
 class bufferStore;
 class bufferArray;
-
-#define DEFAULT_DRIVE "C:"
-#define DEFAULT_BASE_DIRECTORY "\\"
 
 class ftp {
 	public:
 	ftp();
 	~ftp();
-	int session(rfsv32 & a, int xargc, char **xargv);
+	int session(rfsv & a, rpcs & r, int xargc, char **xargv);
 
 	 private:
 	void getCommand(int &argc, char **argv);
+	void initReadline(void);
 
 	// utilities
 	bool unixDirExists(const char *dir);
 	void getUnixDir(bufferArray & files);
 	void resetUnixPwd();
 	void usage();
-	void errprint(long errcode, rfsv32 & a);
+	void errprint(long errcode, rfsv & a);
 	void cd(const char *source, const char *cdto, char *dest);
-	int convertName(const char *orig, char *retVal);
 
+	// MJG: note, this isn't actually used anywhere
+	int convertName(const char *orig, char *retVal);
+#ifdef HAVE_READLINE
+	char *filename_generator(char *, int);
+	char *command_generator(char *, int);
+	char **do_completion(char *, int, int);
+#endif
+	char defDrive[9];
 	char localDir[1024];
-	char psionDir[1024];
+	// char psionDir[1024];
 };
 
 #endif

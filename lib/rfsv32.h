@@ -1,121 +1,119 @@
 #ifndef _rfsv32_h_
 #define _rfsv32_h_
 
+#include "rfsv.h"
+
 class ppsocket;
 class bufferStore;
 class bufferArray;
 
-class rfsv32 {
+class rfsv32 : public rfsv {
 	public:
-	rfsv32(ppsocket * skt);
+	rfsv32(ppsocket *);
 	~rfsv32();
 	void reset();
 	void reconnect();
 
-	long dir(const char *name, bufferArray * files);
-	long dircount(const char *name, long *count);
-	long copyFromPsion(const char *from, const char *to);
-	long copyToPsion(const char *from, const char *to);
-	long mkdir(const char *name);
-	long rmdir(const char *name);
-	long remove(const char *name);
-	long rename(const char *oldname, const char *newname);
-	long mktemp(long *handle, char *tmpname);
-	long fgeteattr(const char *name, long *attr, long *size, long *time);
-	long fgetattr(const char *name, long *attr);
-	long fsetattr(const char *name, long seta, long unseta);
-	long fgetmtime(const char *name, long *mtime);
-	long fsetmtime(const char *name, long mtime);
-	long fopendir(long attr, const char *name, long &handle);
-	long fopen(long attr, const char *name, long &handle);
-	long fcreatefile(long attr, const char *name, long &handle);
-	long freplacefile(long attr, const char *name, long &handle);
-	long fseek(long handle, long pos, long mode);
-	long fread(long handle, char *buf, long len);
-	long fwrite(long handle, char *buf, long len);
-	long fsetsize(long handle, long size);
-	long fclose(long handle);
+	long dir(const char *, bufferArray *);
+	long dircount(const char *, long *);
+	long copyFromPsion(const char *, const char *, cpCallback_t);
+	long copyToPsion(const char *, const char *, cpCallback_t);
+	long mkdir(const char *);
+	long rmdir(const char *);
+	long remove(const char *);
+	long rename(const char *, const char *);
+	long mktemp(long *, char *);
+	long fgeteattr(const char *, long *, long *, long *);
+	long fgetattr(const char *, long *);
+	long fsetattr(const char *, long, long);
+	long fgetmtime(const char *, long *);
+	long fsetmtime(const char *, long);
+	long fopendir(long, const char *, long &);
+	long fopen(long, const char *, long &);
+	long fcreatefile(long, const char *, long &);
+	long freplacefile(long, const char *, long &);
+	long fseek(long, long, long);
+	long fread(long, unsigned char *, long);
+	long fwrite(long, unsigned char *, long);
+	long fsetsize(long, long);
+	long fclose(long);
 
-	long devlist(long *devbits);
-	char *devinfo(int devnum, long *vfree, long *vtotal, long *vattr, long *vuiqueid);
+	long devlist(long *);
+	char *devinfo(int, long *, long *, long *, long *);
 	long getStatus();
-	char *opErr(long status);
+	char *opAttr(long);
+	long opMode(long);
 
-	enum seek_mode {
-		PSI_SEEK_SET = 1,
-		PSI_SEEK_CUR = 2,
-		PSI_SEEK_END = 3
-	};
-
+	private:
+	
 	enum file_attrib {
-		PSI_ATTR_RONLY      = 0x0001,
-		PSI_ATTR_HIDDEN     = 0x0002,
-		PSI_ATTR_SYSTEM     = 0x0004,
-		PSI_ATTR_DIRECTORY  = 0x0010,
-		PSI_ATTR_ARCHIVE    = 0x0020,
-		PSI_ATTR_VOLUME     = 0x0040,
-		PSI_ATTR_NORMAL     = 0x0080,
-		PSI_ATTR_TEMPORARY  = 0x0100,
-		PSI_ATTR_COMPRESSED = 0x0800
+		EPOC_ATTR_RONLY      = 0x0001,
+		EPOC_ATTR_HIDDEN     = 0x0002,
+		EPOC_ATTR_SYSTEM     = 0x0004,
+		EPOC_ATTR_DIRECTORY  = 0x0010,
+		EPOC_ATTR_ARCHIVE    = 0x0020,
+		EPOC_ATTR_VOLUME     = 0x0040,
+		EPOC_ATTR_NORMAL     = 0x0080,
+		EPOC_ATTR_TEMPORARY  = 0x0100,
+		EPOC_ATTR_COMPRESSED = 0x0800
 	};
 
 	enum open_mode {
-		PSI_OMODE_SHARE_EXCLUSIVE = 0x0000,
-		PSI_OMODE_SHARE_READERS = 0x0001,
-		PSI_OMODE_SHARE_ANY = 0x0002,
-		PSI_OMODE_BINARY = 0x0000,
-		PSI_OMODE_TEXT = 0x0020,
-		PSI_OMODE_READ_WRITE = 0x0200
+		EPOC_OMODE_SHARE_EXCLUSIVE = 0x0000,
+		EPOC_OMODE_SHARE_READERS = 0x0001,
+		EPOC_OMODE_SHARE_ANY = 0x0002,
+		EPOC_OMODE_BINARY = 0x0000,
+		EPOC_OMODE_TEXT = 0x0020,
+		EPOC_OMODE_READ_WRITE = 0x0200
 	};
 
-	enum errs {
-		PSI_ERR_NONE = 0,
-		PSI_ERR_NOT_FOUND = -1,
-		PSI_ERR_GENERAL = -2,
-		PSI_ERR_CANCEL = -3,
-		PSI_ERR_NO_MEMORY = -4,
-		PSI_ERR_NOT_SUPPORTED = -5,
-		PSI_ERR_ARGUMENT = -6,
-		PSI_ERR_TOTAL_LOSS_OF_PRECISION = -7,
-		PSI_ERR_BAD_HANDLE = -8,
-		PSI_ERR_OVERFLOW = -9,
-		PSI_ERR_UNDERFLOW = -10,
-		PSI_ERR_ALREADY_EXISTS = -11,
-		PSI_ERR_PATH_NOT_FOUND = -12,
-		PSI_ERR_DIED = -13,
-		PSI_ERR_IN_USE = -14,
-		PSI_ERR_SERVER_TERMINATED = -15,
-		PSI_ERR_SERVER_BUSY = -16,
-		PSI_ERR_COMPLETION = -17,
-		PSI_ERR_NOT_READY = -18,
-		PSI_ERR_UNKNOWN = -19,
-		PSI_ERR_CORRUPT = -20,
-		PSI_ERR_ACCESS_DENIED = -21,
-		PSI_ERR_LOCKED = -22,
-		PSI_ERR_WRITE = -23,
-		PSI_ERR_DISMOUNTED = -24,
-		PSI_ERR_EoF = -25,
-		PSI_ERR_DISK_FULL = -26,
-		PSI_ERR_BAD_DRIVER = -27,
-		PSI_ERR_BAD_NAME = -28,
-		PSI_ERR_COMMS_LINE_FAIL = -29,
-		PSI_ERR_COMMS_FRAME = -30,
-		PSI_ERR_COMMS_OVERRUN = -31,
-		PSI_ERR_COMMS_PARITY = -32,
-		PSI_ERR_TIMEOUT = -33,
-		PSI_ERR_COULD_NOT_CONNECT = -34,
-		PSI_ERR_COULD_NOT_DISCONNECT = -35,
-		PSI_ERR_DISCONNECTED = -36,
-		PSI_ERR_BAD_LIBRARY_ENTRY_POINT = -37,
-		PSI_ERR_BAD_DESCRIPTOR = -38,
-		PSI_ERR_ABORT = -39,
-		PSI_ERR_TOO_BIG = -40,
-		PSI_ERR_DIVIDE_BY_ZERO = -41,
-		PSI_ERR_BAD_POWER = -42,
-		PSI_ERR_DIR_FULL = -43
+	enum epoc_errs {
+		E_EPOC_NONE = 0,
+		E_EPOC_NOT_FOUND = -1,
+		E_EPOC_GENERAL = -2,
+		E_EPOC_CANCEL = -3,
+		E_EPOC_NO_MEMORY = -4,
+		E_EPOC_NOT_SUPPORTED = -5,
+		E_EPOC_ARGUMENT = -6,
+		E_EPOC_TOTAL_LOSS_OF_PRECISION = -7,
+		E_EPOC_BAD_HANDLE = -8,
+		E_EPOC_OVERFLOW = -9,
+		E_EPOC_UNDERFLOW = -10,
+		E_EPOC_ALREADY_EXISTS = -11,
+		E_EPOC_PATH_NOT_FOUND = -12,
+		E_EPOC_DIED = -13,
+		E_EPOC_IN_USE = -14,
+		E_EPOC_SERVER_TERMINATED = -15,
+		E_EPOC_SERVER_BUSY = -16,
+		E_EPOC_COMPLETION = -17,
+		E_EPOC_NOT_READY = -18,
+		E_EPOC_UNKNOWN = -19,
+		E_EPOC_CORRUPT = -20,
+		E_EPOC_ACCESS_DENIED = -21,
+		E_EPOC_LOCKED = -22,
+		E_EPOC_WRITE = -23,
+		E_EPOC_DISMOUNTED = -24,
+		E_EPOC_EoF = -25,
+		E_EPOC_DISK_FULL = -26,
+		E_EPOC_BAD_DRIVER = -27,
+		E_EPOC_BAD_NAME = -28,
+		E_EPOC_COMMS_LINE_FAIL = -29,
+		E_EPOC_COMMS_FRAME = -30,
+		E_EPOC_COMMS_OVERRUN = -31,
+		E_EPOC_COMMS_PARITY = -32,
+		E_EPOC_TIMEOUT = -33,
+		E_EPOC_COULD_NOT_CONNECT = -34,
+		E_EPOC_COULD_NOT_DISCONNECT = -35,
+		E_EPOC_DISCONNECTED = -36,
+		E_EPOC_BAD_LIBRARY_ENTRY_POINT = -37,
+		E_EPOC_BAD_DESCRIPTOR = -38,
+		E_EPOC_ABORT = -39,
+		E_EPOC_TOO_BIG = -40,
+		E_EPOC_DIVIDE_BY_ZERO = -41,
+		E_EPOC_BAD_POWER = -42,
+		E_EPOC_DIR_FULL = -43
 	};
 
-	private:
 	enum commands {
 		CLOSE_HANDLE     = 0x01,
 		OPEN_DIR         = 0x10,
@@ -154,15 +152,16 @@ class rfsv32 {
 	};
 
 	const char *getConnectName();
+	long err2psierr(long);
 
 	// Communication
-	bool sendCommand(enum commands c, bufferStore & data);
-	long getResponse(bufferStore & data);
-	char *convertSlash(const char *name);
+	bool sendCommand(enum commands, bufferStore &);
+	long getResponse(bufferStore &);
+	char *convertSlash(const char *);
 
 	// time-conversion
-	unsigned long micro2time(unsigned long microHi, unsigned long microLo);
-	void time2micro(unsigned long mtime, unsigned long &microHi, unsigned long &microLo);
+	unsigned long micro2time(unsigned long, unsigned long);
+	void time2micro(unsigned long, unsigned long &, unsigned long &);
 
 	// Vars
 	ppsocket *skt;

@@ -36,17 +36,23 @@ public:
   virtual ~socketChan();
 
   void ncpDataCallback(bufferStore& a);
-  const char* getNcpConnectName();
+  char* getNcpConnectName();
   void ncpConnectAck();
+  void ncpRegisterAck();
+  void ncpDoRegisterAck(int) {}
   void ncpConnectTerminate();
+  void ncpConnectNak();
 
   bool isConnected() const;
   void socketPoll();
 private:
+  enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
+  bool ncpCommand(bufferStore &a);
   ppsocket* skt;
   IOWatch &iow;
   char* connectName;
   bool connected;
+  int connectTry;
 };
 
 #endif

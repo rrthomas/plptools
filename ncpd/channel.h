@@ -35,18 +35,25 @@ class bufferStore;
 class channel {
 	public:
 		channel(ncp *ncpController);
+		virtual ~channel() {}
 		void newNcpController(ncp *ncpController);
 
 		void setNcpChannel(int chan);
+		int getNcpChannel(void);
 		void ncpSend(bufferStore &a);
 		void setVerbose(short int _verbose);
 		short int getVerbose();
 		virtual void ncpDataCallback(bufferStore &a) = NULL;
-		virtual const char *getNcpConnectName() = NULL;
+		virtual char *getNcpConnectName() = NULL;
 		void ncpConnect();
+		void ncpRegister();
+		void ncpDoRegisterAck(int);
 		virtual void ncpConnectAck() = NULL;
 		virtual void ncpConnectTerminate() = NULL;
+		virtual void ncpConnectNak() = NULL;
+		virtual void ncpRegisterAck() = NULL;
 		void ncpDisconnect();
+		short int ncpProtocolVersion();
 
 		// The following two calls are used for destructing an instance
 		virtual bool terminate(); // Mainloop will terminate this class if true
@@ -57,8 +64,8 @@ class channel {
 
 	private:
 		ncp *ncpController;
-		bool _terminate;
 		int ncpChannel;
+		bool _terminate;
 };
 
 #endif

@@ -46,7 +46,8 @@ fattr root_fattr =
 	{0, 0}
 };
 
-#if defined(hpux) || defined(__SVR4) || defined(__sgi)
+#if defined(hpux) || defined(__SVR4) || defined(__sgi) 
+#ifndef sun  
 void
 usleep(usec)
 int usec;
@@ -57,7 +58,7 @@ int usec;
 	t.tv_usec = (long) (usec % 1000000);
 	select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, &t);
 }
-
+#endif
 #endif				/* hpux */
 
 int

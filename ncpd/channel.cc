@@ -32,6 +32,7 @@
 channel::channel(ncp * _ncpController)
 {
 	verbose = 0;
+	ncpChannel = 0;
 	ncpController = _ncpController;
 	_terminate = false;
 }
@@ -61,15 +62,39 @@ ncpConnect()
 }
 
 void channel::
+ncpRegister()
+{
+	ncpController->Register(this);
+}
+
+void channel::
+ncpDoRegisterAck(int ch)
+{
+	ncpController->RegisterAck(ch);
+}
+
+void channel::
 ncpDisconnect()
 {
 	ncpController->disconnect(ncpChannel);
+}
+
+short int channel::
+ncpProtocolVersion()
+{
+	return ncpController->getProtocolVersion();
 }
 
 void channel::
 setNcpChannel(int chan)
 {
 	ncpChannel = chan;
+}
+
+int channel::
+getNcpChannel()
+{
+	return ncpChannel;
 }
 
 void channel::

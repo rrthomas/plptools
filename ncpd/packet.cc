@@ -33,6 +33,7 @@
 #include <iomanip.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <termios.h>
 
 extern "C" {
 #include "mp_serial.h"
@@ -170,6 +171,10 @@ get(unsigned char &type, bufferStore & ret)
 		}
 		if (res < 0)
 			return false;
+		// XXX Solaris returns 0 on non blocking TTY lines
+		// even when VMIN > 0
+		if( res == 0 && inLen == 0 )
+			return false;
 		if (inLen >= BUFFERLEN) {
 			cerr << "packet: input buffer overflow!!!!" << endl;
 			inLen = 0;
@@ -256,13 +261,17 @@ linkFailed()
 	int res = ioctl(fd, TIOCMGET, &arg);
 	if (res < 0)
 		failed = true;
-	if (verbose & PKT_DEBUG_DUMP)
+	if (verbose & PKT_DEBUG_HANDSHAKE)
 		cout << "packet: DTR:" << ((arg & TIOCM_DTR)?1:0)
 			<< " RTS:" << ((arg & TIOCM_RTS)?1:0)
 			<< " DCD:" << ((arg & TIOCM_CAR)?1:0)
 			<< " DSR:" << ((arg & TIOCM_DSR)?1:0)
 			<< " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
+#ifdef sun
+	if ((arg & TIOCM_CTS) == 0)
+#else
 	if (((arg & TIOCM_DSR) == 0) || ((arg & TIOCM_CTS) == 0))
+#endif
 		failed = true;
 	if ((verbose & PKT_DEBUG_LOG) && failed)
 		cout << "packet: linkFAILED\n";
