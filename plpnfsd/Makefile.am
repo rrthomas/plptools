@@ -11,7 +11,7 @@ EXTRA_plpnfsd_SOURCES = mount_aix.c
 EXTRA_DIST = rfsv_api.h builtins.h
 
 install-exec-hook:
-	chmod u+s $(sbindir)/plpnfsd
+	chmod u+s $(DESTDIR)$(sbindir)/plpnfsd
 
 maintainer-clean-local:
 	rm -f Makefile.in
