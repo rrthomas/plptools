@@ -77,6 +77,7 @@ public:
     Enum<rfsv::errs> closedir(rfsvDirhandle &);
     Enum<rfsv::errs> setVolumeName(const char, const char * const);
     u_int32_t opMode(const u_int32_t);
+    int getProtocolVersion() { return 5; }
 
 private:
 

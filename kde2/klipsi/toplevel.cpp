@@ -554,6 +554,18 @@ checkConnection() {
 	rf = rff->create(true);
 
     if (rf) {
+	if (rf->getProtocolVersion() == 3) {
+	    closeConnection();
+	    delete timer;
+	    timer = NULL;
+	    KMessageBox::error(NULL, i18n(
+	        "<QT>Your Psion is reported to be a <B>Series 3</B> "
+		"machine. This type of machine does <B>not support</B> the "
+		"remote clipboard protocol; Sorry.<BR/>"
+		"<B>Klipsi</B> will now terminate.</QT>"),
+			       i18n("Protocol not supported"));
+	    return false;
+	}
 	if (!rc) {
 	    rc = new rclip(rclipSocket);
 	    Enum<rfsv::errs> ret;

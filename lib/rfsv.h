@@ -607,6 +607,13 @@ public:
      */
     int getSpeed();
 
+    /**
+     * Retrieves the protocol version.
+     *
+     * @returns Either 3 or 5 representing Series 3 (SIBO) or Series 5 (EPOC)
+     */
+    virtual int getProtocolVersion() = 0;
+
 protected:
     /**
     * Retrieves the PLP protocol name. Mainly internal use.
