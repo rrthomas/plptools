@@ -3,7 +3,7 @@ AC_REVISION($Revision$)dnl revision of this configure.in script
 AC_INIT(acinclude.m4)
 AC_CANONICAL_SYSTEM
 AM_CONFIG_HEADER(include/config.h)
-AM_INIT_AUTOMAKE(plptools, 0.6)
+AM_INIT_AUTOMAKE(plptools, 0.7)
 AM_PROG_LIBTOOL
 
 dnl Enable Maintainer stuff
@@ -12,6 +12,7 @@ AM_MAINTAINER_MODE
 dnl checks for programs
 AC_AIX
 AC_PROG_MAKE_SET
+AC_PROG_CXX
 AC_CHECK_COMPILERS
 AC_PROG_AWK
 AC_PATH_PROG(SED,sed)

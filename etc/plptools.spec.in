@@ -1,0 +1,92 @@
+Summary: Connectivity for psion series 5.
+Name: plptools
+%define version _VERSION_
+Version: %{version}
+Release: 1
+Vendor: Thinking Objects Software GmbH
+Packager: Fritz Elfert <fritz.elfert@to.com>
+URL: http://sourceforge.net/projects/plptools
+Source0: http://download.sourceforge.net/plptools/plptools-%{version}.tar.gz
+Copyright: GPL
+Group: Networking/Utilities
+Requires: chkconfig >= 0.9
+Buildrequires: libreadline
+BuildRoot: /tmp/plputils-buildroot
+
+%package devel
+Summary: Static library and includes for psion series 5 communication.
+Group: Development/Libraries
+
+%description
+This package contains the programs (client and server), necessary to
+communicate with a psion series 5. The psion's file-system will
+be automatically mounted under /mnt/psion at the time it is
+connected to your computer. If the psion is shut down or
+disconnected, the contents of /mnt/psion will automatically
+disappear. A second program (plpftp) allows you to transfer
+files in a ftp-like manner.
+
+%description devel
+This package contains the static library and include files for building
+programs which can communicate with a psion series 5.
+
+%description -l de
+Dieses Packet enthält Programme zur Kommunikation mit einem Psion 5.
+Das Dateisystem des Psion wird beim Anschließen automatisch unter
+/mnt/psion eingehängt. Wird der Psion ausgeschaltet oder das Kabel
+gezogen, so verschwindet der Inhalt dieses Verzeichnisses automatisch
+und erscheint erneuten Anschließen wieder. Ein weiteres Programm ist
+plpftp, welches eine FTP-ähnliche Oberfläche für Dateitransfer
+bietet.
+
+%description -l de devel
+Dieses Packet enthält die statische Bibliothek und include-Dateien
+zur Programm-Entwicklung von Kommunikations-software für den Psion 5.
+
+%changelog
+* Mon Jan 17 2000 Fritz Elfert <fritz.elfert@to.com>
+- New version 0.5 with lots of bugfixes and additions.
+
+* Sat Aug  7 1999 Fritz Elfert <fritz.elfert@to.com>
+- fixed violation of const parameters in rfsv32.cc.
+- corrected BLOCKSIZE in mp.h to fix behaviour of "du" program.
+
+%prep
+%setup
+
+%build
+%configure
+make
+
+%install
+mkdir -p $RPM_BUILD_ROOT/usr $RPM_BUILD_ROOT/etc/rc.d/init.d
+%makeinstall
+install -m755 etc/psion $RPM_BUILD_ROOT/etc/rc.d/init.d
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post
+ldconfig
+/sbin/chkconfig --add psion
+/etc/rc.d/init.d/psion restart
+
+%preun
+if [ "$1" = 0 ]
+then
+	/etc/rc.d/init.d/psion stop >&2
+	/sbin/chkconfig --del psion
+fi
+
+%files
+%doc COPYING INSTALL CHANGES README* TODO etc/*magic patches
+%{_bindir}/*
+%{_sbindir}/*
+%{_mandir}/*/*
+%{_libdir}/libplp.so*
+%config /etc/rc.d/init.d/psion
+
+%files devel
+%doc doc/api etc/*.spec
+%{_libdir}/libplp.a
+%{_includedir}/%{name}/*

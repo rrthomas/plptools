@@ -12,3 +12,9 @@ man_MANS = ncpd.8 plpnfsd.8 plpftp.1
 	MANDATE=`grep CHECKIN $< | $(AWK) '{print $$4}'` ; \
 	$(SED) -e "s%@MANDATE@%$$MANDATE%g" $< > $@
 
+#
+# remove all intermediate files that can be recreated using
+# Makefile.cvs
+#
+maintainer-clean-local:
+	rm -f Makefile.in *.1 *.8
