@@ -26,6 +26,7 @@
 #endif
 
 #include "kpsion.h"
+#include "kpsionconfig.h"
 #include "wizards.h"
 
 #include <kapp.h>
@@ -56,402 +57,6 @@
 #define OFFLINE 0
 
 #define STID_CONNECTION 1
-
-class KPsionCheckListItem::KPsionCheckListItemMetaData {
-    friend KPsionCheckListItem;
-
-private:
-    KPsionCheckListItemMetaData();
-    ~KPsionCheckListItemMetaData() { };
-
-    bool parentIsKPsionCheckListItem;
-    bool dontPropagate;
-    int backupType;
-    int size;
-    time_t when;
-    u_int32_t timeHi;
-    u_int32_t timeLo;
-    u_int32_t attr;
-    QString name;
-};
-
-KPsionCheckListItem::KPsionCheckListItemMetaData::KPsionCheckListItemMetaData() {
-    when = 0;
-    size = 0;
-    timeHi = 0;
-    timeLo = 0;
-    attr = 0;
-    name = QString::null;
-    backupType = KPsionBackupListView::UNKNOWN;
-}
-
-KPsionCheckListItem::~KPsionCheckListItem() {
-    delete meta;
-}
-
-KPsionCheckListItem *KPsionCheckListItem::
-firstChild() const {
-    return (KPsionCheckListItem *)QListViewItem::firstChild();
-}
-
-KPsionCheckListItem *KPsionCheckListItem::
-nextSibling() const {
-    return (KPsionCheckListItem *)QListViewItem::nextSibling();
-}
-
-void KPsionCheckListItem::
-init(bool myparent) {
-    setSelectable(false);
-    meta = new KPsionCheckListItemMetaData();
-    meta->dontPropagate = false;
-    meta->parentIsKPsionCheckListItem = myparent;
-}
-
-void KPsionCheckListItem::
-setMetaData(int type, time_t when, QString name, int size,
-	    u_int32_t tHi, u_int32_t tLo, u_int32_t attr) {
-	meta->backupType = type;
-	meta->when = when;
-	meta->name = name;
-	meta->size = size;
-	meta->timeHi = tHi;
-	meta->timeLo = tLo;
-	meta->attr = attr;
-}
-
-void KPsionCheckListItem::
-stateChange(bool state) {
-    QCheckListItem::stateChange(state);
-
-    if (meta->dontPropagate)
-	return;
-    if (meta->parentIsKPsionCheckListItem)
-	((KPsionCheckListItem *)QListViewItem::parent())->propagateUp(state);
-    else
-	emit rootToggled();
-    propagateDown(state);
-}
-
-void KPsionCheckListItem::
-propagateDown(bool state) {
-    setOn(state);
-    KPsionCheckListItem *child = firstChild();
-    while (child) {
-	child->propagateDown(state);
-	child = child->nextSibling();
-    }
-}
-
-void KPsionCheckListItem::
-propagateUp(bool state) {
-    bool deactivateThis = false;
-
-    KPsionCheckListItem *child = firstChild();
-    while (child) {
-	if ((child->isOn() != state) || (!child->isEnabled())) {
-	    deactivateThis = true;
-	    break;
-	}
-	child = child->nextSibling();
-    }
-    meta->dontPropagate = true;
-    if (deactivateThis) {
-	setOn(true);
-	setEnabled(false);
-    } else {
-	setEnabled(true);
-	setOn(state);
-    }
-    // Bug in QListView? It doesn't update, when
-    // enabled/disabled without activating.
-    // -> force it.
-    listView()->repaintItem(this);
-    meta->dontPropagate = false;
-    if (meta->parentIsKPsionCheckListItem)
-	((KPsionCheckListItem *)QListViewItem::parent())->propagateUp(state);
-    else
-	emit rootToggled();
-}
-
-QString KPsionCheckListItem::
-key(int column, bool ascending) const {
-    if (meta->when) {
-	QString tmp;
-	tmp.sprintf("%08d", meta->when);
-	return tmp;
-    }
-    return text();
-}
-
-QString KPsionCheckListItem::
-psionname() {
-    if (meta->parentIsKPsionCheckListItem)
-	return meta->name;
-    else
-	return QString::null;
-}
-
-QString KPsionCheckListItem::
-unixname() {
-    if (meta->parentIsKPsionCheckListItem)
-	return KPsionMainWindow::psion2unix(meta->name);
-    else
-	return QString::null;
-}
-
-QString KPsionCheckListItem::
-tarname() {
-    if (meta->parentIsKPsionCheckListItem)
-	return ((KPsionCheckListItem *)QListViewItem::parent())->tarname();
-    else
-	return meta->name;
-}
-
-int KPsionCheckListItem::
-backupType() {
-    if (meta->parentIsKPsionCheckListItem)
-	return ((KPsionCheckListItem *)QListViewItem::parent())->backupType();
-    else
-	return meta->backupType;
-}
-
-time_t KPsionCheckListItem::
-when() {
-    if (meta->parentIsKPsionCheckListItem)
-	return ((KPsionCheckListItem *)QListViewItem::parent())->when();
-    else
-	return meta->when;
-}
-
-PlpDirent KPsionCheckListItem::
-plpdirent() {
-    assert(meta->parentIsKPsionCheckListItem);
-    return PlpDirent(meta->size, meta->attr, meta->timeHi, meta->timeLo,
-		     meta->name);
-}
-
-KPsionBackupListView::KPsionBackupListView(QWidget *parent, const char *name)
-    : KListView(parent, name) {
-
-    toRestore.clear();
-    uid = QString::null;
-    KConfig *config = kapp->config();
-    config->setGroup("Settings");
-    backupDir = config->readEntry("BackupDir");
-    addColumn(i18n("Available backups"));
-    setRootIsDecorated(true);
-}
-
-KPsionCheckListItem *KPsionBackupListView::
-firstChild() const {
-    return (KPsionCheckListItem *)QListView::firstChild();
-}
-
-void KPsionBackupListView::
-readBackups(QString uid) {
-    QString bdir(backupDir);
-    bdir += "/";
-    bdir += uid;
-    QDir d(bdir);
-    kapp->processEvents();
-    const QFileInfoList *fil =
-	d.entryInfoList("*.tar.gz", QDir::Files|QDir::Readable, QDir::Name);
-    QFileInfoListIterator it(*fil);
-    QFileInfo *fi;
-    while ((fi = it.current())) {
-	kapp->processEvents();
-
-	bool isValid = false;
-	KTarGz tgz(fi->absFilePath());
-	const KTarEntry *te;
-	QString bTypeName;
-	int bType;
-	QDateTime date;
-
-	tgz.open(IO_ReadOnly);
-	te = tgz.directory()->entry("KPsionFullIndex");
-	if (te && (!te->isDirectory())) {
-	    date.setTime_t(te->date());
-	    bTypeName = i18n("Full");
-	    bType = FULL;
-	    isValid = true;
-	} else {
-	    te = tgz.directory()->entry("KPsionIncrementalIndex");
-	    if (te && (!te->isDirectory())) {
-		date.setTime_t(te->date());
-		bTypeName = i18n("Incremental");
-		bType = INCREMENTAL;
-		isValid = true;
-	    }
-	}
-
-	if (isValid) {
-	    QString n =	i18n("%1 backup, created at %2").arg(bTypeName).arg(KGlobal::locale()->formatDateTime(date, false));
-	    QByteArray a = ((KTarFile *)te)->data();
-	    QTextIStream indexData(a);
-
-	    indexData.readLine();
-	    indexData.flags(QTextStream::hex);
-	    indexData.fill('0');
-	    indexData.width(8);
-
-	    KPsionCheckListItem *i =
-		new KPsionCheckListItem(this, n,
-					KPsionCheckListItem::CheckBox);
-	    i->setMetaData(bType, te->date(), tgz.fileName(), 0, 0, 0, 0);
-	    i->setPixmap(0, KGlobal::iconLoader()->loadIcon("mime_empty",
-							 KIcon::Small));
-	    connect(i, SIGNAL(rootToggled()), this, SLOT(slotRootToggled()));
-
-	    QStringList files = tgz.directory()->entries();
-	    for (QStringList::Iterator f = files.begin();
-		 f != files.end(); f++)
-		if ((*f != "KPsionFullIndex") &&
-		    (*f != "KPsionIncrementalIndex"))
-		    listTree(i, tgz.directory()->entry(*f), indexData, 0);
-	}
-	tgz.close();
-	++it;
-    }
-    header()->setClickEnabled(false);
-    header()->setResizeEnabled(false);
-    header()->setMovingEnabled(false);
-    setMinimumSize(columnWidth(0) + 4, height());
-    QWhatsThis::add(this, i18n(
-			"<qt>Here, you can select the available backups."
-			" Select the items you want to restore, the click"
-			" on <b>Start</b> to start restoring these items."
-			"</qt>"));
-}
-
-void KPsionBackupListView::
-listTree(KPsionCheckListItem *cli, const KTarEntry *te, QTextIStream &idx,
-	 int level) {
-    KPsionCheckListItem *i =
-	new KPsionCheckListItem(cli, te->name(),
-				KPsionCheckListItem::CheckBox);
-    kapp->processEvents();
-    if (te->isDirectory()) {
-	if (level)
-	    i->setPixmap(0, KGlobal::iconLoader()->loadIcon("folder",
-							    KIcon::Small));
-	else
-	    i->setPixmap(0, KGlobal::iconLoader()->loadIcon("hdd_unmount",
-							    KIcon::Small));
-	i->setMetaData(0, 0, QString::null, 0, 0, 0, 0);
-	KTarDirectory *td = (KTarDirectory *)te;
-	QStringList files = td->entries();
-	for (QStringList::Iterator f = files.begin(); f != files.end(); f++)
-	    listTree(i, td->entry(*f), idx, level + 1);
-    } else {
-	uint32_t timeHi;
-	uint32_t timeLo;
-	uint32_t size;
-	uint32_t attr;
-	QString  name;
-
-	i->setPixmap(0, KGlobal::iconLoader()->loadIcon("mime_empty",
-							KIcon::Small));
-	idx >> timeHi >> timeLo >> size >> attr >> name;
-	i->setMetaData(0, 0, name, size, timeHi, timeLo, attr);
-    }
-}
-
-void KPsionBackupListView::
-slotRootToggled() {
-    bool anyOn = false;
-    KPsionCheckListItem *i = firstChild();
-    while (i != 0L) {
-	if (i->isOn()) {
-	    anyOn = true;
-	    break;
-	}
-	i = i->nextSibling();
-    }
-    emit itemsEnabled(anyOn);
-}
-
-QStringList KPsionBackupListView::
-getSelectedTars() {
-    QStringList l;
-
-    KPsionCheckListItem *i = firstChild();
-    while (i != 0L) {
-	if (i->isOn())
-	    l += i->tarname();
-	i = i->nextSibling();
-    }
-    return l;
-}
-
-bool KPsionBackupListView::
-autoSelect(QString drive) {
-    KPsionCheckListItem *latest = NULL;
-    time_t stamp = 0;
-
-    drive += ":";
-    // Find latest full backup for given drive
-    KPsionCheckListItem *i = firstChild();
-    while (i != 0L) {
-	if ((i->backupType() == FULL) && (i->when() > stamp)) {
-	    KPsionCheckListItem *c = i->firstChild();
-	    while (c != 0L) {
-		if (c->text() == drive) {
-		    latest = c;
-		    stamp = i->when();
-		    break;
-		}
-		c = c->nextSibling();
-	    }
-	}
-	i = i->nextSibling();
-    }
-    // Now find all incremental backups for given drive which are newer than
-    // selected backup
-    if (latest != 0) {
-	latest->setOn(true);
-	i = firstChild();
-	while (i != 0L) {
-	    if ((i->backupType() == INCREMENTAL) && (i->when() >= stamp)) {
-		KPsionCheckListItem *c = i->firstChild();
-		while (c != 0L) {
-		    if (c->text() == drive)
-			c->setOn(true);
-		    c = c->nextSibling();
-		}
-	    }
-	    i = i->nextSibling();
-	}
-    }
-    return (latest != 0L);
-}
-
-void KPsionBackupListView::
-collectEntries(KPsionCheckListItem *i) {
-    while (i != 0L) {
-	KPsionCheckListItem *c = i->firstChild();
-	if (c == 0L) {
-	    if (i->isOn())
-		toRestore.push_back(i->plpdirent());
-	} else
-	    collectEntries(c);
-	i = i->nextSibling();
-    }
-}
-
-PlpDir &KPsionBackupListView::
-getRestoreList(QString tarname) {
-    toRestore.clear();
-    KPsionCheckListItem *i = firstChild();
-    while (i != 0L) {
-	if ((i->tarname() == tarname) && (i->isOn())) {
-	    collectEntries(i->firstChild());
-	    break;
-	}
-	i = i->nextSibling();
-    }
-    return toRestore;
-}
 
 KPsionMainWindow::KPsionMainWindow()
     : KMainWindow() {
@@ -488,18 +93,33 @@ KPsionMainWindow::KPsionMainWindow()
     connect(this, SIGNAL(rearrangeIcons(bool)), view,
 	    SLOT(arrangeItemsInGrid(bool)));
     KConfig *config = kapp->config();
-    config->setGroup("Psion");
-    QStringList uids = config->readListEntry("MachineUIDs");
-    for (QStringList::Iterator it = uids.begin(); it != uids.end(); it++) {
-	QString tmp = QString::fromLatin1("Name_%1").arg(*it);
-	machines.insert(*it, config->readEntry(tmp));
-    }
-    config->setGroup("Settings");
-    backupDir = config->readEntry("BackupDir");
-    config->setGroup("Connection");
-    reconnectTime = config->readNumEntry("Retry");
-    ncpdDevice = config->readEntry("Device", i18n("off"));
-    ncpdSpeed = config->readNumEntry("Speed", 115200);
+    KPsionConfig pcfg;
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_UIDS));
+    QStringList uids = config->readListEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_UIDS));
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_MACHNAME));
+    QString tmp = pcfg.getOptionName(KPsionConfig::OPT_MACHNAME);
+
+    for (QStringList::Iterator it = uids.begin(); it != uids.end(); it++)
+	machines.insert(*it, config->readEntry(tmp.arg(*it)));
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_BACKUPDIR));
+    backupDir = config->readEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_BACKUPDIR));
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_CONNRETRY));
+    reconnectTime = config->readNumEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_CONNRETRY));
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_SERIALDEV));
+    ncpdDevice = config->readEntry(pcfg.getOptionName(
+	KPsionConfig::OPT_SERIALDEV));
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_SERIALSPEED));
+    ncpdSpeed = config->readNumEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_SERIALSPEED));
 
     QWhatsThis::add(view, i18n(
 			"<qt>Here, you see your Psion's drives.<br/>"
@@ -691,15 +311,16 @@ queryPsion() {
     QString uid = getMachineUID();
     bool machineFound = false;
     KConfig *config = kapp->config();
-    config->setGroup("Psion");
+    KPsionConfig pcfg;
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_BACKUPDRIVES));
+    QString tmp = pcfg.getOptionName(KPsionConfig::OPT_BACKUPDRIVES);
     machineName = i18n("an unknown machine");
     psionMap::Iterator it;
     for (it = machines.begin(); it != machines.end(); it++) {
 	if (uid == it.key()) {
 	    machineName = it.data();
-	    QString tmp =
-		QString::fromLatin1("BackupDrives_%1").arg(it.key());
-	    backupDrives = config->readListEntry(tmp);
+	    backupDrives = config->readListEntry(tmp.arg(it.key()));
 	    machineFound = true;
 	}
     }
@@ -1172,50 +793,6 @@ doBackup() {
     statusBar()->message(i18n("Backup done"), 2000);
 }
 
-KPsionRestoreDialog::KPsionRestoreDialog(QWidget *parent, QString uid)
-    : KDialogBase(parent, "restoreDialog", true, i18n("Restore"),
-		  KDialogBase::Cancel | KDialogBase::Ok,
-		  KDialogBase::Ok, true) {
-
-    setButtonOKText(i18n("Start"));
-    enableButtonOK(false);
-    setButtonWhatsThis(KDialogBase::Ok,
-		       i18n("Select items in the list of"
-			    " available backups, then click"
-			    " here to start restore of these"
-			    " items."));
-
-    QWidget *w = new QWidget(this);
-    setMainWidget(w);
-    QGridLayout *gl = new QGridLayout(w, 1, 1, KDialog::marginHint(),
-				      KDialog::marginHint());
-    backupView = new KPsionBackupListView(w, "restoreSelector");
-    gl->addWidget(backupView, 0, 0);
-    backupView->readBackups(uid);
-    connect(backupView, SIGNAL(itemsEnabled(bool)), this,
-	    SLOT(slotBackupsSelected(bool)));
-}
-
-void KPsionRestoreDialog::
-slotBackupsSelected(bool any) {
-    enableButtonOK(any);
-}
-
-QStringList KPsionRestoreDialog::
-getSelectedTars() {
-    return backupView->getSelectedTars();
-}
-
-bool KPsionRestoreDialog::
-autoSelect(QString drive) {
-    return backupView->autoSelect(drive);
-}
-
-PlpDir &KPsionRestoreDialog::
-getRestoreList(QString tarname) {
-    return backupView->getRestoreList(tarname);
-}
-
 bool KPsionMainWindow::
 askOverwrite(PlpDirent e) {
     if (overWriteAll)
@@ -1327,6 +904,7 @@ slotStartRestore() {
 
     if (restoreDialog.exec() == KDialogBase::Accepted) {
 	QStringList tars = restoreDialog.getSelectedTars();
+	QStringList fmtDrives = restoreDialog.getFormatDrives();
 	QStringList::Iterator t;
 
 	backupSize = 0;
@@ -1389,6 +967,22 @@ slotStartRestore() {
 			int bslash = cpDir.findRev('\\');
 			if (bslash > 0)
 			    cpDir = cpDir.left(bslash);
+
+			QString drv = cpDir.left(1);
+			if (fmtDrives.find(drv) != fmtDrives.end()) {
+			    int tSave = progressCount;
+			    doFormat(drv);
+			    fmtDrives.remove(drv);
+			    progressTotalText = i18n("Restore %1% done");
+			    progressTotal = backupSize;
+			    progressCount = tSave;
+			    progressLocal = e.getSize();
+			    progressLocalCount = 0;
+			    progressLocalPercent = -1;
+			    emit setProgressText(QString("%1").arg(fn));
+			    emit enableProgressText(true);
+			    emit setProgress(0);
+			}
 			if (pDir != cpDir) {
 			    pDir = cpDir;
 			    res = plpRfsv->mkdir(pDir);
@@ -1447,14 +1041,28 @@ slotStartRestore() {
 			u_int32_t mask = e.getAttr() ^ oldattr;
 			u_int32_t sattr = e.getAttr() & mask;
 			u_int32_t dattr = ~sattr & mask;
-			res = plpRfsv->fsetattr(fn, sattr, dattr);
+			int retry = 10;
+			// Retry, because file somtimes takes some time
+			// to close;
+			do {
+			    res = plpRfsv->fsetattr(fn, sattr, dattr);
+			    if (res != rfsv::E_PSI_GEN_NONE)
+				usleep(100000);
+			    retry--;
+			} while ((res != rfsv::E_PSI_GEN_NONE) && (retry > 0));
 			if (res != rfsv::E_PSI_GEN_NONE) {
 			    KMessageBox::error(this, i18n(
 				"<QT>Could not set attributes of<BR/>"
 				"<B>%1</B><BR/>Reason: %2</QT>").arg(fn).arg(KGlobal::locale()->translate(res)));
 			    continue;
 			}
-			res = plpRfsv->fsetmtime(fn, e.getPsiTime());
+			retry = 10;
+			do {
+			    res = plpRfsv->fsetmtime(fn, e.getPsiTime());
+			    if (res != rfsv::E_PSI_GEN_NONE)
+				usleep(100000);
+			    retry--;
+			} while ((res != rfsv::E_PSI_GEN_NONE) && (retry > 0));
 			if (res != rfsv::E_PSI_GEN_NONE) {
 			    KMessageBox::error(this, i18n(
 				"<QT>Could not set modification time of<BR/>"
@@ -1488,6 +1096,66 @@ slotStartRestore() {
 }
 
 void KPsionMainWindow::
+doFormat(QString drive) {
+    int handle;
+    int count;
+    const char dchar = drive[0].latin1();
+    QString dname("");
+
+    PlpDrive drv;
+    if (plpRfsv->devinfo(dchar, drv) == rfsv::E_PSI_GEN_NONE)
+	dname = QString(drv.getName().c_str());
+
+    statusBar()->changeItem(i18n("Formatting drive %1:").arg(dchar),
+				    STID_CONNECTION);
+    update();
+
+    emit setProgressText(QString(""));
+    emit setProgress(0);
+    emit enableProgressText(true);
+
+    Enum<rfsv::errs> res = plpRpcs->formatOpen(dchar, handle, count);
+    if (res != rfsv::E_PSI_GEN_NONE) {
+	KMessageBox::error(this, i18n(
+	    "<QT>Could not format drive %1:<BR/>"
+	    "%2</QT>").arg(dchar).arg(KGlobal::locale()->translate(res)));
+	emit setProgress(0);
+	emit enableProgressText(false);
+	statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
+				STID_CONNECTION);
+	return;
+    }
+    progressTotal = 0;
+    progressLocal = count;
+    progressLocalCount = 0;
+    progressLocalPercent = -1;
+    updateProgress(0);
+    for (int i = 0; i < count; i++) {
+	res = plpRpcs->formatRead(handle);
+	if (res != rfsv::E_PSI_GEN_NONE) {
+	    KMessageBox::error(this, i18n(
+		"<QT>Error during format of drive %1:<BR/>"
+		"%2</QT>").arg(dchar).arg(KGlobal::locale()->translate(res)));
+	    emit setProgress(0);
+	    emit enableProgressText(false);
+	    statusBar()->changeItem(
+		i18n("Connected to %1").arg(machineName),
+		STID_CONNECTION);
+	    count = 0;
+	    return;
+	}
+	updateProgress(1);
+    }
+    setDriveName(dchar, dname);
+
+    emit setProgress(0);
+    emit enableProgressText(false);
+    statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
+			    STID_CONNECTION);
+    statusBar()->message(i18n("Format done"), 2000);
+}
+
+void KPsionMainWindow::
 slotStartFormat() {
     if (KMessageBox::warningYesNo(this, i18n(
 				      "<QT>This erases <B>ALL</B> data "
@@ -1497,75 +1165,16 @@ slotStartFormat() {
 	return;
     formatRunning = true;
     switchActions();
-
     killSave();
 
     for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
-	if (i->isSelected() && (i->key() != "Z")) {
-	    int handle;
-	    int count;
-	    QString drive = i->key();
-	    const char dchar = drive[0].latin1();
-	    QString dname("");
-
-	    PlpDrive drv;
-	    if (plpRfsv->devinfo(dchar - 'A', drv) == rfsv::E_PSI_GEN_NONE)
-		dname = QString(drv.getName().c_str());
-
-	    statusBar()->changeItem(i18n("Formatting drive %1:").arg(dchar),
-				    STID_CONNECTION);
-	    update();
-
-	    emit setProgressText(QString(""));
-	    emit setProgress(0);
-	    emit enableProgressText(true);
-
-	    Enum<rfsv::errs> res = plpRpcs->formatOpen(dchar, handle, count);
-	    if (res != rfsv::E_PSI_GEN_NONE) {
-		KMessageBox::error(this, i18n(
-		    "<QT>Could not format drive %1:<BR/>"
-		    "%2</QT>").arg(dchar).arg(KGlobal::locale()->translate(res)));
-		emit setProgress(0);
-		emit enableProgressText(false);
-		statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
-					STID_CONNECTION);
-		continue;
-	    }
-	    progressTotal = 0;
-	    progressLocal = count;
-	    progressLocalCount = 0;
-	    progressLocalPercent = -1;
-	    updateProgress(0);
-	    for (int i = 0; i < count; i++) {
-		updateProgress(i);
-		res = plpRpcs->formatRead(handle);
-		if (res != rfsv::E_PSI_GEN_NONE) {
-		    KMessageBox::error(this, i18n(
-			"<QT>Error during format of drive %1:<BR/>"
-			"%2</QT>").arg(dchar).arg(KGlobal::locale()->translate(res)));
-		    emit setProgress(0);
-		    emit enableProgressText(false);
-		    statusBar()->changeItem(
-			i18n("Connected to %1").arg(machineName),
-			STID_CONNECTION);
-		    count = 0;
-		    continue;
-		}
-	    }
-	    setDriveName(dchar, dname);
-	}
+	if (i->isSelected() && (i->key() != "Z"))
+	    doFormat(i->key());
     }
 
     runRestore();
-
     formatRunning = false;
     switchActions();
-
-    emit setProgress(0);
-    emit enableProgressText(false);
-    statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
-			    STID_CONNECTION);
-    statusBar()->message(i18n("Format done"), 2000);
 }
 
 void KPsionMainWindow::
@@ -1641,6 +1250,8 @@ slotSaveOptions() {
 
 void KPsionMainWindow::
 slotPreferences() {
+    SetupDialog d(this, plpRfsv, plpRpcs);
+    d.exec();
 }
 
 void KPsionMainWindow::

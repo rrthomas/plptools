@@ -25,124 +25,19 @@
 
 #include "setupdialog.h"
 #include "statusbarprogress.h"
+#include "kpsionrestoredialog.h"
 
 #include <kmainwindow.h>
 #include <kcmdlineargs.h>
 #include <kiconview.h>
-#include <klistview.h>
 #include <kdialogbase.h>
-#include <ktar.h>
 
-#include <qtextstream.h>
 #include <rfsv.h>
 #include <rpcs.h>
 #include <ppsocket.h>
 
 typedef QMap<char,QString> driveMap;
 typedef QMap<QString,QString> psionMap;
-
-class KPsionCheckListItem : public QObject, public QCheckListItem {
-    Q_OBJECT
-
-public:
-    KPsionCheckListItem(KPsionCheckListItem *parent, const QString &text,
-			Type tt)
-	: QCheckListItem(parent, text, tt) { init(true); }
-    KPsionCheckListItem(QCheckListItem *parent, const QString &text, Type tt)
-	: QCheckListItem(parent, text, tt) { init(false); }
-    KPsionCheckListItem(QListViewItem *parent, const QString &text, Type tt)
-	: QCheckListItem(parent, text, tt) { init(false); }
-    KPsionCheckListItem(QListView *parent, const QString &text, Type tt)
-	: QCheckListItem(parent, text, tt) { init(false); }
-    KPsionCheckListItem(QListViewItem *parent, const QString &text,
-			const QPixmap &p)
-	: QCheckListItem(parent, text, p) { init(false); }
-    KPsionCheckListItem(QListView *parent, const QString &text,
-			const QPixmap &p)
-	: QCheckListItem(parent, text, p) { init(false); }
-
-    KPsionCheckListItem *firstChild() const;
-    KPsionCheckListItem *nextSibling() const;
-
-    ~KPsionCheckListItem();
-
-    virtual QString key(int column, bool ascending) const;
-    void setMetaData(int bType, time_t bTime, QString tarName, int size,
-		     u_int32_t tHi, u_int32_t tLo, u_int32_t attr);
-
-    QString unixname();
-    QString psionname();
-    QString tarname();
-    PlpDirent plpdirent();
-    int backupType();
-    int size();
-    time_t when();
-    bool isPathChecked(QString path);
-
-signals:
-    void rootToggled(void);
-
-protected:
-    virtual void stateChange(bool);
-    void propagateUp(bool);
-    void propagateDown(bool);
-
-private:
-    void init(bool);
-    class KPsionCheckListItemMetaData;
-    KPsionCheckListItemMetaData *meta;
-};
-
-class KPsionBackupListView : public KListView {
-    Q_OBJECT
-
-public:
-    enum backupTypes {
-	UNKNOWN = 0,
-	FULL = 1,
-	INCREMENTAL = 2,
-    };
-
-    KPsionBackupListView(QWidget *parent = 0, const char *name = 0);
-    KPsionCheckListItem *firstChild() const;
-
-    void readBackups(QString uid);
-    PlpDir &getRestoreList(QString tarname);
-    QStringList getSelectedTars();
-    bool autoSelect(QString drive);
-
-signals:
-    void itemsEnabled(bool);
-
-private slots:
-    void slotRootToggled(void);
-
-private:
-    void collectEntries(KPsionCheckListItem *i);
-    void listTree(KPsionCheckListItem *cli, const KTarEntry *te,
-		  QTextIStream &idx, int level);
-
-    QString uid;
-    QString backupDir;
-    PlpDir toRestore;
-};
-
-class KPsionRestoreDialog : public KDialogBase {
-    Q_OBJECT
-
-public:
-    KPsionRestoreDialog(QWidget *parent, QString uid);
-
-    PlpDir &getRestoreList(QString tarname);
-    QStringList getSelectedTars();
-    bool autoSelect(QString drive);
-
-private slots:
-    void slotBackupsSelected(bool);
-
-private:
-    KPsionBackupListView *backupView;
-};
 
 class KPsionMainWindow : public KMainWindow {
     Q_OBJECT
@@ -203,6 +98,7 @@ private:
     void createIndex();
     bool askOverwrite(PlpDirent e);
     void setDriveName(const char dchar, QString dname);
+    void doFormat(QString drive);
 
     rfsv *plpRfsv;
     rpcs *plpRpcs;
@@ -248,8 +144,8 @@ private:
     int progressPercent;
     int progressLocalPercent;
 };
-
 #endif
+
 /*
  * Local variables:
  * c-basic-offset: 4

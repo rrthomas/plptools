@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.7\n"
-"POT-Creation-Date: 2001-03-06 17:49+0100\n"
-"PO-Revision-Date: 2001-03-06 17:50CET\n"
+"POT-Creation-Date: 2001-03-12 05:15+0100\n"
+"PO-Revision-Date: 2001-03-12 05:17CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -39,15 +39,15 @@ msgstr ""
 "die Siezurücksichern wollen aus. Klicken Sie dann auf die Schaltfläche "
 "<B>Start</B> um dieseDateien zu restaurieren.</qt>"
 
-#: kpsion.cpp:460
+#: kpsion.cpp:482
 msgid "Idle"
 msgstr "Bereit"
 
-#: kpsion.cpp:501 wizards.cpp:227
+#: kpsion.cpp:523 wizards.cpp:227
 msgid "off"
 msgstr "aus"
 
-#: kpsion.cpp:505
+#: kpsion.cpp:527
 msgid ""
 "<qt>Here, you see your Psion's drives.<br/>Every drive is represented by an "
 "Icon. If you click on it, it gets selected for the next operation. E.g.: "
@@ -61,66 +61,66 @@ msgstr ""
 "abzuwählen.<br/>Wählen Sie beliebig viele Laufwerke und dann eine "
 "Operation.</qt>"
 
-#: kpsion.cpp:573
+#: kpsion.cpp:595
 msgid "Start &Format"
 msgstr "Starte &Formatierung"
 
-#: kpsion.cpp:575
+#: kpsion.cpp:597
 msgid "Start Full &Backup"
 msgstr "Starte &Komplett-Sicherung"
 
-#: kpsion.cpp:578
+#: kpsion.cpp:600
 msgid "Start &Incremental Backup"
 msgstr "Starte &inkrementelle Sicherung"
 
-#: kpsion.cpp:580
+#: kpsion.cpp:602
 msgid "Start &Restore"
 msgstr "Starte &Rücksicherung"
 
-#: kpsion.cpp:594
+#: kpsion.cpp:616
 msgid "Full backup of selected drive(s)"
 msgstr "Komplett-Sicherung der ausgewählten Laufwerke"
 
-#: kpsion.cpp:596
+#: kpsion.cpp:618
 msgid "Incremental backup of selected drive(s)"
 msgstr "Inkrementelle Sicherung der ausgewählten Laufwerke"
 
-#: kpsion.cpp:598
+#: kpsion.cpp:620
 msgid "Restore selected drive(s)"
 msgstr "Sichere ausgewählte Laufwerke zurück"
 
-#: kpsion.cpp:600
+#: kpsion.cpp:622
 msgid "Format selected drive(s)"
 msgstr "Formatiere ausgewählte Laufwerke"
 
-#: kpsion.cpp:671
+#: kpsion.cpp:693
 msgid "Retrieving machine info ..."
 msgstr "Ermittle Geräte-Info ..."
 
-#: kpsion.cpp:682
+#: kpsion.cpp:704
 msgid "Could not get Psion machine info"
 msgstr "Konnte Psion Geräteinfo nicht ermitteln"
 
-#: kpsion.cpp:695
+#: kpsion.cpp:717
 msgid "an unknown machine"
 msgstr "einem unbekannten Gerät"
 
-#: kpsion.cpp:708
+#: kpsion.cpp:730
 msgid "Retrieving drive list ..."
 msgstr "Ermittle Laufwerks-Liste ..."
 
-#: kpsion.cpp:711
+#: kpsion.cpp:733
 msgid "Could not get list of drives"
 msgstr "Konnte Liste der Laufwerke nicht ermitteln"
 
-#: kpsion.cpp:741 kpsion.cpp:1013 kpsion.cpp:1035 kpsion.cpp:1058
-#: kpsion.cpp:1168 kpsion.cpp:1345 kpsion.cpp:1476 kpsion.cpp:1485
-#: kpsion.cpp:1530 kpsion.cpp:1549 kpsion.cpp:1566
+#: kpsion.cpp:763 kpsion.cpp:1035 kpsion.cpp:1057 kpsion.cpp:1080
+#: kpsion.cpp:1190 kpsion.cpp:1377 kpsion.cpp:1538 kpsion.cpp:1547
+#: kpsion.cpp:1578 kpsion.cpp:1596 kpsion.cpp:1607
 #, c-format
 msgid "Connected to %1"
 msgstr "Verbunden mit %1"
 
-#: kpsion.cpp:775
+#: kpsion.cpp:797
 msgid ""
 "<QT>The selected drive <B>Z:</B> is a <B>ROM</B> drive and therefore cannot "
 "be restored.</QT>"
@@ -128,7 +128,7 @@ msgstr ""
 "<QT>Das gewählte Laufwerk <B>Z:</B> ist ein <B>ROM</B> Laufwerk und kann "
 "deshalb nicht rückgesichert werden.</QT>"
 
-#: kpsion.cpp:822
+#: kpsion.cpp:844
 msgid ""
 "A backup is running.\n"
 "Do you really want to quit?"
@@ -136,7 +136,7 @@ msgstr ""
 "Eine Sicherung läuft.\n"
 "Wollen Sie wirklich das Programm beenden?"
 
-#: kpsion.cpp:824
+#: kpsion.cpp:846
 msgid ""
 "A restore is running.\n"
 "Do you really want to quit?"
@@ -144,7 +144,7 @@ msgstr ""
 "Eine Rücksicherung läuft.\n"
 "Wollen Sie wirklich das Programm beenden?"
 
-#: kpsion.cpp:826
+#: kpsion.cpp:848
 msgid ""
 "A format is running.\n"
 "Do you really want to quit?"
@@ -152,88 +152,88 @@ msgstr ""
 "Eine Formatierung läuft.\n"
 "Wollen Sie wirklich das Programm beenden?"
 
-#: kpsion.cpp:852
+#: kpsion.cpp:874
 msgid "Connecting ..."
 msgstr "Verbindungsaufbau ..."
 
-#: kpsion.cpp:854
+#: kpsion.cpp:876
 msgid "RFSV could not connect to ncpd at %1:%2. "
 msgstr "RFSV konnte ncpd auf %1:%2 nicht erreichen. "
 
-#: kpsion.cpp:857 kpsion.cpp:879 kpsion.cpp:902 kpsion.cpp:927
+#: kpsion.cpp:879 kpsion.cpp:901 kpsion.cpp:924 kpsion.cpp:949
 msgid " (Retry in %1 seconds.)"
 msgstr " (Wiederholung in %1 Sekunden.)"
 
-#: kpsion.cpp:874
+#: kpsion.cpp:896
 #, c-format
 msgid "RFSV could not establish link: %1."
 msgstr "RFSV konnte keine Verbindung aufbauen: %1."
 
-#: kpsion.cpp:895
+#: kpsion.cpp:917
 msgid "RPCS could not connect to ncpd at %1:%2."
 msgstr "RPCS konnte ncpd auf %1:%2 nicht erreichen."
 
-#: kpsion.cpp:918
+#: kpsion.cpp:940
 #, c-format
 msgid "RPCS could not establish link: %1."
 msgstr "RPCS konnte keine Verbindung aufbauen: %1."
 
-#: kpsion.cpp:1017
+#: kpsion.cpp:1039
 #, c-format
 msgid "Could not retrieve drive details for drive %1"
 msgstr "Konnte Details des Laufwerks %1 nicht ermitteln."
 
-#: kpsion.cpp:1022
+#: kpsion.cpp:1044
 #, c-format
 msgid "Scanning drive %1"
 msgstr "Durchsuche Laufwerk %1"
 
-#: kpsion.cpp:1031
+#: kpsion.cpp:1053
 msgid "%1 files need backup"
 msgstr "%1 Dateien müssen gesichert werden"
 
-#: kpsion.cpp:1037
+#: kpsion.cpp:1059
 msgid "No files need backup"
 msgstr "Keine Dateien zu sichern"
 
-#: kpsion.cpp:1060
+#: kpsion.cpp:1082
 #, c-format
 msgid "Could not create backup folder %1"
 msgstr "Konnte Sicherungs-Ordner %1 nicht anlegen."
 
-#: kpsion.cpp:1084
+#: kpsion.cpp:1106
 msgid "Backup %1% done"
 msgstr "Sicherung %1% beendet"
 
-#: kpsion.cpp:1104
+#: kpsion.cpp:1126
 msgid "<QT>Could not open<BR/><B>%1</B></QT>"
 msgstr "<QT>Konnte<BR/><B>%1</B><BR/>nicht öffnen</QT>"
 
-#: kpsion.cpp:1124
+#: kpsion.cpp:1146
 msgid "<QT>Could not read<BR/><B>%1</B></QT>"
 msgstr "<QT>Konnte<BR/><B>%1</B><BR/>nicht lesen</QT>"
 
-#: kpsion.cpp:1137
+#: kpsion.cpp:1159
 msgid "Resetting archive attributes"
 msgstr "Setze Archiv-Attribute zurück"
 
-#: kpsion.cpp:1150
+#: kpsion.cpp:1172
 msgid "<QT>Could not set attributes of<BR/><B>%1</B></QT>"
 msgstr "<QT>Konnte Attribute der Datei<BR/><B>%1</B><BR/>nicht setzen</QT>"
 
-#: kpsion.cpp:1172
+#: kpsion.cpp:1194
 msgid "Backup done"
 msgstr "Sicherung beendet"
 
-#: kpsion.cpp:1176
+#: kpsion.cpp:1198
 msgid "Restore"
 msgstr "Rücksicherung"
 
-#: kpsion.cpp:1180
+#: kpsion.cpp:1202
 msgid "Start"
 msgstr "Start"
 
-#: kpsion.cpp:1183
+#: kpsion.cpp:1205
 msgid ""
 "Select items in the list of available backups, then click here to start "
 "restore of these items."
@@ -241,21 +241,25 @@ msgstr ""
 "Wählen Sie in der Liste der verfügbaren Sicherungen Dateien aus und "
 "klicken Sie dann hier um die gewählten Dateien zu restaurieren."
 
-#: kpsion.cpp:1230 kpsion.cpp:1443
+#: kpsion.cpp:1216
+msgid "Format drive before restore"
+msgstr "Formatiere Laufwerk vor Rücksicherung"
+
+#: kpsion.cpp:1261 kpsion.cpp:1491
 msgid "<QT>Could not get attributes of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 "<QT>Konnte Attribute der Datei<BR/><B>%1</B> nicht abfragen<BR/>Grund: "
 "%2</QT>"
 
-#: kpsion.cpp:1259
+#: kpsion.cpp:1290
 msgid "Overwrite"
 msgstr "Überschreiben"
 
-#: kpsion.cpp:1262
+#: kpsion.cpp:1293
 msgid "Overwrite &All"
 msgstr "Überschreibe &Alles"
 
-#: kpsion.cpp:1275
+#: kpsion.cpp:1306
 msgid ""
 "<QT>The file <B>%1</B> exists already on the Psion with different size "
 "and/or attributes.<P><B>On the Psion:</B><BR/>  Size: %2<BR/>  Date: %3<BR/> "
@@ -268,45 +272,61 @@ msgstr ""
 "%5<BR/>  Datum: %6<BR/>  Attribute: %7</P>Wollen Sie die Datei "
 "überschreiben?</QT>"
 
-#: kpsion.cpp:1313
+#: kpsion.cpp:1344
 msgid "Reading backups ..."
 msgstr "Lese Sicherungsdaten ..."
 
-#: kpsion.cpp:1318
+#: kpsion.cpp:1349
 msgid "Selecting backups ..."
 msgstr "Wähle Sicherungsdaten ..."
 
-#: kpsion.cpp:1350
+#: kpsion.cpp:1382 kpsion.cpp:1430
 msgid "Restore %1% done"
 msgstr "Rücksicherung %1% abgeschlossen"
 
-#: kpsion.cpp:1398
+#: kpsion.cpp:1446
 msgid "<QT>Could not create directory<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr "<QT>Konnte den Ordner<BR/><B>%1</B> nicht anlegen.<BR/>Grund: %2</QT>"
 
-#: kpsion.cpp:1413
+#: kpsion.cpp:1461
 msgid "<QT>Could not create<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr "<QT>Konnte<BR/><B>%1</B> nicht anlegen<BR/>Grund: %2</QT>"
 
-#: kpsion.cpp:1435
+#: kpsion.cpp:1483
 msgid "<QT>Could not write to<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr "<QT>Konnte nicht auf <BR/><B>%1</B> schreiben<BR/>Grund: %2</QT>"
 
-#: kpsion.cpp:1453
+#: kpsion.cpp:1509
 msgid "<QT>Could not set attributes of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr "<QT>Konnte Attribute der Datei<BR/><B>%1</B>nicht setzen.<BR/>Grund: %2</QT>"
 
-#: kpsion.cpp:1460
+#: kpsion.cpp:1522
 msgid "<QT>Could not set modification time of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 "<QT>Konnte Änderungsdatum der Datei<BR/><B>%1</B> nicht setzen<BR/>Grund: "
 "%2</QT>"
 
-#: kpsion.cpp:1487
+#: kpsion.cpp:1549
 msgid "Restore done"
 msgstr "Rücksicherung abgeschlossen"
 
-#: kpsion.cpp:1493
+#: kpsion.cpp:1563
+msgid "Formatting drive %1:"
+msgstr "Formatiere Laufwerk %1:"
+
+#: kpsion.cpp:1574
+msgid "<QT>Could not format drive %1:<BR/>%2</QT>"
+msgstr "<QT>Konnte Laufwerk %1 nicht formatieren:<BR/>%2</QT>"
+
+#: kpsion.cpp:1591
+msgid "<QT>Error during format of drive %1:<BR/>%2</QT>"
+msgstr "<QT>Fehler beim Formatieren von Laufwerk %1:<BR/>%2</QT>"
+
+#: kpsion.cpp:1609
+msgid "Format done"
+msgstr "Formatierung beendet"
+
+#: kpsion.cpp:1615
 msgid ""
 "<QT>This erases <B>ALL</B> data on the drive(s).<BR/>Do you really want to "
 "proceed?"
@@ -314,27 +334,11 @@ msgstr ""
 "<QT>Hierdurch werden <B>ALLE</B> Daten auf dem(den) Laufwerk(en) "
 "gelöscht.<BR/>Wollen Sie wirklich fortfahren?</QT>"
 
-#: kpsion.cpp:1515
-msgid "Formatting drive %1:"
-msgstr "Formatiere Laufwerk %1:"
-
-#: kpsion.cpp:1526
-msgid "<QT>Could not format drive %1:<BR/>%2</QT>"
-msgstr "<QT>Konnte Laufwerk %1 nicht formatieren:<BR/>%2</QT>"
-
-#: kpsion.cpp:1544
-msgid "<QT>Error during format of drive %1:<BR/>%2</QT>"
-msgstr "<QT>Fehler beim Formatieren von Laufwerk %1:<BR/>%2</QT>"
-
-#: kpsion.cpp:1568
-msgid "Format done"
-msgstr "Formatierung beendet"
-
-#: kpsion.cpp:1573
+#: kpsion.cpp:1636
 msgid "Assign drive name"
 msgstr "Weise Laufwerksnamen zu"
 
-#: kpsion.cpp:1582
+#: kpsion.cpp:1645
 msgid ""
 "<QT>Formatting of drive %1: finished. Please assign a name for that "
 "drive.</QT>"
@@ -342,22 +346,24 @@ msgstr ""
 "<QT>Die Formatierung des Laufwerks %1 ist beendet. Bitte weisen Sie dem "
 "Laufwerk nun einen Namen zu.</QT>"
 
-#: kpsion.cpp:1586
+#: kpsion.cpp:1649
 msgid "New name of drive %1:"
 msgstr "Neuer Name für Laufwerk %1:"
 
-#: kpsion.cpp:1730
+#: kpsion.cpp:1793
 #, c-format
 msgid "Stopping %1"
 msgstr "Stoppe %1"
 
-#: kpsion.cpp:1748
+#: kpsion.cpp:1811
 msgid ""
 "<QT>Could not stop all processes.<BR/>Please stop running programs manually "
 "on the Psion, then klick <B>Ok</B>."
 msgstr ""
+"<QT>Konnte nicht alle Prozesse stoppen.<BR/>Bitte beenden Sie laufende Progamme "
+"auf dem Psion manuell. Klickens Die dann <B>Ok</B>."
 
-#: kpsion.cpp:1771
+#: kpsion.cpp:1834
 #, c-format
 msgid "Starting %1"
 msgstr "Starte %1"

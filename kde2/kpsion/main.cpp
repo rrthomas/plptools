@@ -25,6 +25,7 @@
 #endif
 
 #include "kpsion.h"
+#include "kpsionconfig.h"
 #include "wizards.h"
 #include <kapp.h>
 #include <klocale.h>
@@ -75,8 +76,11 @@ int main(int argc, char **argv) {
     KGlobal::locale()->insertCatalogue(QString::fromLatin1("plptools"));
 
     KConfig *config = kapp->config();
-    config->setGroup("Settings");
-    QString backupDir = config->readEntry("BackupDir");
+    KPsionConfig pcfg;
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_BACKUPDIR));
+    QString backupDir = config->readEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_BACKUPDIR));
 
     if (backupDir.isEmpty()) {
 	FirstTimeWizard *wiz = new FirstTimeWizard(0L, "firsttimewizard");
