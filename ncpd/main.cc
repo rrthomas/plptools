@@ -212,7 +212,7 @@ main(int argc, char **argv)
 				}
 				ncp *a = new ncp(serialDevice, baudRate, iow);
 				int numScp = 0;
-				socketChan *scp[a->maxLinks() + 1];
+				socketChan *scp[257]; // MAX_CHANNELS_PSION + 1
 
 				a->setVerbose(nverbose);
 				a->setLinkVerbose(lverbose);
