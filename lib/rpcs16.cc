@@ -52,7 +52,7 @@ queryDrive(char drive, bufferArray &ret)
 	a.addByte(drive);
 	if (!sendCommand(rpcs::QUERY_DRIVE, a))
 		return rfsv::E_PSI_FILE_DISC;
-	Enum<rfsv::errs> res = getResponse(a);
+	Enum<rfsv::errs> res = getResponse(a, true);
 cout << dec << "qd: " << res << " " << a.getLen() << " a="<< a << endl;
 	return res;
 }

@@ -360,7 +360,7 @@ class rpcs {
 		 * @returns true on success, false on failure.
 		 */
 		bool sendCommand(enum commands cc, bufferStore &data);
-		Enum<rfsv::errs> getResponse(bufferStore &);
+		Enum<rfsv::errs> getResponse(bufferStore &data, bool statusIsFirstByte);
 		const char *getConnectName();
 };
 

@@ -56,7 +56,7 @@ queryDrive(char drive, bufferArray &ret)
 	a.addByte(drive);
 	if (!sendCommand(rpcs::QUERY_DRIVE, a))
 		return rfsv::E_PSI_FILE_DISC;
-	if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
+	if ((res = getResponse(a, false)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	int l = a.getLen();
 	ret.clear();
@@ -98,7 +98,7 @@ getCmdLine(const char *process, bufferStore &ret)
 	a.addStringT(process);
 	if (!sendCommand(rpcs::GET_CMDLINE, a))
 		return rfsv::E_PSI_FILE_DISC;
-	res = getResponse(a);
+	res = getResponse(a, true);
 	ret = a;
 	return res;
 }
@@ -111,7 +111,7 @@ getMachineInfo(machineInfo &mi)
 
 	if (!sendCommand(rpcs::GET_MACHINE_INFO, a))
 		return rfsv::E_PSI_FILE_DISC;
-	if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
+	if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	if (a.getLen() != 256)
 		return rfsv::E_PSI_GEN_FAIL;
@@ -178,7 +178,7 @@ configOpen(void)
 
 	if (!sendCommand(rpcs::CONFIG_OPEN, a))
 		return rfsv::E_PSI_FILE_DISC;
-	res = getResponse(a);
+	res = getResponse(a, true);
 cout << "co: r=" << res << " a=" << a << endl;
 	hhh = a.getDWord(0);
 	return rfsv::E_PSI_GEN_NONE;
@@ -198,7 +198,7 @@ configRead(void)
 		a.addDWord(hhh);
 		if (!sendCommand(rpcs::CONFIG_READ, a))
 			return rfsv::E_PSI_FILE_DISC;
-		if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
+		if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
 			return res;
 		l = a.getLen();
 		cout << "cr: " << l << endl;
