@@ -22,7 +22,7 @@
 #include <errno.h>
 #include "nfs_prot.h"
 #include "mp.h"
-#if defined (__SVR4) || defined(__sgi)
+#if defined (__SVR4) || defined(__sgi) || defined(__NetBSD__)
 #include <stdlib.h>		/* getenv */
 #include <string.h>		/* strcmp */
 #endif

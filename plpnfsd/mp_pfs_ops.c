@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <pwd.h>
-#if defined(__SVR4) || defined(__GLIBC__)
+#if defined(__SVR4) || defined(__GLIBC__) || defined(__NetBSD__)
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>

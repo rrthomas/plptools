@@ -11,7 +11,7 @@
 #include "mp.h"
 #include "rfsv_api.h"
 
-#if defined(__SVR4) || defined(__GLIBC__) || defined(__FreeBSD__)
+#if defined(__SVR4) || defined(__GLIBC__) || defined(__FreeBSD__) || defined(__NetBSD__)
 #include <string.h>
 #include <stdlib.h>
 #endif
