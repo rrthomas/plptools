@@ -19,7 +19,7 @@ test -f @prefix@/sbin/plpprintd || exit 0
 
 # The echo return value for success (defined in /etc/rc.config).
 showresult() {
-	test RETVAL -eq 0 && echo -e $rc_done || echo -e $rc_failed
+	test $RETVAL -eq 0 && echo -e $rc_done || echo -e $rc_failed
 }
 
 showstatus() {
@@ -58,7 +58,7 @@ stop() {
 	echo "Stopping Psion support ..."
 	if test "$START_PLPNFSD" = "yes" ; then
 		echo -n "  plpnfsd: "
-		/bin/killproc -HUP plpnfsd
+		/sbin/killproc -HUP plpnfsd
 		WAIT=5
 		while test $WAIT -gt 0 ; do
 			test -z "`pidof plpnfsd`" && break;
