@@ -33,22 +33,18 @@
 #include "socketchan.h"
 #include "ncp.h"
 #include "ppsocket.h"
-#include "iowatch.h"
 
-socketChan:: socketChan(ppsocket * _skt, ncp * _ncpController, IOWatch & _iow):
-channel(_ncpController),
-iow(_iow)
+socketChan:: socketChan(ppsocket * _skt, ncp * _ncpController):
+	channel(_ncpController)
 {
 	skt = _skt;
 	connectName = 0;
 	connectTry = 0;
-	iow.addIO(skt->socket());
 	connected = false;
 }
 
 socketChan::~socketChan()
 {
-	iow.remIO(skt->socket());
 	skt->closeSocket();
 	delete skt;
 	if (connectName)

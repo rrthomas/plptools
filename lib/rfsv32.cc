@@ -358,7 +358,7 @@ devlist(u_int32_t &devbits)
 }
 
 Enum<rfsv::errs> rfsv32::
-devinfo(const u_int32_t dev, u_int32_t &free, u_int32_t &total, u_int32_t &attr, u_int32_t &uniqueid, string &name)
+devinfo(const u_int32_t dev, PlpDrive &drive)
 {
 	bufferStore a;
 	Enum<rfsv::errs> res;
@@ -368,13 +368,14 @@ devinfo(const u_int32_t dev, u_int32_t &free, u_int32_t &total, u_int32_t &attr,
 		return E_PSI_FILE_DISC;
 	res = getResponse(a);
 	if (res == E_PSI_GEN_NONE) {
-		attr = a.getDWord(0);
-		uniqueid = a.getDWord(16);
-		total = a.getDWord(20);
-		free = a.getDWord(28);
-		// vnamelen = a.getDWord(36);
+		drive.setMediaType(a.getDWord(0));
+		drive.setDriveAttribute(a.getDWord(8));
+		drive.setMediaAttribute(a.getDWord(12));
+		drive.setUID(a.getDWord(16));
+		drive.setSize(a.getDWord(20), a.getDWord(24));
+		drive.setSpace(a.getDWord(28), a.getDWord(32));
 		a.addByte(0);
-		name = a.getString(40);
+		drive.setName('A' + dev, a.getString(40));
 	}
 	return res;
 }

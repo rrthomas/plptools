@@ -30,11 +30,10 @@
 #endif
 #include "channel.h"
 class ppsocket;
-class IOWatch;
 
 class socketChan : public channel {
 public:
-  socketChan(ppsocket* comms, ncp* ncpController, IOWatch &iow);
+  socketChan(ppsocket* comms, ncp* ncpController);
   virtual ~socketChan();
 
   void ncpDataCallback(bufferStore& a);
@@ -51,7 +50,6 @@ private:
   enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
   bool ncpCommand(bufferStore &a);
   ppsocket* skt;
-  IOWatch &iow;
   char* connectName;
   bool connected;
   int connectTry;

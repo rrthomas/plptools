@@ -576,7 +576,6 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 	signal(SIGUSR1, usr1_handler);
 	signal(SIGHUP, hup_handler);
 	signal(SIGTERM, term_handler);
-	signal(SIGPIPE, SIG_IGN);
 
 	for (;;) {
 		fd_set readfd;

@@ -1,26 +1,18 @@
-## Makefile.am of kdebase/kioslave/plp
+# $Id$
 
 INCLUDES = $(all_includes) -I$(top_srcdir)/lib
 LDFLAGS  = $(all_libraries) $(KDE_RPATH)
 
-####### Files
-
-kio_plp_la_LDFLAGS = -module -avoid-version -no-undefined
-
-if BUILD_KDE
-
-myprotodir = $(kde_servicesdir)
+kio_plp_la_LDFLAGS = -module -avoid-version
 
 lib_LTLIBRARIES = kio_plp.la
 
 kio_plp_la_SOURCES = kio_plp.cpp
-kio_plp_la_LIBADD = -L$(top_srcdir)/lib -lplp -lkio
+kio_plp_la_LIBADD = -L$(top_srcdir)/lib -lplp $(LIB_KIO)
+
 noinst_HEADERS = kio_plp.h
 
-myproto_DATA = psion.protocol
+services_DATA = psion.protocol
+servicesdir = $(kde_servicesdir)
 
-METASOURCES = AUTO
-
-bin_SCRIPTS = 
-
-endif
+EXTRA_DIST = $(services_DATA)

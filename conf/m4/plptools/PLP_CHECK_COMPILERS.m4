@@ -79,11 +79,13 @@ dnl this was AC_PROG_CC. I had to include it manualy, since I had to patch it
   if test "$ac_use_debug_code" = "no"; then
   	if test -z "$LDFLAGS" && test "$GCC" = "yes"; then
 		LDFLAGS="-s"
+		LIBDEBUG=""
 	fi
   else
   	AC_DEFINE_UNQUOTED(DEBUG)
+	LIBDEBUG="--debug"
   fi
-
+  AC_SUBST(LIB_DEBUG)
 
 dnl this is AC_PROG_CPP. I had to include it here, since autoconf checks
 dnl dependecies between AC_PROG_CPP and AC_PROG_CC (or is it automake?)

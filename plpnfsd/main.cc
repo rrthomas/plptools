@@ -405,13 +405,12 @@ long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
 }
 
 long rfsv_statdev(char letter) {
-	u_int32_t vfree, vtotal, vattr, vuniqueid;
+	PlpDrive drive;
 	u_int32_t devnum = letter - 'A';
-	string n;
 
 	if (!a)
 		return -1;
-	return (a->devinfo(devnum, vfree, vtotal, vattr, vuniqueid, n) != rfsv::E_PSI_GEN_NONE);
+	return (a->devinfo(devnum, drive) != rfsv::E_PSI_GEN_NONE);
 }
 
 long rfsv_rename(const char *oldname, const char *newname) {
@@ -431,19 +430,19 @@ long rfsv_drivelist(int *cnt, device **dlist) {
 	ret = a->devlist(devbits);
 	if (ret == 0)
 		for (i = 0; i<26; i++) {
-			string name;
-			u_int32_t vtotal, vfree, vattr, vuniqueid;
+			PlpDrive drive;
 
 			if ((devbits & 1) &&
-			    ((a->devinfo(i, vfree, vtotal, vattr, vuniqueid, name) == rfsv::E_PSI_GEN_NONE))) {
+			    ((a->devinfo(i, drive) == rfsv::E_PSI_GEN_NONE))) {
+
 				device *next = *dlist;
 				*dlist = (device *)malloc(sizeof(device));
 				(*dlist)->next = next;
-				(*dlist)->name = strdup(name.c_str());
-				(*dlist)->total = vtotal;
-				(*dlist)->free = vfree;
+				(*dlist)->name = strdup(drive.getName().c_str());
+				(*dlist)->total = drive.getSize();
+				(*dlist)->free = drive.getSpace();
 				(*dlist)->letter = 'A' + i;
-				(*dlist)->attrib = vattr;
+				(*dlist)->attrib = drive.getMediaType();
 				(*cnt)++;
 			}
 			devbits >>= 1;
@@ -489,7 +488,6 @@ int main(int argc, char**argv) {
 			usage();
 	}
 
-	signal(SIGPIPE, SIG_IGN);
 	skt = new ppsocket();
 	if (!skt->connect(NULL, sockNum)) {
 		cerr << "plpnfsd: could not connect to ncpd" << endl;

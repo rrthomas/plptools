@@ -1,9 +1,8 @@
 # $Id$
 #
 
-SUBDIRS = kioslave
+SUBDIRS = kioslave plugins mime
 
-TMPDEST=
 #
 # remove all intermediate files that can be recreated using
 # Makefile.cvs

@@ -1,0 +1,4 @@
+*.closure
+*.moc
+Makefile.in
+Makefile

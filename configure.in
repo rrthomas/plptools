@@ -6,6 +6,7 @@ AC_CANONICAL_SYSTEM
 AM_CONFIG_HEADER(include/config.h)
 AM_INIT_AUTOMAKE(plptools, 0.7)
 AM_PROG_LIBTOOL
+PLP_SET_LIBVERSION
 
 dnl Enable Maintainer stuff
 AM_MAINTAINER_MODE
@@ -214,6 +215,7 @@ PLP_HELP_MSG([Options, only needed when building KDE2 stuff:])
 if test "x$ac_enable_kde" = "xyes" ; then
 	AC_PATH_KDE
 	AC_CHECK_KDEMAXPATHLEN
+	KDE_CHECK_FINAL
 	AM_CONDITIONAL(BUILD_KDE, true)
 fi
 
@@ -225,6 +227,9 @@ AC_OUTPUT(
 	plpnfsd/Makefile
 	kde2/Makefile
 	kde2/kioslave/Makefile
+	kde2/plugins/Makefile
+	kde2/mime/Makefile
+	kde2/mime/icons/Makefile
 	plpbackup/Makefile
 	doc/Makefile
 	doc/api/Makefile

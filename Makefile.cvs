@@ -15,13 +15,13 @@ devel: $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	touch include/stamp-h.in
 
 dist: $(LIBTOOLFILES) $(AUTOMAKEFILES)
-	aclocal -I conf/m4/plptools conf/m4/kde
+	aclocal -I conf/m4/plptools -I conf/m4/kde
 	autoheader
 	automake --include-deps
 	make -C kde2 -f Makefile.am am_edit
 	autoconf
 	touch include/stamp-h.in
-	./configure
+	./configure --enable-kde
 	$(MAKE) dist
 
 $(ACLOCAL):

@@ -10,6 +10,7 @@
 typedef deque<class PlpDirent> PlpDir;
 
 class ppsocket;
+class PlpDrive;
 
 const int RFSV_SENDLEN = 2000;
 
@@ -19,8 +20,20 @@ const int RFSV_SENDLEN = 2000;
  */
 typedef int (*cpCallback_t)(void *, u_int32_t);
 
+class rfsv16;
+class rfsv32;
+
+/**
+ * A helper class for storing
+ * intermediate internal information in rfsv16 and
+ * rfsv32 .
+ * @internal
+ */
 class rfsvDirhandle {
- public:
+	friend rfsv16;
+	friend rfsv32;
+
+ private:
 	u_int32_t h;
 	bufferStore b;
 };
@@ -330,15 +343,12 @@ class rfsv {
 		 *
 		 * @param dev   An integer, representing the drive to get details from.
 		 *              (0 represents A:, 1 is B: and so on ...)
-		 * @param free     On return, the free space in bytes is returned here.
-		 * @param total    On return, the total capacity in bytes is returned here.
-		 * @param attr     On return, the attributes of the drive are returned here.
-		 * @param uniqueid On return, the unique Id of the drive is returned here.
-		 * @param name     On return, the volume name returned here.
+		 * @param drive A @ref PlpDrive object which is filled with the drive's
+		 *              information upon return.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> devinfo(const u_int32_t dev, u_int32_t &free, u_int32_t &total, u_int32_t &attr, u_int32_t &uniqueid, string &name) = 0;
+		virtual Enum<errs> devinfo(const u_int32_t dev, PlpDrive &drive) = 0;
 
 		/**
 		 * Reads from a file on the Psion.

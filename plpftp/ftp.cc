@@ -242,15 +242,14 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 
 	if (!strcmp(DDRIVE, "AUTO")) {
 		u_int32_t devbits;
-		u_int32_t vtotal, vfree, vattr, vuniqueid;
 		int i;
 
 		strcpy(defDrive, "::");
 		if (a.devlist(devbits) == rfsv::E_PSI_GEN_NONE) {
 
 			for (i = 0; i < 26; i++) {
-				string n;
-				if ((devbits & 1) && a.devinfo(i, vfree, vtotal, vattr, vuniqueid, n) == rfsv::E_PSI_GEN_NONE) {
+				PlpDrive drive;
+				if ((devbits & 1) && a.devinfo(i, drive) == rfsv::E_PSI_GEN_NONE) {
 					defDrive[0] = 'A' + i;
 					break;
 				}
@@ -417,17 +416,16 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 				cout << "Drive Type Volname     Total     Free      UniqueID" << endl;
 				for (int i = 0; i < 26; i++) {
-					string vname;
-					u_int32_t vtotal, vfree, vattr, vuniqueid;
+					PlpDrive drive;
 
 					if ((devbits & 1) != 0) {
-						if (a.devinfo(i, vfree, vtotal, vattr, vuniqueid, vname) == rfsv::E_PSI_GEN_NONE)
+						if (a.devinfo(i, drive) == rfsv::E_PSI_GEN_NONE)
 							cout << (char) ('A' + i) << "     " <<
-							    hex << setw(4) << setfill('0') << vattr << " " <<
+							    hex << setw(4) << setfill('0') << drive.getMediaType() << " " <<
 							    setw(12) << setfill(' ') << setiosflags(ios::left) << 
-							    vname << resetiosflags(ios::left) << dec << setw(9) <<
-							    vtotal << setw(9) << vfree << "  " << setw(8) << setfill('0') << hex <<
-							    vuniqueid << endl;
+							    drive.getName() << resetiosflags(ios::left) << dec << setw(9) <<
+							    drive.getSize() << setw(9) << drive.getSpace() << "  " << setw(8) << setfill('0') << hex <<
+							    drive.getUID() << endl;
 					}
 					devbits >>= 1;
 				}

@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 
 class bufferStore;
+class IOWatch;
 
 /**
  * A class for dealing with sockets.
@@ -80,11 +81,14 @@ public:
 	ppsocket *accept(string *Peer);
 
 	/**
-	 * Check for incoming data.
+	 * Check and optionally wait for incoming data.
+	 *
+	 * @param sec Timeout in seconds
+	 * @param usec Timeout in microseconds
 	 *
 	 * @returns true if data is available, false otherwise.
 	 */
-	bool dataToGet() const;
+	bool dataToGet(int sec, int usec) const;
 
 	/**
 	 * Receive data into a @ref bufferStore .
@@ -169,11 +173,13 @@ public:
 	bool getHost(string *Host, int *Port);
 
 	/**
-	 * Retrieves the socket number.
+	 * Registers an @ref IOWatch for this socket.
+	 * This IOWatch gets the socket added/removed
+	 * automatically.
 	 *
-	 * @returns the socket number.
+	 * @param watch The IOWatch to register.
 	 */
-	inline int socket(void) const { return(m_Socket); }
+	void setWatch(IOWatch *watch);
 	
  private:
 	/**
@@ -193,6 +199,7 @@ public:
 	int m_Port;
 	bool m_Bound;
 	int m_LastError;
+	IOWatch *myWatch;
 };
 
 #endif

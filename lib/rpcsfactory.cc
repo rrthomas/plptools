@@ -36,8 +36,20 @@
 #include "bufferstore.h"
 #include "ppsocket.h"
 
+#include "Enum.h"
+
+ENUM_DEFINITION(rpcsfactory::errs, rpcsfactory::FACERR_NONE) {
+	stringRep.add(rpcsfactory::FACERR_NONE,           "no error");
+	stringRep.add(rpcsfactory::FACERR_COULD_NOT_SEND, "could not send version request");
+	stringRep.add(rpcsfactory::FACERR_AGAIN,          "try again");
+	stringRep.add(rpcsfactory::FACERR_NOPSION,        "no psion connected");
+	stringRep.add(rpcsfactory::FACERR_PROTVERSION,    "wrong protocol version");
+	stringRep.add(rpcsfactory::FACERR_NORESPONSE,     "no response from ncpd");
+}
+
 rpcsfactory::rpcsfactory(ppsocket *_skt)
 {
+	err = FACERR_NONE;
 	skt = _skt;
 }
 
@@ -49,15 +61,18 @@ rpcs * rpcsfactory::create(bool reconnect)
 	// so we can instantiate the correct rpcs protocol handler for the
 	// caller. We announce ourselves to the NCP daemon, and the relevant
 	// rpcs module will also announce itself.
+
 	bufferStore a;
-	a.init();
+
+	err = FACERR_NONE;
 	a.addStringT("NCP$INFO");
 	if (!skt->sendBufferStore(a)) {
 		if (!reconnect)
-			cerr << "rpcsfactory::create couldn't send version request" << endl;
+			err = FACERR_COULD_NOT_SEND;
 		else {
 			skt->closeSocket();
 			skt->reconnect();
+			err = FACERR_AGAIN;
 		}
 		return NULL;
 	}
@@ -71,13 +86,13 @@ rpcs * rpcsfactory::create(bool reconnect)
 		if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
 			skt->closeSocket();
 			skt->reconnect();
+			err = FACERR_NOPSION;
 			return NULL;
 		}
 		// Invalid protocol version
-		cerr << "rpcsfactory::create received odd protocol version from ncpd! (" << a << ")" << endl;
-	} else {
-		cerr << "rpcsfactory::create sent, response not 1" << endl;
-	}
+		err = FACERR_PROTVERSION;
+	} else
+		err = FACERR_NORESPONSE;
 
 	// No message returned.
 	return NULL;

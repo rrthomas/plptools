@@ -413,8 +413,18 @@ devlist(u_int32_t &devbits)
 	return res;
 }
 
+static int sibo_dattr[] = {
+	1, // Unknown
+	2, // Floppy
+	3, // Disk
+	6, // Flash
+	5, // RAM
+	7, // ROM
+	7, // write-protected == ROM ?
+};
+
 Enum<rfsv::errs> rfsv16::
-devinfo(const u_int32_t devnum, u_int32_t &free, u_int32_t &size, u_int32_t &attr, u_int32_t &uniqueid, string &name)
+devinfo(const u_int32_t devnum, PlpDrive &drive)
 {
 	bufferStore a;
 	Enum<rfsv::errs> res;
@@ -448,16 +458,31 @@ devinfo(const u_int32_t devnum, u_int32_t &free, u_int32_t &size, u_int32_t &att
 		// cerr << "devinfo STATUSDEVICE res is " << dec << (signed short int) res << endl;
 		return res;
 	}
+
+	int attr = a.getWord(2);
+	attr = sibo_dattr[a.getWord(2) & 0xff];
+	drive.setMediaType(attr);
+
 	attr = a.getWord(2);
-	// int changeable = a.getWord(4);
-	size = a.getDWord(6);
-	free = a.getDWord(10);
-	// const char *volume = a.getString(14);
-	// int battery = a.getWord(30);
-	// const char *devicename = a.getString(62);
-	uniqueid = 0;
-	name = "";
-	name += (char)(devnum + 'A');
+	int changeable = a.getWord(4) ? 32 : 0;
+	int internal = (attr & 0x2000) ? 16 : 0;
+
+	drive.setDriveAttribute(changeable | internal);
+
+	int variable = (attr & 0x4000) ? 1 : 0;
+	int dualdens = (attr & 0x1000) ? 2 : 0;
+	int formattable = (attr & 0x0800) ? 4 : 0;
+	int protect = ((attr & 0xff) == 6) ? 8 : 0;
+
+	drive.setMediaAttribute(variable|dualdens|formattable|protect);
+
+	drive.setUID(0);
+	drive.setSize(a.getDWord(6), 0);
+	drive.setSpace(a.getDWord(10), 0);
+
+	drive.setName('A' + devnum, a.getString(14));
+
+
 	return res;
 }
 

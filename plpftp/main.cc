@@ -30,7 +30,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <signal.h>
 
 #include "ppsocket.h"
 #include "rfsv.h"
@@ -71,11 +70,6 @@ main(int argc, char **argv)
 	ftp f;
 	int status = 0;
 	int sockNum = DPORT;
-	sigset_t sigset;
-
-	sigemptyset(&sigset);
-	sigaddset(&sigset, SIGPIPE);
-	sigprocmask(SIG_BLOCK, &sigset, 0L);
 
 	struct servent *se = getservbyname("psion", "tcp");
 	endservent();

@@ -144,14 +144,6 @@ PLPProtocol::PLPProtocol (const QCString &pool, const QCString &app)
 		sscanf(uit.key().data(), "uid-%08X-%08X-%08X", &u1, &u2, &u3);
 		puids.insert(PlpUID(u1, u2, u3), uit.data());
 	}
-#if 0
-	cout << "uids:" << endl;
-	for (UidMap::Iterator it = puids.begin(); it != puids.end(); it++) {
-		cout << "UID: " << hex << setw(8) << setfill('0') << it.key().uid[0]
-		     << it.key().uid[1] << it.key().uid[2] << dec << "->" <<
-			 it.data() << endl;
-	}
-#endif
 }
 
 PLPProtocol::~PLPProtocol() {
@@ -218,20 +210,20 @@ openConnection() {
 
 	plpRfsvSocket = new ppsocket();
 	if (!plpRfsvSocket->connect((char *)(currentHost.data()), currentPort)) {
-		error(ERR_COULD_NOT_CONNECT, i18n("Could not connect to ncpd"));
+		QString tmp = i18n("Could not connect to ncpd at %1:%2").arg(currentHost).arg(currentPort);
+		error(ERR_COULD_NOT_CONNECT, tmp);
 		return;
 	}
 	rfsvfactory factory(plpRfsvSocket);
 	plpRfsv = factory.create(false);
-	if (plpRfsv == 0) {
-		error(ERR_COULD_NOT_CONNECT, i18n("Could not read version info"));
+	if (plpRfsv == 0L) {
+		error(ERR_COULD_NOT_CONNECT, i18n("Could not read version info."));
 		return;
 	}
 
 	/* If we have a S5, get the Psion's Owner- and Mach- info.
 	 * This implicitely sets the Timezone info of the Psion also.
 	 */
-
 	ppsocket rpcsSocket;
 	if (rpcsSocket.connect((char *)(currentHost.data()), currentPort)) {
 		rpcsfactory factory(&rpcsSocket);
@@ -252,12 +244,10 @@ openConnection() {
 
 	if ((res = plpRfsv->devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 		for (int i = 0; i < 26; i++) {
-			string vname;
-			u_int32_t vtotal, vfree, vattr, vuniqueid;
-
 			if ((devbits & 1) != 0) {
-				if (plpRfsv->devinfo(i, vfree, vtotal, vattr, vuniqueid,
-						     vname) == rfsv::E_PSI_GEN_NONE) {
+				PlpDrive drive;
+				if (plpRfsv->devinfo(i, drive) == rfsv::E_PSI_GEN_NONE) {
+					string vname = drive.getName();
 					QString name;
 
 					if (!vname.empty())
@@ -374,17 +364,21 @@ createVirtualDirEntry(UDSEntry & entry, bool rdonly) {
 
 	atom.m_uds = KIO::UDS_FILE_TYPE;
 	atom.m_long = S_IFDIR;
-	entry.append( atom );
+	entry.append(atom);
 
 	atom.m_uds = KIO::UDS_ACCESS;
 	atom.m_long = S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 	if (!rdonly)
 		atom.m_long |= (S_IWUSR | S_IWGRP | S_IWOTH);
-	entry.append( atom );
+	entry.append(atom);
 
 	atom.m_uds = KIO::UDS_SIZE;
 	atom.m_long = 0;
-	entry.append( atom );
+	entry.append(atom);
+
+	//atom.m_uds = KIO::UDS_MIME_TYPE;
+	//atom.m_str = QString("inode/x-psion-drive");
+	//entry.append(atom);
 }
 
 bool PLPProtocol::
@@ -506,7 +500,7 @@ completeUDSEntry(UDSEntry& entry, PlpDirent &e, bool rom) {
 	atom.m_long = (attr & rfsv::PSI_A_DIR) ? S_IFDIR : S_IFREG;
 	entry.append(atom);
 
-#if 1
+#if 0
 	KIO::UDSEntry::ConstIterator it = entry.begin();
 	for( ; it != entry.end(); it++ ) {
 		switch ((*it).m_uds) {
@@ -889,5 +883,70 @@ copy( const KURL &src, const KURL &dest, int _mode, bool _overwrite ) {
 	res = plpRfsv->copyOnPsion(from, to, (void *)this, progresswrapper);
 	if (checkForError(res))
 		return;
+	finished();
+}
+
+void PLPProtocol::
+special(const QByteArray &a) {
+	kdDebug(PLP_DEBUGAREA) << "special()" << endl;
+
+	QDataStream stream(a, IO_ReadOnly);
+	int tmp;
+	UDSEntry entry;
+	UDSAtom atom;
+
+	stream >> tmp;
+
+	switch (tmp) {
+		case 1: {
+			QString param;
+			PlpDrive drive;
+
+			Enum<rfsv::errs> res;
+			int drv;
+
+			stream >> param;
+
+			if (!isDrive(QString("/") + param)) {
+				error(ERR_PROTOCOL_IS_NOT_A_FILESYSTEM, param);
+				return;
+			}
+			drv = drivechars[param] - 'A';
+			res = plpRfsv->devinfo(drv, drive);
+			if (res != rfsv::E_PSI_GEN_NONE) {
+				error(ERR_COULD_NOT_STAT, param);
+				return;
+			}
+
+			string mtype;
+			drive.getMediaType(mtype);
+
+			// DriveLetter
+			atom.m_uds = KIO::UDS_USER;
+			atom.m_str = QString("%1").arg(drivechars[param]);
+			entry.append(atom);
+			// TypeName
+			atom.m_uds = KIO::UDS_NAME;
+			atom.m_str = QString(mtype.c_str());
+			entry.append(atom);
+			// Total capacity
+			atom.m_uds = KIO::UDS_SIZE;
+			atom.m_long = drive.getSize();
+			entry.append(atom);
+			// Free capacity
+			atom.m_uds = KIO::UDS_MODIFICATION_TIME;
+			atom.m_long = drive.getSpace();
+			entry.append(atom);
+			// UID
+			atom.m_uds = KIO::UDS_CREATION_TIME;
+			atom.m_long = drive.getUID();
+			entry.append(atom);
+			statEntry(entry);
+		}
+			break;
+		default:
+			error(ERR_UNSUPPORTED_PROTOCOL, QString(i18n("Code: %1")).arg(tmp));
+			return;
+	}
 	finished();
 }

@@ -35,10 +35,20 @@
 #include "rfsvfactory.h"
 #include "bufferstore.h"
 #include "ppsocket.h"
-#include "bufferarray.h"
+#include "Enum.h"
+
+ENUM_DEFINITION(rfsvfactory::errs, rfsvfactory::FACERR_NONE) {
+	stringRep.add(rfsvfactory::FACERR_NONE,           "no error");
+	stringRep.add(rfsvfactory::FACERR_COULD_NOT_SEND, "could not send version request");
+	stringRep.add(rfsvfactory::FACERR_AGAIN,          "try again");
+	stringRep.add(rfsvfactory::FACERR_NOPSION,        "no psion connected");
+	stringRep.add(rfsvfactory::FACERR_PROTVERSION,    "wrong protocol version");
+	stringRep.add(rfsvfactory::FACERR_NORESPONSE,     "no response from ncpd");
+}
 
 rfsvfactory::rfsvfactory(ppsocket *_skt) : serNum(0)
 {
+	err = FACERR_NONE;
 	skt = _skt;
 }
 
@@ -50,15 +60,19 @@ rfsv * rfsvfactory::create(bool reconnect)
 	// so we can instantiate the correct RFSV protocol handler for the
 	// caller. We announce ourselves to the NCP daemon, and the relevant
 	// RFSV module will also announce itself.
+
 	bufferStore a;
-	a.init();
+
+	err = FACERR_NONE;
 	a.addStringT("NCP$INFO");
 	if (!skt->sendBufferStore(a)) {
 		if (!reconnect)
-			cerr << "rfsvfactory::create couldn't send version request" << endl;		else {
+			err = FACERR_COULD_NOT_SEND;
+		else {
 			skt->closeSocket();
 			serNum = 0;
 			skt->reconnect();
+			err = FACERR_AGAIN;
 		}
 		return NULL;
 	}
@@ -73,16 +87,13 @@ rfsv * rfsvfactory::create(bool reconnect)
 			skt->closeSocket();
 			serNum = 0;
 			skt->reconnect();
+			err = FACERR_NOPSION;
 			return NULL;
 		}
 		// Invalid protocol version
-		cerr << "rfsvfactory::create received odd protocol version from
-ncpd! (" << a << ")" << endl;
-	} else {
-		cerr << "rfsvfactory::create sent, response not 1" << endl;
-	}
+		err = FACERR_PROTVERSION;
+	} else
+		err = FACERR_NORESPONSE;
 
-	// No message returned.
 	return NULL;
 }
-

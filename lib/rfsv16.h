@@ -3,15 +3,19 @@
 
 #include "rfsv.h"
 
+class rfsvfactory;
+
 /**
  * This is the implementation of the @ref rfsv protocol for
- * Psion series 3 (SIBO) variant.
- * For a complete documentation, see @ref rfsv .
+ * Psion series 3 (SIBO) variant. You normally never create
+ * objects of this class directly. Thus the constructor is
+ * private. Use @ref rfsvfactory for creating an instance of
+ * @ref rfsv . For a complete documentation, see @ref rfsv .
  */
 class rfsv16 : public rfsv {
-public:
-	rfsv16(ppsocket *);
+	friend rfsvfactory;
 
+public:
 	Enum<rfsv::errs> fopen(const u_int32_t, const char * const, u_int32_t &);
 	Enum<rfsv::errs> mktemp(u_int32_t &, string &);
 	Enum<rfsv::errs> fcreatefile(const u_int32_t, const char * const, u_int32_t &);
@@ -25,7 +29,7 @@ public:
 	Enum<rfsv::errs> fsetattr(const char * const, const u_int32_t seta, const u_int32_t unseta);
 	Enum<rfsv::errs> dircount(const char * const, u_int32_t &);
 	Enum<rfsv::errs> devlist(u_int32_t &);
-	Enum<rfsv::errs> devinfo(const u_int32_t, u_int32_t &, u_int32_t &, u_int32_t &, u_int32_t &, string &);
+	Enum<rfsv::errs> devinfo(const u_int32_t, PlpDrive &);
 	Enum<rfsv::errs> fread(const u_int32_t, unsigned char * const, const u_int32_t, u_int32_t &);
 	Enum<rfsv::errs> fwrite(const u_int32_t, const unsigned char * const, const u_int32_t, u_int32_t &);
 	Enum<rfsv::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
@@ -102,6 +106,11 @@ private:
 		P_FAMASK   = 0x0f3f  /* All of the above */
 	};
   
+	/**
+	 * Private constructor. Shall be called by
+	 * rfsvfactory only.
+	 */
+	rfsv16(ppsocket *);
 
 	// Miscellaneous
 	Enum<rfsv::errs> fopendir(const char * const, u_int32_t &);

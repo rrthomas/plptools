@@ -38,6 +38,7 @@
 
 #include "bufferstore.h"
 #include "ppsocket.h"
+#include "iowatch.h"
 
 #define  INVALID_SOCKET	-1
 #define  SOCKET_ERROR	-1
@@ -49,6 +50,7 @@ ppsocket::ppsocket(const ppsocket & another)
 	m_PeerAddr = another.m_PeerAddr;
 	m_Bound = another.m_Bound;
 	m_LastError = another.m_LastError;
+	myWatch = another.myWatch;
 }
 
 
@@ -64,21 +66,32 @@ ppsocket::ppsocket()
 
 	m_Bound = false;
 	m_LastError = 0;
+	myWatch = 0L;
 }
 
 ppsocket::~ppsocket()
 {
 	if (m_Socket != INVALID_SOCKET) {
-		shutdown(m_Socket, 3);
+		if (myWatch)
+			myWatch->remIO(m_Socket);
+		shutdown(m_Socket, SHUT_RDWR);
 		::close(m_Socket);
 	}
+}
+
+void ppsocket::
+setWatch(IOWatch *watch) {
+	if (watch)
+		myWatch = watch;
 }
 
 bool ppsocket::
 reconnect()
 {
 	if (m_Socket != INVALID_SOCKET) {
-		shutdown(m_Socket, 3);
+		if (myWatch)
+			myWatch->remIO(m_Socket);
+		shutdown(m_Socket, SHUT_RDWR);
 		::close(m_Socket);
 	}
 	m_Socket = INVALID_SOCKET;
@@ -94,6 +107,8 @@ reconnect()
 		m_LastError = errno;
 		return (false);
 	}
+	if (myWatch)
+		myWatch->addIO(m_Socket);
 	return (true);
 }
 
@@ -148,6 +163,8 @@ connect(const char * const Peer, int PeerPort, const char * const Host, int Host
 		m_LastError = errno;
 		return (false);
 	}
+	if (myWatch)
+		myWatch->addIO(m_Socket);
 	return (true);
 }
 
@@ -167,6 +184,8 @@ listen(const char * const Host, int Port)
 	//* Listen on the port *
 	//**********************
 
+	if (myWatch)
+		myWatch->addIO(m_Socket);
 	if (::listen(m_Socket, 5) != 0) {
 		m_LastError = errno;
 		return (false);
@@ -215,11 +234,9 @@ accept(string *Peer)
 
 	// Make sure the new socket hasn't inherited O_NONBLOCK
 	// from the accept socket
-	int flags = fcntl( accepted->m_Socket, F_GETFL, 0 );
-	if( flags >= 0 ) {
-		flags &= ~O_NONBLOCK;
-		fcntl( accepted->m_Socket, F_SETFL, flags);
-	}
+	int flags = fcntl(accepted->m_Socket, F_GETFL, 0);
+	flags &= ~O_NONBLOCK;
+	fcntl(accepted->m_Socket, F_SETFL, flags);
 
 	accepted->m_HostAddr = m_HostAddr;
 	accepted->m_Bound = true;
@@ -232,18 +249,22 @@ accept(string *Peer)
 		if (peer)
 			*Peer = peer;
 	}
+	if (accepted && myWatch) {
+		accepted->setWatch(myWatch);
+		myWatch->addIO(accepted->m_Socket);
+	}
 	return accepted;
 }
 
 bool ppsocket::
-dataToGet() const
+dataToGet(int sec, int usec) const
 {
 	fd_set io;
 	FD_ZERO(&io);
 	FD_SET(m_Socket, &io);
 	struct timeval t;
-	t.tv_usec = 0;
-	t.tv_sec = 0;
+	t.tv_usec = usec;
+	t.tv_sec = sec;
 	return (select(m_Socket + 1, &io, NULL, NULL, &t) != 0) ? true : false;
 }
 
@@ -258,16 +279,15 @@ getBufferStore(bufferStore & a, bool wait)
 	long count = 0;
 	unsigned char *buff;
 	unsigned char *bp;
-	if (!wait && !dataToGet())
+	if (!wait && !dataToGet(0, 0))
 		return 0;
 	a.init();
-
-	if (recv(&l, sizeof(l), 0) != sizeof(l))
+	if (recv(&l, sizeof(l), MSG_NOSIGNAL) != sizeof(l))
 		return -1;
 	l = ntohl(l);
 	bp = buff = new unsigned char[l];
 	while (l > 0) {
-		int j = recv(bp, l, 0);
+		int j = recv(bp, l, MSG_NOSIGNAL);
 		if (j == SOCKET_ERROR || j == 0) {
 			delete[]buff;
 			return -1;
@@ -290,11 +310,15 @@ sendBufferStore(const bufferStore & a)
 	int retries = 0;
 	int i;
 
-	i = send((char *) &hl, sizeof(hl), 0);
-	if (i != sizeof(hl))
-		return false;
+	bufferStore b;
+	b.addDWord(hl);
+	b.addBuff(a);
+//	i = send((char *)&hl, sizeof(hl), MSG_NOSIGNAL);
+//	if (i != sizeof(hl))
+//		return false;
+	l += 4;
 	while (l > 0) {
-		i = send((const char *)a.getString(sent), l, 0);
+		i = send((const char *)b.getString(sent), l, MSG_NOSIGNAL);
 		if (i == SOCKET_ERROR || i == 0)
 			return (false);
 		sent += i;
@@ -332,7 +356,9 @@ send(const void * const buf, int len, int flags)
 bool ppsocket::
 closeSocket(void)
 {
-	shutdown(m_Socket, 3);
+	if (myWatch)
+		myWatch->remIO(m_Socket);
+	shutdown(m_Socket, SHUT_RDWR);
 	if (::close(m_Socket) != 0) {
 		m_LastError = errno;
 		return false;

@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <iomanip.h>
 #include <unistd.h>
-#include <signal.h>
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -292,11 +291,6 @@ main(int argc, char **argv)
 	int op;
 	char dstPath[1024];
 	struct passwd *pw;
-	sigset_t sigset;
-
-	sigemptyset(&sigset);
-	sigaddset(&sigset, SIGPIPE);
-	sigprocmask(SIG_BLOCK, &sigset, 0L);
 
 	struct servent *se = getservbyname("psion", "tcp");
 	endservent();
@@ -417,13 +411,12 @@ main(int argc, char **argv)
 		} else {
 			char drive[3];
 			u_int32_t devbits;
-			u_int32_t vtotal, vfree, vattr, vuniqueid;
 
 			if (a->devlist(devbits) == rfsv::E_PSI_GEN_NONE) {
 				for (i = 0; i < 26; i++) {
-					string n;
-					if ((devbits & 1) && a->devinfo(i, vfree, vtotal, vattr, vuniqueid, n) == rfsv::E_PSI_GEN_NONE) {
-						if (vattr != 7) {
+					PlpDrive psidr;
+					if ((devbits & 1) && a->devinfo(i, psidr) == rfsv::E_PSI_GEN_NONE) {
+						if (psidr.getMediaType() != 7) {
 							sprintf(drive, "%c:\0", 'A' + i);
 							if (verbose > 0)
 								cout << "Scanning Drive " << drive << " ..." << endl;

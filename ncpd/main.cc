@@ -63,7 +63,7 @@ int_handler(int)
 };
 
 void
-checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp * a, IOWatch & iow)
+checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp * a, IOWatch &iow)
 {
 	string peer;
 	ppsocket *next = skt.accept(&peer);
@@ -73,11 +73,17 @@ checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp 
 			cout << "New socket connection from " << peer << endl;
 		if ((numScp == 7) || (!a->gotLinkChannel())) {
 			bufferStore a;
+
+			// Give the client time to send it's version request.
+			next->dataToGet(1,0);
+			next->getBufferStore(a, false);
+
+			a.init();
 			a.addStringT("No Psion Connected\n");
 			next->sendBufferStore(a);
 			next->closeSocket();
 		} else
-			scp[numScp++] = new socketChan(next, a, iow);
+			scp[numScp++] = new socketChan(next, a);
 	}
 }
 
@@ -126,7 +132,6 @@ main(int argc, char **argv)
 		sockNum = ntohs(se->s_port);
 
 	// Command line parameter processing
-	signal(SIGPIPE, SIG_IGN);
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-p") && i + 1 < argc) {
 			sockNum = atoi(argv[++i]);
@@ -187,6 +192,7 @@ main(int argc, char **argv)
 		case 0:
 			signal(SIGTERM, term_handler);
 			signal(SIGINT, int_handler);
+			skt.setWatch(&iow);
 			if (!skt.listen("127.0.0.1", sockNum))
 				cerr << "listen on port " << sockNum << ": " << strerror(errno) << endl;
 			else {
@@ -209,7 +215,6 @@ main(int argc, char **argv)
 				a->setVerbose(nverbose);
 				a->setLinkVerbose(lverbose);
 				a->setPktVerbose(pverbose);
-				iow.addIO(skt.socket());
 				while (active) {
 					// sockets
 					pollSocketConnections(numScp, scp);

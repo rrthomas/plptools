@@ -10,7 +10,20 @@ class ppsocket;
  * @ref rfsv protocol variant depending on the connected Psion.
  */
 class rfsvfactory {
+	
  public:
+	/**
+	 * The known errors which can happen during @ref create .
+	 */
+	enum errs {
+		FACERR_NONE = 0,
+		FACERR_COULD_NOT_SEND = 1,
+		FACERR_AGAIN = 2,
+		FACERR_NOPSION = 3,
+		FACERR_PROTVERSION = 4,
+		FACERR_NORESPONSE = 5,
+	};
+
 	/**
 	 * Constructs a rfsvfactory.
 	 *
@@ -30,6 +43,14 @@ class rfsvfactory {
 	 */
 	virtual rfsv * create(bool);
 
+	/**
+	 * Retrieve an error code.
+	 *
+	 * @returns The error code, in case @ref create has
+	 * failed, 0 otherwise.
+	 */
+	virtual Enum<errs> getError() { return err; }
+
  private:
 	/**
 	 * The socket to be used for connecting to the
@@ -37,6 +58,7 @@ class rfsvfactory {
 	 */
 	ppsocket *skt;
 	int serNum;
+	Enum<errs> err;
 };
 
 #endif

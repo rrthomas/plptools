@@ -4,16 +4,19 @@
 #include "rfsv.h"
 #include "plpdirent.h"
 
+class rfsvfactory;
+
 /**
  * This is the implementation of the @ref rfsv protocol for
- * Psion series 5 (EPOC) variant.
- * For a complete documentation, see @ref rfsv .
+ * Psion series 5 (EPOC) variant. You normally never create
+ * objects of this class directly. Thus the constructor is
+ * private. Use @ref rfsvfactory for creating an instance of
+ * @ref rfsv . For a complete documentation, see @ref rfsv .
  */
 class rfsv32 : public rfsv {
+	friend rfsvfactory;
 
 public:
-	rfsv32(ppsocket *);
-
 	Enum<rfsv::errs> dir(const char * const, PlpDir &);
 	Enum<rfsv::errs> dircount(const char * const, u_int32_t &);
 	Enum<rfsv::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
@@ -39,7 +42,7 @@ public:
 	Enum<rfsv::errs> fclose(const u_int32_t);
 
 	Enum<rfsv::errs> devlist(u_int32_t &);
-	Enum<rfsv::errs> devinfo(const u_int32_t, u_int32_t &, u_int32_t &, u_int32_t &, u_int32_t &, string &);
+	Enum<rfsv::errs> devinfo(const u_int32_t, PlpDrive&);
 	Enum<rfsv::errs> opendir(const u_int32_t, const char * const, rfsvDirhandle &);
 	Enum<rfsv::errs> readdir(rfsvDirhandle &, PlpDirent &);
 	Enum<rfsv::errs> closedir(rfsvDirhandle &);
@@ -154,6 +157,12 @@ private:
 		SET_DRIVE_NAME   = 0x31,
 		REPLACE          = 0x32
 	};
+
+	/**
+	 * Private constructor. Shall be called by
+	 * rfsvfactory only.
+	 */
+	rfsv32(ppsocket *);
 
 	Enum<rfsv::errs> err2psierr(int32_t);
 	Enum<rfsv::errs> fopendir(const u_int32_t, const char *, u_int32_t &);
