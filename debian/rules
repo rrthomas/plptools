@@ -24,7 +24,7 @@ configure-stamp:
 	autoconf
 	touch include/stamp-h.in
 	./configure --prefix=/usr --with-mountdir=/var/lib/plptools/mnt \
-		--with-initdir=none --enable-kde
+		--mandir=/usr/share/man --with-initdir=none --enable-kde
 	touch configure-stamp
 
 build: configure-stamp build-stamp
@@ -47,10 +47,16 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-
 	# Add here commands to install the package into debian/tmp.
 	$(MAKE) DESTDIR=$(tmp) install
-
+	mkdir -p $(tmp)/etc
+	install -m 644 debian/plptools.conf $(tmp)/etc
+	# Split into sub-packages
+	dh_movefiles -pplptools
+	dh_movefiles -pplptools-dev
+	dh_movefiles -pplptools-kde
+	dh_movefiles -pkpsion
+	dh_movefiles -pklipsi
 
 # Build architecture-independent files here.
 binary-indep: build install

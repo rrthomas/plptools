@@ -7,3 +7,4 @@ usr/lib/libplp.so.*
 usr/share/locale/*/LC_MESSAGES/plptools.mo
 usr/share/man
 usr/share/plptools
+etc/plptools.conf
