@@ -507,6 +507,30 @@ copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 }
 
 Enum<rfsv::errs> rfsv32::
+copyFromPsion(const char *from, int fd, cpCallback_t cb)
+{
+    Enum<rfsv::errs> res;
+    u_int32_t handle;
+    u_int32_t len;
+    u_int32_t total = 0;
+
+    if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle)) != E_PSI_GEN_NONE)
+	return res;
+    unsigned char *buff = new unsigned char[RFSV_SENDLEN];
+    do {
+	if ((res = fread(handle, buff, RFSV_SENDLEN, len)) == E_PSI_GEN_NONE) {
+	    write(fd, buff, len);
+	    total += len;
+	    if (cb && !cb(NULL, total))
+		res = E_PSI_FILE_CANCEL;
+	}
+    } while ((len > 0) && (res == E_PSI_GEN_NONE));
+    delete [] buff;
+    fclose(handle);
+    return res;
+}
+
+Enum<rfsv::errs> rfsv32::
 copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 {
     u_int32_t handle;

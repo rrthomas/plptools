@@ -413,6 +413,11 @@ public:
     virtual Enum<errs> copyFromPsion(const char *from, const char *to, void *, cpCallback_t func) = 0;
 
     /**
+    * Copies a file from the Psion to the local machine.
+    */
+    virtual Enum<rfsv::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb) = 0;
+
+    /**
     * Copies a file from local machine to the Psion.
     *
     * @param from Name of the file on the local machine to be copied.
