@@ -1,14 +1,19 @@
+LIBTOOLFILES = config.guess config.sub ltconfig ltmain.sh
+AUTOMAKEFILES = install-sh missing mkinstalldirs
+CONFIGHIN = include/config.h.in
+ACLOCAL = aclocal.m4
+
 all:
 	@echo "Use make devel for development, make dist for distribution"
 
-devel:
+devel: $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	aclocal
 	autoheader
 	automake
 	autoconf
 	touch include/stamp-h.in
 
-dist:
+dist: $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	aclocal
 	autoheader
 	automake --include-deps
@@ -17,3 +22,14 @@ dist:
 	./configure
 	$(MAKE) dist
 
+$(ACLOCAL): acinclude.m4
+	aclocal
+
+$(CONFIGHIN): acconfig.h
+	autoheader
+
+$(LIBTOOLFILES):
+	libtoolize --copy --force
+
+$(AUTOMAKEFILES): $(CONFIGHIN)
+	-automake --add-missing --copy

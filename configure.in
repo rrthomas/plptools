@@ -13,7 +13,6 @@ AM_MAINTAINER_MODE
 dnl checks for programs
 AC_PROG_MAKE_SET
 AC_CHECK_COMPILERS
-AC_PROG_RANLIB
 
 CFLAGS="-O"
 test "$GCC" = yes && CFLAGS="-O2 -Wall"
@@ -34,8 +33,18 @@ AC_SUBST(EXTRA_OBJS)
 dnl checks for libraries
 
 dnl readline and history for plpftp
-AC_CHECK_LIB(readline, readline)
-AC_CHECK_LIB(history, add_history)
+AC_CHECK_LIB(readline, readline,
+[
+	AC_DEFINE_UNQUOTED(HAVE_LIBREADLINE)
+	have_libreadline=true
+])
+AC_CHECK_LIB(history, add_history,
+[
+	AC_DEFINE_UNQUOTED(HAVE_LIBHISTORY)
+	have_libhistory=true
+])
+AM_CONDITIONAL(HAVE_LIBREADLINE, test x$have_libreadline = xtrue)
+AM_CONDITIONAL(HAVE_LIBHISTORY, test x$have_libhistory = xtrue)
 
 dnl these three are for solaris
 AC_CHECK_LIB(socket, socket)
