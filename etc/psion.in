@@ -18,42 +18,64 @@ if grep -qs ^/PLP/ /etc/mgetty+sendfax/login.config ; then
 	test -n "$mrun" && MGETTY_HASPLP=true
 fi
 
-# See how we were called.
-case "$1" in
-  start)
+start() {
   	if $MGETTY_HASPLP ; then
 		echo "NOT Starting ncpd because mgetty configured for PLP"
 		exit 0
 	fi
-	echo -n "Starting Psion support: "
+	echo -n "Starting Psion support (ncpd): "
 	daemon @prefix@/sbin/ncpd
-	daemon @prefix@/sbin/plpnfsd
+	RETVAL=$?
 	echo
-	touch /var/lock/subsys/psion
-	;;
-  stop)
-	echo -n "Shutting down Psion support: "
+	if [ $RETVAL -eq 0 ] ; then
+		echo -n "Starting Psion support (plpnfsd): "
+		daemon @prefix@/sbin/plpnfsd
+		RETVAL=$?
+		echo
+	fi
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/psion
+	return $RETVAL
+}
+
+stop() {
+	echo -n "Stopping Psion support: "
 	killproc plpnfsd -HUP
 	while true ; do
 		test -z "`pidofproc plpnfsd`" && break;
 		sleep 1 # allow plpnfsd flushing it's cache
 	done
 	killproc ncpd
+	RETVAL=$?
 	echo
-	rm -f /var/lock/subsys/psion
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/psion
+	return $RETVAL
+}
+
+restart() {
+	stop
+	start
+}
+
+# See how we were called.
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
 	;;
   status)
 	status plpnfsd
 	status ncpd
 	;;
-  restart)
-	$0 stop
-	$0 start
+  restart|reload)
+  	restart
 	;;
+  condrestart)
+  	test -f /var/lock/subsys/psion && restart || :
   *)
-	echo "Usage: psion {start|stop|status|restart}"
+	echo "Usage: psion {start|stop|status|restart|reload|condrestart}"
 	exit 1
 esac
 
-exit 0
+exit $?
 

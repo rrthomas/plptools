@@ -32,6 +32,7 @@ $(LIBTOOLFILES):
 
 $(GETTEXT): $(ACLOCAL)
 	echo n | gettextize -f
+	-test -f po/ChangeLog~ && mv -f po/ChangeLog~ po/ChangeLog
 
 $(AUTOMAKEFILES): $(ACLOCAL) $(CONFIGHIN)
 	automake --add-missing
