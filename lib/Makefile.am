@@ -1,3 +1,4 @@
-noinst_LIBRARIES = libutils.a
+lib_LTLIBRARIES = libplp.la
 
-libutils_a_SOURCES = bufferarray.cc  bufferstore.cc iowatch.cc ppsocket.cc rfsv32.cc
+libplp_la_LDFLAGS = -version-info 1:0:0
+libplp_la_SOURCES = bufferarray.cc  bufferstore.cc iowatch.cc ppsocket.cc rfsv32.cc

@@ -1,7 +1,5 @@
 INCLUDES=-I../lib
 
-plpftp_LDADD = -L../lib -lutils
-
 bin_PROGRAMS = plpftp
-
+plpftp_LDADD = ../lib/.libs/libplp.so
 plpftp_SOURCES = ftp.cc main.cc
