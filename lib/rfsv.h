@@ -3,9 +3,9 @@
 
 #include "Enum.h"
 #include "psitime.h"
+#include "bufferstore.h"
 
 class ppsocket;
-class bufferStore;
 class bufferArray;
 
 const long RFSV_SENDLEN = 2000;
@@ -14,7 +14,13 @@ const long RFSV_SENDLEN = 2000;
  * Defines the callback procedure for
  * progress indication of copy operations.
  */
-typedef int (*cpCallback_t)(long);
+typedef int (*cpCallback_t)(void *, long);
+
+class rfsvDirhandle {
+ public:
+	unsigned long h;
+	bufferStore b;
+};
 
 /**
  * Access remote file services of a Psion.
@@ -44,18 +50,18 @@ class rfsv {
 		 * The known modes for file open.
 		 */
 		enum open_flags {
-			PSI_O_RDONLY = 00,
-			PSI_O_WRONLY = 01,
-			PSI_O_RDWR = 02,
+			PSI_O_RDONLY = 0000,
+			PSI_O_WRONLY = 0001,
+			PSI_O_RDWR   = 0002,
 		};
 
 		/**
 		 * The known modes for file creation.
 		 */
 		enum open_mode {
-			PSI_O_CREAT = 0100,
-			PSI_O_EXCL = 0200,
-			PSI_O_TRUNC = 01000,
+			PSI_O_CREAT  = 00100,
+			PSI_O_EXCL   = 00200,
+			PSI_O_TRUNC  = 01000,
 			PSI_O_APPEND = 02000,
 		};
 
@@ -330,7 +336,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> copyFromPsion(const char *from, const char *to, cpCallback_t func) = 0;
+		virtual Enum<errs> copyFromPsion(const char *from, const char *to, void *, cpCallback_t func) = 0;
 
 		/**
 		 * Copies a file from local machine to the Psion.
@@ -343,8 +349,20 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> copyToPsion(const char * const from, const char * const to, cpCallback_t func) = 0;
+		virtual Enum<errs> copyToPsion(const char * const from, const char * const to, void *, cpCallback_t func) = 0;
 
+		/**
+		 * Copies a file from the Psion to the Psion.
+		 *
+		 * @param from Name of the file to be copied.
+		 * @param to Name of the destination file.
+		 * @param func Pointer to a function which gets called on every read.
+		 * 	This function can be used to show some progress etc. May be set
+		 * 	to NULL, where no callback is performed.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> copyOnPsion(const char * const from, const char * const to, void *, cpCallback_t func) = 0;
 		/**
 		 * Resizes an open file on the Psion.
 		 * If the new size is greater than the file's
@@ -407,6 +425,11 @@ class rfsv {
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
 		virtual Enum<errs> remove(const char * const name) = 0;
+
+		virtual Enum<errs> opendir(const long attr, const char * const name, rfsvDirhandle &handle) = 0;
+		virtual Enum<errs> readdir(rfsvDirhandle &handle, bufferStore &buff) = 0;
+		virtual Enum<errs> closedir(rfsvDirhandle &handle) = 0;
+		virtual Enum<errs> setVolumeName(const char drive, const char * const name) = 0;
 
 		/**
 		 * Converts a file attribute @ref rfsv::file_attribs to

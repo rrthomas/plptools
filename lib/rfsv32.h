@@ -3,10 +3,6 @@
 
 #include "rfsv.h"
 
-class ppsocket;
-class bufferStore;
-class bufferArray;
-
 class rfsv32 : public rfsv {
 
 public:
@@ -14,12 +10,13 @@ public:
 
 	Enum<rfsv::errs> dir(const char * const, bufferArray &);
 	Enum<rfsv::errs> dircount(const char * const, long &);
-	Enum<rfsv::errs> copyFromPsion(const char *, const char *, cpCallback_t);
-	Enum<rfsv::errs> copyToPsion(const char *, const char *, cpCallback_t);
-	Enum<rfsv::errs> mkdir(const char *);
-	Enum<rfsv::errs> rmdir(const char *);
-	Enum<rfsv::errs> remove(const char *);
-	Enum<rfsv::errs> rename(const char *, const char *);
+	Enum<rfsv::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
+	Enum<rfsv::errs> copyToPsion(const char * const, const char * const, void *, cpCallback_t);
+	Enum<rfsv::errs> copyOnPsion(const char * const, const char * const, void *, cpCallback_t);
+	Enum<rfsv::errs> mkdir(const char * const);
+	Enum<rfsv::errs> rmdir(const char * const);
+	Enum<rfsv::errs> remove(const char * const);
+	Enum<rfsv::errs> rename(const char * const, const char * const);
 	Enum<rfsv::errs> mktemp(long &, char * const);
 	Enum<rfsv::errs> fgeteattr(const char * const, long &, long &, PsiTime &);
 	Enum<rfsv::errs> fgetattr(const char * const, long &);
@@ -37,7 +34,10 @@ public:
 
 	Enum<rfsv::errs> devlist(long &);
 	Enum<rfsv::errs> devinfo(const int, long &, long &, long &, long &, char * const);
-
+	Enum<rfsv::errs> opendir(const long, const char * const, rfsvDirhandle &);
+	Enum<rfsv::errs> readdir(rfsvDirhandle &, bufferStore &);
+	Enum<rfsv::errs> closedir(rfsvDirhandle &);
+	Enum<rfsv::errs> setVolumeName(const char, const char * const);
 	long opMode(const long);
 
 private:

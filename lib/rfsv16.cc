@@ -167,6 +167,72 @@ fclose(long fileHandle)
 }
 
 Enum<rfsv::errs> rfsv16::
+opendir(const long attr, const char *name, rfsvDirhandle &dH) {
+	long handle;
+	Enum<rfsv::errs> res = fopendir(name, handle);
+	dH.h = handle;
+	dH.b.init();
+	return res;
+}
+
+Enum<rfsv::errs> rfsv16::
+closedir(rfsvDirhandle &dH) {
+	return fclose(dH.h);
+}
+
+Enum<rfsv::errs> rfsv16::
+readdir(rfsvDirhandle &dH, bufferStore &s) {
+	Enum<rfsv::errs> res = E_PSI_GEN_NONE;
+
+	if (dH.b.getLen() < 17) {
+		dH.b.init();
+		dH.b.addWord(dH.h & 0xFFFF);
+		if (!sendCommand(FDIRREAD, dH.b))
+			return E_PSI_FILE_DISC;
+		res = getResponse(dH.b);
+		dH.b.discardFirstBytes(2); // Don't know what these mean!
+	} 
+	if ((res == E_PSI_GEN_NONE) && (dH.b.getLen() > 16)) {
+		int version = dH.b.getWord(0);
+		if (version != 2) {
+			cerr << "dir: not version 2" << endl;
+			return E_PSI_GEN_FAIL;
+		}
+		long attr = attr2std((long)dH.b.getWord(2));
+		long size = dH.b.getDWord(4);
+		PsiTime *date = new PsiTime((time_t)dH.b.getDWord(8));
+		const char *name = dH.b.getString(16);
+
+		dH.b.discardFirstBytes(17+strlen(name));
+
+		s.init();
+		s.addDWord((unsigned long)date);
+		s.addDWord(size);
+		s.addDWord(attr);
+		s.addStringT(name);
+	}
+	return res;
+}
+
+Enum<rfsv::errs> rfsv16::
+dir(const char *name, bufferArray &files)
+{
+	rfsvDirhandle h;
+	Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN | PSI_A_SYSTEM | PSI_A_DIR, name, h);
+	while (res == E_PSI_GEN_NONE) {
+		bufferStore b;
+		res = readdir(h, b);
+		if (res == E_PSI_GEN_NONE)
+			files += b;
+	}
+	closedir(h);
+	if (res == E_PSI_FILE_EOF)
+		res = E_PSI_GEN_NONE;
+	return res;
+}
+
+#if 0
+Enum<rfsv::errs> rfsv16::
 dir(const char * const dirName, bufferArray &files)
 {
 	long fileHandle;
@@ -210,6 +276,7 @@ dir(const char * const dirName, bufferArray &files)
 	fclose(fileHandle);
 	return res;
 }
+#endif
 
 long rfsv16::
 opMode(long mode)
@@ -622,7 +689,7 @@ fwrite(const long handle, const unsigned char * const buf, const long len, long 
 }
 
 Enum<rfsv::errs> rfsv16::
-copyFromPsion(const char *from, const char *to, cpCallback_t cb)
+copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 {
 	long handle;
 	Enum<rfsv::errs> res;
@@ -642,7 +709,7 @@ copyFromPsion(const char *from, const char *to, cpCallback_t cb)
 			if (len > 0)
 				op.write(buf, len);
 			total += len;
-			if (cb && !cb(total))
+			if (cb && !cb(ptr, total))
 				res = E_PSI_FILE_CANCEL;
 		}
 	} while (len > 0 && (res == E_PSI_GEN_NONE));
@@ -655,7 +722,7 @@ copyFromPsion(const char *from, const char *to, cpCallback_t cb)
 }
 
 Enum<rfsv::errs> rfsv16::
-copyToPsion(const char *from, const char *to, cpCallback_t cb)
+copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 {
 	long handle;
 	long len = 0;
@@ -676,13 +743,50 @@ copyToPsion(const char *from, const char *to, cpCallback_t cb)
 		ip.read(buff, RFSV_SENDLEN);
 		if ((res = fwrite(handle, buff, ip.gcount(), len)) == E_PSI_GEN_NONE) {
 			total += len;
-			if (cb && !cb(total))
+			if (cb && !cb(ptr, total))
 				res = E_PSI_FILE_CANCEL;
 		}
 	}
 	delete[]buff;
 	fclose(handle);
 	ip.close();
+	return res;
+}
+
+Enum<rfsv::errs> rfsv16::
+copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
+{
+	long handle_from;
+	long handle_to;
+	long len;
+	long wlen;
+	long total = 0;
+	Enum<rfsv::errs> res;
+
+	if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle_from)) != E_PSI_GEN_NONE)
+		return res;
+	res = fcreatefile(P_FSTREAM | P_FUPDATE, to, handle_to);
+	if (res != E_PSI_GEN_NONE) {
+		res = freplacefile(P_FSTREAM | P_FUPDATE, to, handle_to);
+		if (res != E_PSI_GEN_NONE)
+			return res;
+	}
+	do {
+		unsigned char buf[RFSV_SENDLEN];
+		if ((res = fread(handle_from, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
+			if (len > 0) {
+				if ((res = fwrite(handle_to, buf, len, wlen)) == E_PSI_GEN_NONE) {
+					total += wlen;
+					if (cb && !cb(ptr, total))
+						res = E_PSI_FILE_CANCEL;
+				}
+			}
+		}
+	} while (len > 0 && wlen > 0 && (res == E_PSI_GEN_NONE));
+	fclose(handle_from);
+	fclose(handle_to);
+	if (res == E_PSI_FILE_EOF)
+		res = E_PSI_GEN_NONE;
 	return res;
 }
 
@@ -871,6 +975,13 @@ remove(const char* psionName)
 		return res;
 	}
 	cerr << "Unknown response from delete "<< res <<endl;
+	return E_PSI_GEN_FAIL;
+}
+
+Enum<rfsv::errs> rfsv16::
+setVolumeName(const char drive , const char * const name)
+{
+// Not yet ... 
 	return E_PSI_GEN_FAIL;
 }
 

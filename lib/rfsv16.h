@@ -23,14 +23,19 @@ public:
 	Enum<rfsv::errs> devinfo(const int, long &, long &, long &, long &, char * const);
 	Enum<rfsv::errs> fread(const long, unsigned char * const, const long, long &);
 	Enum<rfsv::errs> fwrite(const long, const unsigned char * const, const long, long &);
-	Enum<rfsv::errs> copyFromPsion(const char * const, const char * const, cpCallback_t);
-	Enum<rfsv::errs> copyToPsion(const char * const, const char * const, cpCallback_t);
+	Enum<rfsv::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
+	Enum<rfsv::errs> copyToPsion(const char * const, const char * const, void *, cpCallback_t);
+	Enum<rfsv::errs> copyOnPsion(const char *, const char *, void *, cpCallback_t);
 	Enum<rfsv::errs> fsetsize(const long, const long);
 	Enum<rfsv::errs> fseek(const long, const long, const long, long &);
 	Enum<rfsv::errs> mkdir(const char * const);
 	Enum<rfsv::errs> rmdir(const char * const);
 	Enum<rfsv::errs> rename(const char * const, const char * const);
 	Enum<rfsv::errs> remove(const char * const);
+	Enum<rfsv::errs> opendir(const long, const char * const, rfsvDirhandle &);
+	Enum<rfsv::errs> readdir(rfsvDirhandle &, bufferStore &);
+	Enum<rfsv::errs> closedir(rfsvDirhandle &);
+	Enum<rfsv::errs> setVolumeName(const char, const char * const);
 
 	long opMode(const long);
 

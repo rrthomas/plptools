@@ -148,66 +148,75 @@ fclose(long handle)
 	return getResponse(a);
 }
 
-#if 0
-/* Microseconds since 1.1.1980 00:00:00 */
-#define PSI_EPOCH_SECS8 0x0e8c52f4
-#define EPOCH_2H  7200
-#define EPOCH_DIFF_SECS (3652 * 24 * 60 * 60)
-
-unsigned long rfsv32::
-micro2time(unsigned long microHi, unsigned long microLo)
-{
-	unsigned long long micro = microHi;
-	unsigned long long pes = PSI_EPOCH_SECS8;
-	pes <<= 8;
-	micro <<= 32;
-	micro += microLo;
-	micro /= 1000000;
-	micro -= pes;
-	micro += EPOCH_DIFF_SECS;
-
-        /* Adjust for timezone and daylight saving time */
-        { 
-          struct tm *t;
-          long date=micro;
-
-          t = localtime(&date);
-          micro += timezone;                 /* Adjust for timezone */
-          if (t->tm_isdst) micro -= (60*60); /* Adjust for DST */
-        }
-
-	return (long) micro;
+Enum<rfsv::errs> rfsv32::
+opendir(const long attr, const char *name, rfsvDirhandle &dH) {
+	long handle;
+	Enum<rfsv::errs> res = fopendir(std2attr(attr), name, handle);
+	dH.h = handle;
+	dH.b.init();
+	return res;
 }
 
-void rfsv32::
-time2micro(unsigned long time, unsigned long &microHi, unsigned long &microLo)
-{
-	unsigned long long micro = (unsigned long long)time;
-	unsigned long long pes = PSI_EPOCH_SECS8;
-	pes <<= 8;
-	micro += pes;
-	micro -= EPOCH_DIFF_SECS;
-
-        /* Adjust for timezone and daylight saving time */
-        { 
-          struct tm *t;
-          long date=time;
-
-          t = localtime(&date);
-          micro -= timezone;                 /* Adjust for timezone */
-          if (t->tm_isdst) micro += (60*60); /* Adjust for DST */
-        }
-
-	micro *= (unsigned long long)1000000;
-	microLo = (micro & (unsigned long long)0x0FFFFFFFF);
-	micro >>= 32;
-	microHi = (micro & (unsigned long long)0x0FFFFFFFF);
+Enum<rfsv::errs> rfsv32::
+closedir(rfsvDirhandle &dH) {
+	return fclose(dH.h);
 }
-#endif
+
+Enum<rfsv::errs> rfsv32::
+readdir(rfsvDirhandle &dH, bufferStore &s) {
+	Enum<rfsv::errs> res = E_PSI_GEN_NONE;
+
+	if (dH.b.getLen() < 17) {
+		dH.b.init();
+		dH.b.addDWord(dH.h);
+		if (!sendCommand(READ_DIR, dH.b))
+			return E_PSI_FILE_DISC;
+		res = getResponse(dH.b);
+	} 
+	if ((res == E_PSI_GEN_NONE) && (dH.b.getLen() > 16)) {
+		long shortLen = dH.b.getDWord(0);
+		long attributes = attr2std(dH.b.getDWord(4));
+		long size = dH.b.getDWord(8);
+		// long uid1 = dH.b.getDWord(20);
+		// long uid2 = dH.b.getDWord(24);
+		// long uid3 = dH.b.getDWord(28);
+		long longLen = dH.b.getDWord(32);
+		PsiTime *date = new PsiTime(dH.b.getDWord(16), dH.b.getDWord(12));
+
+		s.init();
+		s.addDWord((unsigned long)date);
+		s.addDWord(size);
+		s.addDWord(attributes);
+		int d = 36;
+		for (int i = 0; i < longLen; i++, d++)
+			s.addByte(dH.b.getByte(d));
+		s.addByte(0);
+		while (d % 4)
+			d++;
+		d += shortLen;
+		while (d % 4)
+			d++;
+		dH.b.discardFirstBytes(d);
+	}
+	return res;
+}
 
 Enum<rfsv::errs> rfsv32::
 dir(const char *name, bufferArray &files)
 {
+	rfsvDirhandle h;
+	Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN | PSI_A_SYSTEM | PSI_A_DIR, name, h);
+	while (res == E_PSI_GEN_NONE) {
+		bufferStore b;
+		res = readdir(h, b);
+		if (res == E_PSI_GEN_NONE)
+			files += b;
+	}
+	closedir(h);
+	if (res == E_PSI_FILE_EOF)
+		res = E_PSI_GEN_NONE;
+	return res;
+#if 0
 	long handle;
 	Enum<rfsv::errs> res = fopendir(EPOC_ATTR_HIDDEN | EPOC_ATTR_SYSTEM | EPOC_ATTR_DIRECTORY, name, handle);
 	if (res != E_PSI_GEN_NONE)
@@ -256,6 +265,7 @@ dir(const char *name, bufferArray &files)
 		res = E_PSI_GEN_NONE;
 	fclose(handle);
 	return res;
+#endif
 }
 
 long rfsv32::
@@ -532,7 +542,7 @@ fwrite(const long handle, const unsigned char * const buf, const long len, long 
 }
 
 Enum<rfsv::errs> rfsv32::
-copyFromPsion(const char *from, const char *to, cpCallback_t cb)
+copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 {
 	long handle;
 	Enum<rfsv::errs> res;
@@ -551,7 +561,7 @@ copyFromPsion(const char *from, const char *to, cpCallback_t cb)
 		if ((res = fread(handle, buff, RFSV_SENDLEN, len)) == E_PSI_GEN_NONE) {
 			op.write(buff, len);
 			total += len;
-			if (cb && !cb(total))
+			if (cb && !cb(ptr, total))
 				res = E_PSI_FILE_CANCEL;
 		}
 	} while ((len > 0) && (res == E_PSI_GEN_NONE));
@@ -562,7 +572,7 @@ copyFromPsion(const char *from, const char *to, cpCallback_t cb)
 }
 
 Enum<rfsv::errs> rfsv32::
-copyToPsion(const char *from, const char *to, cpCallback_t cb)
+copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 {
 	long handle;
 	Enum<rfsv::errs> res;
@@ -583,13 +593,67 @@ copyToPsion(const char *from, const char *to, cpCallback_t cb)
 		ip.read(buff, RFSV_SENDLEN);
 		if ((res = fwrite(handle, buff, ip.gcount(), len)) == E_PSI_GEN_NONE) {
 			total += len;
-			if (cb && !cb(total))
+			if (cb && !cb(ptr, total))
 				res = E_PSI_FILE_CANCEL;
 		}
 	}
 	fclose(handle);
 	ip.close();
 	delete[]buff;
+	return res;
+}
+
+Enum<rfsv::errs> rfsv32::
+copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
+{
+	long handle_from;
+	long handle_to;
+	long attr;
+	long from_size;
+	long to_size;
+	PsiTime time;
+	Enum<rfsv::errs> res;
+
+	if ((res = fgeteattr(from, attr, from_size, time)) != E_PSI_GEN_NONE)
+		return res;
+	if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle_from))
+	    != E_PSI_GEN_NONE)
+		return res;
+	res = fcreatefile(EPOC_OMODE_BINARY | EPOC_OMODE_SHARE_EXCLUSIVE | EPOC_OMODE_READ_WRITE, to, handle_to);
+	if (res != E_PSI_GEN_NONE) {
+		res = freplacefile(EPOC_OMODE_BINARY | EPOC_OMODE_SHARE_EXCLUSIVE | EPOC_OMODE_READ_WRITE, to, handle_to);
+		if (res != E_PSI_GEN_NONE) {
+			fclose(handle_from);
+			return res;
+		}
+	}
+
+	long total = 0;
+	while (res == E_PSI_GEN_NONE) {
+		bufferStore b;
+		b.addDWord(RFSV_SENDLEN * 10);
+		b.addDWord(handle_to);
+		b.addDWord(handle_from);
+		if (!sendCommand(READ_WRITE_FILE, b))
+			return E_PSI_FILE_DISC;
+		res = getResponse(b);
+		if (res != E_PSI_GEN_NONE)
+			break;
+		if (b.getLen() != 4) {
+			res = E_PSI_GEN_FAIL;
+			break;
+		}
+		unsigned long len = b.getDWord(0);
+		total += len;
+		if (cb && !cb(ptr, total))
+			res = E_PSI_FILE_CANCEL;
+		if (len != (RFSV_SENDLEN * 10))
+			break;
+	}
+	fclose(handle_from);
+	fclose(handle_to);
+	if (res != E_PSI_GEN_NONE)
+		remove(to);
 	return res;
 }
 
@@ -783,6 +847,18 @@ remove(const char *name)
 	a.addString(n);
 	free(n);
 	if (!sendCommand(DELETE, a))
+		return E_PSI_FILE_DISC;
+	return getResponse(a);
+}
+
+Enum<rfsv::errs> rfsv32::
+setVolumeName(const char drive , const char * const name)
+{
+	bufferStore a;
+	a.addDWord(drive - 'A');
+	a.addWord(strlen(name));
+	a.addStringT(name);
+	if (!sendCommand(SET_VOLUME_LABEL, a))
 		return E_PSI_FILE_DISC;
 	return getResponse(a);
 }
