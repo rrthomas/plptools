@@ -8,6 +8,16 @@ export DH_VERBOSE=1
 # This is the debhelper compatability version to use.
 export DH_COMPAT=3
 
+# Set config options
+export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+# FOR AUTOCONF 2.52 AND NEWER ONLY
+ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+  confflags += --build $(DEB_HOST_GNU_TYPE)
+else
+  confflags += --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+endif
+
 tmp = $(shell pwd)/debian/tmp
 ltmp = $(tmp)/usr/share/lintian/overrides
 hdir = $(shell kde-config --expandvars -install html)
@@ -19,17 +29,8 @@ hdir = $(shell kde-config --expandvars -install html)
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	# Add here commands to configure the package.
-	aclocal -I conf/m4/plptools -I conf/m4/kde
-	echo n | gettextize -f
-	-test -f po/ChangeLog~ && mv -f po/ChangeLog~ po/ChangeLog
-	libtoolize --force
-	autoheader
-	automake --add-missing
-	make -C kde2 -f Makefile.am am_edit
-	autoconf
-	touch include/stamp-h.in
-	./configure --prefix=/usr --with-mountdir=/var/lib/plptools/mnt \
+	./configure $(confflags) --prefix=/usr \
+		--with-mountdir=/var/lib/plptools/mnt \
 		--mandir=/usr/share/man --with-initdir=none --enable-kde \
 		--disable-rpath
 	touch configure-stamp
