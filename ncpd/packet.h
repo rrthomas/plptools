@@ -45,6 +45,7 @@ class packet {
 		void setVerbose(short int);
 		short int getVerbose();
 		bool linkFailed();
+		void reset();
   
 	private:
 		bool terminated();

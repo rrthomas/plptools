@@ -61,6 +61,7 @@ reset() {
 	somethingToSend = false;
 	timesSent = 0;
 	failed = false;
+//	p->reset();
 }
 
 short int link::

@@ -62,6 +62,20 @@ iow(_iow)
 	iow.addIO(fd);
 }
 
+void packet::reset()
+{
+	iow.remIO(fd);
+	ser_exit(fd);
+	usleep(100000);
+	inLen = outLen = termLen = 0;
+	foundSync = 0;
+	esc = false;
+	crcIn = crcOut = 0;
+
+	fd = init_serial(devname, baud, 0);
+	iow.addIO(fd);
+}
+
 short int packet::
 getVerbose()
 {
