@@ -1,3 +1,5 @@
+# $Id$
+#
 INCLUDES=-I../lib
 
 bin_PROGRAMS = plpftp
