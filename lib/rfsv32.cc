@@ -441,7 +441,7 @@ fread(const u_int32_t handle, unsigned char * const buf, const u_int32_t len, u_
 	if ((l = a.getLen()) > 0) {
 	    memcpy(p, a.getString(), l);
 	    count += l;
-	    p += res;
+	    p += l;
 	}
     } while ((count < len) && (l > 0));
     return res;
