@@ -324,7 +324,8 @@ putClipText(char *data) {
 
 	// Data
 	b.addDWord(strlen(data)); // @1e Section (String) length
-	b.addString(data);        // @22 Data
+	b.addStringT(data);       // @22 Data (Psion Word seems to need a 
+                                  //     terminating 0.
 
 	p = (const unsigned char *)b.getString(0);
 	rf->fwrite(fh, p, b.getLen(), l);
