@@ -99,6 +99,7 @@ private:
     bool        mustListen;
     int         state;
     int         constate;
+    int         sockNum;
 };
 
 #endif

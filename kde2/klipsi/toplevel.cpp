@@ -59,6 +59,12 @@ TopLevel::TopLevel()
     lastClipData = "";
     state = ENABLED;
     constate = DISCONNECTED;
+    sockNum = DPORT;
+
+    struct servent *se = getservbyname("psion", "tcp");
+    endservent();
+    if (se != 0L)
+        sockNum = ntohs(se->s_port);
 
     menu->insertTitle(kapp->miniIcon(), i18n("Klipsi - Psion Clipboard"));
     menu->insertSeparator();
@@ -193,23 +199,24 @@ slotClipboardChanged()
 	return;
 
     QImage clipImage = clip->image();
-    QString clipData = clip->text();
+    QString clipText = clip->text();
 
-    if (clipImage.isNull()) {
-	if (clipData.isEmpty() || (clipData == lastClipData))
+    if (clipText.isEmpty()) {
+	if (clipImage.isNull())
 	    return;
-	lastClipData = clipData;
-
-	inSend = true;
-	mustListen = true;
-	char *p = strdup(clipData.latin1());
-	ascii2PsiText(p, clipData.length());
-	putClipText(p);
-	free(p);
-    } else {
 	inSend = true;
 	mustListen = true;
 	putClipImage(clipImage);
+    } else {
+	if (clipText == lastClipData)
+	    return;
+	lastClipData = clipText;
+	inSend = true;
+	mustListen = true;
+	char *p = strdup(clipText.latin1());
+	ascii2PsiText(p, clipText.length());
+	putClipText(p);
+	free(p);
     }
 
     res = rc->notify();
@@ -324,7 +331,7 @@ putClipText(char *data) {
 
 	// Data
 	b.addDWord(strlen(data)); // @1e Section (String) length
-	b.addStringT(data);       // @22 Data (Psion Word seems to need a 
+	b.addStringT(data);       // @22 Data (Psion Word seems to need a
                                   //     terminating 0.
 
 	p = (const unsigned char *)b.getString(0);
@@ -675,13 +682,6 @@ checkConnection() {
 	return true;
 
     Enum<rfsv::errs> res;
-    int sockNum = DPORT;
-
-    struct servent *se = getservbyname("psion", "tcp");
-    endservent();
-    if (se != 0L)
-        sockNum = ntohs(se->s_port);
-
     if (!rfsvSocket) {
 	rfsvSocket = new ppsocket();
 	if (!rfsvSocket->connect(NULL, sockNum)) {
