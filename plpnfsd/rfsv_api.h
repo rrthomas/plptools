@@ -32,6 +32,7 @@ extern long rfsv_closecached(void);
 
 extern long rpcs_ownerRead(builtin_node *, char *buf, unsigned long  offset, long len);
 extern long rpcs_ownerSize(builtin_node *);
+extern long rpcs_ps();
 
 /* File attributes, C-style */
 #define	PSI_A_RDONLY		0x0001

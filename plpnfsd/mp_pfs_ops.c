@@ -128,15 +128,291 @@ static long generic_sattr(builtin_node *p, unsigned long sa, unsigned long da) {
 	return 0;
 }
 
-static builtin_node builtins[] = {
-	{ "owner",      0,                PSI_A_READ | PSI_A_RDONLY, 0, rpcs_ownerSize, rpcs_ownerRead, NULL, NULL },
-	{ "debuglevel", BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, param_getsize, param_read, param_write, generic_sattr },
-	{ "acache",     BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, param_getsize, param_read, param_write, generic_sattr },
-	{ "dcache",     BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, param_getsize, param_read, param_write, generic_sattr },
-	{ "unixowner",  BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, user_getsize, user_read, user_write, NULL },
-	{ "exit",       BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 5, NULL, exit_read, exit_write, NULL },
+long generic_getlinks(builtin_node *node) {
+	builtin_child *cp = node->childs;
+	long ncount = 0;
+
+	while (cp) {
+		if ((cp->node->flags & BF_EXISTS_ALWAYS) || rfsv_isalive())
+			ncount++;
+		cp = cp->next;
+	}
+	return ncount;
+}
+
+long generic_getdents(builtin_node *node, dentry **e) {
+	builtin_child *cp = node->childs;
+
+	while (cp) {
+		if ((cp->node->flags & BF_EXISTS_ALWAYS) || rfsv_isalive()) {
+			dentry *tmp = (dentry *)malloc(sizeof(dentry));
+			if (!tmp)
+				return -1;
+			tmp->time = time(0);
+			tmp->size = cp->node->getsize ? cp->node->getsize(cp->node) : cp->node->size;
+			tmp->attr = cp->node->attr;
+			tmp->name = strdup(cp->node->name);
+			tmp->next = *e;
+			*e = tmp;
+		}
+		cp = cp->next;
+	}
+	return 0;
+}
+
+static builtin_node *builtins = NULL;
+static void dump_proctree(builtin_node *n);
+
+static void clear_procs(builtin_child **childs) {
+	builtin_child **cp = childs;
+
+	debuglog("Before clear_procs\n");
+	dump_proctree(builtins);
+	while (*cp) {
+		if ((*cp)->node->flags & BF_ISPROCESS) {
+			builtin_child *tmp = *cp;
+			*cp = (*cp)->next;
+			unregister_builtin(tmp->node);
+			free(tmp);
+		} else
+			cp = &((*cp)->next);
+	}
+	debuglog("After clear_procs\n");
+	dump_proctree(builtins);
+}
+
+static time_t procs_stamp = 0;
+static long procs_keep = 10;
+
+static long proc_getlinks(builtin_node *node) {
+	builtin_child *cp;
+	long ncount = 0;
+
+	if ((time(0) - procs_stamp) > procs_keep) {
+		debuglog("PROCESSLIST\n");
+		clear_procs(&node->childs);
+		rpcs_ps();
+		procs_stamp = time(0);
+		debuglog("After rpcs_ps\n");
+		dump_proctree(builtins);
+	}
+	cp = node->childs;
+	while (cp) {
+		if ((cp->node->flags & BF_EXISTS_ALWAYS) || rfsv_isalive())
+			ncount++;
+		cp = cp->next;
+	}
+	return ncount;
+}
+
+static long proc_getdents(builtin_node *node, dentry **e) {
+	builtin_child *cp = node->childs;
+
+	while (cp) {
+		if ((cp->node->flags & BF_EXISTS_ALWAYS) || rfsv_isalive()) {
+			dentry *tmp = (dentry *)malloc(sizeof(dentry));
+			if (!tmp)
+				return -1;
+			tmp->time = time(0);
+			tmp->size = cp->node->getsize ? cp->node->getsize(cp->node) : cp->node->size;
+			tmp->attr = cp->node->attr;
+			tmp->name = strdup(cp->node->name);
+			tmp->next = *e;
+			*e = tmp;
+		}
+		cp = cp->next;
+	}
+	return 0;
+}
+
+
+static builtin_node proc_node =	{
+	NULL, NULL, NULL, NULL, "proc",  BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_DIR, 0, NULL, NULL, NULL, NULL, proc_getlinks, proc_getdents
 };
-static int num_builtins = sizeof(builtins) / sizeof(builtin_node);
+
+static builtin_node fixed_builtins[] = {
+	{ NULL, NULL, NULL, NULL, "owner", 0, PSI_A_READ | PSI_A_RDONLY, 0, rpcs_ownerSize, rpcs_ownerRead, NULL, NULL, NULL, NULL },
+	{ NULL, NULL, NULL, NULL, "debuglevel", BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, param_getsize, param_read, param_write, generic_sattr, NULL, NULL },
+	{ NULL, NULL, NULL, NULL, "acache",     BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, param_getsize, param_read, param_write, generic_sattr, NULL, NULL },
+	{ NULL, NULL, NULL, NULL, "dcache",     BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, param_getsize, param_read, param_write, generic_sattr, NULL, NULL },
+	{ NULL, NULL, NULL, NULL, "unixowner",  BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, user_getsize, user_read, user_write, NULL, NULL, NULL },
+	{ NULL, NULL, NULL, NULL, "exit",       BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 5, NULL, exit_read, exit_write, NULL, NULL, NULL },
+};
+static int num_fixed_builtins = sizeof(fixed_builtins) / sizeof(builtin_node);
+
+static void dump_proctree(builtin_node *n) {
+	while (n) {
+		if (n->name)
+			debuglog("node@%p, \"%s\"\n", n, n->name);
+		else
+			debuglog("node@%p, \"(null)\"\n", n);
+		if (n->childs) {
+			builtin_child *c = n->childs;
+			debuglog("Childs:\n");
+			while (c) {
+				if (c->node)
+					debuglog("  %s\n", c->node->name ? c->node->name : "(null)");
+				c = c->next;
+			}
+		}
+		if (n->parent)
+			debuglog("Parent: %s\n", n->parent->name);
+		n = n->next;
+	}
+}
+
+static int add_child(builtin_child **childs, builtin_node *node) {
+	builtin_child *newc = malloc(sizeof(builtin_child));
+	if (!newc) {
+		errorlog("Out of memory in add_child %s\n", node->name);
+		return -1;
+	}
+	newc->next = *childs;
+	newc->node = node;
+	*childs = newc;
+	return 0;
+}
+
+static int remove_child(builtin_child **childs, builtin_node *node) {
+	builtin_child **cp = childs;
+
+	if (debug)
+		debuglog("remove_child %s\n", node->name);
+	while (*cp) {
+		if ((*cp)->node == node) {
+			builtin_child *tmp = *cp;
+			*cp = (*cp)->next;
+			free(tmp);
+			return 0;
+		}
+		cp = &((*cp)->next);
+	}
+	return -1;
+}
+
+char *builtin_path(builtin_node *node) {
+	static char tmp[1024];
+	char tmp2[1024];
+
+	strcpy(tmp, node->name);
+	node = node->parent;
+	while (node) {
+		sprintf(tmp2, "%s\\%s", node->name, tmp);
+		strcpy(tmp, tmp2);
+		node = node->parent;
+	}
+	return tmp;
+}
+
+int unregister_builtin(builtin_node *node) {
+	builtin_child *cp = node->childs;
+	builtin_node **n;
+
+	/**
+	 * Unlink and free childs.
+	 */
+	if (debug)
+		debuglog("unregister_builtin %s\n", node->name);
+
+	while (cp) {
+		builtin_child *old = cp;
+		cp->node->parent = 0L;
+		unregister_builtin(cp->node);
+		cp = cp->next;
+		free(old);
+	}
+	/**
+	 * Unlink ourselves from parent child list.
+	 */
+	if (node->parent)
+		remove_child(&node->parent->childs, node);
+	n = &builtins;
+	while (*n) {
+		if (*n == node) {
+			*n = node->next;
+			break;
+		} else
+			n = &(*n)->next;
+	}
+	if (node->name)
+		free(node->name);
+	if (node->private_data)
+		free(node->private_data);
+	free(node);
+	return 0;
+}
+
+builtin_node *register_builtin(char *parent, builtin_node *node) {
+	builtin_node *bn;
+	builtin_node *parent_node = 0L;
+
+	debuglog("register_builtin node=%p\n", node);
+	if (!node) {
+		errorlog("register_builtin called with NULL node\n");
+		return NULL;
+	}
+	if (!node->name) {
+		errorlog("register_builtin called without name\n");
+		return NULL;
+	}
+	if (parent) {
+		debuglog("register_builtin parent: %s\n", parent);
+		for (bn = builtins; bn; bn = bn->next) {
+			debuglog("cmp parent: %s %s\n", builtin_path(bn), parent);
+			if (!strcmp(builtin_path(bn), parent)) {
+				debuglog("cmp parent found bn=%s\n", bn->name);
+				break;
+			}
+		}
+		if (!bn) {
+			errorlog("register_builtin for %s called with nonexistent parent %s\n", node->name, parent);
+			return NULL;
+		}
+		parent_node = bn;
+	}
+	bn = malloc(sizeof(builtin_node));
+	if (!bn) {
+		errorlog("out of memory while registering builtin %s\n", node->name);
+		return NULL;
+	}
+	memset(bn, 0, sizeof(builtin_node));
+	bn->name = strdup(node->name);
+	if (!bn->name) {
+		errorlog("out of memory while registering builtin %s\n", node->name);
+		free(bn);
+		return NULL;
+	}
+	if (parent_node)
+		debuglog("register_builtin %s in %s\n", node->name, builtin_path(parent_node));
+	else
+		debuglog("register_builtin %s\n", node->name);
+	bn->parent = parent_node;
+	bn->flags = node->flags;
+	bn->attr = node->attr;
+	bn->size = node->size;
+	bn->getsize = node->getsize;
+	bn->read = node->read;
+	bn->write = node->write;
+	bn->sattr = node->sattr;
+	bn->getlinks = node->getlinks;
+	bn->getdents = node->getdents;
+	bn->private_data = node->private_data;
+	if (parent_node) {
+		debuglog("Add child %s in %s\n", bn->name, bn->parent->name);
+		if (add_child(&(parent_node->childs), bn)) {
+			errorlog("Couldn't add child %s\n", bn->name);
+			free(bn->name);
+			free(bn);
+			return NULL;
+		}
+	}
+	bn->next = builtins;
+	builtins = bn;
+	debuglog("After register_builtin\n");
+	dump_proctree(builtins);
+	debuglog("register_builtin new node=%p\n", bn);
+	return bn;
+}
 
 /*
  * Nfsd returned NFSERR_STALE if the psion wasn't present, but I didn't like
@@ -308,12 +584,25 @@ pattr2attr(long psiattr, long size, long ftime, fattr *fp, int inode)
 	fp->mtime.seconds = fp->ctime.seconds = fp->atime.seconds;
 }
 
+static int proc_top = 0;
+
 static int
 query_devices()
 {
 	device *dp, *np;
 	int link_count = 2;	/* set the root link count */
 
+	if (!proc_top) {
+		int i;
+		if (register_builtin(NULL, &proc_node)) {
+			for (i = 0; i < num_fixed_builtins; i++)
+				if (register_builtin(proc_node.name, &fixed_builtins[i]))
+					proc_top++;
+		} else
+			errorlog("Couldn't register /proc\n");
+		if (proc_top != num_fixed_builtins)
+			proc_top = 0;
+	}
 	if (query_cache)
 		return 0;
 	for (dp = devices; dp; dp = np) {
@@ -336,15 +625,16 @@ mp_dircount(p_inode *inode, long *count)
 {
 	dentry *e = NULL;
 	long ret;
+	builtin_node *bn;
 
 	*count = 0;
 	debuglog("dircount: %s\n", inode->name);
-	if (!strcmp(inode->name, "proc")) {
-		int i;
-		for (i = 0; i < num_builtins; i++)
-			if ((builtins[i].flags & BF_EXISTS_ALWAYS) || rfsv_isalive())
-				(*count)++;
-		return 0;
+	for (bn = builtins; bn; bn = bn->next) {
+		if ((!strcmp(builtin_path(bn), inode->name) && (bn->attr & PSI_A_DIR))) {
+			if (bn->getlinks)
+				*count = bn->getlinks(bn);
+			return 0;
+		}
 	}
 	debuglog("RFSV dir %s\n", inode->name);
 	if ((ret = rfsv_dir(dirname(inode->name), &e)))
@@ -391,18 +681,6 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 	if ((cp = search_cache(attrcache, inode->inode))) {
 		debuglog("getattr: cache hit\n");
 		*fp = cp->attr;	/* gotcha */
-#if 0
-		if (fp->type == NFDIR) {
-			if (mp_dircount(inode, &dcount)) {
-				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
-				return &res;
-			}
-			if (fp->nlink != (dcount + 2))
-				fp->mtime.seconds = time(0);
-			fp->nlink = dcount + 2;
-			cp->attr = *fp;
-		}
-#endif
 		return &res;
 	}
 	l = strlen(inode->name);
@@ -414,15 +692,6 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 		if (query_devices())	/* root inode and proc is always there */
 			root_fattr.nlink = 3;
 		*fp = root_fattr;
-	} else if (l == 4 && (!strcmp(inode->name, "proc"))) {
-		debuglog("getattr:proc (%#o)\n", root_fattr.mode);
-		*fp = root_fattr;
-		fp->fileid = inode->inode;
-		fp->type = NFDIR;
-		mp_dircount(inode, &dcount);
-		if (fp->nlink != (dcount + 2))
-			fp->mtime.seconds = time(0);
-		fp->nlink = dcount + 2;
 	} else if (l == 2 && inode->name[1] == ':') {
 		debuglog("getattr:device\n");
 		res.status = NO_PSION;
@@ -453,16 +722,19 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 			}
 		}
 	} else {
-		int i;
+		builtin_node *bn;
 
-		for (i = 0; i < num_builtins; i++) {
-			if (!strcmp(inode->name, build_path("proc", builtins[i].name))) {
-				pattr = builtins[i].attr;
-				psize = (builtins[i].getsize != NULL) ? builtins[i].getsize(&builtins[i]) : builtins[i].size;
+		for (bn = builtins; bn; bn = bn->next) {
+			if (!strcmp(inode->name, builtin_path(bn))) {
+				pattr = bn->attr;
+				if (pattr & PSI_A_DIR)
+					psize = 0;
+				else
+					psize = (bn->getsize) ? bn->getsize(bn) : bn->size;
 				ptime = time(0);
 				res.status = NFS_OK;
 				builtin = 1;
-				if (builtins[i].flags && BF_NOCACHE)
+				if (bn->flags && BF_NOCACHE)
 					builtin++;
 				break;
 			}
@@ -621,37 +893,44 @@ nfsproc_readdir_2(readdirargs *ra)
 			addentry(ra, &cp, &searchinode, get_nam(dp->name)->inode, n);
 		}
 	} else {
+		builtin_node *bn;
+		int builtin = 0;
 		dentry *e = NULL;
 		debuglog("nfsdir: dir\n");
-		if (!strcmp(inode->name, "proc")) {
-			int i;
-			for (i = 0; i < num_builtins; i++)
-				if ((builtins[i].flags & BF_EXISTS_ALWAYS) || rfsv_isalive()) {
-					int ni = get_nam(build_path(inode->name, builtins[i].name))->inode;
-					addentry(ra, &cp, &searchinode, ni, builtins[i].name);
+
+		for (bn = builtins; bn ; bn = bn->next)
+			if (!strcmp(inode->name, builtin_path(bn))) {
+				if (bn->attr & PSI_A_DIR) {
+					if (bn->getdents)
+						bn->getdents(bn, &e);
+					builtin = 1;
+				} else {
+					res.status = NFSERR_NOTDIR;
+					return &res;
 				}
-		} else {
+			}
+		if (!builtin) {
 			debuglog("RFSV dir2 %s\n", inode->name);
 			if (rfsv_dir(dirname(inode->name), &e)) {
 				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 				return &res;
 			}
-			while (e) {
-				fattr fp;
-				dentry *o;
-				int ni;
+		}
+		while (e) {
+			fattr fp;
+			dentry *o;
+			int ni;
 	
-				bp = filname(e->name);
-				ni = get_nam(build_path(inode->name, bp))->inode;
-				addentry(ra, &cp, &searchinode, ni, (char *) bp);
-				free(e->name);
-				pattr2attr(e->attr, e->size, e->time, &fp, ni);
-				if (rfsv_isalive())
-					add_cache(&attrcache, ni, &fp);
-				o = e;
-				e = e->next;
-				free(o);
-			}
+			bp = filname(e->name);
+			ni = get_nam(build_path(inode->name, bp))->inode;
+			addentry(ra, &cp, &searchinode, ni, (char *) bp);
+			free(e->name);
+			pattr2attr(e->attr, e->size, e->time, &fp, ni);
+			if (rfsv_isalive())
+				add_cache(&attrcache, ni, &fp);
+			o = e;
+			e = e->next;
+			free(o);
 		}
 	}
 
@@ -666,7 +945,7 @@ nfsproc_setattr_2(sattrargs *sa)
 	static struct attrstat res;
 	p_inode *inode = get_num(fh2inode(sa->file.data));
 	fattr *fp;
-	int bi;
+	builtin_node *bn;
 	int builtin = 0;
 
 	if (!inode) {
@@ -680,19 +959,18 @@ nfsproc_setattr_2(sattrargs *sa)
 		return &res;
 	fp = &res.attrstat_u.attributes;
 
-	for (bi = 0; bi < num_builtins; bi++) {
-		if (!strcmp(inode->name, build_path("proc", builtins[bi].name))) {
+	for (bn = builtins; bn; bn = bn->next)
+		if (!strcmp(inode->name, builtin_path(bn))) {
 			builtin = 1;
 			break;
 		}
-	}
 
 	if ((fp->type == NFREG) &&
 	    (sa->attributes.size != -1) &&
 	    (sa->attributes.size != fp->size)) {
 		debuglog("RFSV setsize %s %d\n", inode->name, sa->attributes.size);
 		if (builtin) {
-			if (builtins[bi].attr & PSI_A_RDONLY) {
+			if (bn->attr & PSI_A_RDONLY) {
 				res.status = NFSERR_ACCES;
 				return &res;
 			}
@@ -726,7 +1004,7 @@ nfsproc_setattr_2(sattrargs *sa)
 		attr2pattr(sa->attributes.mode, fp->mode, &psisattr, &psidattr);
 		debuglog("RFSV setattr %s %d %d\n", inode->name, psisattr, psidattr);
 		if (builtin) {
-			if ((builtins[bi].sattr == NULL) || builtins[bi].sattr(&builtins[bi], psisattr, psidattr)) {
+			if ((bn->sattr == NULL) || bn->sattr(bn, psisattr, psidattr)) {
 				res.status = NFSERR_ACCES;
 				return &res;
 			}
@@ -874,7 +1152,7 @@ nfsproc_read_2(struct readargs *ra)
 	long psize;
 	long ptime;
 	int len = 0;
-	int bi;
+	builtin_node *bn;
 	int builtin = 0;
 
 	if (!inode) {
@@ -897,12 +1175,19 @@ nfsproc_read_2(struct readargs *ra)
 
 	debuglog("RFSV read %s\n", inode->name);
 
-	for (bi = 0; bi < num_builtins; bi++) {
-		if (!strcmp(inode->name, build_path("proc", builtins[bi].name))) {
-			if (builtins[bi].read != NULL) {
-				len = builtins[bi].read(&builtins[bi], rop, ra->offset, ra->count);
+	for (bn = builtins; bn; bn = bn->next) {
+		if (!strcmp(inode->name, builtin_path(bn))) {
+			if (bn->attr & PSI_A_DIR) {
+				res.status = NFSERR_ISDIR;
+				return &res;
+			}
+			if (bn->read) {
+				len = bn->read(bn, rop, ra->offset, ra->count);
 				builtin = 1;
 				break;
+			} else {
+				res.status = NFSERR_IO;
+				return &res;
 			}
 		}
 	}
@@ -919,8 +1204,8 @@ nfsproc_read_2(struct readargs *ra)
 		// Problem: if an epoc process is enlarging the file, we wont recognize it
 		debuglog("RFSV getattr %s\n", inode->name);
 		if (builtin) {
-			pattr = builtins[bi].attr;
-			psize = (builtins[bi].getsize != NULL) ? builtins[bi].getsize(&builtins[bi]) : builtins[bi].size;
+			pattr = bn->attr;
+			psize = (bn->getsize) ? bn->getsize(bn) : bn->size;
 			ptime = time(0);
 		} else
 			rfsv_getattr(inode->name, &pattr, &psize, &ptime);
@@ -1034,7 +1319,8 @@ nfsproc_write_2(writeargs *wa)
 	fattr *fp;
 	struct attrstat *gres;
 	int len = 0;
-	int i, dlen, doff;
+	int dlen, doff;
+	builtin_node *bn;
 
 	if (!inode) {
 		debuglog("write: stale fh\n");
@@ -1046,6 +1332,21 @@ nfsproc_write_2(writeargs *wa)
 	dlen = wa->data.data_len;
 	doff = wa->offset;
 
+	for (bn = builtins; bn ; bn = bn->next) {
+		if (!strcmp(inode->name, builtin_path(bn))) {
+			if (bn->attr & PSI_A_DIR)
+				res.status = NFSERR_ISDIR;
+			else {
+				debuglog("builtin write %s %d@%d\n", inode->name, dlen, doff);
+				if (bn->write) {
+					int l = bn->write(bn, (unsigned char *)wa->data.data_val, doff, dlen);
+					res.status = (l == dlen) ? NFS_OK : NFSERR_IO;
+				} else
+					res.status = NFSERR_ACCES;
+			}
+			return &res;
+		}
+	}
 	/* fetch attributes */
 	if ((cp = search_cache(attrcache, inode->inode)) == 0) {
 		gres = nfsproc_getattr_2((struct nfs_fh *) wa->file.data);
@@ -1068,17 +1369,6 @@ nfsproc_write_2(writeargs *wa)
 
 	res.attrstat_u.attributes = *fp;
 
-	for (i = 0; i < num_builtins; i++) {
-		if (!strcmp(inode->name, build_path("proc", builtins[i].name))) {
-			debuglog("builtin write %s %d@%d\n", inode->name, dlen, doff);
-			if (builtins[i].write != NULL) {
-				int l = builtins[i].write(&builtins[i], (unsigned char *)wa->data.data_val, doff, dlen);
-				res.status = (l == dlen) ? NFS_OK : NFSERR_IO;
-			} else
-				res.status = NFSERR_ACCES;
-			return &res;
-		}
-	}
 	if (addwritecache(cp, doff, dlen, (unsigned char *) wa->data.data_val)) {
 		res.status = NFS_OK;
 		return &res;

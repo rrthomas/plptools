@@ -80,6 +80,127 @@ long rpcs_ownerSize(builtin_node *) {
 	return owner.getLen() - 1;
 }
 
+static long psread(builtin_node *node, char *buf, unsigned long offset, long len) {
+	char *s = (char *)node->private_data;
+
+	if (!s)
+		return 0;
+	if (offset >= ((unsigned long)node->size - 1))
+		return 0;
+	s += offset;
+	int sl = node->size - offset;
+	if (sl > len)
+		sl = len;
+	strncpy(buf, s, sl);
+	return sl;
+}
+
+long rpcs_ps() {
+	Enum<rfsv::errs> res;
+	bufferArray psbuf;
+
+	if (!rpcs_isalive())
+		return -1;
+	res = r->queryDrive('C', psbuf);
+	if (res != rfsv::E_PSI_GEN_NONE)
+		return -1;
+	while (!psbuf.empty()) {
+		builtin_node *dn;
+		builtin_node *fn1;
+		builtin_node *fn2;
+		builtin_node *bn;
+		char bname[40];
+
+		bufferStore bs = psbuf.pop();
+		bufferStore bs2 = psbuf.pop();
+		sprintf(bname, "%d", bs.getWord(0));
+
+		dn = (builtin_node *)malloc(sizeof(builtin_node));
+		if (!dn)
+			return -1;
+		fn1 = (builtin_node *)malloc(sizeof(builtin_node));
+		if (!fn1) {
+			free(dn);
+			return -1;
+		}
+		fn2 = (builtin_node *)malloc(sizeof(builtin_node));
+		if (!fn2) {
+			free(fn1);
+			free(dn);
+			return -1;
+		}
+		memset(dn, 0, sizeof(builtin_node));
+		memset(fn1, 0, sizeof(builtin_node));
+		memset(fn2, 0, sizeof(builtin_node));
+
+		/**
+		 * Directory, named by the PID
+		 */
+		dn->flags = BF_ISPROCESS;
+		dn->name = bname;
+		dn->attr = PSI_A_DIR;
+		dn->getlinks = generic_getlinks;
+		dn->getdents = generic_getdents;
+
+		fn1->name = "cmd";
+		fn1->attr = PSI_A_READ | PSI_A_RDONLY;
+		fn1->private_data = (char *)malloc(strlen(bs.getString(2))+2);
+		if (!fn1->private_data) {
+			free(fn1);
+			free(fn2);
+			free(dn);
+			return -1;
+		}
+		fn1->read = psread;
+		sprintf(fn1->private_data, "%s\n", bs.getString(2));
+		fn1->size = strlen(fn1->private_data);
+
+		fn2->name = "args";
+		fn2->attr = PSI_A_READ | PSI_A_RDONLY;
+		fn2->private_data = (char *)malloc(strlen(bs2.getString())+2);
+		if (!fn2->private_data) {
+			free(fn1->private_data);
+			free(fn1);
+			free(fn2);
+			free(dn);
+			return -1;
+		}
+		fn2->read = psread;
+		sprintf(fn2->private_data, "%s\n", bs2.getString());
+		fn2->size = strlen(fn2->private_data);
+
+		if (!(bn = register_builtin("proc", dn))) {
+			free(fn1->private_data);
+			free(fn1);
+			free(fn2->private_data);
+			free(fn2);
+			free(dn);
+			return -1;
+		}
+		strcpy(bname, builtin_path(bn));
+		if (!register_builtin(bname, fn1)) {
+			free(fn1->private_data);
+			free(fn1);
+			free(fn2->private_data);
+			free(fn2);
+			unregister_builtin(bn);
+			free(dn);
+			return -1;
+		}
+		if (!register_builtin(bname, fn2)) {
+			free(fn2->private_data);
+			free(fn2);
+			unregister_builtin(bn);
+			free(dn);
+			return -1;
+		}
+		free(fn1);
+		free(fn2);
+		free(dn);
+	}
+	return 0;
+}
+
 long rfsv_isalive() {
 	if (!a) {
 		if (!(a = rf->create(true)))
@@ -343,6 +464,11 @@ int main(int argc, char**argv) {
 	int verbose = 0;
 	int status = 0;
 
+	struct servent *se = getservbyname("psion", "tcp");
+	endservent();
+	if (se != 0L)
+		sockNum = ntohs(se->s_port);
+
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-p") && i + 1 < argc) {
 			sockNum = atoi(argv[++i]);
@@ -352,12 +478,15 @@ int main(int argc, char**argv) {
 			user = argv[++i];
 		} else if (!strcmp(argv[i], "-v")) {
 			verbose++;
+		} else if (!strcmp(argv[i], "-D")) {
+			debug++;
 		} else if (!strcmp(argv[i], "-V")) {
 			cout << "plpnfsd version " << VERSION << endl;
 			exit(0);
 		} else
 			usage();
 	}
+
 	signal(SIGPIPE, SIG_IGN);
 	skt = new ppsocket();
 	if (!skt->connect(NULL, sockNum)) {
