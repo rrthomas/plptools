@@ -1,6 +1,6 @@
 # $Id$
 #
-SUBDIRS = lib ncpd plpnfsd plpftp
+SUBDIRS = lib ncpd plpnfsd plpftp doc
 EXTRA_DIST = COPYING README TODO INSTALL README.mjg include/*.h* etc/*magic etc/*.in patches
 DISTCLEANFILES = etc/psion
 AUTOMAKE_OPTIONS = foreign
