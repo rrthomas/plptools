@@ -684,13 +684,13 @@ help() {
     cout <<
 	"Options of plpprintd:\n"
 	"\n"
-	" -d, --debug        Debugging, do not fork.\n"
-	" -h, --help         Display this text.\n"
-	" -v, --verbose      Increase verbosity.\n"
-	" -V, --version      Print version and exit.\n"
-	" -p, --port=NUM     Connect to port NUM.\n"
-	" -s, --spooldir=DIR Specify spooldir DIR.\n"
-	" -c, --printcmd=CMD Specify print command.\n";
+	" -d, --debug            Debugging, do not fork.\n"
+	" -h, --help             Display this text.\n"
+	" -v, --verbose          Increase verbosity.\n"
+	" -V, --version          Print version and exit.\n"
+	" -p, --port=[HOST:]PORT Connect to port PORT on host HOST.\n"
+	" -s, --spooldir=DIR     Specify spooldir DIR.\n"
+	" -c, --printcmd=CMD     Specify print command.\n";
 }
 
 static void
@@ -710,10 +710,40 @@ static struct option opts[] = {
     {NULL,       0,                 0,  0 }
 };
 
+static void
+parse_destination(const char *arg, const char **host, int *port)
+{
+    if (!arg)
+	return;
+    // We don't want to modify argv, therefore copy it first ...
+    char *argcpy = strdup(arg);
+    char *pp = strchr(argcpy, ':');
+
+    if (pp) {
+	// host.domain:400
+	// 10.0.0.1:400
+	*pp ++= '\0';
+	*host = argcpy;
+    } else {
+	// 400
+	// host.domain
+	// host
+	// 10.0.0.1
+	if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
+	    *host = argcpy;
+	    pp = 0L;
+	} else
+	    pp = argcpy;
+    }
+    if (pp)
+	*port = atoi(pp);
+}
+
 int
 main(int argc, char **argv)
 {
     ppsocket *skt;
+    const char *host = "127.0.0.1";
     int status = 0;
     int sockNum = DPORT;
     int ret = 0;
@@ -745,7 +775,7 @@ main(int argc, char **argv)
 		help();
 		return 0;
 	    case 'p':
-		sscanf(optarg, "%hd", &sockNum);
+		parse_destination(optarg, &host, &sockNum);
 		break;
 	    case 's':
 		spooldir = strdup(optarg);
