@@ -215,6 +215,8 @@ AC_ARG_WITH(mountdir,
 )
 AC_DEFINE_UNQUOTED(DMOUNTPOINT,"$DMOUNTPOINT")
 AC_SUBST(DMOUNTPOINT)
+eval PKGDATA="${datadir}/${PACKAGE}"
+AC_DEFINE_UNQUOTED(PKGDATA,"$PKGDATA",[This defines the dir for support files])
 
 dnl KDE stuff
 PLP_HELP_MSG([Options for activating sub packages:])
@@ -279,6 +281,7 @@ AC_OUTPUT(
 	kde2/doc/de/Makefile
 	plpbackup/Makefile
 	plpprint/Makefile
+	plpprint/prolog.ps
 	sisinstall/Makefile
 	doc/Makefile
 	doc/api/Makefile
