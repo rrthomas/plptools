@@ -392,8 +392,8 @@ devlist(u_int32_t &devbits)
 	if (res)
 	    break;
 	u_int16_t version = a.getWord(0);
-	if (version != 2) {
-	    cerr << "devlist: not version 2" << endl;
+	if ((version < 1) || (version > 2)) {
+	    cerr << "devlist: not version 1 or 2" << endl;
 	    fclose(fileHandle);
 	    return E_PSI_GEN_FAIL; // FIXME
 	}

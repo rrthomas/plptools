@@ -285,7 +285,6 @@ getBufferStore(bufferStore & a, bool wait)
 	return 0;
     a.init();
     if (recv(&l, sizeof(l), MSG_NOSIGNAL) != sizeof(l)) {
-//		cerr << "gBS: e=" << strerror(errno) << endl;
 	return -1;
     }
     l = ntohl(l);
@@ -293,7 +292,6 @@ getBufferStore(bufferStore & a, bool wait)
     while (l > 0) {
 	int j = recv(bp, l, MSG_NOSIGNAL);
 	if (j == SOCKET_ERROR || j == 0) {
-//			cerr << "gBS: j=" << j << " e=" << strerror(errno) << endl;
 	    delete[]buff;
 	    return -1;
 	}
