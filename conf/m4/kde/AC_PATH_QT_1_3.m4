@@ -47,7 +47,7 @@ AC_DEFUN(AC_PATH_QT_1_3,[
 	AC_CACHE_VAL(ac_cv_have_qt,[
 		#try to guess Qt locations
 
-		qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt /usr/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt $x_includes"
+		qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt /usr/include /usr/lib/qt3/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt $x_includes"
 		test -n "$QTDIR" && qt_incdirs="$QTDIR/include $QTDIR $qt_incdirs"
 		qt_incdirs="$ac_qt_includes $qt_incdirs"
 
@@ -60,7 +60,7 @@ AC_DEFUN(AC_PATH_QT_1_3,[
 		AC_FIND_FILE($kde_qt_header, $qt_incdirs, qt_incdir)
 		ac_qt_includes="$qt_incdir"
 
-		qt_libdirs="$QTLIB /usr/lib/qt/lib /usr/X11R6/lib /usr/lib /usr/local/qt/lib /usr/lib/qt /usr/lib/qt2/lib $x_libraries"
+		qt_libdirs="$QTLIB /usr/lib/qt/lib /usr/X11R6/lib /usr/lib /usr/local/qt/lib /usr/lib/qt /usr/lib/qt3/lib /usr/lib/qt2/lib $x_libraries"
 		test -n "$QTDIR" && qt_libdirs="$QTDIR/lib $QTDIR $qt_libdirs"
 		if test ! "$ac_qt_libraries" = "NO"; then
 			qt_libdirs="$ac_qt_libraries $qt_libdirs"

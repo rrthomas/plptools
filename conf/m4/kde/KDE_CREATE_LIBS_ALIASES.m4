@@ -3,6 +3,8 @@ AC_DEFUN(KDE_CREATE_LIBS_ALIASES,
    AC_REQUIRE([KDE_MISC_TESTS])
    AC_REQUIRE([KDE_CHECK_LIBDL])
    AC_REQUIRE([K_PATH_X])
+   AC_REQUIRE([KDE_VERSION])
+
 
 if test $kde_qtver = 2; then
    LIB_KDECORE='-lkdecore'
@@ -15,7 +17,11 @@ if test $kde_qtver = 2; then
    AC_SUBST(LIB_KIO)
    LIB_SMB='-lsmb'
    AC_SUBST(LIB_SMB)
-   LIB_KFILE='-lkfile'
+   if test $ac_kde_version = 2; then
+   	LIB_KFILE='-lkfile'
+   else
+   	LIB_KFILE=
+   fi
    AC_SUBST(LIB_KFILE)
    LIB_KAB='-lkab'
    AC_SUBST(LIB_KAB)
@@ -32,7 +38,11 @@ else
    AC_SUBST(LIB_KDEUI)
    LIB_KFM='-lkfm $(LIB_KDECORE)'
    AC_SUBST(LIB_KFM)
-   LIB_KFILE='-lkfile $(LIB_KFM) $(LIB_KDEUI)'
+   if test $ac_kde_version = 2; then
+   	LIB_KFILE='-lkfile $(LIB_KFM) $(LIB_KDEUI)'
+   else
+   	LIB_KFILE='$(LIB_KFM) $(LIB_KDEUI)'
+   fi
    AC_SUBST(LIB_KFILE)
    LIB_KAB='-lkab $(LIB_KIMGIO) $(LIB_KDECORE)'
    AC_SUBST(LIB_KAB)
