@@ -1,0 +1,36 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Fritz Elfert <felfert@to.com>, 2001.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: plptools 0.10\n"
+"POT-Creation-Date: 2001-05-24 02:01+0200\n"
+"PO-Revision-Date: 2001-05-24 02:11CET\n"
+"Last-Translator: Fritz Elfert <felfert@to.com>\n"
+"Language-Team: Deutsch <de@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 0.8\n"
+
+#: main.cpp:36
+msgid "Klipsi"
+msgstr "Klipsi"
+
+#: main.cpp:37
+msgid "Psion remote clipboard utility"
+msgstr "Psion Zwischenablage"
+
+#: main.cpp:43
+msgid "Original Developer/Maintainer"
+msgstr "Original Entwickler/Betreuer"
+
+#: toplevel.cpp:58
+msgid "Klipsi - Psion Clipboard"
+msgstr "Klipsi - Psion Zwischenablage"
+
+#: toplevel.cpp:60
+msgid "&Quit"
+msgstr "B&eenden"
+

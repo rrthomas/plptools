@@ -1,0 +1,8 @@
+Makefile.in
+Makefile
+.xvpics
+.libs
+.deps
+*.lo
+*.moc.cpp
+klipsi

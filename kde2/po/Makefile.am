@@ -4,7 +4,7 @@ maintainer-clean-local:
 
 SUBDIRS = de
 
-APPS = kpsion libplpprops
+APPS = kpsion libplpprops klipsi
 
 merge:
 	@apps='$(APPS)'; \

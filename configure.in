@@ -298,6 +298,7 @@ AC_OUTPUT(
 	kde2/kioslave/Makefile
 	kde2/plugins/Makefile
 	kde2/kpsion/Makefile
+	kde2/klipsi/Makefile
 	kde2/po/Makefile
 	kde2/po/de/Makefile
 	kde2/mime/Makefile
