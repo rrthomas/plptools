@@ -216,7 +216,7 @@ long rfsv_dir(const char *file, dentry **e) {
 	if (!a)
 		return -1;
 	ret = a->dir(file, entries);
-	
+
 	for (int i = 0; i < entries.size(); i++) {
 		PlpDirent pe = entries[i];
 		tmp = *e;
@@ -279,7 +279,7 @@ long rfsv_fclose(long handle) {
 	return a->fclose(handle);
 }
 
-long rfsv_fcreate(long attr, const char *file, long *handle) {
+long rfsv_fcreate(long attr, const char *file, u_int32_t *handle) {
 	u_int32_t ph;
 	long ret;
 
@@ -394,7 +394,7 @@ long rfsv_setattr(const char *name, long sattr, long dattr) {
 long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
 	long res;
 	PlpDirent e;
-	
+
 	if (!a)
 		return -1;
 	res = a->fgeteattr(name, e);

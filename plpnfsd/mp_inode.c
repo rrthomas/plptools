@@ -174,8 +174,10 @@ unsigned inode;
 	if (debug)
 		debuglog("search_cache %d\n", inode);
 	for (cp = root; cp; cp = cp->next)
-		if (cp->inode == inode)
+		if (cp->inode == inode) {
+			cp->stamp = time(0);
 			return cp;
+		}
 	return 0;
 }
 
