@@ -15,4 +15,4 @@ config.guess
 config.sub
 plptools-*.tar.gz
 .vimsession
-.emacs.dektop
+.emacs.desktop
