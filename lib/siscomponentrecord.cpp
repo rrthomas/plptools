@@ -22,6 +22,7 @@
 
 #include "siscomponentrecord.h"
 #include "sisfile.h"
+#include "plpintl.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -52,7 +53,7 @@ SISComponentNameRecord::fillFrom(uint8_t* buf, int base, off_t len,
 		m_nameLengths[i] = read32(p + size);
 		if (m_nameLengths[i] > len)
 			{
-			printf("Length too large for name record %d.\n", i);
+			printf(_("Length too large for name record %d.\n"), i);
 			return SIS_TRUNCATED;
 			}
 		size += 4;
@@ -66,12 +67,12 @@ SISComponentNameRecord::fillFrom(uint8_t* buf, int base, off_t len,
 		m_namePtrs[i] = read32(p + size);
 		if (m_namePtrs[i] + m_nameLengths[i] > len)
 			{
-			printf("Position/length too large for name record %d.\n", i);
+			printf(_("Position/length too large for name record %d.\n"), i);
 			return SIS_TRUNCATED;
 			}
 		size += 4;
 		if (logLevel >= 2)
-			printf("Name %d (for %s) is %.*s\n",
+			printf(_("Name %d (for %s) is %.*s\n"),
 				   i,
 				   sisFile->getLanguage(i)->m_name,
 				   m_nameLengths[i],
@@ -82,7 +83,7 @@ SISComponentNameRecord::fillFrom(uint8_t* buf, int base, off_t len,
 		m_names[i][len] = 0;
 		}
 	if (logLevel >= 1)
-		printf("%d .. %d (%d bytes): Name records\n", base, base + size, size);
+		printf(_("%d .. %d (%d bytes): Name records\n"), base, base + size, size);
 	return SIS_OK;
 }
 

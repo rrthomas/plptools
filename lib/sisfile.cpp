@@ -24,6 +24,7 @@
 #include "sislangrecord.h"
 #include "sisfilerecord.h"
 #include "sisreqrecord.h"
+#include "plpintl.h"
 
 #include <stdio.h>
 
@@ -40,11 +41,11 @@ SISFile::fillFrom(uint8_t* buf, off_t len)
 	SisRC rc = m_header.fillFrom(buf, &ix, len);
 	if (rc != SIS_OK)
 		{
-		printf("Could not read header, rc = %d\n", rc);
+		printf(_("Could not read header, rc = %d\n"), rc);
 		return rc;
 		}
 	if (logLevel >= 2)
-		printf("Ate header, got ix = %d\n", ix);
+		printf(_("Ate header, got ix = %d\n"), ix);
 	int n;
 
 	// Read languages.
@@ -59,7 +60,7 @@ SISFile::fillFrom(uint8_t* buf, off_t len)
 		rc = m_langRecords[i].fillFrom(buf, &ix, len);
 		if (rc != SIS_OK)
 			{
-			printf("Problem reading language record %d, rc = %d.\n", i, rc);
+			printf(_("Problem reading language record %d, rc = %d.\n"), i, rc);
 			return rc;
 			}
 		}
@@ -76,7 +77,7 @@ SISFile::fillFrom(uint8_t* buf, off_t len)
 		rc = m_reqRecords[i].fillFrom(buf, &ix, len, this);
 		if (rc != SIS_OK)
 			{
-			printf("Problem reading requisite record %d, rc = %d.\n", i, rc);
+			printf(_("Problem reading requisite record %d, rc = %d.\n"), i, rc);
 			return rc;
 			}
 		}
@@ -87,7 +88,7 @@ SISFile::fillFrom(uint8_t* buf, off_t len)
 	rc = m_componentRecord.fillFrom(buf, ix, len, this);
 	if (rc != SIS_OK)
 		{
-		printf("Problem reading the name record, rc = %d.\n", rc);
+		printf(_("Problem reading the name record, rc = %d.\n"), rc);
 		return rc;
 		}
 
@@ -103,7 +104,7 @@ SISFile::fillFrom(uint8_t* buf, off_t len)
 		rc = m_fileRecords[i].fillFrom(buf, &ix, len, this);
 		if (rc != SIS_OK)
 			{
-			printf("Problem reading file record %d, rc = %d.\n", i, rc);
+			printf(_("Problem reading file record %d, rc = %d.\n"), i, rc);
 			return rc;
 			}
 		}

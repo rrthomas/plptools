@@ -21,6 +21,7 @@
  */
 
 #include "sislangrecord.h"
+#include "plpintl.h"
 
 #include <stdio.h>
 
@@ -33,9 +34,9 @@ SISLangRecord::fillFrom(uint8_t* buf, int* base, off_t len)
 	if (m_lang > 33)	// Thai, last language
 		return SIS_CORRUPTED;
 	if (logLevel >= 2)
-		printf("Got language %d (%s)\n", m_lang, langTable[m_lang].m_name);
+		printf(_("Got language %d (%s)\n"), m_lang, langTable[m_lang].m_name);
 	if (logLevel >= 1)
-		printf("%d .. %d (%d bytes): Language record for %s\n",
+		printf(_("%d .. %d (%d bytes): Language record for %s\n"),
 			   *base, *base + 2, 2, langTable[m_lang].m_name);
 	*base += 2;
 	return SIS_OK;

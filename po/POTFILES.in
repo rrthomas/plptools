@@ -4,7 +4,15 @@ lib/psitime.h
 lib/rpcsfactory.cc
 lib/plpdirent.cc
 lib/rfsvfactory.cc
+lib/siscomponentrecord.cpp
+lib/sisfile.cpp
+lib/sisfileheader.cpp
+lib/sisfilerecord.cpp
+lib/sislangrecord.cpp
+lib/sisreqrecord.cpp
 
 plpftp/main.cc
 plpftp/ftp.cc
 plpbackup/plpbackup.cc
+sisinstall/sismain.cpp
+

@@ -22,6 +22,7 @@
 
 #include "sisreqrecord.h"
 #include "sisfile.h"
+#include "plpintl.h"
 
 #include <stdio.h>
 
@@ -58,19 +59,19 @@ SISReqRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 		m_namePtrs[i] = read32(p + size);
 		if (m_namePtrs[i] + m_nameLengths[i] > len)
 			{
-			printf("Position/length too large for req record %d.\n", i);
+			printf(_("Position/length too large for req record %d.\n"), i);
 			return SIS_CORRUPTED;
 			}
 		size += 4;
 		if (logLevel >= 2)
-			printf("Name %d (for %s) is %.*s\n",
+			printf(_("Name %d (for %s) is %.*s\n"),
 				   i,
 				   sisFile->getLanguage(i)->m_name,
 				   m_nameLengths[i],
 				   buf + m_namePtrs[i]);
 		}
 	if (logLevel >= 1)
-		printf("%d .. %d (%d bytes): Req record\n",
+		printf(_("%d .. %d (%d bytes): Req record\n"),
 			   *base, *base + size, size);
 	*base += size;
 	return SIS_OK;

@@ -24,6 +24,12 @@ void main(int argc, char* argv[])
 	char* filename = 0;
 	char option;
 	bool dryrun = false;
+
+#ifdef LC_ALL
+	setlocale(LC_ALL, "");
+#endif
+	textdomain(PACKAGE);
+
 	while ((option = getopt(argc, argv, "nl:")) != -1)
 		{
 		switch (option)
@@ -39,15 +45,15 @@ void main(int argc, char* argv[])
 	if (optind < argc)
 		{
 		filename = argv[optind];
-		printf("Installing sis file %s%s\n", filename,
-			   dryrun ? ", not really" : "");
+		printf(_("Installing sis file %s%s\n"), filename,
+			   dryrun ? _(", not really") : "");
 		}
 	struct stat st;
 	if (-1 == stat(filename, &st))
 		error(__LINE__);
 	off_t len = st.st_size;
 	if (logLevel >= 2)
-		printf("File is %d bytes long\n", len);
+		printf(_("File is %d bytes long\n"), len);
 	uint8_t* buf = new uint8_t[len];
 	int fd = open(filename, O_RDONLY);
 	if (-1 == fd)
@@ -62,7 +68,7 @@ void main(int argc, char* argv[])
 		psion = new Psion();
 	if (!psion->connect())
 		{
-		printf("Couldn't connect with the Psion\n");
+		printf(_("Couldn't connect with the Psion\n"));
 		exit(1);
 		}
 	createCRCTable();
@@ -79,7 +85,7 @@ void main(int argc, char* argv[])
 		}
 	else
 		{
-		printf("Could not parse the sis file.\n");
+		printf(_("Could not parse the sis file.\n"));
 		}
 	psion->disconnect();
 
