@@ -1,7 +1,7 @@
 # $Id$
 
 maintainer-clean-local:
-	rm -f Makefile.in
+	rm -f Makefile.in *.closure
 
 INCLUDES = $(all_includes) -I$(top_srcdir)/lib
 
