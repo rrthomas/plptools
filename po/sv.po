@@ -465,12 +465,12 @@ msgstr "Österrikiska"
 msgid "New Zealand"
 msgstr "Nya Zeeländska"
 
-#. FIXME: not shure about ISO code
+#  FIXME: not shure about ISO code
 #: lib/rpcs.cc:90
 msgid "International French"
 msgstr "Internationell Franska"
 
-#. FIXME: not shure about ISO code
+#  FIXME: not shure about ISO code
 #: lib/rpcs.cc:91
 msgid "Czech"
 msgstr "Tjeckoslovakiska"
