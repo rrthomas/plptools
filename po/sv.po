@@ -1315,7 +1315,7 @@ msgstr "Kunde inte hämta maskinens UID"
 
 #: plpbackup/plpbackup.cc:140
 msgid "Could not read SIBO UID file"
-msgstr "Kunde inte parsa uid-filen."
+msgstr "Kunde inte parsa uid-filen"
 
 #: plpbackup/plpbackup.cc:145
 msgid "Could not get Psion owner info"
