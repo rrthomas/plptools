@@ -37,7 +37,7 @@ public:
   virtual ~socketChan();
 
   void ncpDataCallback(bufferStore& a);
-  char* getNcpConnectName();
+  char* getNcpRegisterName();
   void ncpConnectAck();
   void ncpRegisterAck();
   void ncpDoRegisterAck(int) {}
@@ -50,7 +50,7 @@ private:
   enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
   bool ncpCommand(bufferStore &a);
   ppsocket* skt;
-  char* connectName;
+  char* registerName;
   bool connected;
   int connectTry;
 };

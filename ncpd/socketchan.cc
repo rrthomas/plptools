@@ -1,44 +1,43 @@
-// $Id$
-//
-//  PLP - An implementation of the PSION link protocol
-//
-//  Copyright (C) 1999  Philip Proudman
-//  Modifications for plptools:
-//    Copyright (C) 1999 Fritz Elfert <felfert@to.com>
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-//  e-mail philip.proudman@btinternet.com
-
+/*-*-c++-*-
+ * $Id$
+ *
+ * This file is part of plptools.
+ *
+ *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
+ *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 #include <stream.h>
-#include "stdio.h"
-#include "string.h"
-#include "malloc.h"
+#include <stdio.h>
+#include <string.h>
+#include <malloc.h>
 
 #include "socketchan.h"
 #include "ncp.h"
-#include "ppsocket.h"
+#include <ppsocket.h>
 
 socketChan:: socketChan(ppsocket * _skt, ncp * _ncpController):
     channel(_ncpController)
 {
     skt = _skt;
-    connectName = 0;
+    registerName = 0;
     connectTry = 0;
     connected = false;
 }
@@ -47,23 +46,23 @@ socketChan::~socketChan()
 {
     skt->closeSocket();
     delete skt;
-    if (connectName)
-	free(connectName);
+    if (registerName)
+	free(registerName);
 }
 
 void socketChan::
 ncpDataCallback(bufferStore & a)
 {
-    if (connectName != 0) {
+    if (registerName != 0) {
 	skt->sendBufferStore(a);
     } else
 	cerr << "socketchan: Connect without name!!!\n";
 }
 
 char *socketChan::
-getNcpConnectName()
+getNcpRegisterName()
 {
-    return connectName;
+    return registerName;
 }
 
 // NCP Command processing
@@ -145,7 +144,7 @@ ncpRegisterAck()
 void socketChan::
 ncpConnectNak()
 {
-    if (!connectName || (connectTry > 1))
+    if (!registerName || (connectTry > 1))
 	ncpConnectTerminate();
     else {
 	connectTry++;
@@ -158,7 +157,7 @@ socketPoll()
 {
     int res;
 
-    if (connectName == 0) {
+    if (registerName == 0) {
 	bufferStore a;
 	res = skt->getBufferStore(a, false);
 	switch (res) {
@@ -180,7 +179,7 @@ socketPoll()
 		// before any connection can be made.
 		//
 		// All commands begin with "NCP$".
-		
+
 		// There is a magic process name called "NCP$INFO.*"
 		// which is announced by the rfsvfactory. This causes a
 		// response to be issued containing the NCP version
@@ -196,9 +195,17 @@ socketPoll()
 		}
 
 		// This isn't a command, it's a remote process. Connect.
-		connectName = strdup(a.getString());
+		registerName = strdup(a.getString());
 		connectTry++;
-		ncpConnect();
+
+		// If this is SYS$RFSV, we immediately connect. In all
+		// other cases, we first perform a registration. Connect
+		// is then triggered by RegisterAck and uses the name
+		// we received from the Psion.
+		if (strncmp(registerName, "SYS$RFSV", 8) == 0)
+		    ncpConnect();
+		else
+		    ncpRegister();
 		break;
 	    case -1:
 		ncpConnectTerminate();

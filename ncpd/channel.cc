@@ -1,118 +1,146 @@
-// $Id$
-//
-//  PLP - An implementation of the PSION link protocol
-//
-//  Copyright (C) 1999  Philip Proudman
-//  Modifications for plptools:
-//    Copyright (C) 1999 Fritz Elfert <felfert@to.com>
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-//  e-mail philip.proudman@btinternet.com
-
-
+/*-*-c++-*-
+ * $Id$
+ *
+ * This file is part of plptools.
+ *
+ *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
+ *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 #include <stream.h>
+#include <string>
 
 #include "channel.h"
 #include "ncp.h"
 
 channel::channel(ncp * _ncpController)
 {
-	verbose = 0;
-	ncpChannel = 0;
-	ncpController = _ncpController;
-	_terminate = false;
+    verbose = 0;
+    ncpChannel = 0;
+    connectName = 0;
+    ncpController = _ncpController;
+    _terminate = false;
+}
+
+channel::~channel()
+{
+    if (connectName)
+	free((void *)connectName);
 }
 
 void channel::
 ncpSend(bufferStore & a)
 {
-	ncpController->send(ncpChannel, a);
+    ncpController->send(ncpChannel, a);
 }
 
 bool channel::
 terminate()
 {
-	return _terminate;
+    return _terminate;
 }
 
 void channel::
 terminateWhenAsked()
 {
-	_terminate = true;
+    _terminate = true;
 }
 
 void channel::
 ncpConnect()
 {
-	ncpController->connect(this);
+    ncpController->connect(this);
 }
 
 void channel::
 ncpRegister()
 {
-	ncpController->Register(this);
+    ncpController->Register(this);
 }
 
 void channel::
-ncpDoRegisterAck(int ch)
+ncpDoRegisterAck(int ch, const char *name)
 {
-	ncpController->RegisterAck(ch);
+    ncpController->RegisterAck(ch, name);
 }
 
 void channel::
 ncpDisconnect()
 {
-	ncpController->disconnect(ncpChannel);
+    ncpController->disconnect(ncpChannel);
 }
 
 short int channel::
 ncpProtocolVersion()
 {
-	return ncpController->getProtocolVersion();
+    return ncpController->getProtocolVersion();
 }
 
 void channel::
 setNcpChannel(int chan)
 {
-	ncpChannel = chan;
+    ncpChannel = chan;
 }
 
 int channel::
 getNcpChannel()
 {
-	return ncpChannel;
+    return ncpChannel;
 }
 
 void channel::
 newNcpController(ncp * _ncpController)
 {
-	ncpController = _ncpController;
+    ncpController = _ncpController;
 }
 
 void channel::
 setVerbose(short int _verbose)
 {
-	verbose = _verbose;
+    verbose = _verbose;
 }
 
 short int channel::
 getVerbose()
 {
-	return verbose;
+    return verbose;
 }
+
+const char * channel::
+getNcpConnectName()
+{
+    return connectName;
+}
+
+void channel::
+setNcpConnectName(const char *name)
+{
+    if (name) {
+	if (connectName)
+	    free((void *)connectName);
+	connectName = strdup(name);
+    }
+}
+
+/*
+ * Local variables:
+ * c-basic-offset: 4
+ * End:
+ */
