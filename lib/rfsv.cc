@@ -126,7 +126,7 @@ convertSlash(const string &name)
 }
 
 string rfsv::
-attr2String(const long attr)
+attr2String(const u_int32_t attr)
 {
 	string tmp = "";
 	tmp += ((attr & PSI_A_DIR) ? 'd' : '-');

@@ -24,12 +24,13 @@
 #endif
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <iostream.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
+#include <ctype.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -38,29 +39,16 @@
 #include "bufferstore.h"
 #include "ppsocket.h"
 
-//**********************************************************************
-// For unix we need a few definitions
-//**********************************************************************
+#define  INVALID_SOCKET	-1
+#define  SOCKET_ERROR	-1
 
-#ifndef MAKEWORD
-#define MAKEWORD(a, b) ((WORD)(((BYTE)(a)) | ((WORD)((BYTE)(b))) << 8))
-#endif
-#ifndef SHORT
-#define SHORT int
-#endif
-
-//This constructor is useful when converting a socket
-//to a derived class of socket
 ppsocket::ppsocket(const ppsocket & another)
 {
 	m_Socket = another.m_Socket;
 	m_HostAddr = another.m_HostAddr;
 	m_PeerAddr = another.m_PeerAddr;
 	m_Bound = another.m_Bound;
-	m_Timeout = another.m_Timeout;
 	m_LastError = another.m_LastError;
-
-	m_Timeout = INFINITE;
 }
 
 
@@ -71,20 +59,18 @@ ppsocket::ppsocket()
 	memset(&m_HostAddr, 0, sizeof(m_HostAddr));
 	memset(&m_PeerAddr, 0, sizeof(m_PeerAddr));
 
-
 	((struct sockaddr_in *) &m_HostAddr)->sin_family = AF_INET;
 	((struct sockaddr_in *) &m_PeerAddr)->sin_family = AF_INET;
 
 	m_Bound = false;
 	m_LastError = 0;
-	m_Timeout = INFINITE;
 }
 
 ppsocket::~ppsocket()
 {
 	if (m_Socket != INVALID_SOCKET) {
 		shutdown(m_Socket, 3);
-		close(m_Socket);
+		::close(m_Socket);
 	}
 }
 
@@ -93,40 +79,52 @@ reconnect()
 {
 	if (m_Socket != INVALID_SOCKET) {
 		shutdown(m_Socket, 3);
-		close(m_Socket);
+		::close(m_Socket);
 	}
 	m_Socket = INVALID_SOCKET;
 	if (!createSocket())
 		return (false);
 	m_LastError = 0;
-	m_Bound = 0;
+	m_Bound = false;
 	if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) != 0) {
-		m_LastError = lastErrorCode();
+		m_LastError = errno;
 		return (false);
 	}
 	if (::connect(m_Socket, &m_PeerAddr, sizeof(m_PeerAddr)) != 0) {
-		m_LastError = lastErrorCode();
+		m_LastError = errno;
 		return (false);
 	}
 	return (true);
 }
 
-void ppsocket::
-printPeer()
+string ppsocket::
+toString()
 {
-	char *pPeer = 0;
+	string ret = "";
+	char nbuf[10];
+	char *tmp = 0L;
 	int port;
 
-	pPeer = inet_ntoa(((struct sockaddr_in *) &m_PeerAddr)->sin_addr);
-	if (pPeer) {
-		port = ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port);
-		cout << "Peer : " << pPeer << " Port : " << port << endl;
-	} else
-		cerr << "Error getting Peer details\n";
+	tmp = inet_ntoa(((struct sockaddr_in *) &m_HostAddr)->sin_addr);
+	ret += tmp ? tmp : "none:none";
+	if (tmp) {
+		ret += ':';
+		sprintf(nbuf, "%d", ntohs(((struct sockaddr_in *) &m_HostAddr)->sin_port));
+		ret += nbuf;
+	}
+	ret += " -> ";
+	tmp = inet_ntoa(((struct sockaddr_in *) &m_PeerAddr)->sin_addr);
+	ret += tmp ? tmp : "none:none";
+	if (tmp) {
+		ret += ':';
+		sprintf(nbuf, "%d", ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port));
+		ret += nbuf;
+	}
+	return ret;
 }
 
 bool ppsocket::
-connect(char *Peer, int PeerPort, char *Host, int HostPort)
+connect(const char * const Peer, int PeerPort, const char * const Host, int HostPort)
 {
 	//****************************************************
 	//* If we aren't already bound set the host and bind *
@@ -147,14 +145,14 @@ connect(char *Peer, int PeerPort, char *Host, int HostPort)
 	//* Connect *
 	//***********
 	if (::connect(m_Socket, &m_PeerAddr, sizeof(m_PeerAddr)) != 0) {
-		m_LastError = lastErrorCode();
+		m_LastError = errno;
 		return (false);
 	}
 	return (true);
 }
 
 bool ppsocket::
-listen(char *Host, int Port)
+listen(const char * const Host, int Port)
 {
 	//****************************************************
 	//* If we aren't already bound set the host and bind *
@@ -170,7 +168,7 @@ listen(char *Host, int Port)
 	//**********************
 
 	if (::listen(m_Socket, 5) != 0) {
-		m_LastError = lastErrorCode();
+		m_LastError = errno;
 		return (false);
 	}
 	// Our accept member function relies on non-blocking accepts,
@@ -180,7 +178,7 @@ listen(char *Host, int Port)
 }
 
 ppsocket *ppsocket::
-accept(char *Peer, int MaxLen)
+accept(string *Peer)
 {
 #ifdef sun
 	int len;
@@ -193,24 +191,23 @@ accept(char *Peer, int MaxLen)
 	//*****************************************************
 	//* Allocate a new object to hold the accepted socket *
 	//*****************************************************
-
 	accepted = new ppsocket;
 
 	if (!accepted) {
-		m_LastError = lastErrorCode();
-		return (NULL);
+		m_LastError = errno;
+		return NULL;
 	}
 	//***********************
 	//* Accept a connection *
 	//***********************
 
 	len = sizeof(struct sockaddr);
-	accepted->m_Socket =::accept(m_Socket, &accepted->m_PeerAddr, &len);
+	accepted->m_Socket = ::accept(m_Socket, &accepted->m_PeerAddr, &len);
 
 	if (accepted->m_Socket == INVALID_SOCKET) {
-		m_LastError = lastErrorCode();
+		m_LastError = errno;
 		delete accepted;
-		return (NULL);
+		return NULL;
 	}
 	//****************************************************
 	//* Got a connection so fill in the other attributes *
@@ -230,33 +227,12 @@ accept(char *Peer, int MaxLen)
 	//****************************************************
 	//* If required get the name of the connected client *
 	//****************************************************
-
 	if (Peer) {
 		peer = inet_ntoa(((struct sockaddr_in *) &accepted->m_PeerAddr)->sin_addr);
-		if (peer) {
-			strncpy(Peer, peer, MaxLen);
-			Peer[MaxLen] = '\0';
-		}
-	} else {
-		strcpy(Peer, "");
+		if (peer)
+			*Peer = peer;
 	}
-	return (accepted);
-}
-
-int ppsocket::
-printf(const char *Format,...)
-{
-	int i;
-	va_list ap;
-	char s[512];
-
-	va_start(ap, Format);
-	vsprintf(s, Format, ap);
-	va_end(ap);
-
-	i = writeTimeout(s, strlen(s), 0);
-
-	return (i);
+	return accepted;
 }
 
 bool ppsocket::
@@ -278,7 +254,7 @@ getBufferStore(bufferStore & a, bool wait)
 	 * 1 for message OK, and -1 for socket problem
 	 */
 
-	long l;
+	u_int32_t l;
 	long count = 0;
 	unsigned char *buff;
 	unsigned char *bp;
@@ -286,12 +262,12 @@ getBufferStore(bufferStore & a, bool wait)
 		return 0;
 	a.init();
 
-	if (readTimeout(&l, sizeof(l), 0) != sizeof(l))
+	if (recv(&l, sizeof(l), 0) != sizeof(l))
 		return -1;
 	l = ntohl(l);
 	bp = buff = new unsigned char[l];
 	while (l > 0) {
-		int j = readTimeout(bp, l, 0);
+		int j = recv(bp, l, 0);
 		if (j == SOCKET_ERROR || j == 0) {
 			delete[]buff;
 			return -1;
@@ -309,16 +285,16 @@ bool ppsocket::
 sendBufferStore(const bufferStore & a)
 {
 	long l = a.getLen();
-	long hl = htonl(l);
+	u_int32_t hl = htonl(l);
 	long sent = 0;
 	int retries = 0;
 	int i;
 
-	i = writeTimeout((char *) &hl, sizeof(hl), 0);
+	i = send((char *) &hl, sizeof(hl), 0);
 	if (i != sizeof(hl))
 		return false;
 	while (l > 0) {
-		i = writeTimeout((const char *)a.getString(sent), l, 0);
+		i = send((const char *)a.getString(sent), l, 0);
 		if (i == SOCKET_ERROR || i == 0)
 			return (false);
 		sent += i;
@@ -332,157 +308,23 @@ sendBufferStore(const bufferStore & a)
 }
 
 int ppsocket::
-readEx(unsigned char *Data, int cTerm, int MaxLen)
+recv(void *buf, int len, int flags)
 {
-	int i, j;
-
-	for (i = 0; i < MaxLen; i++) {
-		j = readTimeout(Data + i, 1, 0);
-
-		if (j == SOCKET_ERROR || j == 0) {
-			Data[i] = '\0';
-			return (i > 0 ? i : 0);
-		}
-		if (Data[i] == cTerm)
-			break;
-	}
-
-	return (i + 1);
-}
-
-bool ppsocket::
-puts(const char *Data)
-{
-	int tosend, sent, retries, i;
-
-	tosend = strlen(Data);
-	sent = retries = 0;
-
-	while (tosend > 0) {
-		i = writeTimeout(Data + sent, tosend, 0);
-
-		if (i == SOCKET_ERROR || i == 0)
-			return (sent > 0 ? true : false);
-
-		sent += i;
-		tosend -= i;
-
-		if (++retries > 5) {
-			m_LastError = 0;
-			return (false);
-		}
-	}
-
-	return (true);
-}
-
-char ppsocket::
-sgetc(void)
-{
-	int i;
-	char c;
-
-	i = readTimeout(&c, 1, 0);
-	if (i == SOCKET_ERROR || i == 0) {
-		return (0);
-	}
-	return (c);
-}
-
-bool ppsocket::
-sputc(char c)
-{
-	int i;
-
-	cout << hex << (int) c << endl;
-	i = writeTimeout(&c, 1, 0);
-	if (i == SOCKET_ERROR || i == 0)
-		return (false);
-	return (true);
-}
-
-int ppsocket::
-read(void *Data, size_t Size, size_t NumObj)
-{
-	int i = readTimeout(Data, Size * NumObj, 0);
-
-	return (i);
-}
-
-int ppsocket::
-write(const void *Data, size_t Size, size_t NumObj)
-{
-	int i = writeTimeout((char *) Data, Size * NumObj, 0);
-
-	return (i);
-}
-
-int ppsocket::
-recv(char *buf, int len, int flags)
-{
-	int i =::recv(m_Socket, buf, len, flags);
+	int i = ::recv(m_Socket, buf, len, flags);
 
 	if (i < 0)
-		m_LastError = lastErrorCode();
+		m_LastError = errno;
 
 	return (i);
 }
 
 int ppsocket::
-send(const char *buf, int len, int flags)
+send(const void * const buf, int len, int flags)
 {
-	int i =::send(m_Socket, buf, len, flags);
+	int i = ::send(m_Socket, buf, len, flags);
 
 	if (i < 0)
-		m_LastError = lastErrorCode();
-
-	return (i);
-}
-
-int ppsocket::
-readTimeout(void *buf, int len, int flags)
-{
-	int i;
-
-	//*********************************************************
-	//* If there is no timeout use the Berkeley recv function *
-	//*********************************************************
-
-	if (m_Timeout == INFINITE) {
-		i = ::recv(m_Socket, buf, len, flags);
-
-		if (i == SOCKET_ERROR) {
-			m_LastError = lastErrorCode();
-		}
-	}
-	//********************************************
-	//* If there is a timeout use overlapped i/o *
-	//********************************************
-
-	else {
-		i = SOCKET_ERROR;
-	}
-
-
-	return (i);
-}
-
-int ppsocket::
-writeTimeout(const char *buf, int len, int flags)
-{
-	int i;
-	// If there is no timeout use the Berkeley send function
-
-	if (m_Timeout == INFINITE) {
-		i =::send(m_Socket, buf, len, flags);
-
-		if (i == SOCKET_ERROR) {
-			m_LastError = lastErrorCode();
-		}
-	} else {
-		// If there is a timeout use overlapped i/o
-		i = SOCKET_ERROR;
-	}
+		m_LastError = errno;
 
 	return (i);
 }
@@ -491,97 +333,97 @@ bool ppsocket::
 closeSocket(void)
 {
 	shutdown(m_Socket, 3);
-	if (close(m_Socket) != 0) {
-		m_LastError = lastErrorCode();
-		return (false);
+	if (::close(m_Socket) != 0) {
+		m_LastError = errno;
+		return false;
 	}
 	m_Socket = INVALID_SOCKET;
-
-	return (true);
+	return true;
 }
 
 bool ppsocket::
-bindSocket(char *Host, int Port)
+bindSocket(const char * const Host, int Port)
 {
 
 	// If we are already bound return false but with no last error
-
-	m_LastError = 0;
-
 	if (m_Bound) {
-		return (false);
+		m_LastError = 0;
+		return false;
 	}
+
 	// If the socket hasn't been created create it now
 
 	if (m_Socket == INVALID_SOCKET) {
-		if (!createSocket()) {
-			return (false);
-		}
+		if (!createSocket())
+			return false;
 	}
+
 	// Set SO_REUSEADDR
 	int one = 1;
-	if (setsockopt( m_Socket, SOL_SOCKET, SO_REUSEADDR, 
-			(const char *) &one, sizeof(int)) < 0 )
+	if (setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, 
+			(const char *)&one, sizeof(int)) < 0)
 	  	cerr << "Warning: Unable to set SO_REUSEADDR option\n";
+
 	// If a host name was supplied then use it
-	if (!setHost(Host, Port)) {
-		return (false);
-	}
+	if (!setHost(Host, Port))
+		return false;
+
 	// Now bind the socket
 	if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) != 0) {
-		m_LastError = lastErrorCode();
-		return (false);
+		m_LastError = errno;
+		return false;
 	}
-	m_Bound = true;
 
-	return (true);
+	m_Bound = true;
+	return true;
 }
 
 bool ppsocket::
-bindInRange(char *Host, int Low, int High, int Retries)
+bindInRange(const char * const Host, int Low, int High, int Retries)
 {
-	int port, i;
+	int port;
+	int i;
 
 	// If we are already bound return false but with no last error
-	m_LastError = 0;
 	if (m_Bound) {
+		m_LastError = 0;
 		return (false);
 	}
+
 	// If the socket hasn't been created create it now
 	if (m_Socket == INVALID_SOCKET) {
-		if (!createSocket()) {
-			return (false);
-		}
+		if (!createSocket())
+			return false;
 	}
+
 	// If the number of retries is greater than the range then work
 	// through the range sequentially.
 	if (Retries > High - Low) {
 		for (port = Low; port <= High; port++) {
 			if (!setHost(Host, port))
-				return (false);
-
-				if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) == 0)
-				break;
+				return false;
+			if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) == 0)
+					break;
 		}
 		if (port > High) {
-			m_LastError = lastErrorCode();
-			return (false);
+			m_LastError = errno;
+			return false;
 		}
 	} else {
 		for (i = 0; i < Retries; i++) {
 			port = Low + (rand() % (High - Low));
 			if (!setHost(Host, port))
-				return (false);
+				return false;
 			if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) == 0)
 				break;
 		}
 		if (i >= Retries) {
-			m_LastError = lastErrorCode();
-			return (false);
+			m_LastError = errno;
+			return false;
 		}
 	}
 	m_Bound = true;
-	return (true);
+	return true;
 }
 
 bool ppsocket::
@@ -592,10 +434,10 @@ linger(bool LingerOn, int LingerTime)
 
 	// If the socket hasn't been created create it now
 	if (m_Socket == INVALID_SOCKET) {
-		if (!createSocket()) {
-			return (false);
-		}
+		if (!createSocket())
+			return false;
 	}
+
 	// Set the lingering
 	if (LingerOn) {
 		l.l_onoff = 1;
@@ -607,11 +449,10 @@ linger(bool LingerOn, int LingerTime)
 	i = setsockopt(m_Socket, SOL_SOCKET, SO_LINGER, (const char *) &l, sizeof(l));
 	// Check for errors
 	if (i != 0) {
-		m_LastError = lastErrorCode();
-		return (false);
+		m_LastError = errno;
+		return false;
 	}
-	// Return indicating success
-	return (true);
+	return true;
 }
 
 bool ppsocket::
@@ -619,122 +460,122 @@ createSocket(void)
 {
 	// If the socket has already been created just return true
 	if (m_Socket != INVALID_SOCKET)
-		return (true);
+		return true;
+
 	// Create the socket
-	m_Socket =::socket(PF_INET, SOCK_STREAM, 0);
+	m_Socket = ::socket(PF_INET, SOCK_STREAM, 0);
 	if (m_Socket == INVALID_SOCKET) {
-		m_LastError = lastErrorCode();
-		return (false);
+		m_LastError = errno;
+		return false;
 	}
+
 	// By default set no lingering
-	linger(false, 0);
+	linger(false);
+
 	// Return indicating success
-	return (true);
+	return true;
 }
 
 bool ppsocket::
-setPeer(char *Peer, int Port)
+setPeer(const char * const Peer, int Port)
 {
-	struct hostent *he;
+	struct hostent *he = NULL;
 
 	// If a peer name was supplied then use it
 	if (Peer) {
-		he = gethostbyname(Peer);
+		if (!isdigit(Peer[0]))
+			// RFC1035 specifies that hostnames must not start
+			// with a digit. So we can speed up things here.
+			he = gethostbyname(Peer);
 		if (!he) {
-			unsigned long ipaddress = inet_addr(Peer);
-			if (ipaddress == INADDR_NONE) {
-				m_LastError = lastErrorCode();
-				return (false);
+			struct in_addr ipaddr;
+
+			if (!inet_aton(Peer, &ipaddr)) {
+				m_LastError = errno;
+				return false;
 			}
-			he = gethostbyaddr((const char *) &ipaddress, 4, PF_INET);
+			he = gethostbyaddr(&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
 			if (!he) {
-				m_LastError = lastErrorCode();
+				m_LastError = errno;
 				return (false);
 			}
 		}
-		memcpy((void *) &((struct sockaddr_in *) &m_PeerAddr)->sin_addr, (void *) he->h_addr_list[0], 4);
+		memcpy(&((struct sockaddr_in *)&m_PeerAddr)->sin_addr, he->h_addr_list[0],
+		       sizeof(((struct sockaddr_in *)&m_PeerAddr)->sin_addr));
 	}
 	// If a port name was supplied use it
 	if (Port > 0)
-		((struct sockaddr_in *) &m_PeerAddr)->sin_port = htons((SHORT) Port);
-	return (true);
+		((struct sockaddr_in *)&m_PeerAddr)->sin_port = htons(Port);
+	return true;
 }
 
 bool ppsocket::
-getPeer(char *Peer, int MaxLen, int *Port)
+getPeer(string *Peer, int *Port)
 {
 	char *peer;
 
 	if (Peer) {
 		peer = inet_ntoa(((struct sockaddr_in *) &m_PeerAddr)->sin_addr);
 		if (!peer) {
-			m_LastError = lastErrorCode();
+			m_LastError = errno;
 			return (false);
 		}
-		strncpy(Peer, peer, MaxLen);
-		Peer[MaxLen] = '\0';
+		*Peer = peer;
 	}
 	if (Port)
 		*Port = ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port);
-	return (false);
+	return false;
 }
 
 bool ppsocket::
-setHost(char *Host, int Port)
+setHost(const char * const Host, int Port)
 {
 	struct hostent *he;
 
 	// If a host name was supplied then use it
 	if (Host) {
+		if (!isdigit(Host[0]))
+			// RFC1035 specifies that hostnames must not start
+			// with a digit. So we can speed up things here.
+			he = gethostbyname(Host);
 		he = gethostbyname(Host);
 		if (!he) {
-			unsigned long ipaddress = inet_addr(Host);
-			if (ipaddress == INADDR_NONE) {
-				m_LastError = lastErrorCode();
-				return (false);
+			struct in_addr ipaddr;
+
+			if (!inet_aton(Host, &ipaddr)) {
+				m_LastError = errno;
+				return false;
 			}
-			he = gethostbyaddr((const char *) &ipaddress, 4, PF_INET);
+			he = gethostbyaddr(&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
 			if (!he) {
-				m_LastError = lastErrorCode();
-				return (false);
+				m_LastError = errno;
+				return false;
 			}
 		}
-		memcpy((void *) &((struct sockaddr_in *) &m_HostAddr)->sin_addr, (void *) he->h_addr_list[0], 4);
+		memcpy(&((struct sockaddr_in *)&m_HostAddr)->sin_addr, he->h_addr_list[0],
+		       sizeof(((struct sockaddr_in *)&m_HostAddr)->sin_addr));
 	}
-	// If a port name was supplied use it
 
+	// If a port name was supplied use it
 	if (Port > 0)
-		((struct sockaddr_in *) &m_HostAddr)->sin_port = htons((SHORT) Port);
-	return (true);
+		((struct sockaddr_in *)&m_HostAddr)->sin_port = htons(Port);
+	return true;
 }
 
 bool ppsocket::
-getHost(char *Host, int MaxLen, int *Port)
+getHost(string *Host, int *Port)
 {
 	char *host;
 
 	if (Host) {
-		host = inet_ntoa(((struct sockaddr_in *) &m_HostAddr)->sin_addr);
+		host = inet_ntoa(((struct sockaddr_in *)&m_HostAddr)->sin_addr);
 		if (!host) {
-			m_LastError = lastErrorCode();
-			return (false);
+			m_LastError = errno;
+			return false;
 		}
-		strncpy(Host, host, MaxLen);
-		Host[MaxLen] = '\0';
+		*Host = host;
 	}
 	if (Port)
-		*Port = ntohs(((struct sockaddr_in *) &m_HostAddr)->sin_port);
-	return (false);
-}
-
-DWORD ppsocket::
-lastErrorCode()
-{
-	return errno;
-}
-
-void ppsocket::
-setSocketInvalid()
-{
-	m_Socket = INVALID_SOCKET;
+		*Port = ntohs(((struct sockaddr_in *)&m_HostAddr)->sin_port);
+	return true;
 }

@@ -247,21 +247,21 @@ openConnection() {
 		}
 	}
 
-	long devbits;
+	u_int32_t devbits;
 	Enum<rfsv::errs> res;
 
 	if ((res = plpRfsv->devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 		for (int i = 0; i < 26; i++) {
-			char vname[256];
-			long vtotal, vfree, vattr, vuniqueid;
+			string vname;
+			u_int32_t vtotal, vfree, vattr, vuniqueid;
 
 			if ((devbits & 1) != 0) {
 				if (plpRfsv->devinfo(i, vfree, vtotal, vattr, vuniqueid,
 						     vname) == rfsv::E_PSI_GEN_NONE) {
 					QString name;
 
-					if (strlen(vname))
-						name = QString(vname);
+					if (!vname.empty())
+						name = QString(vname.c_str());
 					else
 						name.sprintf("%c", 'A' + i);
 					drives.append(name);
@@ -688,10 +688,10 @@ get( const KURL& url ) {
 	convertName(name);
 
 	Enum<rfsv::errs> res;
-	long handle;
-	long len;
-	long size;
-	long total = 0;
+	u_int32_t handle;
+	u_int32_t len;
+	u_int32_t size;
+	u_int32_t total = 0;
 
 	if (emitTotalSize(name))
 	    return;
@@ -738,7 +738,7 @@ put( const KURL& url, int _mode, bool _overwrite, bool /*_resume*/ ) {
 	convertName(name);
 
 	Enum<rfsv::errs> res;
-	long handle;
+	u_int32_t handle;
 	int result;
 
 	res = plpRfsv->fcreatefile(plpRfsv->opMode(rfsv::PSI_O_RDWR), name, handle);
@@ -756,8 +756,8 @@ put( const KURL& url, int _mode, bool _overwrite, bool /*_resume*/ ) {
 
 		if (result > 0)
 			do {
-				long written;
-				int count = (len > RFSV_SENDLEN) ? RFSV_SENDLEN : len;
+				u_int32_t written;
+				u_int32_t count = (len > RFSV_SENDLEN) ? RFSV_SENDLEN : len;
 				res = plpRfsv->fwrite(handle, data, count, written);
 				if (checkForError(res)) {
 					plpRfsv->fclose(handle);
@@ -820,7 +820,7 @@ rename(const KURL &src, const KURL &dest, bool _overwrite) {
 		convertName(from);
 		convertName(to);
 		if (!_overwrite) {
-			long attr;
+			u_int32_t attr;
 			if ((res = plpRfsv->fgetattr(to, attr)) == rfsv::E_PSI_GEN_NONE) {
 
 				error(ERR_FILE_ALREADY_EXIST, to);
@@ -836,7 +836,7 @@ rename(const KURL &src, const KURL &dest, bool _overwrite) {
 
 extern "C" {
 static int
-progresswrapper(void *ptr, long total) {
+progresswrapper(void *ptr, u_int32_t total) {
 	
 	((PLPProtocol *)ptr)->calcprogress(total);
 	return 1;
@@ -877,7 +877,7 @@ copy( const KURL &src, const KURL &dest, int _mode, bool _overwrite ) {
 	convertName(to);
 	Enum <rfsv::errs> res;
 	if (!_overwrite) {
-		long attr;
+		u_int32_t attr;
 		if ((res = plpRfsv->fgetattr(to, attr)) == rfsv::E_PSI_GEN_NONE) {
 			error(ERR_FILE_ALREADY_EXIST, to);
 			return;

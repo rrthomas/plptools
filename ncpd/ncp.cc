@@ -27,7 +27,7 @@
 #endif
 
 #include <stream.h>
-#include <string.h>
+#include <string>
 #include <time.h>
 
 #include "ncp.h"

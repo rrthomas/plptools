@@ -84,11 +84,11 @@ unsigned char bufferStore::getByte(long pos) const {
 	return buff[pos+start];
 }
 
-unsigned int bufferStore::getWord(long pos) const {
+u_int16_t bufferStore::getWord(long pos) const {
 	return buff[pos+start] + (buff[pos+start+1] << 8);
 }
 
-unsigned int bufferStore::getDWord(long pos) const {
+u_int32_t bufferStore::getDWord(long pos) const {
 	return buff[pos+start] +
 		(buff[pos+start+1] << 8) +
 		(buff[pos+start+2] << 16) +

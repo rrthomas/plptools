@@ -156,7 +156,7 @@ runrestore(rfsv *a, rpcs *r) {
 				// the ususal \System\Apps\<AppName>\<AppName>.app
 				// on all drives.
 				if (strchr(cmd, '\\') == NULL) {
-					long devbits;
+					u_int32_t devbits;
 					char tmp[512];
 					if ((res = a->devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 						int i;
@@ -215,7 +215,7 @@ collectFiles(rfsv *a, char *dir) {
 }
 
 static int
-reportProgress(void *, long size)
+reportProgress(void *, u_int32_t size)
 {
 	unsigned long percent;
 	char pstr[10];
@@ -416,12 +416,13 @@ main(int argc, char **argv)
 			}
 		} else {
 			char drive[3];
-			long devbits;
-			long vtotal, vfree, vattr, vuniqueid;
+			u_int32_t devbits;
+			u_int32_t vtotal, vfree, vattr, vuniqueid;
 
 			if (a->devlist(devbits) == rfsv::E_PSI_GEN_NONE) {
 				for (i = 0; i < 26; i++) {
-					if ((devbits & 1) && a->devinfo(i, vfree, vtotal, vattr, vuniqueid, NULL) == rfsv::E_PSI_GEN_NONE) {
+					string n;
+					if ((devbits & 1) && a->devinfo(i, vfree, vtotal, vattr, vuniqueid, n) == rfsv::E_PSI_GEN_NONE) {
 						if (vattr != 7) {
 							sprintf(drive, "%c:\0", 'A' + i);
 							if (verbose > 0)

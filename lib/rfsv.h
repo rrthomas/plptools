@@ -11,17 +11,17 @@ typedef deque<class PlpDirent> PlpDir;
 
 class ppsocket;
 
-const long RFSV_SENDLEN = 2000;
+const int RFSV_SENDLEN = 2000;
 
 /**
  * Defines the callback procedure for
  * progress indication of copy operations.
  */
-typedef int (*cpCallback_t)(void *, long);
+typedef int (*cpCallback_t)(void *, u_int32_t);
 
 class rfsvDirhandle {
  public:
-	unsigned long h;
+	u_int32_t h;
 	bufferStore b;
 };
 
@@ -198,7 +198,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> fopen(const long attr, const char * const name, long &handle) = 0;
+		virtual Enum<errs> fopen(const u_int32_t attr, const char * const name, u_int32_t &handle) = 0;
 
 		/**
 		 * Creates a unique temporary file.
@@ -210,7 +210,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> mktemp(long &handle, char * const name) = 0;
+		virtual Enum<errs> mktemp(u_int32_t &handle, string &name) = 0;
 
 		/**
 		 * Creates a named file.
@@ -223,7 +223,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> fcreatefile(const long attr, const char * const name, long &handle) = 0;
+		virtual Enum<errs> fcreatefile(const u_int32_t attr, const char * const name, u_int32_t &handle) = 0;
 
 		/**
 		 * Creates an named file, overwriting an existing file.
@@ -236,7 +236,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> freplacefile(const long attr, const char * const name, long &handle) = 0;
+		virtual Enum<errs> freplacefile(const u_int32_t attr, const char * const name, u_int32_t &handle) = 0;
 
 		/**
 		 * Close a file on the Psion whih was previously opened/created by using
@@ -244,7 +244,7 @@ class rfsv {
 		 *
 		 * @param handle A valid file handle.
 		 */
-		virtual Enum<errs> fclose(const long handle) = 0;
+		virtual Enum<errs> fclose(const u_int32_t handle) = 0;
 
 		/**
 		 * Reads a directory on the Psion.
@@ -286,7 +286,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> fgetattr(const char * const name, long &attr) = 0;
+		virtual Enum<errs> fgetattr(const char * const name, u_int32_t &attr) = 0;
 
 		/**
 		 * Retrieves attributes, size and modification time of a file on the Psion.
@@ -303,7 +303,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> fsetattr(const char * const name, const long seta, const long unseta) = 0;
+		virtual Enum<errs> fsetattr(const char * const name, const u_int32_t seta, const u_int32_t unseta) = 0;
 
 		/**
 		 * Counts number of entries in a directory.
@@ -313,7 +313,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> dircount(const char * const name, long &count) = 0;
+		virtual Enum<errs> dircount(const char * const name, u_int32_t &count) = 0;
 
 		/**
 		 * Retrieves available drives on the Psion.
@@ -323,7 +323,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> devlist(long &devbits) = 0;
+		virtual Enum<errs> devlist(u_int32_t &devbits) = 0;
 
 		/**
 		 * Retrieves details about a drive.
@@ -334,11 +334,11 @@ class rfsv {
 		 * @param total    On return, the total capacity in bytes is returned here.
 		 * @param attr     On return, the attributes of the drive are returned here.
 		 * @param uniqueid On return, the unique Id of the drive is returned here.
-		 * @param name     On return, the volume name is copied to this pointer's destination.
+		 * @param name     On return, the volume name returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> devinfo(const int dev, long &free, long &total, long &attr, long &uniqueid, char * const name) = 0;
+		virtual Enum<errs> devinfo(const u_int32_t dev, u_int32_t &free, u_int32_t &total, u_int32_t &attr, u_int32_t &uniqueid, string &name) = 0;
 
 		/**
 		 * Reads from a file on the Psion.
@@ -350,7 +350,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> fread(const long handle, unsigned char * const buffer, const long len, long &count) = 0;
+		virtual Enum<errs> fread(const u_int32_t handle, unsigned char * const buffer, const u_int32_t len, u_int32_t &count) = 0;
 
 		/**
 		 * Write to a file on the Psion.
@@ -362,7 +362,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> fwrite(const long handle, const unsigned char * const buffer, const long len, long &count) = 0;
+		virtual Enum<errs> fwrite(const u_int32_t handle, const unsigned char * const buffer, const u_int32_t len, u_int32_t &count) = 0;
 
 		/**
 		 * Copies a file from the Psion to the local machine.
@@ -418,7 +418,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> fsetsize(const long handle, const long size) = 0;
+		virtual Enum<errs> fsetsize(const u_int32_t handle, const u_int32_t size) = 0;
 
 		/**
 		 * Sets the current file position of a file on the Psion.
@@ -430,7 +430,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> fseek(const long handle, const long offset, const long mode, long &resultpos) = 0;
+		virtual Enum<errs> fseek(const u_int32_t handle, const int32_t offset, const u_int32_t mode, u_int32_t &resultpos) = 0;
 
 		/**
 		 * Creates a directory on the Psion.
@@ -479,7 +479,7 @@ class rfsv {
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> opendir(const long attr, const char * const name, rfsvDirhandle &handle) = 0;
+		virtual Enum<errs> opendir(const u_int32_t attr, const char * const name, rfsvDirhandle &handle) = 0;
 
 		/**
 		 * Read directory entries.
@@ -540,7 +540,7 @@ class rfsv {
 		 * @returns Pointer to static textual representation of file attributes.
 		 *
 		 */
-		string attr2String(const long attr);
+		string attr2String(const u_int32_t attr);
 
 		/**
 		 * Converts an open-mode (A combination of the PSI_O_ constants.)
@@ -551,7 +551,7 @@ class rfsv {
 		 * @returns The machine specific representation for use with
 		 *          @ref fopen , @ref fcreatefile and @freplacefile.
 		 */
-		virtual long opMode(const long mode) = 0;
+		virtual u_int32_t opMode(const u_int32_t mode) = 0;
 
 		/**
 		 * Utility method, converts '/' to '\'.
@@ -568,7 +568,7 @@ protected:
 
 		ppsocket *skt;
 		Enum<errs> status;
-		int serNum;
+		int32_t serNum;
 };
 
 #endif

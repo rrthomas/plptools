@@ -171,13 +171,13 @@ Wildmat(const char *s, char *p)
 }
 
 static int
-checkAbortNoHash(void *, long)
+checkAbortNoHash(void *, u_int32_t)
 {
 	return continueRunning;
 }
 
 static int
-checkAbortHash(void *, long)
+checkAbortHash(void *, u_int32_t)
 {
 	if (continueRunning) {
 		printf("#"); fflush(stdout);
@@ -241,15 +241,16 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	}
 
 	if (!strcmp(DDRIVE, "AUTO")) {
-		long devbits;
-		long vtotal, vfree, vattr, vuniqueid;
+		u_int32_t devbits;
+		u_int32_t vtotal, vfree, vattr, vuniqueid;
 		int i;
 
 		strcpy(defDrive, "::");
 		if (a.devlist(devbits) == rfsv::E_PSI_GEN_NONE) {
 
 			for (i = 0; i < 26; i++) {
-				if ((devbits & 1) && a.devinfo(i, vfree, vtotal, vattr, vuniqueid, NULL) == rfsv::E_PSI_GEN_NONE) {
+				string n;
+				if ((devbits & 1) && a.devinfo(i, vfree, vtotal, vattr, vuniqueid, n) == rfsv::E_PSI_GEN_NONE) {
 					defDrive[0] = 'A' + i;
 					break;
 				}
@@ -338,7 +339,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			continue;
 		}
 		if (!strcmp(argv[0], "gattr") && (argc == 2)) {
-			long attr;
+			u_int32_t attr;
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
 			if ((res = a.fgetattr(f1, attr)) != rfsv::E_PSI_GEN_NONE)
@@ -404,7 +405,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			continue;
 		}
 		if (!strcmp(argv[0], "dircnt")) {
-			long cnt;
+			u_int32_t cnt;
 			if ((res = a.dircount(psionDir, cnt)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			else
@@ -412,12 +413,12 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			continue;
 		}
 		if (!strcmp(argv[0], "devs")) {
-			long devbits;
+			u_int32_t devbits;
 			if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 				cout << "Drive Type Volname     Total     Free      UniqueID" << endl;
 				for (int i = 0; i < 26; i++) {
-					char vname[256];
-					long vtotal, vfree, vattr, vuniqueid;
+					string vname;
+					u_int32_t vtotal, vfree, vattr, vuniqueid;
 
 					if ((devbits & 1) != 0) {
 						if (a.devinfo(i, vfree, vtotal, vattr, vuniqueid, vname) == rfsv::E_PSI_GEN_NONE)
@@ -463,7 +464,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				strcpy(psionDir, defDrive);
 				strcat(psionDir, DBASEDIR);
 			} else {
-				long tmp;
+				u_int32_t tmp;
 				if (!strcmp(argv[1], "..")) {
 					strcpy(f1, psionDir);
 					char *p = f1 + strlen(f1);
@@ -852,7 +853,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 						// registered in the Psion's path properly. Now try the ususal
 						// \System\Apps\<AppName>\<AppName>.app on all drives.
 						if (strchr(cmd, '\\') == NULL) {
-							long devbits;
+							u_int32_t devbits;
 							char tmp[512];
 							if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 								int i;

@@ -430,7 +430,7 @@ create_it(createargs *ca, int isdir)
 	char *name = dirinode->name;
 	fattr *fp;
 	p_inode *inode;
-	long phandle;
+	u_int32_t phandle;
 	int rfsv_ret;
 
 	debuglog("create: in %s %s (%#o, %d)\n",

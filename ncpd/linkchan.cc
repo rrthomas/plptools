@@ -23,7 +23,7 @@
 //  e-mail philip.proudman@btinternet.com
 
 #include <stream.h>
-#include <iomanip.h>
+#include <iomanip>
 
 #include "linkchan.h"
 #include "bufferstore.h"

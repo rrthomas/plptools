@@ -27,10 +27,11 @@
 #endif
 
 #include <stdio.h>
-#include <string.h>
+#include <string>
 #include <stream.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <errno.h>
 
 #include "ncp.h"
 #include "bufferstore.h"
@@ -64,8 +65,8 @@ int_handler(int)
 void
 checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp * a, IOWatch & iow)
 {
-	char peer[201];
-	ppsocket *next = skt.accept(peer, 200);
+	string peer;
+	ppsocket *next = skt.accept(&peer);
 	if (next != NULL) {
 		// New connect
 		if (verbose)

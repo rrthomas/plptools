@@ -1,6 +1,8 @@
 #ifndef _bufferstore_h
 #define _bufferstore_h
 
+#include <sys/types.h>
+
 class ostream;
 
 /**
@@ -68,7 +70,7 @@ public:
 	 *
 	 * @returns The value of the word at index <em>pos</em>
 	 */
-	unsigned int getWord(long pos = 0) const;
+	u_int16_t getWord(long pos = 0) const;
 
 	/**
 	 * Retrieves the dword at index <em>pos</em>.
@@ -77,7 +79,7 @@ public:
 	 *
 	 * @returns The value of the dword at index <em>pos</em>
 	 */
-	unsigned int getDWord(long pos = 0) const;
+	u_int32_t getDWord(long pos = 0) const;
 
 	/**
 	 * Retrieves the characters at index <em>pos</em>.

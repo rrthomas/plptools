@@ -10,7 +10,7 @@ public:
 	rfsv32(ppsocket *);
 
 	Enum<rfsv::errs> dir(const char * const, PlpDir &);
-	Enum<rfsv::errs> dircount(const char * const, long &);
+	Enum<rfsv::errs> dircount(const char * const, u_int32_t &);
 	Enum<rfsv::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
 	Enum<rfsv::errs> copyToPsion(const char * const, const char * const, void *, cpCallback_t);
 	Enum<rfsv::errs> copyOnPsion(const char * const, const char * const, void *, cpCallback_t);
@@ -18,28 +18,28 @@ public:
 	Enum<rfsv::errs> rmdir(const char * const);
 	Enum<rfsv::errs> remove(const char * const);
 	Enum<rfsv::errs> rename(const char * const, const char * const);
-	Enum<rfsv::errs> mktemp(long &, char * const);
+	Enum<rfsv::errs> mktemp(u_int32_t &, string &);
 	Enum<rfsv::errs> fgeteattr(const char * const, PlpDirent &);
-	Enum<rfsv::errs> fgetattr(const char * const, long &);
-	Enum<rfsv::errs> fsetattr(const char * const, const long, const long);
+	Enum<rfsv::errs> fgetattr(const char * const, u_int32_t &);
+	Enum<rfsv::errs> fsetattr(const char * const, const u_int32_t, const u_int32_t);
 	Enum<rfsv::errs> fgetmtime(const char * const, PsiTime &);
 	Enum<rfsv::errs> fsetmtime(const char * const, PsiTime const);
-	Enum<rfsv::errs> fopen(const long, const char * const, long &);
-	Enum<rfsv::errs> fcreatefile(const long, const char * const, long &);
-	Enum<rfsv::errs> freplacefile(const long, const char * const, long &);
-	Enum<rfsv::errs> fseek(const long, const long, const long, long &);
-	Enum<rfsv::errs> fread(const long, unsigned char * const, const long, long &);
-	Enum<rfsv::errs> fwrite(const long, const unsigned char * const, const long, long &);
-	Enum<rfsv::errs> fsetsize(long, long);
-	Enum<rfsv::errs> fclose(const long);
+	Enum<rfsv::errs> fopen(const u_int32_t, const char * const, u_int32_t &);
+	Enum<rfsv::errs> fcreatefile(const u_int32_t, const char * const, u_int32_t &);
+	Enum<rfsv::errs> freplacefile(const u_int32_t, const char * const, u_int32_t &);
+	Enum<rfsv::errs> fseek(const u_int32_t, const int32_t, const u_int32_t, u_int32_t &);
+	Enum<rfsv::errs> fread(const u_int32_t, unsigned char * const, const u_int32_t, u_int32_t &);
+	Enum<rfsv::errs> fwrite(const u_int32_t, const unsigned char * const, const u_int32_t, u_int32_t &);
+	Enum<rfsv::errs> fsetsize(u_int32_t, u_int32_t);
+	Enum<rfsv::errs> fclose(const u_int32_t);
 
-	Enum<rfsv::errs> devlist(long &);
-	Enum<rfsv::errs> devinfo(const int, long &, long &, long &, long &, char * const);
-	Enum<rfsv::errs> opendir(const long, const char * const, rfsvDirhandle &);
+	Enum<rfsv::errs> devlist(u_int32_t &);
+	Enum<rfsv::errs> devinfo(const u_int32_t, u_int32_t &, u_int32_t &, u_int32_t &, u_int32_t &, string &);
+	Enum<rfsv::errs> opendir(const u_int32_t, const char * const, rfsvDirhandle &);
 	Enum<rfsv::errs> readdir(rfsvDirhandle &, PlpDirent &);
 	Enum<rfsv::errs> closedir(rfsvDirhandle &);
 	Enum<rfsv::errs> setVolumeName(const char, const char * const);
-	long opMode(const long);
+	u_int32_t opMode(const u_int32_t);
 
 private:
 	
@@ -150,19 +150,15 @@ private:
 		REPLACE          = 0x32
 	};
 
-	Enum<rfsv::errs> err2psierr(long);
-	Enum<rfsv::errs> fopendir(const long, const char *, long &);
-	long attr2std(const long);
-	long std2attr(const long);
+	Enum<rfsv::errs> err2psierr(int32_t);
+	Enum<rfsv::errs> fopendir(const u_int32_t, const char *, u_int32_t &);
+	u_int32_t attr2std(const u_int32_t);
+	u_int32_t std2attr(const u_int32_t);
 
 
 	// Communication
 	bool sendCommand(enum commands, bufferStore &);
 	Enum<rfsv::errs> getResponse(bufferStore &);
-
-	// time-conversion
-	// unsigned long micro2time(unsigned long, unsigned long);
-	// void time2micro(unsigned long, unsigned long &, unsigned long &);
 };
 
 #endif

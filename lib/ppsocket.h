@@ -1,88 +1,198 @@
 #ifndef _PPSOCKET_H_
 #define _PPSOCKET_H_
 
+#include <string>
 #include <unistd.h>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#define  DWORD		unsigned int
-#define  SOCKET		int
-
-#ifndef INADDR_NONE
-#define  INADDR_NONE (in_addr_t)-1
-#endif
-#define  INVALID_SOCKET	-1
-#define  SOCKET_ERROR	-1
-#define  INFINITE	0
-
-extern int errno;
-
 class bufferStore;
 
+/**
+ * A class for dealing with sockets.
+ */
 class ppsocket
 {
 
 public:
-  ppsocket();
-  virtual ~ppsocket();
+	/**
+	 * Constructs a ppsocket
+	 */
+	ppsocket();
 
-  virtual bool connect(char* Peer, int PeerPort, char* Host = NULL, int HostPort = 0);
-  virtual bool reconnect();
-  virtual void printPeer();
-  virtual bool listen(char* Host, int Port);
-  ppsocket* accept(char* Peer, int MaxLen);
-  bool dataToGet() const;
-  int getBufferStore(bufferStore &a, bool wait = true);
-  bool sendBufferStore(const bufferStore &a);
-  int printf(const char* Format, ...);
-  int   readEx(unsigned char *Data, int cTerm, int MaxLen);
-  bool  puts(const char* Data);
-  char sgetc(void);
-  bool sputc(char c);
-  int read(void* Data, size_t Size, size_t NumObj);
-  virtual int write(const void* Data, size_t Size, size_t NumObj);
-  int recv(char* buf, int len, int flags);
-  int send(const char* buf, int len, int flags);
-  int readTimeout(void * buf, int len, int flags);
-  int writeTimeout(const char *buf, int len, int flags);
-  inline void timeout(DWORD t) { m_Timeout = t; }
-  inline DWORD timeout(void) { return(m_Timeout); }
-  bool closeSocket(void);
-  bool bindSocket(char* Host, int Port);
-  bool bindInRange(char* Host, int Low, int High, int Retries);
-  bool linger(bool LingerOn, int LingerTime = 0);
-  virtual bool createSocket(void);
-  bool setPeer(char *Peer, int Port);
-  bool getPeer(char *Peer, int MaxLen, int* Port);
-  bool setHost(char *Host, int Port);
-  bool getHost(char *Host, int MaxLen, int* Port);
-  DWORD getLastError(void) { return(m_LastError); }
-  inline SOCKET socket(void) const { return(m_Socket); }
-  DWORD  lastErrorCode();
+	/**
+	 * Copy constructor
+	 */
+	ppsocket(const ppsocket&);
 
-  //set the current socket to invalid
-  //useful when deleting if the socket has been 
-  //copied to another and should not be closed
-  //when this instance is destructed
-  void setSocketInvalid();
+	/**
+	 * Destructor
+	 */
+	virtual ~ppsocket();
+	  
+	/**
+	 * Connects to a given host.
+	 *
+	 * @param Peer     The Host to connect to (name or dotquad-string).
+	 * @param PeerPort The port to connect to.
+	 * @param Host     The local address to bind to.
+	 * @param HostPort The local port to bind to.
+	 *
+	 * @returns true on success, false otherwise.
+	 */
+	virtual bool connect(const char * const Peer, int PeerPort, const char * const Host = NULL, int HostPort = 0);
 
-protected:
-  ppsocket(const ppsocket&);
-  struct sockaddr* getPeerAddrStruct() { return &m_PeerAddr; }
-  struct sockaddr* getHostAddrStruct() { return &m_HostAddr; }
-  void setHostAddrStruct(struct sockaddr* pHostStruct) { m_HostAddr = *pHostStruct; }
-  void setSocket(SOCKET& sock) { m_Socket = sock; }
-  void setBound() { m_Bound = true;}
-  void updateLastError() {m_LastError = lastErrorCode(); }
+	/**
+	 * Reopens the connection after closing it.
+	 *
+	 * @returns true on success, false otherwise.
+	 */
+	virtual bool reconnect();
 
-private:
-  SOCKET m_Socket;
-  struct sockaddr m_HostAddr, m_PeerAddr;
-  int m_Port;
-  bool   m_Bound;
-  DWORD m_Timeout;
-  DWORD m_LastError;
+	/**
+	 * Retrieve a string representation of the ppsocket.
+	 *
+	 * @returns a string in the form "<host>:<hostport> -> <peer>:<peerport>"
+	 *          where elements not known, are replaced by "???" and none-existing
+	 *          elements are represented by the word "none".
+	 */
+	virtual string toString();
+
+	/**
+	 * Starts listening.
+	 *
+	 * @param Host The local address to bind to.
+	 * @param Port The local port to listen on.
+	 *
+	 * @returns true on success, false otherwise.
+	 */
+	virtual bool listen(const char * const Host, int Port);
+
+	/**
+	 * Accept a connection.
+	 *
+	 * @param Peer If non-Null, the peer's name is returned here.
+	 *
+	 * @returns A pointer to a new instance for the accepted connection or NULL
+	 *          if an error happened.
+	 */
+	ppsocket *accept(string *Peer);
+
+	/**
+	 * Check for incoming data.
+	 *
+	 * @returns true if data is available, false otherwise.
+	 */
+	bool dataToGet() const;
+
+	/**
+	 * Receive data into a @ref bufferStore .
+	 *
+	 * @param a The bufferStore to fill with received data.
+	 * @param wait If true, wait until something is received, else return
+	 *              if no data is available.
+	 * @returns 1 if a bufferStore received, 0, if no bufferStore received, -1
+	 *          on error.
+	 */
+	int getBufferStore(bufferStore &a, bool wait = true);
+
+	/**
+	 * Sends data from a @ref bufferStore .
+	 *
+	 * @param a The bufferStore to send.
+	 * @returns true on success, false otherwise.
+	 */
+	bool sendBufferStore(const bufferStore &a);
+
+	/**
+	 * Closes the connection.
+	 *
+	 * @returns true on success, false otherwise.
+	 */
+	bool closeSocket(void);
+
+	/**
+	 * Binds to a local address and port.
+	 *
+	 * @param Host The local address to bind to.
+	 * @param Port The local port to listen on.
+	 *
+	 * @returns true on success, false otherwise.
+	 */
+	bool bindSocket(const char * const Host, int Port);
+
+	/**
+	 * Tries repeated binds to a local address and port.
+	 * If @p Retries is <= @p High - @p Low, then
+	 * the port to bind is randomly chosen in the given range.
+	 * Otherwise, all ports starting from @p High up to @p Low
+	 * are tried in sequence.
+	 *
+	 * @param Host The local address to bind to.
+	 * @param Low  The lowest local port to listen on.
+	 * @param High The highest local port to listen on.
+	 * @param Retries The number of retries until giving up.
+	 *
+	 * @returns true on success, false otherwise.
+	 */
+	bool bindInRange(const char * const Host, int Low, int High, int Retries);
+
+	/**
+	 * Sets the linger parameter of the socket.
+	 *
+	 * @param LingerOn true, if lingering should be on.
+	 * @param LingerTime If lingering is on, the linger-time.
+	 *
+	 * @returns true on success, false otherwise.
+	 */
+	bool linger(bool LingerOn, int LingerTime = 0);
+
+	/**
+	 * Retrieves peer information.
+	 *
+	 * @param Peer The peers name is returned here.
+	 * @param Port The peers port is returned here.
+	 *
+	 * @returns true on success, false otherwise.
+	 */
+	bool getPeer(string *Peer, int *Port);
+
+	/**
+	 * Retrieves local information.
+	 *
+	 * @param Host The local name is returned here.
+	 * @param Port The local port is returned here.
+	 *
+	 * @returns true on success, false otherwise.
+	 */
+	bool getHost(string *Host, int *Port);
+
+	/**
+	 * Retrieves the socket number.
+	 *
+	 * @returns the socket number.
+	 */
+	inline int socket(void) const { return(m_Socket); }
+	
+ private:
+	/**
+	 * Creates the socket.
+	 */
+	virtual bool createSocket(void);
+
+	int getLastError(void) { return(m_LastError); }
+	bool setPeer(const char * const Peer, int Port);
+	bool setHost(const char * const Host, int Port);
+	int recv(void *buf, int len, int flags);
+	int send(const void * const buf, int len, int flags);
+	
+	struct sockaddr m_HostAddr;
+	struct sockaddr m_PeerAddr;
+	int m_Socket;
+	int m_Port;
+	bool m_Bound;
+	int m_LastError;
 };
 
 #endif

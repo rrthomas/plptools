@@ -28,9 +28,9 @@ extern "C" {
 static rfsv *a;
 static rfsvfactory *rf;
 static char *a_filename = 0;
-static long  a_handle;
-static long  a_offset;
-static long  a_openmode;
+static u_int32_t a_handle;
+static u_int32_t a_offset;
+static u_int32_t a_openmode;
 
 static rpcs *r;
 static rpcsfactory *rp;
@@ -232,7 +232,7 @@ long rfsv_dir(const char *file, dentry **e) {
 	return ret;
 }
 
-long rfsv_dircount(const char *file, long *count) {
+long rfsv_dircount(const char *file, u_int32_t *count) {
 	if (!a)
 		return -1;
 	return a->dircount(file, *count);
@@ -280,7 +280,7 @@ long rfsv_fclose(long handle) {
 }
 
 long rfsv_fcreate(long attr, const char *file, long *handle) {
-	long ph;
+	u_int32_t ph;
 	long ret;
 
 	if (!a)
@@ -310,8 +310,8 @@ static long rfsv_opencached(const char *name, long mode) {
 }
 
 long rfsv_read(char *buf, long offset, long len, char *name) {
-	long ret = 0;
-	long r_offset;
+	u_int32_t ret = 0;
+	u_int32_t r_offset;
 
 	if (!a)
 		return -1;
@@ -334,8 +334,8 @@ long rfsv_read(char *buf, long offset, long len, char *name) {
 }
 
 long rfsv_write(char *buf, long offset, long len, char *name) {
-	long ret = 0;
-	long r_offset;
+	u_int32_t ret = 0;
+	u_int32_t r_offset;
 
 	if (!a)
 		return -1;
@@ -368,7 +368,7 @@ long rfsv_setmtime(const char *name, long time) {
 }
 
 long rfsv_setsize(const char *name, long size) {
-	long ph;
+	u_int32_t ph;
 	long ret;
 
 	if (!a)
@@ -405,12 +405,13 @@ long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
 }
 
 long rfsv_statdev(char letter) {
-	long vfree, vtotal, vattr, vuniqueid;
-	int devnum = letter - 'A';
+	u_int32_t vfree, vtotal, vattr, vuniqueid;
+	u_int32_t devnum = letter - 'A';
+	string n;
 
 	if (!a)
 		return -1;
-	return (a->devinfo(devnum, vfree, vtotal, vattr, vuniqueid, NULL) != rfsv::E_PSI_GEN_NONE);
+	return (a->devinfo(devnum, vfree, vtotal, vattr, vuniqueid, n) != rfsv::E_PSI_GEN_NONE);
 }
 
 long rfsv_rename(const char *oldname, const char *newname) {
@@ -421,7 +422,7 @@ long rfsv_rename(const char *oldname, const char *newname) {
 
 long rfsv_drivelist(int *cnt, device **dlist) {
 	*dlist = NULL;
-	long devbits;
+	u_int32_t devbits;
 	long ret;
 	int i;
 
@@ -430,15 +431,15 @@ long rfsv_drivelist(int *cnt, device **dlist) {
 	ret = a->devlist(devbits);
 	if (ret == 0)
 		for (i = 0; i<26; i++) {
-			char name[256];
-			long vtotal, vfree, vattr, vuniqueid;
+			string name;
+			u_int32_t vtotal, vfree, vattr, vuniqueid;
 
 			if ((devbits & 1) &&
 			    ((a->devinfo(i, vfree, vtotal, vattr, vuniqueid, name) == rfsv::E_PSI_GEN_NONE))) {
 				device *next = *dlist;
 				*dlist = (device *)malloc(sizeof(device));
 				(*dlist)->next = next;
-				(*dlist)->name = strdup(name);
+				(*dlist)->name = strdup(name.c_str());
 				(*dlist)->total = vtotal;
 				(*dlist)->free = vfree;
 				(*dlist)->letter = 'A' + i;

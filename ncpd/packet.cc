@@ -32,9 +32,9 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <string.h>
-#include <fstream.h>
-#include <iomanip.h>
+#include <string>
+#include <fstream>
+#include <iomanip>
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <termios.h>
