@@ -28,7 +28,6 @@
 #include "kpsionconfig.h"
 #include "wizards.h"
 
-#include <kapp.h>
 #include <klocale.h>
 #include <kaction.h>
 #include <kstdaction.h>
@@ -180,7 +179,11 @@ psion2unix(const char * const path) {
     QString tmp = path;
     tmp.replace(QRegExp("%"), "%25");
     tmp.replace(QRegExp("/"), "%2f");
+#if QT_VERSION >= 300
+    tmp.replace(QRegExp("\\\\"), "/");
+#else
     tmp.replace(QRegExp("\\"), "/");
+#endif
     return tmp;
 }
 
@@ -909,7 +912,11 @@ doBackup() {
     strftime(tstr, sizeof(tstr), "%Y-%m-%d-%H-%M-%S.tmp.gz",
 	     localtime(&now));
     archiveName += tstr;
+#if KDE_VERSION >= 300
+    backupTgz = new KTar(archiveName, "application/x-gzip");
+#else
     backupTgz = new KTarGz(archiveName);
+#endif
     backupTgz->open(IO_WriteOnly);
     createIndex();
 
@@ -924,7 +931,6 @@ doBackup() {
     for (int i = 0; i < toBackup.size(); i++) {
 	PlpDirent e = toBackup[i];
 	const char *fn = e.getName();
-	QString unixname = psion2unix(fn);
 	QByteArray ba;
 	QDataStream os(ba, IO_WriteOnly);
 
@@ -980,7 +986,8 @@ doBackup() {
 	    break;
 	if (res != rfsv::E_PSI_GEN_NONE)
 	    continue;
-	backupTgz->writeFile(unixname, "root", "root", ba.size(), ba.data());
+	backupTgz->writeFile(psion2unix(fn), "root", "root", ba.size(),
+			     ba.data());
     }
 
     if (!badBackup) {
@@ -1088,7 +1095,11 @@ removeOldBackups(QStringList &drives) {
     while ((fi = it.current())) {
 	kapp->processEvents();
 
+#if KDE_VERSION >= 300
+	KTar tgz(fi->absFilePath());
+#else
 	KTarGz tgz(fi->absFilePath());
+#endif
 	const KTarEntry *te;
 
 	tgz.open(IO_ReadOnly);
@@ -1128,7 +1139,11 @@ removeOldBackups(QStringList &drives) {
     while ((fi = it.current())) {
 	kapp->processEvents();
 
+#if KDE_VERSION >= 300
+	KTar tgz(fi->absFilePath());
+#else
 	KTarGz tgz(fi->absFilePath());
+#endif
 	const KTarEntry *te;
 	bool valid = false;
 	bool del = false;
@@ -1308,7 +1323,11 @@ slotStartRestore() {
 	for (t = tars.begin(); t != tars.end(); t++) {
 	    PlpDir toRestore = restoreDialog.getRestoreList(*t);
 	    if (toRestore.size() > 0) {
+#if KDE_VERSION >= 300
+		KTar tgz(*t);
+#else
 		KTarGz tgz(*t);
+#endif
 		const KTarEntry *te;
 		QString pDir("");
 
@@ -1318,7 +1337,6 @@ slotStartRestore() {
 		    PlpDirent olde;
 
 		    const char *fn = e.getName();
-		    QString unixname = psion2unix(fn);
 		    Enum<rfsv::errs> res;
 
 		    progressLocal = e.getSize();
@@ -1327,7 +1345,7 @@ slotStartRestore() {
 		    emit setProgressText(QString("%1").arg(fn));
 		    emit setProgress(0);
 
-		    te = findTarEntry(tgz.directory(), unixname);
+		    te = findTarEntry(tgz.directory(), psion2unix(fn));
 		    if (te != 0L) {
 			u_int32_t handle;
 			QString cpDir(fn);

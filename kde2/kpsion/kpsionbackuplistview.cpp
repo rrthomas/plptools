@@ -25,8 +25,8 @@
 #include <config.h>
 #endif
 
-#include "kpsionbackuplistview.h"
 #include "kpsion.h"
+#include "kpsionbackuplistview.h"
 #include "kpsionconfig.h"
 
 #include <kapp.h>
@@ -283,7 +283,11 @@ readBackups(QString uid) {
 	kapp->processEvents();
 
 	bool isValid = false;
+#if KDE_VERSION >= 300
+	KTar tgz(fi->absFilePath());
+#else
 	KTarGz tgz(fi->absFilePath());
+#endif
 	const KTarEntry *te;
 	QString bTypeName;
 	int bType;

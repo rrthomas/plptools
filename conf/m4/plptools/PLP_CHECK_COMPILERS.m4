@@ -39,7 +39,7 @@ AC_DEFUN(PLP_CHECK_COMPILERS,
 
   if test "$GCC" = "yes"; then
     if test "$plp_use_debug_code" = "yes"; then
-      CFLAGS="-g -O2 $CFLAGS"
+      CFLAGS="-g $CFLAGS"
       case $host in
         *-*-linux-gnu)	
           CFLAGS="-Wpointer-arith $CFLAGS"
@@ -80,7 +80,7 @@ AC_DEFUN(PLP_CHECK_COMPILERS,
 
   if test "$GXX" = "yes"; then
     if test "$plp_use_debug_code" = "yes"; then
-      CXXFLAGS="-g -O2 -Wpointer-arith -Wmissing-prototypes $CXXFLAGS"
+      CXXFLAGS="-g -Wpointer-arith -Wmissing-prototypes $CXXFLAGS"
 
       PLP_CHECK_COMPILER_FLAG(Wno-long-long,[CXXFLAGS="-Wno-long-long $CXXFLAGS"])
       PLP_CHECK_COMPILER_FLAG(Wnon-virtual-dtor,[CXXFLAGS="-Wnon-virtual-dtor $CXXFLAGS"])
@@ -156,9 +156,14 @@ AC_DEFUN(PLP_CHECK_COMPILERS,
       IFS=$plp_safe_IFS
   fi
 
+  if test "$plp_use_debug_code" = "yes"; then
+    STRIP=true
+    AC_SUBST(STRIP)
+  fi
+
   AC_SUBST(NOOPT_CXXFLAGS)
   THREADED_CFLAGS="-D_REENTRANT $CFLAGS"
-  THREADED_CXXFLAGS="-D_REENTRANT $CFLAGS"
+  THREADED_CXXFLAGS="-D_REENTRANT $CXXFLAGS"
   AC_SUBST(THREADED_CFLAGS)
   AC_SUBST(THREADED_CXXFLAGS)
 ])

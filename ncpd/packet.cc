@@ -222,8 +222,10 @@ reset()
     }
     outRead = outWrite = 0;
     internalReset();
-    if (fd != -1)
+    if (fd != -1) {
 	pthread_create(&datapump, NULL, pump_run, this);
+	realWrite();
+    }
 }
 
 void packet::
@@ -254,10 +256,8 @@ internalReset()
     if (verbose & PKT_DEBUG_LOG)
 	lout << "serial connection set to " << dec << realBaud
 	     << " baud, fd=" << fd << endl;
-    if (fd != -1) {
+    if (fd != -1)
 	lastFatal = false;
-	realWrite();
-    }
 }
 
 short int packet::
@@ -465,7 +465,7 @@ findSync()
 	    int rx_amount = (inw > inRead) ?
 		inw - inRead : BUFLEN - inRead + inw;
 	    if (rx_amount > 15)
-		internalReset();
+		reset();
 	}
     }
 }

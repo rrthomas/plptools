@@ -2,8 +2,8 @@ AC_REVISION($Revision$)dnl revision of this configure.in script
 
 AC_INIT(Makefile.am)
 AC_CONFIG_AUX_DIR(conf)
-AC_AIX
 AC_CANONICAL_SYSTEM
+PLP_CHECK_COMPILERS
 AM_CONFIG_HEADER(include/config.h)
 AM_INIT_AUTOMAKE(plptools, 0.11)
 AM_PROG_LIBTOOL
@@ -14,7 +14,6 @@ AM_MAINTAINER_MODE
 
 dnl checks for programs
 AC_PROG_MAKE_SET
-PLP_CHECK_COMPILERS
 AC_PROG_AWK
 AC_PATH_PROG(SED,sed)
 
@@ -52,6 +51,7 @@ if test "`uname -s 2>/dev/null`" = AIX ; then
   AC_MSG_RESULT(yes)
   AC_CHECK_LIB(bsd, hostname)
   EXTRA_OBJS=mount_aix.o
+  AC_DEFINE(_ALL_SOURCE)
 else
   AC_MSG_RESULT(no)
 fi
@@ -166,9 +166,6 @@ AC_CHECK_HEADERS(
 	sys/time.h sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h \
 	sys/int_types.h stdint.h
 )
-
-PLP_HELP_MSG([Debugging (developer only!):])
-AC_CHECK_CCMALLOC
 
 dnl special options for customization
 PLP_HELP_MSG([Options for overriding builtin defaults:])

@@ -23,6 +23,9 @@
 #ifndef _KPSION_H_
 #define _KPSION_H_
 
+// get KDE_VERSION
+#include <kapplication.h>
+
 #include "setupdialog.h"
 #include "statusbarprogress.h"
 #include "kpsionrestoredialog.h"
@@ -112,7 +115,11 @@ private:
     SetupDialog *setupDialog;
     KIconView *view;
     KPsionStatusBarProgress *progress;
+#if KDE_VERSION >= 300
+    KTar *backupTgz;
+#else
     KTarGz *backupTgz;
+#endif
     KCmdLineArgs *args;
 
     driveMap drives;

@@ -39,6 +39,11 @@ extern inline char * stpcpy(char *dest, const char *src) {
 }
 #endif
 
+/* libintl.h includes locale.h only if optimized.
+ * however, we need LC_ALL ...
+ */
+#include <locale.h>
+
 #if defined(ENABLE_NLS) && defined(HAVE_GETTEXT)
 #  include <libintl.h>
 static inline const char *X_(const char *t) { return gettext(t); }

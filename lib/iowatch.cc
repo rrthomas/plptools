@@ -33,6 +33,7 @@
 IOWatch::IOWatch() {
     num = 0;
     io = new int [FD_SETSIZE];
+    memset(io, -1, FD_SETSIZE);
 }
 
 IOWatch::~IOWatch() {
