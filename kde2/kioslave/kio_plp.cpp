@@ -52,6 +52,14 @@ extern "C" {
 	int kdemain(int argc, char **argv);
 }
 
+#define PLP_FTYPE_DRIVE   1
+#define PLP_FTYPE_OWNER   2
+#define PLP_FTYPE_MACHINE 3
+#define PLP_FTYPE_SETUP   4
+#define PLP_FTYPE_BACKUP  5
+#define PLP_FTYPE_RESTORE 6
+#define PLP_FTYPE_ROOT    7
+
 int
 kdemain( int argc, char **argv ) {
 	KInstance instance( "kio_nfs" );
@@ -191,6 +199,22 @@ driveChar(const QString& path) {
 	return '\0';
 }
 
+int PLPProtocol::
+checkSpecial(const QString& path) {
+	QString tmp = path.mid(1);
+	if (tmp == i18n("Owner"))
+		return PLP_FTYPE_OWNER;
+	if (tmp == i18n("Machine"))
+		return PLP_FTYPE_MACHINE;
+	if (tmp == i18n("Settings"))
+		return PLP_FTYPE_SETUP;
+	if (tmp == i18n("Backup"))
+		return PLP_FTYPE_BACKUP;
+	if (tmp == i18n("Restore"))
+		return PLP_FTYPE_RESTORE;
+	return 0;
+}
+
 void PLPProtocol::
 convertName(QString &path) {
 	kdDebug(PLP_DEBUGAREA) << "convert: in='" << path << "' out='";
@@ -209,15 +233,15 @@ openConnection() {
 	closeConnection();
 
 	plpRfsvSocket = new ppsocket();
+	QString estr = i18n("Could not connect to ncpd at %1:%2").arg(currentHost).arg(currentPort);
 	if (!plpRfsvSocket->connect((char *)(currentHost.data()), currentPort)) {
-		QString tmp = i18n("Could not connect to ncpd at %1:%2").arg(currentHost).arg(currentPort);
-		error(ERR_COULD_NOT_CONNECT, tmp);
+		error(ERR_COULD_NOT_CONNECT, estr);
 		return;
 	}
 	rfsvfactory factory(plpRfsvSocket);
 	plpRfsv = factory.create(false);
 	if (plpRfsv == 0L) {
-		error(ERR_COULD_NOT_CONNECT, i18n("Could not read version info."));
+		error(ERR_COULD_NOT_CONNECT, estr);
 		return;
 	}
 
@@ -270,6 +294,7 @@ openConnection() {
 
 bool PLPProtocol::
 checkConnection() {
+	kdDebug(PLP_DEBUGAREA) << "PLP::checkConnection" << endl;
 	if (plpRfsv == 0)
 		openConnection();
 	return (plpRfsv == 0);
@@ -305,19 +330,56 @@ listDir(const KURL& _url) {
 
 	if (isRoot(path)) {
 		kdDebug(PLP_DEBUGAREA) << "listing root" << endl;
-		totalSize(drives.count());
+		totalSize(drives.count()/* + 5*/);
 		//in this case we don't need to do a real listdir
 		UDSEntry entry;
+		UDSAtom atom;
 		for (QStringList::Iterator it = drives.begin(); it != drives.end(); it++) {
-			UDSAtom atom;
 			entry.clear();
 			atom.m_uds = KIO::UDS_NAME;
 			atom.m_str = (*it);
 			kdDebug(PLP_DEBUGAREA) << "listing " << (*it) << endl;
 			entry.append(atom);
-			createVirtualDirEntry(entry, drivechars[*it] == 'Z');
+			createVirtualDirEntry(entry, drivechars[*it] == 'Z', PLP_FTYPE_DRIVE);
 			listEntry(entry, false);
 		}
+#if 0
+		entry.clear();
+		atom.m_uds = KIO::UDS_NAME;
+		atom.m_str = i18n("Owner");
+		entry.append(atom);
+		createVirtualDirEntry(entry, false, PLP_FTYPE_OWNER);
+		listEntry(entry, false);
+
+		entry.clear();
+		atom.m_uds = KIO::UDS_NAME;
+		atom.m_str = i18n("Machine");
+		entry.append(atom);
+		createVirtualDirEntry(entry, false, PLP_FTYPE_MACHINE);
+		listEntry(entry, false);
+
+		entry.clear();
+		atom.m_uds = KIO::UDS_NAME;
+		atom.m_str = i18n("Settings");
+		entry.append(atom);
+		createVirtualDirEntry(entry, false, PLP_FTYPE_SETUP);
+		listEntry(entry, false);
+
+		entry.clear();
+		atom.m_uds = KIO::UDS_NAME;
+		atom.m_str = i18n("Backup");
+		entry.append(atom);
+		createVirtualDirEntry(entry, false, PLP_FTYPE_BACKUP);
+		listEntry(entry, false);
+
+		entry.clear();
+		atom.m_uds = KIO::UDS_NAME;
+		atom.m_str = i18n("Restore");
+		entry.append(atom);
+		createVirtualDirEntry(entry, false, PLP_FTYPE_RESTORE);
+		listEntry(entry, false);
+#endif
+
 		listEntry(entry, true);
 		finished();
 		return;
@@ -330,7 +392,7 @@ listDir(const KURL& _url) {
 
 	PlpDir files;
 	Enum<rfsv::errs> res = plpRfsv->dir(path, files);
-	if (checkForError(res))
+	if (checkForError(res, url.path()))
 		return;
 	totalSize(files.size());
 	UDSEntry entry;
@@ -359,12 +421,8 @@ listDir(const KURL& _url) {
 }
 
 void PLPProtocol::
-createVirtualDirEntry(UDSEntry & entry, bool rdonly) {
+createVirtualDirEntry(UDSEntry & entry, bool rdonly, int type) {
 	UDSAtom atom;
-
-	atom.m_uds = KIO::UDS_FILE_TYPE;
-	atom.m_long = S_IFDIR;
-	entry.append(atom);
 
 	atom.m_uds = KIO::UDS_ACCESS;
 	atom.m_long = S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
@@ -376,9 +434,66 @@ createVirtualDirEntry(UDSEntry & entry, bool rdonly) {
 	atom.m_long = 0;
 	entry.append(atom);
 
-	//atom.m_uds = KIO::UDS_MIME_TYPE;
-	//atom.m_str = QString("inode/x-psion-drive");
-	//entry.append(atom);
+	switch (type) {
+		case PLP_FTYPE_ROOT:
+			//atom.m_uds = KIO::UDS_FILE_TYPE;
+			//atom.m_long = S_IFBLK;
+			//entry.append(atom);
+			// atom.m_uds = KIO::UDS_GUESSED_MIME_TYPE;
+			atom.m_uds = KIO::UDS_MIME_TYPE;
+			atom.m_str = QString("inode/x-psion-drive");
+			entry.append(atom);
+			break;
+		case PLP_FTYPE_DRIVE:
+			atom.m_uds = KIO::UDS_FILE_TYPE;
+			atom.m_long = S_IFDIR;
+			entry.append(atom);
+			atom.m_uds = KIO::UDS_GUESSED_MIME_TYPE;
+			// atom.m_uds = KIO::UDS_MIME_TYPE;
+			atom.m_str = QString("inode/x-psion-drive");
+			entry.append(atom);
+			break;
+		case PLP_FTYPE_OWNER:
+			atom.m_uds = KIO::UDS_FILE_TYPE;
+			atom.m_long = S_IFREG;
+			entry.append(atom);
+			atom.m_uds = KIO::UDS_MIME_TYPE;
+			atom.m_str = QString("application/x-psion-owner");
+			entry.append(atom);
+			break;
+		case PLP_FTYPE_MACHINE:
+			atom.m_uds = KIO::UDS_FILE_TYPE;
+			atom.m_long = S_IFREG;
+			entry.append(atom);
+			atom.m_uds = KIO::UDS_MIME_TYPE;
+			atom.m_str = QString("application/x-psion-machine");
+			entry.append(atom);
+			break;
+		case PLP_FTYPE_SETUP:
+			atom.m_uds = KIO::UDS_FILE_TYPE;
+			atom.m_long = S_IFREG;
+			entry.append(atom);
+			atom.m_uds = KIO::UDS_MIME_TYPE;
+			atom.m_str = QString("application/x-psion-setup");
+			entry.append(atom);
+			break;
+		case PLP_FTYPE_BACKUP:
+			atom.m_uds = KIO::UDS_FILE_TYPE;
+			atom.m_long = S_IFREG;
+			entry.append(atom);
+			atom.m_uds = KIO::UDS_MIME_TYPE;
+			atom.m_str = QString("application/x-psion-backup");
+			entry.append(atom);
+			break;
+		case PLP_FTYPE_RESTORE:
+			atom.m_uds = KIO::UDS_FILE_TYPE;
+			atom.m_long = S_IFREG;
+			entry.append(atom);
+			atom.m_uds = KIO::UDS_MIME_TYPE;
+			atom.m_str = QString("application/x-psion-restore");
+			entry.append(atom);
+			break;
+	}
 }
 
 bool PLPProtocol::
@@ -386,7 +501,7 @@ emitTotalSize(QString &name) {
 	PlpDirent e;
 
 	Enum<rfsv::errs> res = plpRfsv->fgeteattr(name, e);
-	if (checkForError(res))
+	if (checkForError(res), &name)
 		return true;
 	totalSize(e.getSize());
 	return false;
@@ -405,11 +520,24 @@ stat(const KURL & url) {
 	stripTrailingSlash(path);
 
 	if (isRoot(path) || isDrive(path)) {
-
 		atom.m_uds = KIO::UDS_NAME;
 		atom.m_str = path;
 		entry.append(atom);
-		createVirtualDirEntry(entry, isRoot(path) || isRomDrive(path));
+		if (isRoot(path))
+			createVirtualDirEntry(entry, true, PLP_FTYPE_ROOT);
+		else
+			createVirtualDirEntry(entry, isRomDrive(path), PLP_FTYPE_DRIVE);
+		statEntry(entry);
+		finished();
+		kdDebug(PLP_DEBUGAREA) << "succeeded" << endl;
+		return;
+	}
+	int ftype = checkSpecial(path);
+	if (ftype != 0) {
+		atom.m_uds = KIO::UDS_NAME;
+		atom.m_str = path;
+		entry.append(atom);
+		createVirtualDirEntry(entry, false, ftype);
 		statEntry(entry);
 		finished();
 		kdDebug(PLP_DEBUGAREA) << "succeeded" << endl;
@@ -421,14 +549,14 @@ stat(const KURL & url) {
 	convertName(path);
 
 	if (path.isEmpty()) {
-		error(ERR_DOES_NOT_EXIST, fileName);
+		error(ERR_DOES_NOT_EXIST, url.path());
 		return;
 	}
 
 	PlpDirent e;
 
 	Enum<rfsv::errs> res = plpRfsv->fgeteattr(path, e);
-	if (checkForError(res))
+	if (checkForError(res, url.path()))
 		return;
 
 	atom.m_uds = KIO::UDS_NAME;
@@ -460,13 +588,13 @@ mimetype(const KURL & url) {
 	convertName(path);
 
 	if (path.isEmpty()) {
-		error(ERR_DOES_NOT_EXIST, path);
+		error(ERR_DOES_NOT_EXIST, url.path());
 		return;
 	}
 
 	PlpDirent e;
 	Enum<rfsv::errs> res = plpRfsv->fgeteattr(path, e);
-	if (checkForError(res))
+	if (checkForError(res, url.path()))
 		return;
 	mimeType(uid2mime(e));
 	finished();
@@ -484,7 +612,10 @@ completeUDSEntry(UDSEntry& entry, PlpDirent &e, bool rom) {
 	atom.m_long = e.getSize();
 	entry.append(atom);
 
-	atom.m_uds = KIO::UDS_MODIFICATION_TIME;
+	if (attr & rfsv::PSI_A_DIR)
+		atom.m_uds = KIO::UDS_CREATION_TIME;
+	else
+		atom.m_uds = KIO::UDS_MODIFICATION_TIME;
 	atom.m_long = e.getPsiTime().getTime();
 	entry.append(atom);
 
@@ -576,25 +707,34 @@ mkdir(const KURL& url, int) {
 		return;
 	kdDebug(PLP_DEBUGAREA) << "mkdir(" << name << ")" << endl;
 	if (isRomDrive(name)) {
-		error(ERR_ACCESS_DENIED, i18n("read only filesystem"));
+		error(ERR_ACCESS_DENIED, i18n("%1: read only filesystem").arg(url.path()));
 		return;
 	}
 	if (isRoot(name) || isDrive(name)) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1: virtual directory").arg(url.path()));
 		return;
 	}
 	convertName(name);
 	Enum<rfsv::errs> res = plpRfsv->mkdir(name);
-	if (checkForError(res))
+	if (checkForError(res), url.path())
 		return;
 	finished();
 }
 
 bool PLPProtocol::
-checkForError(Enum<rfsv::errs> res) {
+checkForError(Enum<rfsv::errs> res, QString n1, QString n2) {
 	if (res != rfsv::E_PSI_GEN_NONE) {
 		kdDebug(PLP_DEBUGAREA) << "plp error: " << res << endl;
-		QString text(res.toString().data());
+		QString reason(res.toString().data());
+		QString text;
+		if (!!n1 && !!n2)
+			text = i18n("%1 or %2: %3").arg(n1).arg(n2).arg(reason);
+		else {
+			if (!!n1 || !!n2)
+				text = QString("%1: %2").arg(n1 ? n1 : n2).arg(reason);
+			else
+				text = reason;
+		}
 		switch (res) {
 			case rfsv::E_PSI_FILE_ACCESS:
 				error(ERR_ACCESS_DENIED, text);
@@ -626,18 +766,18 @@ del( const KURL& url, bool isfile) {
 		return;
 	kdDebug(PLP_DEBUGAREA) << "del(" << name << ")" << endl;
 	if (isRomDrive(name)) {
-		error(ERR_ACCESS_DENIED, i18n("read only filesystem"));
+		error(ERR_ACCESS_DENIED, i18n("%1: read only filesystem").arg(url.path()));
 		return;
 	}
 	if (isRoot(name) || isDrive(name)) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1: virtual directory").arg(url.path()));
 		return;
 	}
 	convertName(name);
 
 	Enum<rfsv::errs> res =
 		(isfile) ? plpRfsv->remove(name) : plpRfsv->rmdir(name);
-	if (checkForError(res))
+	if (checkForError(res, url.path()))
 		return;
 	finished();
 }
@@ -651,18 +791,18 @@ chmod( const KURL& url, int permissions ) {
 		return;
 	kdDebug(PLP_DEBUGAREA) << "chmod(" << name << ")" << endl;
 	if (isRomDrive(name)) {
-		error(ERR_ACCESS_DENIED, i18n("read only filesystem"));
+		error(ERR_ACCESS_DENIED, i18n("%1: read only filesystem").arg(url.path()));
 		return;
 	}
 	if (isRoot(name) || isDrive(name)) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1: virtual directory").arg(url.path()));
 		return;
 	}
 	convertName(name);
 	long attr[2];
 	attr[0] = attr[1] = 0;
 	Enum <rfsv::errs> res = plpRfsv->fsetattr(name, attr[0], attr[1]);
-	if (checkForError(res))
+	if (checkForError(res, url.path()))
 		return;
 	finished();
 }
@@ -676,7 +816,7 @@ get( const KURL& url ) {
 		return;
 	kdDebug(PLP_DEBUGAREA) << "get(" << name << ")" << endl;
 	if (isRoot(name) || isDrive(name)) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1: virtual directory").arg(url.path()));
 		return;
 	}
 	convertName(name);
@@ -690,7 +830,7 @@ get( const KURL& url ) {
 	if (emitTotalSize(name))
 	    return;
 	res = plpRfsv->fopen(plpRfsv->opMode(rfsv::PSI_O_RDONLY), name, handle);
-	if (checkForError(res))
+	if (checkForError(res, url.path()))
 		return;
 
 	QByteArray a(RFSV_SENDLEN);
@@ -705,7 +845,7 @@ get( const KURL& url ) {
 		}
 	} while ((len > 0) && (res == rfsv::E_PSI_GEN_NONE));
 	plpRfsv->fclose(handle);
-	if (checkForError(res))
+	if (checkForError(res, url.path()))
 		return;
 	data(QByteArray());
 
@@ -722,11 +862,11 @@ put( const KURL& url, int _mode, bool _overwrite, bool /*_resume*/ ) {
 		return;
 	kdDebug(PLP_DEBUGAREA) << "put(" << name << ")" << endl;
 	if (isRomDrive(name)) {
-		error(ERR_ACCESS_DENIED, i18n("read only filesystem"));
+		error(ERR_ACCESS_DENIED, i18n("%1: read only filesystem").arg(url.path()));
 		return;
 	}
 	if (isRoot(name) || isDrive(name)) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1: virtual directory").arg(url.path()));
 		return;
 	}
 	convertName(name);
@@ -738,7 +878,7 @@ put( const KURL& url, int _mode, bool _overwrite, bool /*_resume*/ ) {
 	res = plpRfsv->fcreatefile(plpRfsv->opMode(rfsv::PSI_O_RDWR), name, handle);
 	if ((res == rfsv::E_PSI_FILE_EXIST) && _overwrite)
 		res = plpRfsv->freplacefile(plpRfsv->opMode(rfsv::PSI_O_RDWR), name, handle);
-	if (checkForError(res))
+	if (checkForError(res, url.path()))
 		return;
 
 	do {
@@ -753,7 +893,7 @@ put( const KURL& url, int _mode, bool _overwrite, bool /*_resume*/ ) {
 				u_int32_t written;
 				u_int32_t count = (len > RFSV_SENDLEN) ? RFSV_SENDLEN : len;
 				res = plpRfsv->fwrite(handle, data, count, written);
-				if (checkForError(res)) {
+				if (checkForError(res, url.path())) {
 					plpRfsv->fclose(handle);
 					return;
 				}
@@ -774,28 +914,28 @@ rename(const KURL &src, const KURL &dest, bool _overwrite) {
 		return;
 	kdDebug(PLP_DEBUGAREA) << "rename(" << from << "," << to << ")" << endl;
 	if ((driveChar(from) != driveChar(to)) && (driveChar(to) != '\0')) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1 or %2: virtual directory").arg(src.path()).arg(dest.path()));
 		kdDebug(PLP_DEBUGAREA) << "from FS != to FS" << endl;
 		return;
 	}
 	if (isRomDrive(from)) {
-		error(ERR_ACCESS_DENIED, i18n("read only filesystem"));
+		error(ERR_ACCESS_DENIED, i18n("%1: read only filesystem").arg(src.path()));
 		kdDebug(PLP_DEBUGAREA) << "from ROFS" << endl;
 		return;
 	}
 	if (isRoot(from)) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1: virtual directory").arg(src.path()));
 		kdDebug(PLP_DEBUGAREA) << "from VFS" << endl;
 		return;
 	}
 	bool volRename = isDrive(from);
 	if (isRomDrive(to)) {
-		error(ERR_ACCESS_DENIED, i18n("read only filesystem"));
+		error(ERR_ACCESS_DENIED, i18n("%1: read only filesystem").arg(dest.path()));
 		kdDebug(PLP_DEBUGAREA) << "to ROFS" << endl;
 		return;
 	}
 	if (isRoot(to)) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1: virtual directory").arg(dest.path()));
 		kdDebug(PLP_DEBUGAREA) << "to VFS" << endl;
 		return;
 	}
@@ -823,7 +963,7 @@ rename(const KURL &src, const KURL &dest, bool _overwrite) {
 		}
 		res = plpRfsv->rename(from, to);
 	}
-	if (checkForError(res))
+	if (checkForError(res, src.path(), dest.path()))
 		return;
 	finished();
 }
@@ -856,16 +996,16 @@ copy( const KURL &src, const KURL &dest, int _mode, bool _overwrite ) {
 		return;
 	kdDebug(PLP_DEBUGAREA) << "copy(" << from << "," << to << ")" << endl;
 	if (isRoot(from) || isDrive(from)) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1 or %2: virtual directory").arg(src.path()).arg(dest.path()));
 		return;
 	}
 	convertName(from);
 	if (isRomDrive(to)) {
-		error(ERR_ACCESS_DENIED, i18n("read only filesystem"));
+		error(ERR_ACCESS_DENIED, i18n("%1: read only filesystem").arg(dest.path()));
 		return;
 	}
 	if (isRoot(to) || isDrive(to)) {
-		error(ERR_ACCESS_DENIED, i18n("Virtual directory"));
+		error(ERR_ACCESS_DENIED, i18n("%1: virtual directory").arg(dest.path()));
 		return;
 	}
 	convertName(to);
@@ -881,7 +1021,7 @@ copy( const KURL &src, const KURL &dest, int _mode, bool _overwrite ) {
 	    return;
 	t_last = t_start = time(0);
 	res = plpRfsv->copyOnPsion(from, to, (void *)this, progresswrapper);
-	if (checkForError(res))
+	if (checkForError(res, src.path(), dest.path()))
 		return;
 	finished();
 }

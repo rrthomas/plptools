@@ -95,6 +95,8 @@ class PlpDriveAttrPage : public KPropsDlgPlugin {
 	QLabel      *typeLabel;
 	QLabel      *totalLabel;
 	QLabel      *freeLabel;
+	QColor      usedColor;
+	QColor      freeColor;
 	Pie3DWidget *pie;
 };
 

@@ -60,15 +60,16 @@ private:
 
 	char driveChar(const QString& path);
 
-	void createVirtualDirEntry(KIO::UDSEntry & entry, bool rdonly);
+	void createVirtualDirEntry(KIO::UDSEntry & entry, bool rdonly, int type);
 	void completeUDSEntry(KIO::UDSEntry& entry, PlpDirent &e, bool rom);
-	bool checkForError(Enum<rfsv::errs> res);
+	bool checkForError(Enum<rfsv::errs> res, QString name1 = QString(0), QString name2 = QString(0));
 	bool isRomDrive(const QString& path);
 	bool isDrive(const QString& path);
 	bool isRoot(const QString& path);
 	void convertName(QString &path);
 	bool emitTotalSize(QString &name);
 	QString uid2mime(PlpDirent &e);
+	int checkSpecial(const QString& path);
 
 	rfsv *plpRfsv;
 	ppsocket *plpRfsvSocket;

@@ -237,14 +237,12 @@ PlpDriveAttrPage::PlpDriveAttrPage(KPropertiesDialog *_props)
 	QBoxLayout *box = new QVBoxLayout( d->m_frame, KDialog::spacingHint() );
 	QLabel *l;
 	QGridLayout *gl;
+	usedColor = QColor(219, 58, 197);
+	freeColor = QColor(39, 56, 167);
 
 	KIO_ARGS << int(1) << properties->item()->name();
 	KIO::StatJob *job = new KIO::StatJob(KURL("psion:/"), KIO::CMD_SPECIAL, packedArgs, false);
 	connect(job, SIGNAL(result(KIO::Job *)), SLOT(slotSpecialFinished(KIO::Job *)));
-
-
-	long total = 33267;
-	long free = 12345;
 
 	gb = new QGroupBox(i18n("Information"), d->m_frame);
 	box->addWidget(gb);
@@ -252,46 +250,48 @@ PlpDriveAttrPage::PlpDriveAttrPage(KPropertiesDialog *_props)
 	gl = new QGridLayout(gb, 7, 4, 15);
 	gl->addRowSpacing(0, 10);
 
-	l = new QLabel(i18n("Type"), gb);
+	l = new QLabel(i18n("Type"), gb, "typeLabel");
 	gl->addWidget(l, 1, 0);
 
 	typeLabel = new QLabel(gb);
 	gl->addWidget(typeLabel, 2, 0);
 
-	l = new QLabel(i18n("Total capacity"), gb);
+	l = new QLabel(i18n("Total capacity"), gb, "capacityLabel");
 	gl->addWidget (l, 1, 1);
 
-	totalLabel = new QLabel(gb);
+	totalLabel = new QLabel(i18n(" "), gb, "capacityValue");
 	gl->addWidget(totalLabel, 2, 1);
 
-	l = new QLabel(i18n("Free space"), gb);
+	l = new QLabel(i18n("Free space"), gb, "spaceLabel");
 	gl->addWidget (l, 1, 2);
 
-	freeLabel = new QLabel(gb);
+	freeLabel = new QLabel(i18n(" "), gb, "spaceValue");
 	gl->addWidget(freeLabel, 2, 2);
 
-	l = new QLabel(i18n("Unique ID"), gb);
+	l = new QLabel(i18n("Unique ID"), gb, "uidLabel");
 	gl->addWidget (l, 1, 3);
 
-	uidLabel = new QLabel(gb);
+	uidLabel = new QLabel(i18n(" "), gb, "uidValue");
 	gl->addWidget(uidLabel, 2, 3);
 
 	pie = new Pie3DWidget(gb, "pie");
 
 	gl->addMultiCellWidget(pie, 3, 4, 1, 2);
 
-	l = new QLabel(i18n("Used space"), gb);
+	l = new QLabel(i18n("Used space:"), gb, "usedLgend");
+	l->setAlignment(AlignRight | AlignVCenter);
 	gl->addWidget (l, 5, 2);
 	
-	l = new QLabel(i18n(" "), gb);
-	l->setBackgroundColor(QColor(219, 58, 197));
+	l = new QLabel(i18n(" "), gb, "usedLegendColor");
+	l->setBackgroundColor(usedColor);
 	gl->addWidget (l, 5, 3);
 
-	l = new QLabel(i18n("Free space"), gb);
+	l = new QLabel(i18n("Free space:"), gb, "spaceLegend");
+	l->setAlignment(AlignRight | AlignVCenter);
 	gl->addWidget (l, 6, 2);
 
-	l = new QLabel(i18n(" "), gb);
-	l->setBackgroundColor(QColor(39, 56, 167));
+	l = new QLabel(i18n(" "), gb, "spaceLegendColor");
+	l->setBackgroundColor(freeColor);
 
 	gl->addWidget (l, 6, 3);
 
@@ -351,8 +351,8 @@ void PlpDriveAttrPage::slotSpecialFinished(KIO::Job *job) {
 		if (total_found && free_found) {
 			totalLabel->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(total)).arg(KGlobal::locale()->formatNumber(total, 0)));
 			freeLabel->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(unused)).arg(KGlobal::locale()->formatNumber(unused, 0)));
-			pie->addPiece(total - unused, QColor(219, 58, 197));
-			pie->addPiece(unused, QColor(39, 56, 167));
+			pie->addPiece(total - unused, usedColor);
+			pie->addPiece(unused, freeColor);
 		}
 	}
 }

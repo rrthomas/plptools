@@ -3,6 +3,7 @@ exec=kio_plp
 protocol=psion
 input=none
 output=filesystem
+defaultMimetype=inode/directory
 listing=Name,Type,Size,Date,Access
 reading=true
 writing=true

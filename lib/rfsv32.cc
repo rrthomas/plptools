@@ -715,7 +715,7 @@ mkdir(const char *name)
 {
 	bufferStore a;
 	string n = convertSlash(name);
-	if (n.find_last_of('\\') == (n.size() - 1))
+	if (n.find_last_of('\\') != (n.size() - 1))
 		n += '\\';
 	a.addWord(n.size());
 	a.addString(n.c_str());
@@ -729,7 +729,7 @@ rmdir(const char *name)
 {
 	bufferStore a;
 	string n = convertSlash(name);
-	if (n.find_last_of('\\') == (n.size() - 1))
+	if (n.find_last_of('\\') != (n.size() - 1))
 		n += '\\';
 	a.addWord(n.size());
 	a.addString(n.c_str());
