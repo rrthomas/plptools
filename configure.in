@@ -283,6 +283,7 @@ AC_OUTPUT(
 	kde2/mime/icons/Makefile
 	kde2/doc/Makefile
 	kde2/doc/en/Makefile
+	kde2/doc/de/Makefile
 	plpbackup/Makefile
 	doc/Makefile
 	doc/api/Makefile

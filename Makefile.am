@@ -21,7 +21,7 @@ maintainer-clean-local:
 	rm -f configure aclocal.m4 Makefile.in libtool \
 	conf/config.guess conf/config.sub conf/install-sh conf/ltconfig \
 	conf/ltmain.sh conf/missing conf/mkinstalldirs \
-	etc/*.spec
+	etc/*.spec ABOUT-NLS
 	find . -name "*~" -exec rm -f {} \;
 	find . -name "\.\#*" -exec rm -f {} \;
 	sh conf/intlclean

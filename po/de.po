@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-03-06 18:13+0100\n"
+"POT-Creation-Date: 2001-04-09 00:43+0200\n"
 "PO-Revision-Date: 2001-02-28 02:44CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -488,43 +488,43 @@ msgstr "Polnisch"
 msgid "Slovenian"
 msgstr "Slowenisch"
 
-#: lib/psitime.h:63
+#: lib/psitime.h:73
 msgid " years "
 msgstr " Jahre "
 
-#: lib/psitime.h:63
+#: lib/psitime.h:73
 msgid " year "
 msgstr " Jahr "
 
-#: lib/psitime.h:65
+#: lib/psitime.h:75
 msgid " days "
 msgstr " Tage "
 
-#: lib/psitime.h:65
+#: lib/psitime.h:75
 msgid " day "
 msgstr " Tag "
 
-#: lib/psitime.h:67
+#: lib/psitime.h:77
 msgid " hours "
 msgstr " Stunden "
 
-#: lib/psitime.h:67
+#: lib/psitime.h:77
 msgid " hour "
 msgstr " Stunde "
 
-#: lib/psitime.h:69
+#: lib/psitime.h:79
 msgid " minutes "
 msgstr " Minuten "
 
-#: lib/psitime.h:69
+#: lib/psitime.h:79
 msgid " minute "
 msgstr " Minute "
 
-#: lib/psitime.h:70 plpftp/ftp.cc:797
+#: lib/psitime.h:80 plpftp/ftp.cc:797
 msgid " seconds"
 msgstr " Sekunden"
 
-#: lib/psitime.h:70
+#: lib/psitime.h:80
 msgid " second"
 msgstr " Sekunde"
 
@@ -620,47 +620,47 @@ msgstr "Formatierbar"
 msgid "write protected"
 msgstr "Schreibgeschützt"
 
-#: plpftp/main.cc:44
+#: plpftp/main.cc:45
 msgid "Version "
 msgstr "Version"
 
-#: plpftp/main.cc:45
+#: plpftp/main.cc:46
 msgid "Usage : plpftp -p <port> [ftpcommand parameters]"
 msgstr "Anwendung : plpftp -p <port> [FTP-Kommando Parameter]"
 
-#: plpftp/main.cc:51
+#: plpftp/main.cc:52
 msgid "PLPFTP Version "
 msgstr "PLPFTP Version "
 
-#: plpftp/main.cc:52
+#: plpftp/main.cc:53
 msgid " Copyright (C) 1999  Philip Proudman"
 msgstr " Copyright (C) 1999  Philip Proudman"
 
-#: plpftp/main.cc:53
+#: plpftp/main.cc:54
 msgid " Additions Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>"
 msgstr " Erweiterungen Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>"
 
-#: plpftp/main.cc:54
+#: plpftp/main.cc:55
 msgid "                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>"
 msgstr "                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>"
 
-#: plpftp/main.cc:55
+#: plpftp/main.cc:56
 msgid "PLPFTP comes with ABSOLUTELY NO WARRANTY."
 msgstr "PLPFTP kommt mit ABSOLUT KEINER GARANTIE"
 
-#: plpftp/main.cc:56
+#: plpftp/main.cc:57
 msgid "This is free software, and you are welcome to redistribute it"
 msgstr "Dies ist freie Software. Sie können Sie unter den Bedingungen"
 
-#: plpftp/main.cc:57
+#: plpftp/main.cc:58
 msgid "under GPL conditions; see the COPYING file in the distribution."
 msgstr "der GPL weitergeben. Siehe die Datei COPYING im Packet."
 
-#: plpftp/main.cc:59
+#: plpftp/main.cc:60
 msgid "FTP like interface started. Type \"?\" for help."
 msgstr "FTP Oberfläche gestartet. Geben Sie \"?\" ein, um Hilfe zu bekommen."
 
-#: plpftp/main.cc:92 plpftp/main.cc:97
+#: plpftp/main.cc:94 plpftp/main.cc:99
 msgid "plpftp: could not connect to ncpd"
 msgstr "plpftp: Konnte ncpd nicht kontaktieren."
 
