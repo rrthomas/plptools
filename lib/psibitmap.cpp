@@ -21,6 +21,7 @@
  *
  */
 
+#include <plp_inttypes.h>
 #include "psibitmap.h"
 
 void
