@@ -48,6 +48,7 @@ class TopLevel : public KMainWindow
 public:
     TopLevel();
     ~TopLevel();
+    bool isNotSupported();
 
 protected:
     void paintEvent(QPaintEvent *);

@@ -55,11 +55,16 @@ int main(int argc, char *argv[])
 
     TopLevel *toplevel = new TopLevel();
 
-    KWin::setSystemTrayWindowFor(toplevel->winId(), 0);
-    toplevel->setGeometry(-100, -100, 42, 42 );
-    toplevel->show();
+    if (toplevel->isNotSupported())
+	app.quit();
+    else {
+	KWin::setSystemTrayWindowFor(toplevel->winId(), 0);
+	toplevel->setGeometry(-100, -100, 42, 42 );
+	toplevel->show();
 
-    return app.exec();
+	return app.exec();
+    }
+    return 0;
 }
 /*
  * Local variables:

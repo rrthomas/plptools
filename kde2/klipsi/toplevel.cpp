@@ -34,6 +34,7 @@
 #include <kiconloader.h>
 #include <knotifyclient.h>
 #include <kdebug.h>
+#include <kmessagebox.h>
 
 
 #define QUIT_ITEM    50
@@ -89,16 +90,21 @@ TopLevel::TopLevel()
     setBackgroundMode(X11ParentRelative);
 
     int interval = checkConnection() ? 500 : 5000;
-    timer->start(interval, true);
-
-
+    if (timer)
+	timer->start(interval, true);
 }
 
 TopLevel::~TopLevel()
 {
     closeConnection();
-    delete timer;
+    if (timer)
+	delete timer;
     delete menu;
+}
+
+bool TopLevel::
+isNotSupported() {
+    return (timer == NULL);
 }
 
 void TopLevel::
@@ -155,7 +161,10 @@ slotTimer()
     }
 
     if (!checkConnection()) {
-	timer->start(5000, true);
+	if (timer)
+	    timer->start(5000, true);
+	else
+	    kapp->quit();
 	return;
     }
 
@@ -709,13 +718,27 @@ checkConnection() {
     if (rf) {
 	if (!rc) {
 	    rc = new rclip(rclipSocket);
-	    if (rc->initClipbd() == rfsv::E_PSI_GEN_NONE) {
+	    Enum<rfsv::errs> ret;
+
+	    if ((ret = rc->initClipbd()) == rfsv::E_PSI_GEN_NONE) {
 		KNotifyClient::event("connected");
 		constate = CONNECTED;
 		repaint();
 		return true;
-	    } else
+	    } else {
 		closeConnection();
+		if (ret == rfsv::E_PSI_GEN_NSUP) {
+		    KMessageBox::error(NULL, i18n(
+			"<QT>Your Psion does not support the remote clipboard "
+			"protocol.<BR/>The reason for that is usually a missing "
+			"server library on your Psion.<BR/>Make shure, that "
+			"<B>C:\\System\\Libs\\clipsvr.rsy</B> exists.<BR/>"
+			"<B>Klipsi</B> will now terminate.</QT>"),
+				       i18n("Protocol not supported"));
+		    delete timer;
+		    timer = NULL;
+		}
+	    }
 	}
     }
     return false;
