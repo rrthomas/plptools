@@ -49,9 +49,8 @@
 
 using namespace KIO;
 
-static int PLP_DEBUGAREA = 7999;
-// until we get an offical assignment
-#define kdDebug(PLP_DEBUGAREA) cout
+static int PLP_DEBUGAREA = 0xbeef;
+//#define kdDebug(PLP_DEBUGAREA) cout
 
 extern "C" {
 	int kdemain(int argc, char **argv);
@@ -753,7 +752,7 @@ mkdir(const KURL& url, int) {
 bool PLPProtocol::
 checkForError(Enum<rfsv::errs> res, QString n1, QString n2) {
     if (res != rfsv::E_PSI_GEN_NONE) {
-	kdDebug(PLP_DEBUGAREA) << "plp error: " << res << endl;
+	kdDebug(PLP_DEBUGAREA) << "plp error: " << (const char *)res << endl;
 	QString reason(KGlobal::locale()->translate(res));
 	QString text;
 	if (!!n1 && !!n2)
@@ -1159,7 +1158,7 @@ special(const QByteArray &a) {
 	    Enum<rfsv::errs>res = plpRpcs->getOwnerInfo(b);
 	    if (res != rfsv::E_PSI_GEN_NONE) {
 		kdDebug(PLP_DEBUGAREA) <<
-		    "get Ownerinfo returned " << res << endl;
+		    "get Ownerinfo returned " << (const char *)res << endl;
 		error(ERR_COULD_NOT_STAT, "Owner");
 		return;
 	    }
