@@ -25,6 +25,12 @@ dist: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	./configure --enable-kde
 	$(MAKE) dist
 
+htmldoc:
+	for f in doc/*.[0123456789] ; do \
+		o=../web/htdocs/`basename $$f`.html; \
+		man2html -H plptools.sourceforge.net -M "" $$f > $$o; \
+	done
+
 $(ACLOCAL):
 	aclocal -I conf/m4/plptools -I conf/m4/kde
 
