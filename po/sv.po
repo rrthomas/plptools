@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2003-02-05 07:33+0100\n"
+"POT-Creation-Date: 2003-02-06 01:39+0100\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -1643,7 +1643,11 @@ msgstr "Formatläget kräver minst en enhetsbokstav."
 msgid "Backup can only create one archive at a time."
 msgstr "Backup kan bara skapa ett arkiv i taget."
 
-#: plpbackup/plpbackup.cc:1564 plpbackup/plpbackup.cc:1569
+#: plpbackup/plpbackup.cc:1559
+msgid "No action specified."
+msgstr ""
+
+#: plpbackup/plpbackup.cc:1568 plpbackup/plpbackup.cc:1573
 msgid "plpbackup: could not connect to ncpd"
 msgstr "plpbackup: fick ingen kontakt med ncpd"
 

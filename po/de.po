@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2003-02-05 07:33+0100\n"
+"POT-Creation-Date: 2003-02-06 01:39+0100\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -1648,7 +1648,11 @@ msgstr "Formatier-Modus benötigt mindestens eine Laufwerksangabe."
 msgid "Backup can only create one archive at a time."
 msgstr "Die Sicherung kann nur jeweils ein Archiv zu einer Zeit anlegen."
 
-#: plpbackup/plpbackup.cc:1564 plpbackup/plpbackup.cc:1569
+#: plpbackup/plpbackup.cc:1559
+msgid "No action specified."
+msgstr "Keine Aktion angegeben."
+
+#: plpbackup/plpbackup.cc:1568 plpbackup/plpbackup.cc:1573
 msgid "plpbackup: could not connect to ncpd"
 msgstr "plpbackup: Konnte ncpd nicht kontaktieren"
 

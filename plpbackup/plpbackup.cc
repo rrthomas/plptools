@@ -1555,6 +1555,10 @@ main(int argc, char **argv)
 	cerr << _("Backup can only create one archive at a time.") << endl;
 	usage(&cerr);
     }
+    if (!(doBackup || doRestore || doFormat)) {
+	cerr << _("No action specified.") << endl;
+	usage(&cerr);
+    }
 
     signal(SIGTERM, sig_handler);
     signal(SIGINT, sig_handler);
