@@ -125,9 +125,9 @@ putinterval d
           d
         }{
           % must copy CharStrings dict to make it writeable
-          dup length dict begin{d}forall
+          dup length dict begin{def}forall
           % copy /Euro charstring from Symbol font
-          /Euro /Symbol findfont /CharStrings get /Euro get d
+          /Euro /Symbol findfont /CharStrings get /Euro get def
           currentdict end d
         }ifelse
       }{
