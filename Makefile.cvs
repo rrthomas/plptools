@@ -20,6 +20,7 @@ devel: $(LIBTOOLFILES) $(AUTOMAKEFILES)
 
 dist: $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	aclocal -I conf/m4/plptools -I conf/m4/kde
+	aclocal -I conf/m4/plptools -I conf/m4/kde
 	autoheader
 	automake --include-deps
 	make -C kde2 -f Makefile.am am_edit
@@ -35,6 +36,7 @@ $(CONFIGHIN): acconfig.h
 	autoheader
 
 $(LIBTOOLFILES):
+	gettextize
 	libtoolize --copy --force
 
 $(AUTOMAKEFILES): $(CONFIGHIN)

@@ -12,4 +12,4 @@ maintainer-clean-local:
 	rm -f Makefile.in
 
 am_edit:
-	perl ../conf/am_edit -v
+	perl ../conf/am_edit
