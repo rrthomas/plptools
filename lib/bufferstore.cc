@@ -179,3 +179,8 @@ void bufferStore::addDWord(long a) {
 	buff[len++] = (a>>16) & 0xff;
 	buff[len++] = (a>>24) & 0xff;  
 }
+
+void bufferStore::truncate(long newLen) {
+	if (newLen < len)
+		len = newLen;
+}

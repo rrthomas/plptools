@@ -190,6 +190,14 @@ public:
 	 */
 	void addBuff(const bufferStore &b, long maxLen = -1);
   
+	/**
+	 * Truncates the buffer.
+	 * If the buffer is smaller, does nothing.
+	 *
+	 * @param newLen The new length of the buffer.
+	 */
+	void truncate(long newLen);
+  
 private:
 	void checkAllocd(long newLen);
 
