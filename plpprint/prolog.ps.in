@@ -1,108 +1,170 @@
 %%BeginResource: plpprint_prolog @VERSION@ 0
 % $Id$
-/ul false def
-/st false def
-/bg [0 0 0] def
-/fg [0 0 0] def
-/twips{1440 div 72 mul}bind def
-/pixel{10 twips mul}bind def
+/bd{bind def}bind def
+/ed{exch def}bd
+/d{def}bd
+/e{exch}bd
+/twips{1440 div 72 mul}bd
+/pixel{10 twips mul}bd
+/ul false d
+/st false d
+/bg[0 0 0]d
+/fg[0 0 0]d
+/pen_st 0 d
+/pen_th 0 d
+/brush_st 0 d
+/dofill false d
+/parray 6 array d
 /EpocEncoding ISOLatin1Encoding 256 array copy dup 128
 [/Euro/.notdef/quotesinglbase/florin/quotedblbase/ellipsis/dagger/daggerdbl
 /circumflex/perthousand/Scaron/guilsinglleft/OE/.notdef/Zcaron/.notdef
 /.notdef/quoteleft/quoteright/quotedblleft/quotedblright/bullet/endash
 /emdash/tilde/trademark/scaron/guilsinglright/oe/.notdef/zcaron/ydieresis]
-putinterval def
+putinterval d
+/dashes[[][1 2][3][1 2 3 2][1 2 1 2 3 2]]d
+/s{
+  pen_st 0 ne{
+    dashes pen_st 1 sub get 0 setdash
+    stroke
+  }if
+}bd
+/bp1{begin 0 setgray}bd
+/bp2{lineto s end}bd
+/bps[
+  {bp1 0 0 moveto 0 8 bp2}bind
+  {bp1 0 0 moveto 8 8 bp2}bind
+  {bp1 0 0 moveto 8 0 bp2}bind
+  {bp1 0 8 moveto 8 0 bp2}bind
+  {bp1 0 8 moveto 0 0 lineto 8 0 bp2}bind
+  {bp1 0 0 moveto 8 8 lineto s 0 8 moveto 8 0 bp2}bind
+]d
+/ip{ % init patterns
+  0 1 5{
+    /i ed
+    parray i
+    <<
+      /PatternType 1
+      /PaintType 1
+      /TilingType 2
+      /BBox [0 0 8 8]
+      /XStep 8
+      /YStep 8
+    >> dup/PaintProc bps i get put
+    matrix makepattern put
+  }for
+}bd
 /fs{ % fontvalue fs pointvalue
   1000 div 24 mul
-}bind def
+}bd
 /m{
-  top exch sub moveto
-}bind def
+  top e sub moveto
+}bd
 /l{
-  top exch sub lineto
-}bind def
+  top e sub lineto
+}bd
 /f{
-  dofill { fill } if
-}bind def
-/s{
-  pen_st 0 ne{stroke}if
-}bind def
+  dofill{
+    gsave
+    fill
+    grestore
+    brush_st 2 gt{
+      gsave
+      parray brush_st 3 sub get setpattern
+      fill
+      grestore
+      /DeviceRGB setcolorspace
+      fg SC
+    }if
+  }if
+}bd
 /ef{
-  dofill { eofill } if
-}bind def
+  dofill{
+    gsave
+    eofill
+    grestore
+    brush_st 2 gt{
+      gsave
+      parray brush_st 3 sub get setpattern
+      eofill
+      grestore
+      /DeviceRGB setcolorspace
+      fg SC
+    }if
+  }if
+}bd
 /UL{
-  1 eq /ul exch def
-}bind def
+  1 eq/ul ed
+}bd
 /ST{
-  1 eq /st exch def
-}bind def
+  1 eq/st ed
+}bd
 /BG{ % r g b BG - (store background color)
-  mark 4 1 roll ] /bg exch def
-}bind def
+  mark 4 1 roll ]/bg ed
+}bd
 /FG{ % r g b FG - (store foreground color)
-  mark 4 1 roll ] /fg exch def
-}bind def
+  mark 4 1 roll ]/fg ed
+}bd
 /RC{ % - RC - (reset colors)
   0 BS
   0 0 0 FG
-}bind def
+}bd
 /SC{ % colorarray SC - (set stored color)
-  dup 0 get 255 div exch
-  dup 1 get 255 div exch
+  dup 0 get 255 div e
+  dup 1 get 255 div e
   2 get 255 div
   setrgbcolor
-}bind def
+}bd
 /F{
   findfont
   % reencode for ISOLatin1. (From redbook sec. 5.6.1) and add some
   % special symbols, resulting in an EPOC encoding
   dup length dict begin
     {
-      1 index dup /FID ne {
-        /CharStrings ne {
-          def
-        } {
+      1 index dup/FID ne{
+        /CharStrings ne{
+          d
+        }{
           % must copy CharStrings dict to make it writeable
-          dup length dict begin {def} forall
+          dup length dict begin{d}forall
           % copy /Euro charstring from Symbol font
-          /Euro /Symbol findfont /CharStrings get /Euro get def
-          currentdict end def
-        } ifelse
-      } {
+          /Euro /Symbol findfont /CharStrings get /Euro get d
+          currentdict end d
+        }ifelse
+      }{
         pop pop pop
-      } ifelse
-    } forall
+      }ifelse
+    }forall
     % Replace encoding
-    /Encoding EpocEncoding def
+    /Encoding EpocEncoding d
     currentdict
-  end dup /FontName get 80 string cvs (-EPOCLatin15) concatstrings cvn
-  exch definefont
+  end dup/FontName get 80 string cvs (-EPOCLatin15) concatstrings cvn
+  e definefont
   % end of reencoding
-  exch twips scalefont setfont
-}bind def
+  e twips scalefont setfont
+}bd
 /L{ % x1 y1 x2 y2 L - (draw line from x1,y1 to x2,y2)
   4 -1 roll twips 4 -1 roll twips m
-  twips exch twips exch l fg SC s
-}bind def
+  twips e twips e l fg SC s
+}bd
 /R{ % left top right bottom R - (draw rectangle)
   4 dict begin
-    twips /y2 exch def
-    twips /x2 exch def
-    twips /y1 exch def
-    twips /x1 exch def
+    twips/y2 ed
+    twips/x2 ed
+    twips/y1 ed
+    twips/x1 ed
     newpath
     x1 y1 m x2 y1 l x2 y2 l x1 y2 l closepath
     gsave bg SC f grestore fg SC s
   end
-}bind def
-/E { % ulx uly llx lly E - (draw ellipse)
+}bd
+/E{ % ulx uly llx lly E - (draw ellipse)
   6 dict begin
-    twips /lly exch def
-    twips /llx exch def
-    twips /uly exch def
-    twips /ulx exch def
-    /wx llx ulx sub def
-    /wy lly uly sub def
+    twips/lly ed
+    twips/llx ed
+    twips/uly ed
+    twips/ulx ed
+    /wx llx ulx sub d
+    /wy lly uly sub d
     gsave
       newpath
       ulx wx 2 div add top uly sub wy 2 div sub translate
@@ -112,104 +174,104 @@ putinterval def
       gsave bg SC f grestore fg SC s
     grestore
   end
-}bind def
+}bd
 /P{ % pointarray eofill P - (draw polygon)
   5 dict begin
-    /efmode exch def
-    /points exch def
-    0 2 points length 1 sub {
-      /idx exch def
+    /efmode ed
+    /points ed
+    0 2 points length 1 sub{
+      /idx ed
       points idx get twips
       points idx 1 add get twips
-      idx 0 eq {m}{l} ifelse
-    } for
-    gsave bg SC efmode {ef}{f}ifelse grestore fg SC s
+      idx 0 eq{m}{l}ifelse
+    }for
+    gsave bg SC efmode{ef}{f}ifelse grestore fg SC s
   end
-}bind def
+}bd
 /T{ % string left bottom top right justify T - (draw text)
   6 dict begin
-    /just exch def
-    twips /x2 exch def
-    twips /y2 exch def
-    twips /y1 exch def
-    twips /x1 exch def
-    dup stringwidth pop /sw exch def
-    just 0 gt {
-      just 1 gt {x2 sw sub}{x2 x1 sub sw sub 2 div x1 add}ifelse
-    } {x1} ifelse
+    /just ed
+    twips/x2 ed
+    twips/y2 ed
+    twips/y1 ed
+    twips/x1 ed
+    dup stringwidth pop/sw ed
+    just 0 gt{
+      just 1 gt{x2 sw sub}{x2 x1 sub sw sub 2 div x1 add}ifelse
+    }{x1}ifelse
     y1 m
     gsave
-    ul {
+    ul{
       gsave
-        currentfont /FontInfo known {
-          currentfont /FontInfo get begin
+        currentfont/FontInfo known{
+          currentfont/FontInfo get begin
             0 UnderlinePosition fs rmoveto
             UnderlineThickness fs setlinewidth
           end
-        } {
+        }{
           0 -10 rmoveto 0.5 setlinewidth
-        } ifelse
+        }ifelse
         sw 0 rlineto s
 	pen_th setlinewidth
       grestore
-    } if
-    st {
+    }if
+    st{
       gsave
         newpath 0 0 moveto (I) false charpath pathbbox
-        exch pop exch sub exch pop 2 div 0 exch
+        e pop e sub e pop 2 div 0 e
       grestore
       gsave
         rmoveto
         sw 0 rlineto s
       grestore
-    } if
+    }if
     show
     grestore
   end
-}bind def
+}bd
 /I{
   7 dict begin
-    /rows exch def
-    /cols exch def
-    twips /ury exch def
-    twips /urx exch def
-    twips /lly exch def
-    twips /llx exch def
-    /ibuf cols string def
+    /rows ed
+    /cols ed
+    twips/ury ed
+    twips/urx ed
+    twips/lly ed
+    twips/llx ed
+    /ibuf cols string d
     gsave
       llx top lly sub translate
       urx llx sub lly ury sub scale
       cols rows 8 [cols 0 0 rows neg 0 rows]
-      {currentfile ibuf readhexstring pop} image
+      {currentfile ibuf readhexstring pop}image
     grestore
   end
-}bind def
+}bd
 /TH{ % xwid ywid TH - (set pen thickness)
-  pop pixel /pen_th exch def
+  pop pixel/pen_th ed
   pen_th setlinewidth
-}bind def
+}bd
 /DM{ % mode DM - (set drawing mode)
   pop
-}bind def
+}bd
 /PS{ % style PS - (set pen style)
-  /pen_st exch def
-}bind def
+  /pen_st ed
+}bd
 /BS{ % style BS - (set brush style)
-  dup /brush_st exch def
-  0 ne /dofill exch def
-}bind def
+  dup/brush_st ed
+  0 ne/dofill ed
+}bd
 /CB{ % left top right bottom CB - (clipping bbox)
   4 dict begin
-    twips /y2 exch def
-    twips /x2 exch def
-    twips /y1 exch def
-    twips /x1 exch def
+    twips/y2 ed
+    twips/x2 ed
+    twips/y1 ed
+    twips/x1 ed
     newpath
     x1 y1 m x2 y1 l x2 y2 l x1 y2 l closepath clip
     newpath
   end
-}bind def
+}bd
 /CC{ % - CC - (restore clipping)
   initclip
-}bind def
+}bd
 %%EndResource

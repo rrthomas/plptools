@@ -335,7 +335,7 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    "%%EndProlog\n"
 	    "%%BeginSetup\n"
 	    "currentpagedevice /PageSize get 1 get /top exch def\n"
-	    "1 1 TH 32 DM RC 1 PS\n"
+	    "ip 1 1 TH 32 DM RC 1 PS\n"
 	    "%%EndSetup\n", f);
 	minx = miny = 9999;
 	maxx = maxy = 0;
