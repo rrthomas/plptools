@@ -199,6 +199,12 @@ public:
 	return *this;
     }
 
+    inline Enum& operator = (const Enum& rhs) {
+        if (&rhs != this)
+            value = rhs.value;
+	return *this;
+    }
+
     /**
     * returns the enumeration value hold with this
     * enum.

@@ -428,12 +428,12 @@ Enum<rfsv::errs> rfsv32::
 fread(const u_int32_t handle, unsigned char * const buf, const u_int32_t len, u_int32_t &count)
 {
     Enum<rfsv::errs> res;
+    bufferStore a;
     count = 0;
     long l;
     unsigned char *p = buf;
 
     do {
-	bufferStore a;
 	a.addDWord(handle);
 	a.addDWord(((len - count) > RFSV_SENDLEN)?RFSV_SENDLEN:(len - count));
 	if (!sendCommand(READ_FILE, a))
@@ -445,6 +445,7 @@ fread(const u_int32_t handle, unsigned char * const buf, const u_int32_t len, u_
 	    count += l;
 	    p += l;
 	}
+	a.init();
     } while ((count < len) && (l > 0));
     return res;
 }
@@ -499,7 +500,7 @@ copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 		res = E_PSI_FILE_CANCEL;
 	}
     } while ((len > 0) && (res == E_PSI_GEN_NONE));
-    delete[]buff;
+    delete [] buff;
     fclose(handle);
     op.close();
     return res;

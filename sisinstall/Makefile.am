@@ -1,0 +1,11 @@
+# $Id$
+#
+INCLUDES=-I$(top_srcdir)/lib
+
+bin_PROGRAMS = sisinstall
+sisinstall_LDADD = $(top_srcdir)/lib/libplp.la
+sisinstall_SOURCES = psion.cpp sisinstaller.cpp sismain.cpp
+EXTRA_DIST = psion.h sisinstaller.h
+
+maintainer-clean-local:
+	rm -f Makefile.in

@@ -55,10 +55,12 @@ bufferStore::bufferStore(const unsigned char *_buff, long _len) {
 }
 
 bufferStore &bufferStore::operator =(const bufferStore &a) {
-    checkAllocd(a.getLen());
-    len = a.getLen();
-    memcpy(buff, a.getString(0), len);
-    start = 0;
+    if (this != &a) {
+        checkAllocd(a.getLen());
+        len = a.getLen();
+        memcpy(buff, a.getString(0), len);
+        start = 0;
+    }
     return *this;
 }
 
