@@ -51,11 +51,6 @@
 #include <rpcsfactory.h>
 #include <bufferarray.h>
 
-// internal use for developing offline without
-// having a Psion connected.
-// !!!!! set to 0 for production code !!!!!
-#define OFFLINE 0
-
 #define STID_CONNECTION 1
 
 KPsionMainWindow::KPsionMainWindow()
@@ -203,11 +198,7 @@ setupActions() {
 
     actionCollection()->action("fullbackup")->setEnabled(false);
     actionCollection()->action("incbackup")->setEnabled(false);
-#if OFFLINE
-    actionCollection()->action("restore")->setEnabled(true);
-#else
     actionCollection()->action("restore")->setEnabled(false);
-#endif
     actionCollection()->action("format")->setEnabled(false);
 
     actionCollection()->action("fullbackup")->
@@ -245,11 +236,7 @@ switchActions() {
 	}
 	view->setEnabled(true);
     }
-#if OFFLINE
-    actionCollection()->action("restore")->setEnabled(true);
-#else
     actionCollection()->action("restore")->setEnabled(rwSelected);
-#endif
     actionCollection()->action("format")->setEnabled(rwSelected);
     actionCollection()->action("fullbackup")->setEnabled(anySelected);
     actionCollection()->action("incbackup")->setEnabled(anySelected);
@@ -290,13 +277,6 @@ queryPsion() {
 
     statusBar()->changeItem(i18n("Retrieving machine info ..."),
 			    STID_CONNECTION);
-#if OFFLINE
-    machineUID = 0x1000118a0c428fa3ULL;
-    S5mx = true;
-    insertDrive('C', "Intern");
-    insertDrive('D', "Flash");
-    insertDrive('Z', "RomDrive");
-#else
     rpcs::machineInfo mi;
     if ((res = plpRpcs->getMachineInfo(mi)) != rfsv::E_PSI_GEN_NONE) {
 	QString msg = i18n("Could not get Psion machine info");
@@ -306,7 +286,6 @@ queryPsion() {
     }
     machineUID = mi.machineUID;
     S5mx = (strcmp(mi.machineName, "SERIES5mx") == 0);
-#endif
 
     QString uid = getMachineUID();
     bool machineFound = false;
@@ -324,7 +303,7 @@ queryPsion() {
 	    machineFound = true;
 	}
     }
-#if (!(OFFLINE))
+
     drives.clear();
     statusBar()->changeItem(i18n("Retrieving drive list ..."),
 			    STID_CONNECTION);
@@ -342,7 +321,7 @@ queryPsion() {
 	}
 	devbits >>= 1;
     }
-#endif
+
     if (!machineFound) {
 	if (args->isSet("autobackup")) {
 	    connected = false;
@@ -361,6 +340,78 @@ queryPsion() {
     }
     statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
 			    STID_CONNECTION);
+
+    if (args->isSet("autobackup") || args->isSet("backup") ||
+	args->isSet("restore") || args->isSet("format")) {
+	view->setEnabled(false);
+	actionCollection()->action("restore")->setEnabled(false);
+	actionCollection()->action("format")->setEnabled(false);
+	actionCollection()->action("fullbackup")->setEnabled(false);
+	actionCollection()->action("incbackup")->setEnabled(false);
+	QTimer::singleShot(1000, this, SLOT(slotAutoAction()));
+    }
+}
+
+void KPsionMainWindow::
+slotAutoAction() {
+    QString uid = getMachineUID();
+    KConfig *config = kapp->config();
+    KPsionConfig pcfg;
+
+    if (args->isSet("autobackup")) {
+	bool any = false;
+	QStringList::Iterator it;
+	QDateTime d;
+	int fi = pcfg.getIntervalDays(config, KPsionConfig::OPT_FULLINTERVAL);
+	int ii = pcfg.getIntervalDays(config, KPsionConfig::OPT_INCINTERVAL);
+
+	KPsionBackupListView *bl = new KPsionBackupListView(0, "backups");
+	bl->readBackups(uid);
+
+	// Full Backups
+	for (it = backupDrives.begin(); it != backupDrives.end(); ++it) {
+	    d = bl->getLastBackup(KPsionBackupListView::FULL, *it);
+	    if (fi && d.daysTo(QDateTime::currentDateTime()) >= fi) {
+		fullBackup = true;
+		for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+		    if (i->key() == *it) {
+			i->setSelected(true);
+			any = true;
+		    }
+		}
+	    }
+	}
+	if (any) {
+	    delete bl;
+	    doBackup();
+	    // If just made a backup, re-read backups
+	    bl = new KPsionBackupListView(0, "backups");
+	    bl->readBackups(uid);
+	}
+
+	// Incremental Backups
+	any = false;
+	fullBackup = false;
+	view->clearSelection();
+	for (it = backupDrives.begin(); it != backupDrives.end(); ++it) {
+	    d = bl->getLastBackup(KPsionBackupListView::INCREMENTAL, *it);
+	    if (ii && d.daysTo(QDateTime::currentDateTime()) >= ii) {
+		for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+		    if (i->key() == *it) {
+			i->setSelected(true);
+			any = true;
+		    }
+		}
+	    }
+	}
+	delete bl;
+
+	if (any)
+	    doBackup();
+
+	return;
+    }
+
     if (args->isSet("backup")) {
 	bool any = false;
 
@@ -383,6 +434,7 @@ queryPsion() {
 	}
 	return;
     }
+
     if (args->isSet("restore")) {
 	bool any = false;
 
@@ -408,6 +460,7 @@ queryPsion() {
 	    slotStartRestore();
 	return;
     }
+
     if (args->isSet("format")) {
 	bool any = false;
 	QCStringList argl = args->getOptionList("format");
@@ -422,7 +475,8 @@ queryPsion() {
 		}
 	    }
 	}
-	KMessageBox::sorry(this, "Formatting is not yet implemented");
+	if (any)
+	    slotStartFormat();
 	return;
     }
 }
@@ -454,7 +508,6 @@ queryClose() {
 
 void KPsionMainWindow::
 tryConnect() {
-#if (!(OFFLINE))
     if (shuttingDown || connected)
 	return;
     bool showMB = firstTry;
@@ -558,7 +611,6 @@ tryConnect() {
 	}
 	return;
     }
-#endif
     connected = true;
     queryPsion();
 }

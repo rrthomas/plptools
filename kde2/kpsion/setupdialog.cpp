@@ -29,6 +29,8 @@
 
 #include <kapp.h>
 #include <kconfig.h>
+#include <kdesktopfile.h>
+#include <kglobalsettings.h>
 #include <klocale.h>
 #include <kfiledialog.h>
 #include <kmessagebox.h>
@@ -415,6 +417,19 @@ slotSaveSettings() {
     config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_SERIALSPEED));
     config->writeEntry(pcfg.getOptionName(KPsionConfig::OPT_SERIALSPEED),
 		       speedCombo->currentText());
+
+    QString asFile = KGlobalSettings::autostartPath() + "/PsionBackup.desktop";
+    // Create or remove autostart entry
+    if (iIntCombo->currentItem() || fIntCombo->currentItem()) {
+	KDesktopFile f(asFile);
+	f.setGroup("Desktop Entry");
+	f.writeEntry("Type", "Application");
+	f.writeEntry("Exec", "kpsion --autobackup");
+	f.writeEntry("Icon", "kpsion");
+	f.writeEntry("Terminal", false);
+	f.writeEntry("Comment", "Scheduled backup of your Psion");
+    } else
+	unlink(asFile.latin1());
 }
 
 bool SetupDialog::

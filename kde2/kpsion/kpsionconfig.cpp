@@ -131,6 +131,21 @@ getConfigBackupInterval() {
     return l;
 }
 
+int KPsionConfig::
+getIntervalDays(KConfig *config, int optIdx) {
+    config->setGroup(getSectionName(optIdx));
+    int i = config->readNumEntry(getOptionName(optIdx));
+    switch (i) {
+	case 8:
+	    return 14;
+	case 9:
+	    return 21;
+	case 10:
+	    return 28;
+    }
+    return i;
+}
+
 /*
  * Local variables:
  * c-basic-offset: 4

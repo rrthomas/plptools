@@ -23,6 +23,8 @@
 #ifndef _KPSIONCONFIG_H_
 #define _KPSIONCONFIG_H_
 
+#include <kconfig.h>
+
 #include <qstringlist.h>
 #include <qmap.h>
 
@@ -64,6 +66,7 @@ public:
     const QString getSectionName(int);
     const QString getStrDefault(int);
     int getIntDefault(int);
+    int getIntervalDays(KConfig *config, int optIdx);
 
 private:
     cfgMap optionNames;

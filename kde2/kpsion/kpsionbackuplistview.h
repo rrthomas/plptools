@@ -28,6 +28,7 @@
 #include <klistview.h>
 #include <ktar.h>
 
+#include <qdatetime.h>
 #include <qcheckbox.h>
 #include <qstringlist.h>
 #include <qtextstream.h>
@@ -102,6 +103,7 @@ public:
     QStringList getSelectedTars();
     QStringList getFormatDrives();
     bool autoSelect(QString drive);
+    QDateTime getLastBackup(int backupType, QString drive);
 
 signals:
     void itemsEnabled(bool);

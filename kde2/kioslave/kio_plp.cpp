@@ -278,7 +278,7 @@ openConnection() {
 	for (int i = 0; i < 26; i++) {
 	    if ((devbits & 1) != 0) {
 		PlpDrive drive;
-		if (plpRfsv->devinfo(i, drive) == rfsv::E_PSI_GEN_NONE) {
+		if (plpRfsv->devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE) {
 		    string vname = drive.getName();
 		    QString name;
 
@@ -337,8 +337,8 @@ listDir(const KURL& _url) {
 	return;
 
     if (isRoot(path)) {
-	kdDebug(PLP_DEBUGAREA) << "listing root" << endl;
-	totalSize(drives.count()/* + 5*/);
+	kdDebug(PLP_DEBUGAREA) << "listing root " << drives.count() << endl;
+	totalSize(drives.count());
 	//in this case we don't need to do a real listdir
 	UDSEntry entry;
 	UDSAtom atom;
@@ -351,43 +351,6 @@ listDir(const KURL& _url) {
 	    createVirtualDirEntry(entry, drivechars[*it] == 'Z', PLP_FTYPE_DRIVE);
 	    listEntry(entry, false);
 	}
-#if 0
-	entry.clear();
-	atom.m_uds = KIO::UDS_NAME;
-	atom.m_str = i18n("Owner");
-	entry.append(atom);
-	createVirtualDirEntry(entry, false, PLP_FTYPE_OWNER);
-	listEntry(entry, false);
-
-	entry.clear();
-	atom.m_uds = KIO::UDS_NAME;
-	atom.m_str = i18n("Machine");
-	entry.append(atom);
-	createVirtualDirEntry(entry, false, PLP_FTYPE_MACHINE);
-	listEntry(entry, false);
-
-	entry.clear();
-	atom.m_uds = KIO::UDS_NAME;
-	atom.m_str = i18n("Settings");
-	entry.append(atom);
-	createVirtualDirEntry(entry, false, PLP_FTYPE_SETUP);
-	listEntry(entry, false);
-
-	entry.clear();
-	atom.m_uds = KIO::UDS_NAME;
-	atom.m_str = i18n("Backup");
-	entry.append(atom);
-	createVirtualDirEntry(entry, false, PLP_FTYPE_BACKUP);
-	listEntry(entry, false);
-
-	entry.clear();
-	atom.m_uds = KIO::UDS_NAME;
-	atom.m_str = i18n("Restore");
-	entry.append(atom);
-	createVirtualDirEntry(entry, false, PLP_FTYPE_RESTORE);
-	listEntry(entry, false);
-#endif
-
 	listEntry(entry, true);
 	finished();
 	return;
@@ -1088,7 +1051,7 @@ special(const QByteArray &a) {
 		return;
 	    }
 	    param = param.mid(1);
-	    drv = drivechars[param] - 'A';
+	    drv = drivechars[param];
 	    res = plpRfsv->devinfo(drv, drive);
 	    if (res != rfsv::E_PSI_GEN_NONE) {
 		error(ERR_COULD_NOT_STAT, param);

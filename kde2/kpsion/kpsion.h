@@ -87,6 +87,7 @@ private slots:
     void iconClicked(QIconViewItem *i);
     void iconOver(QIconViewItem *i);
     void slotUpdateTimer();
+    void slotAutoAction();
 
 private:
     void doBackup();
