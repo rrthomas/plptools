@@ -19,6 +19,10 @@ PLP_CHECK_COMPILERS
 AC_PROG_AWK
 AC_PATH_PROG(SED,sed)
 
+dnl NLS support
+ALL_LINGUAS="de"
+AM_GNU_GETTEXT
+
 dnl This is stupid for two resaons:
 dnl
 dnl 1. It doesn't save and restore CFLAGS if it's _not_ Sun's cc
@@ -129,6 +133,42 @@ AC_TYPE_SIGNAL
 dnl checks for header files
 AC_CHECK_HEADERS(sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h)
 
+PLP_HELP_MSG([Debugging (developer only!):])
+LIBCCMALLOC=
+AC_ARG_WITH(ccmalloc,
+    [  --with-ccmalloc=DIR     link against ccmalloc leak-checking lib],
+    [
+      search_dirs="/usr/lib /lib /usr/local/lib"
+      case "${withval}" in
+      	yes)
+		ccmalloc_dirs=${search_dirs}
+		;;
+	no)
+		ccmalloc_dirs=
+		;;
+	*)
+		ccmalloc_dirs="${withval} ${search_dirs}"
+		;;
+      esac
+      AC_MSG_CHECKING(for libccmalloc)
+      save_LIBS="$LIBS"
+      ccmalloc_found=NO
+      for d in ${ccmalloc_dirs} ; do
+      	LIBS="-L$d -lccmalloc -ldl"
+      	AC_TRY_LINK_FUNC(ccmalloc_report,ccmalloc_found=$d ; break)
+      done
+      LIBS="$save_LIBS"
+      if test "${ccmalloc_found}" = "NO" ; then
+      	AC_MSG_RESULT(not found)
+      else
+      	AC_MSG_RESULT(found)
+	LIBCCMALLOC="-L$ccmalloc_found -lccmalloc -ldl"
+      fi
+    ]
+)
+AC_SUBST(LIBCCMALLOC)
+
+
 dnl special options for customization
 
 PLP_HELP_MSG([Options for overriding builtin defaults:])
@@ -216,11 +256,14 @@ if test "x$ac_enable_kde" = "xyes" ; then
 	AC_PATH_KDE
 	AC_CHECK_KDEMAXPATHLEN
 	KDE_CHECK_FINAL
+	AM_KDE_WITH_NLS
 	AM_CONDITIONAL(BUILD_KDE, true)
 fi
 
 AC_OUTPUT(
 	Makefile
+	intl/Makefile
+	po/Makefile.in
 	lib/Makefile
 	ncpd/Makefile
 	plpftp/Makefile
@@ -228,6 +271,9 @@ AC_OUTPUT(
 	kde2/Makefile
 	kde2/kioslave/Makefile
 	kde2/plugins/Makefile
+	kde2/kpsion/Makefile
+	kde2/po/Makefile
+	kde2/po/de/Makefile
 	kde2/mime/Makefile
 	kde2/mime/icons/Makefile
 	plpbackup/Makefile

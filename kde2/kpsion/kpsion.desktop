@@ -1,0 +1,10 @@
+[Desktop Entry]
+DocPath=kpsion/index.html
+Exec=kpsion
+Terminal=0
+Type=Application
+Icon=psion_desktop
+Comment=My Psion PDA
+Comment[de]=Mein Psion
+Name=KPsion
+Name[de]=KPsion

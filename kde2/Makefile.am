@@ -1,8 +1,9 @@
 # $Id$
 #
 
-SUBDIRS = kioslave plugins mime
+SUBDIRS = kioslave plugins mime kpsion po
 
+POFILES =
 #
 # remove all intermediate files that can be recreated using
 # Makefile.cvs
@@ -11,4 +12,4 @@ maintainer-clean-local:
 	rm -f Makefile.in
 
 am_edit:
-	perl ../conf/am_edit
+	perl ../conf/am_edit -v

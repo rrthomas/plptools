@@ -130,10 +130,11 @@ ncpConnectAck()
 void socketChan::
 ncpConnectTerminate()
 {
-	bufferStore a;
+//	bufferStore a;
 	connectTry = 0;
-	a.addStringT("Close");
-	skt->sendBufferStore(a);
+//	a.addStringT("Close");
+//	skt->sendBufferStore(a);
+	skt->closeSocket();
 	terminateWhenAsked();
 }
 
@@ -202,13 +203,14 @@ socketPoll()
 		int res = skt->getBufferStore(a, false);
 		if (res == -1) {
 			ncpDisconnect();
+			skt->closeSocket();
 		} else if (res == 1) {
-			if (a.getLen() > 5 &&
-			    !strncmp(a.getString(), "Close", 5)) {
-				ncpDisconnect();
-			} else {
+//			if (a.getLen() > 4 &&
+//			    !strncmp(a.getString(), "Close", 5)) {
+//				ncpDisconnect();
+//			} else {
 				ncpSend(a);
-			}
+//			}
 		}
 	}
 }

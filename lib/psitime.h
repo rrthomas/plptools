@@ -1,10 +1,37 @@
+/*-*-c++-*-
+ * $Id$
+ *
+ * This file is part of plptools.
+ *
+ *  Copyright (C) 2000-2001 Fritz Elfert <felfert@to.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
 #ifndef _PSITIME_H_
 #define _PSITIME_H_
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include <sys/time.h>
 #include <unistd.h>
 
 #include <ostream.h>
+#include <intl.h>
 
 /**
  * Holds a Psion time value.
@@ -13,63 +40,63 @@
  * since 01.01.0001 in microseconds.
  */
 typedef struct psi_timeval_t {
-	/**
-	 * Prints a psi_timeval in human readable format.
-	 */
-	friend ostream &operator<<(ostream &o, const psi_timeval_t &ptv) {
-		ostream::fmtflags old = o.flags();
-		unsigned long long micro = ptv.tv_high;
-		micro = (micro << 32) | ptv.tv_low;
-		micro /= 1000000;
-		int s = micro % 60;
-		micro /= 60;
-		int m = micro % 60;
-		micro /= 60;
-		int h = micro % 24;
-		micro /= 24;
-		int d = micro % 365;
-		micro /= 365;
-		int y = micro;
-		o << dec;
-		if (y > 0)
-			o << y << " year" << ((y > 1) ? "s " : " ");
-		if (d > 0)
-			o << d << " day" << ((d > 1) ? "s " : " ");
-		if (h > 0)
-			o << h << " hour" << ((h != 1) ? "s " : " ");
-		if (m > 0)
-			o << m << " minute" << ((m != 1) ? "s " : " ");
-		o << s << " second" << ((s != 1) ? "s" : "");
-		o.flags(old);
-		return o;
-	}
-	/**
-	 * The lower 32 bits
-	 */
-	unsigned long tv_low;
-	/**
-	 * The upper 32 bits
-	 */
-	unsigned long tv_high;
+    /**
+     * Prints a psi_timeval in human readable format.
+     */
+    friend ostream &operator<<(ostream &o, const psi_timeval_t &ptv) {
+	ostream::fmtflags old = o.flags();
+	unsigned long long micro = ptv.tv_high;
+	micro = (micro << 32) | ptv.tv_low;
+	micro /= 1000000;
+	int s = micro % 60;
+	micro /= 60;
+	int m = micro % 60;
+	micro /= 60;
+	int h = micro % 24;
+	micro /= 24;
+	int d = micro % 365;
+	micro /= 365;
+	int y = micro;
+	o << dec;
+	if (y > 0)
+	    o << y << ((y > 1) ? _(" years ") : _(" year "));
+	if (d > 0)
+	    o << d << ((d > 1) ? _(" days ") : _(" day "));
+	if (h > 0)
+	    o << h << ((h != 1) ? _(" hours ") : _(" hour "));
+	if (m > 0)
+	    o << m << ((m != 1) ? _(" minutes ") : _(" minute "));
+	o << s << ((s != 1) ? _(" seconds") : _(" second"));
+	o.flags(old);
+	return o;
+    }
+    /**
+    * The lower 32 bits
+    */
+    unsigned long tv_low;
+    /**
+    * The upper 32 bits
+    */
+    unsigned long tv_high;
 } psi_timeval;
 
 /**
  * holds a Psion time zone description.
  */
 typedef struct psi_timezone_t {
-	friend ostream &operator<<(ostream &s, const psi_timezone_t &ptz) {
-		ostream::fmtflags old = s.flags();
-		int h = ptz.utc_offset / 3600;
-		int m = ptz.utc_offset % 3600;
-		s << "offs: " << dec << h << "h";
-		if (m != 0)
-			s << ", " << m << "m";
-		s.flags(old);
-		return s;
-	}
-	unsigned long utc_offset;
-	unsigned long dst_zones;
-	unsigned long home_zone;
+    friend ostream &operator<<(ostream &s, const psi_timezone_t &ptz) {
+	ostream::fmtflags old = s.flags();
+	int h = ptz.utc_offset / 3600;
+	int m = ptz.utc_offset % 3600;
+	s << "offs: " << dec << h << "h";
+	if (m != 0)
+	    s << ", " << m << "m";
+	s.flags(old);
+	return s;
+    }
+    unsigned long utc_offset;
+    unsigned long dst_zones;
+    unsigned long home_zone;
 } psi_timezone;
 
 /**
@@ -98,169 +125,171 @@ typedef struct psi_timezone_t {
  */
 class PsiTime {
 public:
-	/**
-	 * Contructs a new instance.
-	 * 
-	 * @param _utv A Unix time value for initialization.
-	 * @param _utz A Unix timezone for initialization.
-	 */
-	PsiTime(struct timeval *_utv, struct timezone *_utz = 0L);
+    /**
+    * Contructs a new instance.
+    *
+    * @param _utv A Unix time value for initialization.
+    * @param _utz A Unix timezone for initialization.
+    */
+    PsiTime(struct timeval *_utv, struct timezone *_utz = 0L);
 
-	/**
-	 * Contructs a new instance.
-	 * 
-	 * @param time A Unix time value for initialization.
-	 */
-	PsiTime(time_t time);
+    /**
+    * Contructs a new instance.
+    *
+    * @param time A Unix time value for initialization.
+    */
+    PsiTime(time_t time);
 
-	/**
-	 * Contructs a new instance.
-	 * 
-	 * @param _ptv A Psion time value for initialization.
-	 * @param _ptz A Psion timezone for initialization.
-	 */
-	PsiTime(psi_timeval *_ptv, psi_timezone *_ptz = 0L);
+    /**
+    * Contructs a new instance.
+    *
+    * @param _ptv A Psion time value for initialization.
+    * @param _ptz A Psion timezone for initialization.
+    */
+    PsiTime(psi_timeval *_ptv, psi_timezone *_ptz = 0L);
 
-	/**
-	 * Contructs a new instance.
-	 * 
-	 * @param _ptvHi The high 16 bits of a Psion time value for initialization.
-	 * @param _ptvLo The low 16 bits of a Psion time value for initialization.
-	 */
-	PsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo);
+    /**
+    * Contructs a new instance.
+    *
+    * @param _ptvHi The high 16 bits of a Psion time value for initialization.
+    * @param _ptvLo The low 16 bits of a Psion time value for initialization.
+    */
+    PsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo);
 
-	/**
-	 * Constructs a new instance, initializing to now.
-	 */
-	PsiTime(void);
+    /**
+    * Constructs a new instance, initializing to now.
+    */
+    PsiTime(void);
 
-	/**
-	 * A copy-constructor
-	 */
-	PsiTime(const PsiTime &t);
+    /**
+    * A copy-constructor
+    */
+    PsiTime(const PsiTime &t);
 
-	/**
-	 * Destroys the instance.
-	 */
-	~PsiTime();
+    /**
+    * Destroys the instance.
+    */
+    ~PsiTime();
 
-	/**
-	 * Modifies the value of this instance.
-	 *
-	 * @param _ptv The new Psion time representation.
-	 */
-	void setPsiTime(psi_timeval *_ptv);
+    /**
+    * Modifies the value of this instance.
+    *
+    * @param _ptv The new Psion time representation.
+    */
+    void setPsiTime(psi_timeval *_ptv);
 
-	/**
-	 * Modifies the value of this instance.
-	 *
-	 * @param _ptvHi The high 32 bits of a Psion time.
-	 * @param _ptvLo The low 32 bits of a Psion time.
-	 */
-	void setPsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo);
+    /**
+    * Modifies the value of this instance.
+    *
+    * @param _ptvHi The high 32 bits of a Psion time.
+    * @param _ptvLo The low 32 bits of a Psion time.
+    */
+    void setPsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo);
 
-	/**
-	 * Sets the Psion time zone of this instance.
-	 *
-	 * @param _ptz The new Psion time zone.
-	 */
-	void setPsiZone(psi_timezone *_ptz);
+    /**
+    * Sets the Psion time zone of this instance.
+    *
+    * @param _ptz The new Psion time zone.
+    */
+    void setPsiZone(psi_timezone *_ptz);
 
-	/**
-	 * Sets the value of this instance.
-	 *
-	 * @param _utv The new Unix time representation.
-	 */
-	void setUnixTime(struct timeval *_utv);
+    /**
+    * Sets the value of this instance.
+    *
+    * @param _utv The new Unix time representation.
+    */
+    void setUnixTime(struct timeval *_utv);
 
-	/**
-	 * Sets the value of this instance.
-	 *
-	 * @param _utv The new Unix time representation.
-	 */
-	void setUnixTime(time_t time);
+    /**
+    * Sets the value of this instance.
+    *
+    * @param _utv The new Unix time representation.
+    */
+    void setUnixTime(time_t time);
 
-	/**
-	 * Sets the value of this instance to the
-	 * current time of the Unix machine.
-	 */
-	void setUnixNow(void);
+    /**
+    * Sets the value of this instance to the
+    * current time of the Unix machine.
+    */
+    void setUnixNow(void);
 
-	/**
-	 * Retrieves the instance's current value
-	 * in Unix time format.
-	 *
-	 * @returns The instance's current time as Unix struct timeval.
-	 */
-	struct timeval &getTimeval(void);
+    /**
+    * Retrieves the instance's current value
+    * in Unix time format.
+    *
+    * @returns The instance's current time as Unix struct timeval.
+    */
+    struct timeval &getTimeval(void);
 
-	/**
-	 * Retrieves the instance's current value
-	 * in Unix time format.
-	 *
-	 * @returns The instance's current time as Unix time_t.
-	 */
-	time_t getTime(void);
+    /**
+    * Retrieves the instance's current value
+    * in Unix time format.
+    *
+    * @returns The instance's current time as Unix time_t.
+    */
+    time_t getTime(void);
 
-	/**
-	 * Retrieves the instance's current value
-	 * in Psion time format.
-	 *
-	 * @returns The instance's current time a Psion struct psi_timeval_t.
-	 */
-	psi_timeval &getPsiTimeval(void);
+    /**
+    * Retrieves the instance's current value
+    * in Psion time format.
+    *
+    * @returns The instance's current time a Psion struct psi_timeval_t.
+    */
+    psi_timeval &getPsiTimeval(void);
 
-	/**
-	 * Retrieves the instance's current value
-	 * in Psion time format, high 32 bits.
-	 *
-	 * @returns The instance's current time as lower 32 bits of a Psion struct psi_timeval_t.
-	 */
-	const unsigned long getPsiTimeLo(void);
+    /**
+    * Retrieves the instance's current value
+    * in Psion time format, high 32 bits.
+    *
+    * @returns The instance's current time as lower 32 bits of
+    * a Psion struct psi_timeval_t.
+    */
+    const unsigned long getPsiTimeLo(void);
 
-	/**
-	 * Retrieves the instance's current value
-	 * in Psion time format, low 32 bits.
-	 *
-	 * @returns The instance's current time as upper 32 bits of a Psion struct psi_timeval_t.
-	 */
-	const unsigned long getPsiTimeHi(void);
+    /**
+    * Retrieves the instance's current value
+    * in Psion time format, low 32 bits.
+    *
+    * @returns The instance's current time as upper 32 bits of
+    * a Psion struct psi_timeval_t.
+    */
+    const unsigned long getPsiTimeHi(void);
 
-	/**
-	 * Prints the instance's value in human readable format.
-	 * This function uses the current locale setting for
-	 * formatting the time.
-	 *
-	 * @param s The stream to be written.
-	 * @param t The instance whose value should be displayed.
-	 *
-	 * @returns The stream.
-	 */
-	friend ostream &operator<<(ostream &s, const PsiTime &t);
+    /**
+    * Prints the instance's value in human readable format.
+    * This function uses the current locale setting for
+    * formatting the time.
+    *
+    * @param s The stream to be written.
+    * @param t The instance whose value should be displayed.
+    *
+    * @returns The stream.
+    */
+    friend ostream &operator<<(ostream &s, const PsiTime &t);
 
-	/**
-	 * Assignment operator
-	 */
-	PsiTime &operator=(const PsiTime &t);
+    /**
+    * Assignment operator
+    */
+    PsiTime &operator=(const PsiTime &t);
 
-	enum zone {
-		PSI_TZ_NONE = 0,
-		PSI_TZ_EUROPEAN = 1,
-		PSI_TZ_NORTHERN = 2,
-		PSI_TZ_SOUTHERN = 4,
-		PSI_TZ_HOME = 0x40000000,
-	};
+    enum zone {
+	PSI_TZ_NONE = 0,
+	PSI_TZ_EUROPEAN = 1,
+	PSI_TZ_NORTHERN = 2,
+	PSI_TZ_SOUTHERN = 4,
+	PSI_TZ_HOME = 0x40000000,
+    };
 
 private:
-	void psi2unix(void);
-	void unix2psi(void);
-	void tryPsiZone();
+    void psi2unix(void);
+    void unix2psi(void);
+    void tryPsiZone();
 
-	psi_timeval ptv;
-	psi_timezone ptz;
-	struct timeval utv;
-	struct timezone utz;
-	bool ptzValid;
+    psi_timeval ptv;
+    psi_timezone ptz;
+    struct timeval utv;
+    struct timezone utz;
+    bool ptzValid;
 };
 
 /**
@@ -274,39 +303,45 @@ private:
  * @author Fritz Elfert <felfert@to.com>
  */
 class PsiZone {
-	friend class rpcs32;
+    friend class rpcs32;
 
 public:
-	/**
-	 * Retrieve the singleton object.
-	 * If it does not exist, it is created.
-	 */
-	static PsiZone &getInstance();
+    /**
+    * Retrieve the singleton object.
+    * If it does not exist, it is created.
+    */
+    static PsiZone &getInstance();
 
-	/**
-	 * Retrieve the Psion's time zone.
-	 *
-	 * @param ptz The time zone is returned here.
-	 *
-	 * @returns false, if the time zone is not
-	 *          known (yet).
-	 */
-	bool getZone(psi_timezone &ptz);
+    /**
+    * Retrieve the Psion time zone.
+    *
+    * @param ptz The time zone is returned here.
+    *
+    * @returns false, if the time zone is not
+    *          known (yet).
+    */
+    bool getZone(psi_timezone &ptz);
 
 private:
-	/**
-	 * This objects instance (singleton)
-	 */
-	static PsiZone *_instance;
+    /**
+    * This objects instance (singleton)
+    */
+    static PsiZone *_instance;
 
-	/**
-	 * Private constructor.
-	 */
-	PsiZone();
+    /**
+    * Private constructor.
+    */
+    PsiZone();
 
-	void setZone(psi_timezone &ptz);
+    void setZone(psi_timezone &ptz);
 
-	bool _ptzValid;
-	psi_timezone _ptz;
+    bool _ptzValid;
+    psi_timezone _ptz;
 };
 #endif
+
+/*
+ * Local variables:
+ * c-basic-offset: 4
+ * End:
+ */

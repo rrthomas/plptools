@@ -1,5 +1,7 @@
 # $Id$
 #
+INCLUDES += -I$(top_srcdir)/intl
+
 lib_LTLIBRARIES = libplp.la
 
 libplp_la_LDFLAGS = $(LIBDEBUG) -version-info $(LIBVERSION)

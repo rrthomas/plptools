@@ -6,6 +6,10 @@ ACLOCAL = conf/aclocal.m4
 all:
 	@echo "Use make devel for development, make dist for distribution"
 
+build: devel
+	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-kde
+	make
+
 devel: $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	aclocal -I conf/m4/plptools -I conf/m4/kde
 	autoheader

@@ -2,7 +2,7 @@
 AM_CPPFLAGS = -DQT_NO_CAST_ASCII
 
 INCLUDES = $(all_includes) -I$(top_srcdir)/lib
-LDFLAGS  = $(all_libraries) $(KDE_RPATH)
+LDFLAGS  = $(all_libraries)
 
 libplpprops_la_LDFLAGS = $(LIBDEBUG) $(all_libraries) -module -no-undefined -version-info $(LIBVERSION)
 

@@ -1,65 +1,65 @@
+/*-*-c++-*-
+ * $Id$
+ *
+ * This file is part of plptools.
+ *
+ *  Copyright (C) 2001 Fritz Elfert <felfert@to.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#include <stream.h>
-#include <errno.h>
-#include <assert.h>
-
-#include <qfile.h>
-#include <qapplication.h>
-#include <qdir.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qcheckbox.h>
-#include <qstrlist.h>
-#include <qstringlist.h>
-#include <qtextstream.h>
-#include <qpainter.h>
-#include <qlayout.h>
-#include <qcombobox.h>
-#include <qgroupbox.h>
-
-#include <kdialog.h>
-#include <kdirsize.h>
-#include <kdirwatch.h>
-#include <kdebug.h>
-#include <kdesktopfile.h>
-#include <kicondialog.h>
-#include <kurl.h>
-#include <kurlrequester.h>
-#include <klocale.h>
-#include <kglobal.h>
-#include <kglobalsettings.h>
-#include <kstddirs.h>
-#include <kio/job.h>
-#include <kio/renamedlg.h>
-#include <kfiledialog.h>
-#include <kmimetype.h>
-#include <kmessagebox.h>
-#include <kservice.h>
-#include <kglobal.h>
-#include <kcompletion.h>
-#include <klineedit.h>
-//#include <klibloader.h>
-//#include <ktrader.h>
-#include <kio/slaveinterface.h>
-
 #include "plpprops.h"
 #include "pie3dwidget.h"
 
+#include <kdebug.h>
+#include <klocale.h>
+#include <kio/slaveinterface.h>
+#include <krun.h>
+
+#include <qlayout.h>
+#include <qlabel.h>
 #include <qobjectlist.h>
 #include <qtabwidget.h>
+#include <qcheckbox.h>
+#include <qwhatsthis.h>
+
+#include <rfsv.h>
+#include <rpcs.h>
+
+#include <strstream>
+#include <iomanip>
+
+#define PLP_CMD_DRIVEINFO 1
+#define PLP_CMD_OWNERINFO 2
+#define PLP_CMD_GETATTR   3
+#define PLP_CMD_SETATTR   4
+#define PLP_CMD_MACHINFO  5
 
 #define KIO_ARGS QByteArray packedArgs; \
 QDataStream stream( packedArgs, IO_WriteOnly ); stream
 
 class PlpPropsPlugin::PlpPropsPluginPrivate {
 public:
-	PlpPropsPluginPrivate() { }
-	~PlpPropsPluginPrivate() { }
+    PlpPropsPluginPrivate() { }
+    ~PlpPropsPluginPrivate() { }
 
-	QFrame *m_frame;
+    QFrame *frame;
 };
 
 /*
@@ -67,375 +67,908 @@ public:
  * the Properties dialog.
  */
 static void
-removePermsPage(QWidget *theDialog) {
-	QObject *qtabwidget = 0L;
-	QFrame *permframe = 0L;
+removeDialogPage(QWidget *theDialog, QString theLabel) {
+    QObject *qtabwidget = 0L;
+    QFrame *permframe = 0L;
 
-	//
-	// First, find the QTabWidget in the dialog.
-	// This is easy, cause there's only one.
-	//
-	QObjectList *l = theDialog->queryList("QTabWidget");
+    //
+    // First, find the QTabWidget in the dialog.
+    // Easy, cause there's only one.
+    //
+    QObjectList *l = theDialog->queryList("QTabWidget");
+    QObjectListIt it(*l);
+    QObject * obj;
+    while ((obj=it.current()) != 0) {
+	++it;
+	qtabwidget = obj;
+    }
+    delete l;
+
+    // Now, walk thru all Childs of the QTabWidget which are
+    // inherited from class QFrame. For every found frame,
+    // compare the tabLabel against the required label (&Permissions).
+    //
+    if (qtabwidget != 0L) {
+	l = qtabwidget->queryList("QFrame");
 	QObjectListIt it(*l);
-	QObject * obj;
-	while ((obj=it.current()) != 0) {
-		++it;
-		qtabwidget = obj;
+
+	while ((obj = it.current()) != 0) {
+	    if (theLabel ==
+		((QTabWidget *)qtabwidget)->tabLabel((QWidget*)obj)) {
+		permframe = (QFrame *)obj;
+		break;
+	    }
+	    ++it;
 	}
 	delete l;
 
-	// Now, walk thru all Childs of the QTabWidget which are
-	// inherited from class QFrame.
-	//
-	if (qtabwidget != 0L) {
-		l = qtabwidget->queryList("QFrame");
-		QObjectListIt it(*l);
-
-		while ((obj = it.current()) != 0) {
-			QObjectList *l2 = obj->queryList();
-			QObjectListIt it2(*l2);
-			QObject *o2;
-			int qvbl, qgb, qgl, ql, qcb;
-			qvbl = qgb = qgl = ql = qcb = 0;
-
-			// If we found a QFrame, count it's children
-			// by className. We must rely on the numbers,
-			// because not a single child has been given
-			// a name.
-			while ((o2 = it2.current()) != 0) {
-				if (o2->isA("QVBoxLayout"))
-					qvbl++;
-				if (o2->isA("QGroupBox"))
-					qgb++;
-				if (o2->isA("QGridLayout"))
-					qgl++;
-				if (o2->isA("QLabel"))
-					ql++;
-				if (o2->isA("QCheckBox"))
-					qcb++;
-				++it2;
-			}
-			delete l2;
-
-			// The PermissionsPage is build out of:
-			//
-			// 1 QVBoxLayout, 2 QGroupboxes, 2 QGridLayouts,
-			// 15 QLabels and 12 QCheckBoxes
-			//
-			if ((qvbl == 1) &&
-			    (qgb == 2) &&
-			    (qgl == 2) &&
-			    (ql == 15) &&
-			    (qcb == 12)) {
-				permframe = (QFrame *)obj;
-				break;
-			}
-			++it;
-		}
-		delete l;
-
-		// If we found it, remove it.
-		if (permframe != 0)
-			((QTabWidget *)qtabwidget)->removePage(permframe);
-	}
+	// If we found it, remove it.
+	if (permframe != 0)
+	    ((QTabWidget *)qtabwidget)->removePage(permframe);
+    }
 }
 
 PlpPropsPlugin::PlpPropsPlugin(KPropertiesDialog *_props)
-	: KPropsDlgPlugin( _props )
+    : KPropsDlgPlugin( _props )
 {
-	d = new PlpPropsPluginPrivate;
-	bool removePerms = false;
-	
-	if (!supports(properties->items()))
-		return;
+    d = new PlpPropsPluginPrivate;
+    bool removePerms = false;
+    bool removeGeneral = false;
 
-	if (PlpFileAttrPage::supports(properties->items())) {
-		PlpFileAttrPage *p = new PlpFileAttrPage(_props);
-		removePerms = true;
-	}
-	if (PlpDriveAttrPage::supports(properties->items())) {
-		PlpDriveAttrPage *p = new PlpDriveAttrPage(_props);
-		removePerms = true;
-	}
-	if (PlpMachinePage::supports(properties->items())) {
-		PlpMachinePage *p = new PlpMachinePage(_props);
-	}
-	if (PlpOwnerPage::supports(properties->items())) {
-		PlpOwnerPage *p = new PlpOwnerPage(_props);
-	}
-	if (removePerms)
-		removePermsPage(properties->dialog());
+    if (!supports(properties->items()))
+	return;
+
+    if (PlpFileAttrPage::supports(properties->items())) {
+	PlpFileAttrPage *p = new PlpFileAttrPage(_props);
+	connect(p, SIGNAL(changed()), SLOT(doChange()));
+	connect(this, SIGNAL(save()), p, SLOT(applyChanges()));
+	removePerms = true;
+    }
+    if (PlpDriveAttrPage::supports(properties->items())) {
+	PlpDriveAttrPage *p = new PlpDriveAttrPage(_props);
+	removePerms = true;
+    }
+    if (PlpMachinePage::supports(properties->items())) {
+	PlpMachinePage *p = new PlpMachinePage(_props);
+	removePerms = true;
+	removeGeneral = true;
+    }
+    if (PlpOwnerPage::supports(properties->items())) {
+	PlpOwnerPage *p = new PlpOwnerPage(_props);
+	removePerms = true;
+	removeGeneral = true;
+    }
+    if (removePerms)
+	removeDialogPage(properties->dialog(), i18n("&Permissions"));
+    if (removeGeneral)
+	removeDialogPage(properties->dialog(), i18n("&General"));
 }
 
 PlpPropsPlugin::~PlpPropsPlugin() {
-	delete d;
+    delete d;
 }
 
 bool PlpPropsPlugin::supports(KFileItemList _items) {
-	for (KFileItemListIterator it(_items); it.current(); ++it) {
-		KFileItem *fi = it.current();
+    for (KFileItemListIterator it(_items); it.current(); ++it) {
+	KFileItem *fi = it.current();
 
-		if (fi->url().protocol() != QString::fromLatin1("psion"))
-			return false;
-	}
-	return true;
+	if (fi->url().protocol() != QString::fromLatin1("psion"))
+	    return false;
+    }
+    return true;
 }
 
 void PlpPropsPlugin::applyChanges() {
-	kdDebug(250) << "PlpFileAttrPlugin::applyChanges" << endl;
+    emit save();
 }
 
-void PlpPropsPlugin::postApplyChanges() {
+void PlpPropsPlugin::doChange() {
+    emit changed();
 }
 
 class PlpFileAttrPage::PlpFileAttrPagePrivate {
-public:
-	PlpFileAttrPagePrivate() { }
-	~PlpFileAttrPagePrivate() { }
 
-	QFrame *m_frame;
+    typedef struct {
+	const char * const lbl;
+	const u_int32_t mask;
+	bool inverted;
+	bool direnabled;
+	bool s5enabled;
+    } UIelem;
+
+public:
+
+    PlpFileAttrPagePrivate();
+    ~PlpFileAttrPagePrivate() {}
+
+    KPropertiesDialog *props;
+
+    bool  jobReturned;
+    u_int32_t flags;
+    u_int32_t attr;
+
+    const UIelem *generic;
+    const UIelem *s3;
+    const UIelem *s5;
+
+    QFrame *frame;
+    QLabel *psiPath;
+    QCheckBox *genCb[5];  // MUST match initializers below!!!
+    QCheckBox *specCb[3]; // MUST match initializers below!!!
 };
 
-PlpFileAttrPage::PlpFileAttrPage(KPropertiesDialog *_props)
-	: KPropsDlgPlugin( _props ) {
-	d = new PlpFileAttrPagePrivate;
-	d->m_frame = properties->dialog()->addPage(i18n("Psion &Attributes"));
+PlpFileAttrPage::PlpFileAttrPagePrivate::PlpFileAttrPagePrivate() {
+    int i;
+
+    static const UIelem _generic[] = {
+	{ "Readable",  rfsv::PSI_A_READ,    false, false, false }, // Fake for S5
+	{ "Writeable", rfsv::PSI_A_RDONLY,  true,  true,  true  },
+	{ "Hidden",    rfsv::PSI_A_HIDDEN,  false, true,  true  },
+	{ "System",    rfsv::PSI_A_SYSTEM,  false, false, true  },
+	{ "Archive",   rfsv::PSI_A_ARCHIVE, false, true,  true  },
+	{ 0L,          0L,                  false, false, true  },
+    };
+    static const UIelem _s3[] = {
+	{ "Executable", rfsv::PSI_A_EXEC,   false, false, true },
+	{ "Stream",     rfsv::PSI_A_STREAM, false, false, true },
+	{ "Text",       rfsv::PSI_A_TEXT,   false, false, true },
+	{ 0L,           0L,                 false, false, true },
+    };
+    static const UIelem _s5[] = {
+	{ "Normal",     rfsv::PSI_A_NORMAL,     false, false, true },
+	{ "Temporary",  rfsv::PSI_A_TEMP,       false, false, true },
+	{ "Compressed", rfsv::PSI_A_COMPRESSED, false, false, true },
+	{ 0L,          0L,                      false, false, true },
+    };
+    generic = _generic;
+    s3 = _s3;
+    s5 = _s5;
+}
+
+PlpFileAttrPage::PlpFileAttrPage(KPropertiesDialog *_props) {
+    QGridLayout *mgl;
+    QGridLayout *gl;
+    QGroupBox *gb;
+    QLabel *l;
+    int i;
+
+    d = new PlpFileAttrPagePrivate;
+    d->props = _props;
+    d->frame = _props->dialog()->addPage(i18n("Psion &Attributes"));
+
+    mgl = new QGridLayout(d->frame, 1, 1, KDialog::marginHint(),
+			  KDialog::spacingHint(), "mainLayout");
+
+    l = new QLabel(i18n("Path on Psion:"), d->frame, "psiPathLabel");
+    mgl->addWidget(l, 0, 0);
+
+    d->psiPath = new QLabel(QString::fromLatin1("?"), d->frame, "psiPath");
+    mgl->addWidget(d->psiPath, 0, 1);
+    mgl->setColStretch(1, 1);
+
+    gb = new QGroupBox(i18n("Generic attributes"), d->frame, "genattrBox");
+    mgl->addMultiCellWidget(gb, 1, 1, 0, 1);
+    gl = new QGridLayout (gb, 1, 1, KDialog::marginHint(),
+			  KDialog::spacingHint(), "genattrLayout");
+    for (i = 0; d->generic[i].lbl; i++) {
+	QString lbl = KGlobal::locale()->translate(d->generic[i].lbl);
+	d->genCb[i] = new QCheckBox(lbl, gb, d->generic[i].lbl);
+	d->genCb[i]->setEnabled(false);
+	connect(d->genCb[i], SIGNAL(toggled(bool)), SLOT(slotCbToggled(bool)));
+	gl->addWidget(d->genCb[i], 0, i);
+    }
+
+    gb = new QGroupBox(i18n("Machine specific attributes"), d->frame,
+		       "specattrBox");
+    mgl->addMultiCellWidget(gb, 2, 2, 0, 1);
+    gl = new QGridLayout (gb, 1, 1, KDialog::marginHint(),
+			  KDialog::spacingHint(), "specattrLayout");
+    for (i = 0; d->s5[i].lbl; i++) {
+	QString lbl = KGlobal::locale()->translate(d->s5[i].lbl);
+	d->specCb[i] = new QCheckBox(lbl, gb, d->s5[i].lbl);
+	d->specCb[i]->setEnabled(false);
+	connect(d->specCb[i], SIGNAL(toggled(bool)), SLOT(slotCbToggled(bool)));
+	gl->addWidget(d->specCb[i], 0, i);
+    }
+    mgl->addRowSpacing(3, KDialog::marginHint());
+
+    d->jobReturned = false;
+    KIO_ARGS << int(PLP_CMD_GETATTR) << _props->item()->url().path();
+    KIO::StatJob *job = new KIO::StatJob(KURL("psion:/"), KIO::CMD_SPECIAL,
+					 packedArgs, false);
+    connect(job, SIGNAL(result(KIO::Job *)),
+	    SLOT(slotGetSpecialFinished(KIO::Job *)));
 }
 
 PlpFileAttrPage::~PlpFileAttrPage() {
-	delete d;
+    delete d;
 }
 
 bool PlpFileAttrPage::supports(KFileItemList _items) {
-	for (KFileItemListIterator it(_items); it.current(); ++it) {
-		KFileItem *fi = it.current();
+    for (KFileItemListIterator it(_items); it.current(); ++it) {
+	KFileItem *fi = it.current();
 
-		QString path = fi->url().path(-1);
-		if (path.contains('/') == 1)
-			return false;
-	}
-	return true;
+	QString path = fi->url().path(-1);
+	if (path.contains('/') == 1)
+	    return false;
+    }
+    return true;
 }
 
 void PlpFileAttrPage::applyChanges() {
+    u_int32_t attr = 0;
+    bool isS5 = ((d->flags & 1) != 0);
+    bool val;
+    int i;
+
+    for (i = 0; d->generic[i].lbl; i++) {
+	val = d->genCb[i]->isChecked();
+	if (d->generic[i].inverted)
+	    val = !val;
+	if (val)
+	    attr |= d->generic[i].mask;
+    }
+    if (isS5)
+	for (i = 0; d->s5[i].lbl; i++) {
+	    val = d->specCb[i]->isChecked();
+	    if (d->s5[i].inverted)
+		val = !val;
+	    if (val)
+		attr |= d->s5[i].mask;
+	}
+    else
+	for (i = 0; d->s3[i].lbl; i++) {
+	    val = d->specCb[i]->isChecked();
+	    if (d->s3[i].inverted)
+		val = !val;
+	    if (val)
+		attr |= d->s3[i].mask;
+	}
+    if (d->attr != attr) {
+	u_int32_t mask = d->attr ^ attr;
+	u_int32_t sattr = attr & mask;
+	u_int32_t dattr = ~sattr & mask;
+	cout << "apply: old=" << hex << d->attr << " new=" << attr << endl;
+	cout << "apply: m=" << hex << mask << " s=" << sattr << " d=" << dattr << endl;
+
+	KIO_ARGS << int(PLP_CMD_SETATTR) << sattr << dattr
+		 << d->props->item()->url().path();
+	KIO::SimpleJob *sjob = new KIO::SimpleJob(KURL("psion:/"),
+						  KIO::CMD_SPECIAL, packedArgs,
+						  false);
+	connect(sjob, SIGNAL(result(KIO::Job *)),
+		SLOT(slotSetSpecialFinished(KIO::Job *)));
+    }
+}
+
+void PlpFileAttrPage::slotCbToggled(bool) {
+    if (d->jobReturned)
+	emit changed();
+}
+
+void PlpFileAttrPage::slotSetSpecialFinished(KIO::Job *job) {
+    KIO::SimpleJob *sJob = static_cast<KIO::SimpleJob *>(job);
+
+    if (sJob->error())
+	job->showErrorDialog(d->props->dialog());
+}
+
+void PlpFileAttrPage::slotGetSpecialFinished(KIO::Job *job) {
+    KIO::StatJob *sJob = static_cast<KIO::StatJob *>(job);
+
+    if (sJob->error())
+	job->showErrorDialog(d->props->dialog());
+    else {
+	KIO::UDSEntry e = sJob->statResult();
+	bool attr_found = false;
+	bool flags_found = false;
+	u_int32_t flags;
+	u_int32_t attr;
+
+	for (KIO::UDSEntry::ConstIterator it = e.begin(); it != e.end(); ++it) {
+	    if ((*it).m_uds == KIO::UDS_SIZE) {
+		attr_found = true;
+		attr = (unsigned long)((*it).m_long);
+	    }
+	    if ((*it).m_uds == KIO::UDS_CREATION_TIME) {
+		flags_found = true;
+		flags = (unsigned long)((*it).m_long);
+	    }
+	    if ((*it).m_uds == KIO::UDS_NAME)
+		d->psiPath->setText((*it).m_str);
+	}
+	if (attr_found && flags_found) {
+	    bool isS5 = ((flags & 1) != 0);
+	    bool isRom = ((flags & 2) != 0);
+	    bool noDir = ((attr & rfsv::PSI_A_DIR) == 0);
+	    int i;
+
+	    d->attr = attr;
+	    d->flags = flags;
+	    for (i = 0; d->generic[i].lbl; i++) {
+		bool val = ((attr & d->generic[i].mask) != 0);
+		if (d->generic[i].inverted)
+		    val = !val;
+		d->genCb[i]->setChecked(val);
+		if ((!isRom) && (d->generic[i].s5enabled) &&
+		    (noDir || d->generic[i].direnabled)) {
+		    d->genCb[i]->setEnabled(true);
+		}
+	    }
+	    if (isS5)
+		for (i = 0; d->s5[i].lbl; i++) {
+		    bool val = ((attr & d->s5[i].mask) != 0);
+		    d->specCb[i]->setChecked(val);
+		    if ((!isRom) && (noDir || d->s5[i].direnabled))
+			d->specCb[i]->setEnabled(true);
+		}
+	    else
+		for (i = 0; d->s3[i].lbl; i++) {
+		    bool val = ((attr & d->s3[i].mask) != 0);
+		    QString lbl = KGlobal::locale()->translate(d->s3[i].lbl);
+		    d->specCb[i]->setText(lbl);
+		    d->specCb[i]->setChecked(val);
+		    if ((!isRom) && (noDir || d->s3[i].direnabled))
+			d->specCb[i]->setEnabled(true);
+		}
+	}
+    }
+    d->jobReturned = true;
 }
 
 class PlpDriveAttrPage::PlpDriveAttrPagePrivate {
 public:
-	PlpDriveAttrPagePrivate() { }
-	~PlpDriveAttrPagePrivate() { }
+    PlpDriveAttrPagePrivate() { }
+    ~PlpDriveAttrPagePrivate() { }
 
-	QFrame *m_frame;
+    QColor  usedColor;
+    QColor  freeColor;
+    QString driveLetter;
+
+    KPropertiesDialog *props;
+    QFrame *frame;
+    QGroupBox *gb;
+    Pie3DWidget *pie;
+    QLabel *typeLabel;
+    QLabel *totalLabel;
+    QLabel *freeLabel;
+    QLabel *uidLabel;
+    QPushButton *restoreButton;
+    QPushButton *formatButton;
 };
 
-PlpDriveAttrPage::PlpDriveAttrPage(KPropertiesDialog *_props)
-	: KPropsDlgPlugin( _props ) {
+PlpDriveAttrPage::PlpDriveAttrPage(KPropertiesDialog *_props) {
+    d = new PlpDriveAttrPagePrivate;
+    d->props = _props;
+    d->frame = _props->dialog()->addPage(i18n("Psion &Drive"));
 
-	d = new PlpDriveAttrPagePrivate;
-	d->m_frame = properties->dialog()->addPage(i18n("Psion &Drive"));
+    QBoxLayout *box = new QVBoxLayout(d->frame, KDialog::spacingHint());
+    QLabel *l;
+    QGridLayout *gl;
+    QPushButton *b;
+    d->usedColor = QColor(219, 58, 197);
+    d->freeColor = QColor(39, 56, 167);
+    d->driveLetter = "";
 
-	QBoxLayout *box = new QVBoxLayout( d->m_frame, KDialog::spacingHint() );
-	QLabel *l;
-	QGridLayout *gl;
-	usedColor = QColor(219, 58, 197);
-	freeColor = QColor(39, 56, 167);
+    d->gb = new QGroupBox(i18n("Information"), d->frame, "driveinfo");
+    box->addWidget(d->gb);
 
-	KIO_ARGS << int(1) << properties->item()->name();
-	KIO::StatJob *job = new KIO::StatJob(KURL("psion:/"), KIO::CMD_SPECIAL, packedArgs, false);
-	connect(job, SIGNAL(result(KIO::Job *)), SLOT(slotSpecialFinished(KIO::Job *)));
+    gl = new QGridLayout(d->gb, 7, 4, 15);
+    gl->addRowSpacing(0, 10);
 
-	gb = new QGroupBox(i18n("Information"), d->m_frame);
-	box->addWidget(gb);
+    l = new QLabel(i18n("Type"), d->gb, "typeLabel");
+    gl->addWidget(l, 1, 0);
 
-	gl = new QGridLayout(gb, 7, 4, 15);
-	gl->addRowSpacing(0, 10);
+    d->typeLabel = new QLabel(d->gb);
+    gl->addWidget(d->typeLabel, 2, 0);
+    QWhatsThis::add(d->typeLabel,
+		    i18n("The type of the drive is shown here."));
 
-	l = new QLabel(i18n("Type"), gb, "typeLabel");
-	gl->addWidget(l, 1, 0);
+    l = new QLabel(i18n("Total capacity"), d->gb, "capacityLabel");
+    gl->addWidget (l, 1, 1);
 
-	typeLabel = new QLabel(gb);
-	gl->addWidget(typeLabel, 2, 0);
+    d->totalLabel = new QLabel(i18n(" "), d->gb, "capacityValue");
+    gl->addWidget(d->totalLabel, 2, 1);
+    QWhatsThis::add(d->totalLabel,
+		    i18n("This shows the total capacity of the drive."));
 
-	l = new QLabel(i18n("Total capacity"), gb, "capacityLabel");
-	gl->addWidget (l, 1, 1);
+    l = new QLabel(i18n("Free space"), d->gb, "spaceLabel");
+    gl->addWidget (l, 1, 2);
 
-	totalLabel = new QLabel(i18n(" "), gb, "capacityValue");
-	gl->addWidget(totalLabel, 2, 1);
+    d->freeLabel = new QLabel(i18n(" "), d->gb, "spaceValue");
+    gl->addWidget(d->freeLabel, 2, 2);
+    QWhatsThis::add(d->freeLabel,
+		    i18n("This shows the available space of the drive."));
 
-	l = new QLabel(i18n("Free space"), gb, "spaceLabel");
-	gl->addWidget (l, 1, 2);
+    l = new QLabel(i18n("Unique ID"), d->gb, "uidLabel");
+    gl->addWidget (l, 1, 3);
 
-	freeLabel = new QLabel(i18n(" "), gb, "spaceValue");
-	gl->addWidget(freeLabel, 2, 2);
+    d->uidLabel = new QLabel(i18n(" "), d->gb, "uidValue");
+    gl->addWidget(d->uidLabel, 2, 3);
+    QWhatsThis::add(d->freeLabel,
+		    i18n("This shows unique ID of the drive. For ROM drives, this is always 0."));
 
-	l = new QLabel(i18n("Unique ID"), gb, "uidLabel");
-	gl->addWidget (l, 1, 3);
+    d->pie = new Pie3DWidget(d->gb, "pie");
 
-	uidLabel = new QLabel(i18n(" "), gb, "uidValue");
-	gl->addWidget(uidLabel, 2, 3);
+    gl->addMultiCellWidget(d->pie, 3, 4, 1, 2);
 
-	pie = new Pie3DWidget(gb, "pie");
+    QHBoxLayout *blay = new QHBoxLayout(KDialog::spacingHint(), "buttons");
+    gl->addMultiCellLayout(blay, 5, 6, 1, 3);
+    blay->setAlignment(AlignRight | AlignVCenter);
 
-	gl->addMultiCellWidget(pie, 3, 4, 1, 2);
+    b  = new QPushButton(i18n("Backup"), d->gb, "backupButton");
+    connect(b, SIGNAL(clicked()), SLOT(slotBackupClicked()));
+    blay->addWidget(b, 0);
+    QWhatsThis::add(b,
+		    i18n("Click here, to do a backup of this drive. This launches KPsion to perform that task."));
 
-	l = new QLabel(i18n("Used space:"), gb, "usedLgend");
-	l->setAlignment(AlignRight | AlignVCenter);
-	gl->addWidget (l, 5, 2);
-	
-	l = new QLabel(i18n(" "), gb, "usedLegendColor");
-	l->setBackgroundColor(usedColor);
-	gl->addWidget (l, 5, 3);
+    b = new QPushButton(i18n("Restore"), d->gb, "restoreButton");
+    connect(b, SIGNAL(clicked()), SLOT(slotRestoreClicked()));
+    blay->addWidget(b, 0);
+    d->restoreButton = b;
+    QWhatsThis::add(b,
+		    i18n("Click here, to do a restore of this drive. This launches KPsion to perform that task."));
 
-	l = new QLabel(i18n("Free space:"), gb, "spaceLegend");
-	l->setAlignment(AlignRight | AlignVCenter);
-	gl->addWidget (l, 6, 2);
+    b = new QPushButton(i18n("Format"), d->gb, "formatButton");
+    connect(b, SIGNAL(clicked()), SLOT(slotFormatClicked()));
+    blay->addWidget(b, 0);
+    d->formatButton = b;
+    QWhatsThis::add(b,
+		    i18n("Click here, to format this drive. This launches KPsion to perform that task."));
 
-	l = new QLabel(i18n(" "), gb, "spaceLegendColor");
-	l->setBackgroundColor(freeColor);
+    blay->addStretch(10);
 
-	gl->addWidget (l, 6, 3);
+    box->addStretch(10);
 
-	box->addStretch(10);
+    KIO_ARGS << int(PLP_CMD_DRIVEINFO) << _props->item()->url().path();
+    KIO::StatJob *job = new KIO::StatJob(KURL("psion:/"), KIO::CMD_SPECIAL,
+					 packedArgs, false);
+    connect(job, SIGNAL(result(KIO::Job *)),
+	    SLOT(slotSpecialFinished(KIO::Job *)));
+
 }
 
 PlpDriveAttrPage::~PlpDriveAttrPage() {
-	delete d;
+    delete d;
 }
 
 bool PlpDriveAttrPage::supports(KFileItemList _items) {
-	for (KFileItemListIterator it(_items); it.current(); ++it) {
-		KFileItem *fi = it.current();
+    for (KFileItemListIterator it(_items); it.current(); ++it) {
+	KFileItem *fi = it.current();
 
-		QString path = fi->url().path(-1);
-		if (path.contains('/') != 1)
-			return false;
-	}
-	return true;
+	QString path = fi->url().path(-1);
+	if (path.contains('/') != 1)
+	    return false;
+	if (fi->url().path() == QString::fromLatin1("/"))
+	    return false;
+    }
+    return true;
 }
 
-void PlpDriveAttrPage::applyChanges() {
+void PlpDriveAttrPage::slotBackupClicked() {
+    if (!d->driveLetter.isEmpty())
+	KRun::runCommand(
+	    QString::fromLatin1("kpsion --backup %1").arg(d->driveLetter));
+}
+
+void PlpDriveAttrPage::slotRestoreClicked() {
+    if (!d->driveLetter.isEmpty())
+	KRun::runCommand(
+	    QString::fromLatin1("kpsion --restore %1").arg(d->driveLetter));
+}
+
+void PlpDriveAttrPage::slotFormatClicked() {
+    if (!d->driveLetter.isEmpty())
+	KRun::runCommand(
+	    QString::fromLatin1("kpsion --format %1").arg(d->driveLetter));
 }
 
 void PlpDriveAttrPage::slotSpecialFinished(KIO::Job *job) {
-	KIO::StatJob *sJob = static_cast<KIO::StatJob *>(job);
+    KIO::StatJob *sJob = static_cast<KIO::StatJob *>(job);
 
-	if (sJob->error())
-		job->showErrorDialog(properties->dialog());
-	else {
-		KIO::UDSEntry e = sJob->statResult();
-		bool total_found = false;
-		bool free_found = false;
+    if (sJob->error())
+	job->showErrorDialog(d->props->dialog());
+    else {
+	KIO::UDSEntry e = sJob->statResult();
+	bool total_found = false;
+	bool free_found = false;
+	u_int32_t total;
+	u_int32_t unused;
 
-		for (KIO::UDSEntry::ConstIterator it = e.begin(); it != e.end(); ++it) {
-			if ((*it).m_uds == KIO::UDS_SIZE) {
-				total_found = true;
-				total = (unsigned long)((*it).m_long);
-			}
-			if ((*it).m_uds == KIO::UDS_MODIFICATION_TIME) {
-				free_found = true;
-				unused = (unsigned long)((*it).m_long);
-			}
-			if ((*it).m_uds == KIO::UDS_CREATION_TIME) {
-				unsigned long uid = (unsigned long)((*it).m_long);
-				uidLabel->setText(QString::fromLatin1("%1").arg(uid, 8, 16));
-			}
-			if ((*it).m_uds == KIO::UDS_NAME) {
-				QString name = ((*it).m_str);
-				typeLabel->setText(name);
-			}
-			if ((*it).m_uds == KIO::UDS_USER) {
-				QString name = ((*it).m_str);
-				gb->setTitle(QString(i18n("Information for Psion drive %1: (%2)")).arg(name).arg(properties->item()->name()));
-			}
+	for (KIO::UDSEntry::ConstIterator it = e.begin(); it != e.end(); ++it) {
+	    if ((*it).m_uds == KIO::UDS_SIZE) {
+		total_found = true;
+		total = (unsigned long)((*it).m_long);
+	    }
+	    if ((*it).m_uds == KIO::UDS_MODIFICATION_TIME) {
+		free_found = true;
+		unused = (unsigned long)((*it).m_long);
+	    }
+	    if ((*it).m_uds == KIO::UDS_CREATION_TIME) {
+		unsigned long uid = (unsigned long)((*it).m_long);
+		d->uidLabel->setText(QString::fromLatin1("%1").arg(uid, 8, 16));
+	    }
+	    if ((*it).m_uds == KIO::UDS_NAME) {
+		QString name = ((*it).m_str);
+		d->typeLabel->setText(name);
+		if (name == QString::fromLatin1("ROM")) {
+		    d->restoreButton->setEnabled(false);
+		    d->formatButton->setEnabled(false);
+		    // Can't change anything
+		    removeDialogPage(d->props->dialog(), i18n("&General"));
 		}
-		if (total_found && free_found) {
-			totalLabel->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(total)).arg(KGlobal::locale()->formatNumber(total, 0)));
-			freeLabel->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(unused)).arg(KGlobal::locale()->formatNumber(unused, 0)));
-			pie->addPiece(total - unused, usedColor);
-			pie->addPiece(unused, freeColor);
-		}
+	    }
+	    if ((*it).m_uds == KIO::UDS_USER) {
+		d->driveLetter = ((*it).m_str);
+		d->gb->setTitle(QString(i18n("Information for Psion drive %1: (%2)")).arg(d->driveLetter).arg(d->props->item()->name()));
+	    }
 	}
+	if (total_found && free_found) {
+	    d->totalLabel->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(total)).arg(KGlobal::locale()->formatNumber(total, 0)));
+	    d->freeLabel->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(unused)).arg(KGlobal::locale()->formatNumber(unused, 0)));
+	    d->pie->addPiece(total - unused, d->usedColor);
+	    d->pie->addPiece(unused, d->freeColor);
+	}
+    }
 }
 
 class PlpMachinePage::PlpMachinePagePrivate {
 public:
-	PlpMachinePagePrivate() { }
-	~PlpMachinePagePrivate() { }
+    PlpMachinePagePrivate() { }
+    ~PlpMachinePagePrivate() { }
 
-	QFrame *m_frame;
+    KPropertiesDialog *props;
+
+    QFrame *f;
+    QGridLayout *g;
+
+    QLabel *machType;
+    QLabel *machName;
+    QLabel *machUID;
+    QLabel *machLang;
+
+    QLabel *romVersion;
+    QLabel *romSize;
+    QLabel *romProg;
+
+    QLabel *ramSize;
+    QLabel *ramFree;
+    QLabel *ramMaxFree;
+    QLabel *ramDiskSz;
+
+    QLabel *regSize;
+    QLabel *dispGeo;
+    QLabel *machTime;
+    QLabel *machUTCo;
+    QLabel *machDST;
+
+    QLabel *mbattChanged;
+    QLabel *mbattUsage;
+    QLabel *mbattStatus;
+    QLabel *mbattPower;
+    QLabel *mbattCurrent;
+    QLabel *mbattVoltage;
+    QLabel *mbattMaxVoltage;
+
+    QLabel *bbattStatus;
+    QLabel *bbattUsage;
+    QLabel *bbattVoltage;
+    QLabel *bbattMaxVoltage;
+
+    rpcs::machineInfo mi;
 };
 
-PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props )
-	: KPropsDlgPlugin( _props ) {
+QLabel *PlpMachinePage::
+makeEntry(QString text, QWidget *w, int y) {
+    QLabel *l = new QLabel(w);
+    d->g->addWidget(new QLabel(text, w), y, 0);
+    d->g->addWidget(l, y, 1);
+    return l;
+}
 
-	d = new PlpMachinePagePrivate;
-	d->m_frame = properties->dialog()->addPage(i18n("Psion &Machine"));
+PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
+    d = new PlpMachinePagePrivate;
+    d->props = _props;
 
-	QVBoxLayout * mainlayout = new QVBoxLayout( d->m_frame, KDialog::spacingHint());
+    QGroupBox *gb;
+    QBoxLayout *box;
 
-	// Now the widgets in the top layout
+    d->f = _props->dialog()->addPage(i18n("Psion &Machine"));
 
-	QLabel* l;
-	l = new QLabel(d->m_frame, "Label_1" );
-	l->setText( i18n("Machine UID:") );
-	mainlayout->addWidget(l, 1);
+    box = new QVBoxLayout(d->f, KDialog::spacingHint());
+    gb = new QGroupBox(i18n("General"), d->f, "genInfBox");
+    box->addWidget(gb);
+    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+			   KDialog::spacingHint());
 
-	mainlayout->addStretch(2);
+    d->machType = makeEntry(i18n("Machine type:"), gb, 1);
+    QWhatsThis::add(d->machType,
+		    i18n("Here, the type of the connected device is shown."));
+    d->machName = makeEntry(i18n("Model name:"), gb, 2);
+    QWhatsThis::add(d->machName,
+		    i18n("Here, the model name of the connected device is shown."));
+    d->machUID  = makeEntry(i18n("Machine UID:"), gb, 3);
+    QWhatsThis::add(d->machUID,
+		    i18n("Here, the unique ID of the connected device is shown."));
+    d->machLang = makeEntry(i18n("UI language:"), gb, 4);
+    QWhatsThis::add(d->machLang,
+		    i18n("Here, the user interface language of the connected device is shown."));
+    d->dispGeo  = makeEntry(i18n("Display geometry:"), gb, 5);
+    QWhatsThis::add(d->dispGeo,
+		    i18n("Here, the display geometry of the connected device is shown."));
+    d->regSize  = makeEntry(i18n("Registry size:"), gb, 6);
+    QWhatsThis::add(d->regSize,
+		    i18n("Here, the size of the registry data is shown."));
+    d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(1, 1);
+
+    gb = new QGroupBox(i18n("Time"), d->f, "timeInfBox");
+    box->addWidget(gb);
+    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+			   KDialog::spacingHint());
+    d->machTime = makeEntry(i18n("Date/Time:"), gb, 1);
+    QWhatsThis::add(d->machTime,
+		    i18n("Here, the current time setting of the connected device is shown."));
+    d->machUTCo = makeEntry(i18n("UTC offset"), gb, 2);
+    QWhatsThis::add(d->machUTCo,
+		    i18n("Here, the offset of the connected device's time zone relative to GMT is shown."));
+    d->machDST  = makeEntry(i18n("Daylight saving"), gb, 3);
+    QWhatsThis::add(d->machDST,
+		    i18n("Here, you can see, if daylight saving time is currently active on the connected device."));
+    d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(1, 1);
+    box->addStretch(10);
+
+    d->f = _props->dialog()->addPage(i18n("Psion &Battery"));
+    box = new QVBoxLayout(d->f, KDialog::spacingHint());
+    gb = new QGroupBox(i18n("Main battery"), d->f, "mbatInfBox");
+    box->addWidget(gb);
+    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+			   KDialog::spacingHint());
+    d->mbattChanged    = makeEntry(i18n("Changed at:"), gb, 1);
+    QWhatsThis::add(d->mbattChanged,
+		    i18n("This shows the time of last battery change."));
+    d->mbattUsage      = makeEntry(i18n("Usage time:"), gb, 2);
+    QWhatsThis::add(d->mbattUsage,
+		    i18n("This shows the accumulated time of running on battery power."));
+    d->mbattStatus     = makeEntry(i18n("Status:"), gb, 3);
+    QWhatsThis::add(d->mbattStatus,
+		    i18n("This shows current status of the battery."));
+    d->mbattPower      = makeEntry(i18n("Total consumed power:"), gb, 4);
+    QWhatsThis::add(d->mbattPower,
+		    i18n("This shows accumulated power consumtion of the device."));
+    d->mbattCurrent    = makeEntry(i18n("Current:"), gb, 5);
+    QWhatsThis::add(d->mbattCurrent,
+		    i18n("This shows the current, drawn from power supply (battery or mains)."));
+    d->mbattVoltage    = makeEntry(i18n("Voltage:"), gb, 6);
+    QWhatsThis::add(d->mbattVoltage,
+		    i18n("This shows the current battery voltage."));
+    d->mbattMaxVoltage = makeEntry(i18n("Max. voltage:"), gb, 7);
+    QWhatsThis::add(d->mbattMaxVoltage,
+		    i18n("This shows the maximum battery voltage."));
+    d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(1, 1);
+
+    gb = new QGroupBox(i18n("Backup battery"), d->f, "bbatInfBox");
+    box->addWidget(gb);
+    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+			   KDialog::spacingHint());
+    d->bbattUsage      = makeEntry(i18n("Usage time:"), gb, 1);
+    QWhatsThis::add(d->bbattUsage,
+		    i18n("This shows the accumulated time of running on backup battery power."));
+    d->bbattStatus     = makeEntry(i18n("Status:"), gb, 2);
+    QWhatsThis::add(d->bbattStatus,
+		    i18n("This shows current status of the backup battery."));
+    d->bbattVoltage    = makeEntry(i18n("Voltage:"), gb, 3);
+    QWhatsThis::add(d->bbattVoltage,
+		    i18n("This shows the current backup battery voltage."));
+    d->bbattMaxVoltage = makeEntry(i18n("Max. voltage:"), gb, 4);
+    QWhatsThis::add(d->bbattMaxVoltage,
+		    i18n("This shows the maximum backup battery voltage."));
+    d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(1, 1);
+    box->addStretch(10);
+
+    d->f = _props->dialog()->addPage(i18n("Psion M&emory"));
+
+    box = new QVBoxLayout(d->f, KDialog::spacingHint());
+    gb = new QGroupBox(i18n("ROM"), d->f, "romInfBox");
+    box->addWidget(gb);
+    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+			   KDialog::spacingHint());
+    d->romVersion = makeEntry(i18n("Version:"), gb, 1);
+    QWhatsThis::add(d->romVersion,
+		    i18n("This shows the firmware version."));
+    d->romSize    = makeEntry(i18n("Size:"), gb, 2);
+    QWhatsThis::add(d->romSize,
+		    i18n("This shows the size of the ROM."));
+    d->romProg    = makeEntry(i18n("Programmable:"), gb, 3);
+    QWhatsThis::add(d->romProg,
+		    i18n("This shows, whether the ROM is flashable or not."));
+    d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(1, 1);
+
+    gb = new QGroupBox(i18n("RAM"), d->f, "ramInfBox");
+    box->addWidget(gb);
+    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+			   KDialog::spacingHint());
+    d->ramSize    = makeEntry(i18n("Size:"), gb, 1);
+    QWhatsThis::add(d->ramSize,
+		    i18n("This shows the total capacity of the RAM."));
+    d->ramFree    = makeEntry(i18n("Free:"), gb, 2);
+    QWhatsThis::add(d->ramFree,
+		    i18n("This shows the free capacity of the RAM."));
+    d->ramMaxFree = makeEntry(i18n("Max. free:"), gb, 3);
+    QWhatsThis::add(d->ramMaxFree,
+		    i18n("This shows the size of the largest free block of the RAM."));
+    d->ramDiskSz  = makeEntry(i18n("RAMDisk size:"), gb, 4);
+    QWhatsThis::add(d->ramMaxFree,
+		    i18n("This shows, how much RAM is currently used for the RAMDisc."));
+    d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(1, 1);
+    box->addStretch(10);
+
+    KIO_ARGS << int(PLP_CMD_MACHINFO);
+    PlpMachInfoJob *job = new PlpMachInfoJob(packedArgs);
+    connect(job, SIGNAL(result(KIO::Job *)),
+	    SLOT(slotJobFinished(KIO::Job *)));
+    connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)),
+	    SLOT(slotJobData(KIO::Job *, const QByteArray &)));
 }
 
 PlpMachinePage::~PlpMachinePage() {
-	delete d;
+    delete d;
 }
 
 bool PlpMachinePage::supports(KFileItemList _items) {
-	for (KFileItemListIterator it(_items); it.current(); ++it) {
-		KFileItem *fi = it.current();
+    for (KFileItemListIterator it(_items); it.current(); ++it) {
+	KFileItem *fi = it.current();
 
-		QString path = fi->url().path(-1);
-		if (path.contains('/') != 1)
-			return false;
-		if (fi->mimetype() != QString::fromLatin1("application/x-psion-machine"))
-			return false;
-	}
-	return true;
+	if (fi->url().path() != QString::fromLatin1("/"))
+	    return false;
+    }
+    return true;
 }
 
-void PlpMachinePage::applyChanges() {
+void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
+    cout << "Mjdata" << endl;
+    if (data.size() == sizeof(d->mi)) {
+	memcpy((char *)&d->mi, data, sizeof(d->mi));
+	cout << "got machInfo" << endl;
+
+	d->machType->setText(KGlobal::locale()->translate(d->mi.machineType));
+	d->machName->setText(QString::fromLatin1(d->mi.machineName));
+	// ??! None of QString's formatting methods knows about long long.
+	ostrstream s;
+	s << hex << setw(16) << d->mi.machineUID << '\0';
+	d->machUID->setText(QString::fromLatin1(s.str()));
+	d->machLang->setText(KGlobal::locale()->translate(d->mi.uiLanguage));
+	d->dispGeo->setText(QString::fromLatin1("%1x%2").arg(d->mi.displayWidth).arg(d->mi.displayHeight));
+	d->regSize->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.registrySize)).arg(KGlobal::locale()->formatNumber(d->mi.registrySize, 0)));
+
+	QString rev;
+	rev.sprintf("%d.%02d(%d)", d->mi.romMajor, d->mi.romMinor,
+		    d->mi.romBuild);
+	d->romVersion->setText(rev);
+	d->romSize->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.romSize)).arg(KGlobal::locale()->formatNumber(d->mi.romSize, 0)));
+	d->romProg->setText(d->mi.romProgrammable ? i18n("yes") : i18n("no"));
+
+	d->ramSize->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.ramSize)).arg(KGlobal::locale()->formatNumber(d->mi.ramSize, 0)));
+	d->ramFree->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.ramFree)).arg(KGlobal::locale()->formatNumber(d->mi.ramFree, 0)));
+	d->ramMaxFree->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.ramMaxFree)).arg(KGlobal::locale()->formatNumber(d->mi.ramMaxFree, 0)));
+	d->ramDiskSz->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.ramDiskSize)).arg(KGlobal::locale()->formatNumber(d->mi.ramDiskSize, 0)));
+
+
+	PsiTime pt(&d->mi.time, &d->mi.tz);
+	QDateTime dt;
+	dt.setTime_t(pt.getTime());
+	d->machTime->setText(KGlobal::locale()->formatDateTime(dt, false));
+	d->machUTCo->setText(i18n("%1 seconds").arg(d->mi.tz.utc_offset));
+	d->machDST->setText((d->mi.tz.dst_zones & PsiTime::PSI_TZ_HOME) ? i18n("yes") : i18n("no"));
+
+	ostrstream mbs;
+	mbs << d->mi.mainBatteryUsedTime << '\0';
+	d->mbattUsage->setText(QString::fromLatin1(mbs.str()));
+	pt.setPsiTime(&d->mi.mainBatteryInsertionTime);
+	dt.setTime_t(pt.getTime());
+	d->mbattChanged->setText(KGlobal::locale()->formatDateTime(dt, false));
+	d->mbattStatus->setText(
+	    KGlobal::locale()->translate(d->mi.mainBatteryStatus));
+	d->mbattPower->setText(QString::fromLatin1("%1 mAs").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryUsedPower, 0)));
+	d->mbattCurrent->setText(QString::fromLatin1("%1 mA").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryCurrent, 0)));
+	d->mbattVoltage->setText(QString::fromLatin1("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryVoltage, 0)));
+	d->mbattMaxVoltage->setText(QString::fromLatin1("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryMaxVoltage, 0)));
+
+	ostrstream bbs;
+	bbs << d->mi.backupBatteryUsedTime << '\0';
+	d->bbattUsage->setText(QString::fromLatin1(bbs.str()));
+	d->bbattStatus->setText(
+	    KGlobal::locale()->translate(d->mi.backupBatteryStatus));
+	d->bbattVoltage->setText(QString::fromLatin1("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryVoltage, 0)));
+	d->bbattMaxVoltage->setText(QString::fromLatin1("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryMaxVoltage, 0)));
+    }
 }
 
+void PlpMachinePage::slotJobFinished(KIO::Job *job) {
+    PlpMachInfoJob *mJob = static_cast<PlpMachInfoJob *>(job);
+
+    if (mJob->error())
+	job->showErrorDialog(d->props->dialog());
+}
 
 class PlpOwnerPage::PlpOwnerPagePrivate
 {
 public:
-	PlpOwnerPagePrivate()	{ }
-	~PlpOwnerPagePrivate() { }
+    PlpOwnerPagePrivate()	{ }
+    ~PlpOwnerPagePrivate() { }
 
-	QFrame *m_frame;
+    QFrame *frame;
+    KPropertiesDialog *props;
+    QMultiLineEdit *owneredit;
 };
 
-PlpOwnerPage::PlpOwnerPage( KPropertiesDialog *_props ) : KPropsDlgPlugin( _props ) {
-	d = new PlpOwnerPagePrivate;
-	d->m_frame = properties->dialog()->addPage(i18n("Psion &Owner"));
+PlpOwnerPage::PlpOwnerPage( KPropertiesDialog *_props ) {
+    d = new PlpOwnerPagePrivate;
+    d->props = _props;
+    d->frame = _props->dialog()->addPage(i18n("Psion &Owner"));
+    QBoxLayout *box = new QVBoxLayout( d->frame, KDialog::spacingHint() );
+    d->owneredit = new QMultiLineEdit(d->frame, "ownerinfo");
+    d->owneredit->setReadOnly(true);
+    box->addWidget(d->owneredit);
+    QWhatsThis::add(d->owneredit,
+		    i18n("This shows the owner's information of the connected device."));
+
+    KIO_ARGS << int(PLP_CMD_OWNERINFO);
+    KIO::StatJob *job = new KIO::StatJob(KURL("psion:/"),
+					 KIO::CMD_SPECIAL, packedArgs, false);
+    connect(job, SIGNAL(result(KIO::Job *)),
+	    SLOT(slotSpecialFinished(KIO::Job *)));
+
+    box->addStretch(10);
 }
 
 PlpOwnerPage::~PlpOwnerPage() {
-	delete d;
+    delete d;
 }
 
 bool PlpOwnerPage::supports(KFileItemList _items) {
-	for (KFileItemListIterator it(_items); it.current(); ++it) {
-		KFileItem *fi = it.current();
+    for (KFileItemListIterator it(_items); it.current(); ++it) {
+	KFileItem *fi = it.current();
 
-		QString path = fi->url().path(-1);
-		if (path.contains('/') != 1)
-			return false;
-		if (fi->mimetype() != QString::fromLatin1("application/x-psion-owner"))
-			return false;
-	}
-	return true;
+	if (fi->url().path() != QString::fromLatin1("/"))
+	    return false;
+    }
+    return true;
 }
 
-void PlpOwnerPage::applyChanges() {
+void PlpOwnerPage::slotSpecialFinished(KIO::Job *job) {
+    KIO::StatJob *sJob = static_cast<KIO::StatJob *>(job);
+
+    if (sJob->error())
+	job->showErrorDialog(d->props->dialog());
+    else {
+	KIO::UDSEntry e = sJob->statResult();
+	for (KIO::UDSEntry::ConstIterator it = e.begin();
+	     it != e.end(); ++it) {
+	    if ((*it).m_uds == KIO::UDS_NAME)
+		d->owneredit->setText((*it).m_str);
+	}
+    }
+}
+
+PlpMachInfoJob::PlpMachInfoJob(const QByteArray &packedArgs)
+    : KIO::TransferJob(KURL("psion:/"), KIO::CMD_SPECIAL,
+		       packedArgs, QByteArray(), false) {
+}
+
+void PlpMachInfoJob::
+slotFinished() {
+    SimpleJob::slotFinished();
 }
 
 #include "plpprops.moc"
+/*
+ * Local variables:
+ * c-basic-offset: 4
+ * End:
+ */

@@ -1,5 +1,28 @@
-#ifndef _rpcsfactory_h_
-#define _rpcsfactory_h_
+/*-*-c++-*-
+ * $Id$
+ *
+ * This file is part of plptools.
+ *
+ *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
+ *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+#ifndef _RPCSFACTORY_H_
+#define _RPCSFACTORY_H_
 
 #include "rpcs.h"
 
@@ -12,53 +35,58 @@ class ppsocket;
 class rpcsfactory {
  public:
 
-	/**
-	 * The known errors which can happen during @ref create .
-	 */
-	enum errs {
-		FACERR_NONE = 0,
-		FACERR_COULD_NOT_SEND = 1,
-		FACERR_AGAIN = 2,
-		FACERR_NOPSION = 3,
-		FACERR_PROTVERSION = 4,
-		FACERR_NORESPONSE = 5,
-	};
+    /**
+    * The known errors which can happen during @ref create .
+    */
+    enum errs {
+	FACERR_NONE = 0,
+	FACERR_COULD_NOT_SEND = 1,
+	FACERR_AGAIN = 2,
+	FACERR_NOPSION = 3,
+	FACERR_PROTVERSION = 4,
+	FACERR_NORESPONSE = 5,
+    };
 
-	/**
-	 * Constructs a rpcsfactory.
-	 *
-	 * @param skt The socket to be used for connecting
-	 * to the ncpd daemon.
-	 */
-	rpcsfactory(ppsocket * skt);
+    /**
+    * Constructs a rpcsfactory.
+    *
+    * @param skt The socket to be used for connecting
+    * to the ncpd daemon.
+    */
+    rpcsfactory(ppsocket * skt);
 
-	/**
-	 * Creates a new rpcs instance.
-	 *
-	 * @param reconnect Set to true, if automatic reconnect
-	 * should be performed on failure.
-	 *
-	 * @returns A pointer to a newly created rpcs instance or
-	 * NULL on failure.
-	 */
-	virtual rpcs * create(bool reconnect);
+    /**
+    * Creates a new rpcs instance.
+    *
+    * @param reconnect Set to true, if automatic reconnect
+    * should be performed on failure.
+    *
+    * @returns A pointer to a newly created rpcs instance or
+    * NULL on failure.
+    */
+    virtual rpcs * create(bool reconnect);
 
-	/**
-	 * Retrieve an error code.
-	 *
-	 * @returns The error code, in case @ref create has
-	 * failed, 0 otherwise.
-	 */
-	virtual Enum<errs> getError() { return err; }
+    /**
+    * Retrieve an error code.
+    *
+    * @returns The error code, in case @ref create has
+    * failed, 0 otherwise.
+    */
+    virtual Enum<errs> getError() { return err; }
 
  private:
-	/**
-	 * The socket to be used for connecting to the
-	 * ncpd daemon.
-	 */
-	ppsocket *skt;
-	Enum<errs> err;
+    /**
+    * The socket to be used for connecting to the
+    * ncpd daemon.
+    */
+    ppsocket *skt;
+    Enum<errs> err;
 };
 
 #endif
 
+/*
+ * Local variables:
+ * c-basic-offset: 4
+ * End:
+ */

@@ -12,6 +12,21 @@
 /* Define if the C++ compiler supports BOOL */
 #undef HAVE_BOOL
 
+/* Define this, if you want NLS support */
+#undef ENABLE_NLS
+
+/* Define this, if you have catgets */
+#undef HAVE_CATGETS
+
+/* Define this, if you have gettext */
+#undef HAVE_GETTEXT
+
+/* Define this, if you have stpcpy */
+#undef HAVE_STPCPY
+
+/* Define this, if your locale.h defines LC_MESSAGES */
+#undef HAVE_LC_MESSAGES
+
 /* The package version */
 #undef VERSION 
 

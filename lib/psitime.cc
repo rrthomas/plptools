@@ -1,140 +1,161 @@
-
+/*-*-c++-*-
+ * $Id$
+ *
+ * This file is part of plptools.
+ *
+ *  Copyright (C) 2000-2001 Fritz Elfert <felfert@to.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
 #include "psitime.h"
 #include <stdlib.h>
 
 PsiTime::PsiTime(void) {
-	ptzValid = false;
-	tryPsiZone();
-	setUnixNow();
+    ptzValid = false;
+    tryPsiZone();
+    setUnixNow();
 }
 
 PsiTime::PsiTime(time_t time) {
-	ptzValid = false;
-	gettimeofday(NULL, &utz);
-	setUnixTime(time);
+    ptzValid = false;
+    gettimeofday(NULL, &utz);
+    setUnixTime(time);
 }
 
 PsiTime::PsiTime(psi_timeval *_ptv, psi_timezone *_ptz) {
-	if (_ptv != 0L)
-		ptv = *_ptv;
-	if (_ptz != 0L) {
-		ptz = *_ptz;
-		ptzValid = true;
-	} else {
-		ptzValid = false;
-		tryPsiZone();
-	}
-	/* get our own timezone */
-	gettimeofday(NULL, &utz);
-	psi2unix();
+    if (_ptv != 0L)
+	ptv = *_ptv;
+    if (_ptz != 0L) {
+	ptz = *_ptz;
+	ptzValid = true;
+    } else {
+	ptzValid = false;
+	tryPsiZone();
+    }
+    /* get our own timezone */
+    gettimeofday(NULL, &utz);
+    psi2unix();
 }
 
 PsiTime::PsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo) {
-	ptv.tv_high = _ptvHi;
-	ptv.tv_low = _ptvLo;
-	ptzValid = false;
-	tryPsiZone();
-	/* get our own timezone */
-	gettimeofday(NULL, &utz);
-	psi2unix();
+    ptv.tv_high = _ptvHi;
+    ptv.tv_low = _ptvLo;
+    ptzValid = false;
+    tryPsiZone();
+    /* get our own timezone */
+    gettimeofday(NULL, &utz);
+    psi2unix();
 }
 
 PsiTime::PsiTime(struct timeval *_utv = 0L, struct timezone *_utz = 0L) {
-	if (_utv != 0L)
-		utv = *_utv;
-	if (_utz != 0L)
-		utz = *_utz;
-	tryPsiZone();
-	unix2psi();
+    if (_utv != 0L)
+	utv = *_utv;
+    if (_utz != 0L)
+	utz = *_utz;
+    tryPsiZone();
+    unix2psi();
 }
 
 PsiTime::PsiTime(const PsiTime &t) {
-	utv = t.utv;
-	utz = t.utz;
-	ptv = t.ptv;
-	ptz = t.ptz;
-	ptzValid = t.ptzValid;
-	tryPsiZone();
+    utv = t.utv;
+    utz = t.utz;
+    ptv = t.ptv;
+    ptz = t.ptz;
+    ptzValid = t.ptzValid;
+    tryPsiZone();
 }
 
 PsiTime::~PsiTime() {
-	tryPsiZone();
+    tryPsiZone();
 }
 
 void PsiTime::setUnixTime(struct timeval *_utv) {
-	if (_utv != 0L)
-		utv = *_utv;
-	unix2psi();
+    if (_utv != 0L)
+	utv = *_utv;
+    unix2psi();
 }
 
 void PsiTime::setUnixTime(time_t time) {
-	utv.tv_sec = time;
-	utv.tv_usec = 0;
-	unix2psi();
+    utv.tv_sec = time;
+    utv.tv_usec = 0;
+    unix2psi();
 }
 
 void PsiTime::setUnixNow(void) {
-	gettimeofday(&utv, &utz);
-	unix2psi();
+    gettimeofday(&utv, &utz);
+    unix2psi();
 }
 
 
 void PsiTime::setPsiTime(psi_timeval *_ptv) {
-	if (_ptv != 0L)
-		ptv = *_ptv;
-	psi2unix();
+    if (_ptv != 0L)
+	ptv = *_ptv;
+    psi2unix();
 }
 
 void PsiTime::setPsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo) {
-	ptv.tv_high = _ptvHi;
-	ptv.tv_low = _ptvLo;
-	psi2unix();
+    ptv.tv_high = _ptvHi;
+    ptv.tv_low = _ptvLo;
+    psi2unix();
 }
 
 void PsiTime::setPsiZone(psi_timezone *_ptz) {
-	if (_ptz != 0L) {
-		ptz = *_ptz;
-		ptzValid = true;
-	}
-	psi2unix();
+    if (_ptz != 0L) {
+	ptz = *_ptz;
+	ptzValid = true;
+    }
+    psi2unix();
 }
 
 struct timeval &PsiTime::getTimeval(void) {
-	return utv;
+    return utv;
 }
 
 time_t PsiTime::getTime(void) {
-	return utv.tv_sec;
+    return utv.tv_sec;
 }
 
 psi_timeval &PsiTime::getPsiTimeval(void) {
-	return ptv;
+    return ptv;
 }
 
 const unsigned long PsiTime::getPsiTimeLo(void) {
-	return ptv.tv_low;
+    return ptv.tv_low;
 }
 
 const unsigned long PsiTime::getPsiTimeHi(void) {
-	return ptv.tv_high;
+    return ptv.tv_high;
 }
 
 PsiTime &PsiTime::operator=(const PsiTime &t) {
-	utv = t.utv;
-	utz = t.utz;
-	ptv = t.ptv;
-	ptz = t.ptz;
-	ptzValid = t.ptzValid;
-	tryPsiZone();
-	return *this;
+    utv = t.utv;
+    utz = t.utz;
+    ptv = t.ptv;
+    ptz = t.ptz;
+    ptzValid = t.ptzValid;
+    tryPsiZone();
+    return *this;
 }
 
 ostream &operator<<(ostream &s, const PsiTime &t) {
-	const char *fmt = "%c";
-	char buf[100];
-	strftime(buf, sizeof(buf), fmt, localtime(&t.utv.tv_sec));
-	s << buf;
-	return s;
+    const char *fmt = "%c";
+    char buf[100];
+    strftime(buf, sizeof(buf), fmt, localtime(&t.utv.tv_sec));
+    s << buf;
+    return s;
 }
 
 /**
@@ -147,93 +168,99 @@ ostream &operator<<(ostream &s, const PsiTime &t) {
 
 static unsigned long long
 evalOffset(psi_timezone ptz, time_t time, bool valid) {
-	unsigned long long offset = 0;
+    unsigned long long offset = 0;
 
-	if (valid) {
-		offset = ptz.utc_offset;
-		if (!(ptz.dst_zones & 0x40000000) || (ptz.dst_zones & ptz.home_zone))
-			offset += 3600;
+    if (valid) {
+	offset = ptz.utc_offset;
+	if (!(ptz.dst_zones & 0x40000000) || (ptz.dst_zones & ptz.home_zone))
+	    offset += 3600;
+    } else {
+	/**
+	* Fallback. If no Psion zone given, use
+	* environment variable PSI_TZ
+	*/
+	const char *offstr = getenv("PSI_TZ");
+	if (offstr != 0L) {
+	    char *err = 0L;
+	    offset = strtoul(offstr, &err, 0);
+	    if (err != 0L && *err != '\0')
+		offset = 0;
 	} else {
-		/**
-		 * Fallback. If no Psion zone given, use
-		 * environment variable PSI_TZ
-		 */
-		const char *offstr = getenv("PSI_TZ");
-		if (offstr != 0L) {
-			char *err = 0L;
-			offset = strtoul(offstr, &err, 0);
-			if (err != 0L && *err != '\0')
-				offset = 0;
-		} else {
-			/**
-			 * Fallback. If PSI_TZ is not set,
-			 * use the local timezone. This assumes,
-			 * that both Psion and local machine are
-			 * configured for the same timezone and
-			 * daylight saving.
-			 */
-			struct tm *tm = localtime(&time);
-			offset = timezone;
-          		if (tm->tm_isdst)
-				offset += 3600;
-		}
+	    /**
+	    * Fallback. If PSI_TZ is not set,
+	    * use the local timezone. This assumes,
+	    * that both Psion and local machine are
+	    * configured for the same timezone and
+	    * daylight saving.
+	    */
+	    struct tm *tm = localtime(&time);
+	    offset = timezone;
+	    if (tm->tm_isdst)
+		offset += 3600;
 	}
-	offset *= 1000000;
-	return offset;
+    }
+    offset *= 1000000;
+    return offset;
 }
 
 void PsiTime::psi2unix(void) {
-	unsigned long long micro = ptv.tv_high;
-	micro = (micro << 32) | ptv.tv_low;
+    unsigned long long micro = ptv.tv_high;
+    micro = (micro << 32) | ptv.tv_low;
 
-	/* Substract Psion's idea of UTC offset */
-	micro -= EPOCH_DIFF;
-	micro -= evalOffset(ptz, micro / 1000000, ptzValid);
+    /* Substract Psion's idea of UTC offset */
+    micro -= EPOCH_DIFF;
+    micro -= evalOffset(ptz, micro / 1000000, ptzValid);
 
-	utv.tv_sec = micro / 1000000;
-	utv.tv_usec = micro % 1000000;
+    utv.tv_sec = micro / 1000000;
+    utv.tv_usec = micro % 1000000;
 }
 
 void PsiTime::unix2psi(void) {
-	unsigned long long micro = utv.tv_sec * 1000000 + utv.tv_usec;
+    unsigned long long micro = utv.tv_sec * 1000000 + utv.tv_usec;
 
-	/* Add Psion's idea of UTC offset */
-	micro += evalOffset(ptz, utv.tv_sec, ptzValid);
-	micro += EPOCH_DIFF;
+    /* Add Psion's idea of UTC offset */
+    micro += evalOffset(ptz, utv.tv_sec, ptzValid);
+    micro += EPOCH_DIFF;
 
-	ptv.tv_low = micro & 0x0ffffffff;
-	ptv.tv_high = (micro >> 32) & 0x0ffffffff;
+    ptv.tv_low = micro & 0x0ffffffff;
+    ptv.tv_high = (micro >> 32) & 0x0ffffffff;
 }
 
 void PsiTime::tryPsiZone() {
-	if (ptzValid)
-		return;
-	if (PsiZone::getInstance().getZone(ptz))
-		ptzValid = true;
+    if (ptzValid)
+	return;
+    if (PsiZone::getInstance().getZone(ptz))
+	ptzValid = true;
 }
 
 PsiZone *PsiZone::_instance = 0L;
 
 PsiZone &PsiZone::
 getInstance() {
-	if (_instance == 0L)
-		_instance = new PsiZone();
-	return *_instance;
+    if (_instance == 0L)
+	_instance = new PsiZone();
+    return *_instance;
 }
 
 PsiZone::PsiZone() {
-	_ptzValid = false;
+    _ptzValid = false;
 }
 
 void PsiZone::
 setZone(psi_timezone &ptz) {
-	_ptz = ptz;
-	_ptzValid = true;
+    _ptz = ptz;
+    _ptzValid = true;
 }
 
 bool PsiZone::
 getZone(psi_timezone &ptz) {
-	if (_ptzValid)
-		ptz = _ptz;
-	return _ptzValid;
+    if (_ptzValid)
+	ptz = _ptz;
+    return _ptzValid;
 }
+
+/*
+ * Local variables:
+ * c-basic-offset: 4
+ * End:
+ */

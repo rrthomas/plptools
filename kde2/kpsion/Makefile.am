@@ -1,0 +1,31 @@
+# $Id$
+
+METASOURCES = AUTO
+
+KDE_ICON = AUTO
+
+INCLUDES = $(all_includes) -I$(top_srcdir)/lib
+
+DISTCLEANFILES = $(kpsion_METASOURCES) ./.deps/* ./.deps/.P
+
+lib_LTLIBRARIES = libkpsion.la
+bin_PROGRAMS	= kpsion
+
+libkpsion_la_LDFLAGS = $(LIBDEBUG) $(all_libraries) -module -version-info $(LIBVERSION)
+libkpsion_la_SOURCES = kpsion.cpp setupdialog.cpp wizards.cpp
+libkpsion_la_LIBADD = -L$(top_srcdir)/lib -lplp $(LIB_KFILE)
+
+kpsion_SOURCES	= main.cpp
+kpsion_LDFLAGS  = $(KDE_RPATH)
+kpsion_LDADD	= libkpsion.la $(top_srcdir)/lib/libplp.la
+
+applnk_DATA = kpsion.desktop
+applnkdir = $(kde_appsdir)/Utilities
+
+rcdir = $(kde_datadir)/kpsion
+rc_DATA = kpsionui.rc
+
+noinst_HEADERS = kpsion.h setupdialog.h wizards.h
+
+messages:
+	$(XGETTEXT) -C -ki18n -kI18N_NOOP -ktranslate -kaliasLocale *.cpp *.h && mv messages.po ../po/kpsion.pot

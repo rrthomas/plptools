@@ -7,8 +7,8 @@ else
 KDESUB =
 endif
 
-SUBDIRS = lib ncpd plpnfsd plpftp plpbackup $(KDESUB) doc
-EXTRA_DIST = CHANGES COPYING README TODO INSTALL README.mjg include/*.h* etc/*magic etc/*.in patches
+SUBDIRS = intl po lib ncpd plpnfsd plpftp plpbackup $(KDESUB) doc
+EXTRA_DIST = CHANGES COPYING README TODO INSTALL README.mjg ABOUT-NLS include/*.h* etc/*magic etc/*.in patches
 DISTCLEANFILES = etc/psion
 AUTOMAKE_OPTIONS = foreign
 
