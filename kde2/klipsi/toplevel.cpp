@@ -32,6 +32,7 @@
 #include <klocale.h>
 #include <kwin.h>
 #include <kiconloader.h>
+#include <knotifyclient.h>
 #include <kdebug.h>
 
 
@@ -41,6 +42,8 @@
 TopLevel::TopLevel()
   : KMainWindow(0)
 {
+    KNotifyClient::startDaemon();
+
     clip = kapp->clipboard();
     menu = new KPopupMenu(0, "main_menu");
     timer = new QTimer();
@@ -362,6 +365,7 @@ getClipData() {
 	inSetting = true;
 	clip->setText(clipData);
 	inSetting = false;
+	KNotifyClient::event("data received");
     }
 }
 

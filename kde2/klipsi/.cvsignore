@@ -4,5 +4,8 @@ Makefile
 .libs
 .deps
 *.lo
+*.la
 *.moc.cpp
+klipsi_la_meta_unload.cpp
+dummy.cpp
 klipsi

@@ -29,6 +29,11 @@ klipsi_LDFLAGS = $(all_libraries) $(KDE_RPATH)
 
 applnkdir = $(kde_appsdir)/Utilities
 applnk_DATA = klipsi.desktop
+EXTRA_DIST += $(applnk_DATA)
+
+appsdir = $(kde_datadir)/klipsi
+apps_DATA = eventsrc
+EXTRA_DIST += $(apps_DATA)
 
 noinst_HEADERS = toplevel.h
 	 

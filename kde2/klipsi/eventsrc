@@ -1,0 +1,11 @@
+[!Global!]
+IconName=klipsi
+Comment=Klipsi
+
+[data received]
+Name=New data
+Name[de]=Neue Daten
+Comment=The Psion has sent new data to the clipboard.
+Comment[de]=Neue Daten wurden vom Psion in die Zwischenablage abgelegt.
+default_presentation=1
+default_sound=KDE_Beep_Pop.wav
