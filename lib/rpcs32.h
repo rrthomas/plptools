@@ -17,7 +17,9 @@ class rpcs32 : public rpcs {
 		Enum<rfsv::errs> configRead(void);
 #if 0
 		Enum<rfsv::errs> closeHandle(int);
+#endif
 		Enum<rfsv::errs> regOpenIter(void);
+#if 0
 		Enum<rfsv::errs> regReadIter(void);
 		Enum<rfsv::errs> regWrite(void);
 		Enum<rfsv::errs> regRead(void);

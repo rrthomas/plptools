@@ -153,12 +153,12 @@ getResponse(bufferStore & data, bool statusIsFirstByte)
 	Enum<rfsv::errs> ret;
 	if (skt->getBufferStore(data) == 1) {
 		if (statusIsFirstByte) {
-			ret = (enum rfsv::errs)data.getByte(0);
+			ret = (enum rfsv::errs)((char)data.getByte(0));
 			data.discardFirstBytes(1);
 		} else {
 			int l = data.getLen();
 			if (l > 0) {
-				ret = (enum rfsv::errs)data.getByte(data.getLen() - 1);
+				ret = (enum rfsv::errs)((char)data.getByte(data.getLen() - 1));
 				data.init((const unsigned char *)data.getString(), l - 1);
 			} else
 				ret = rfsv::E_PSI_GEN_FAIL;
@@ -198,7 +198,16 @@ execProgram(const char *program, const char *args)
 	int l = strlen(program);
 	for (int i = 127; i > l; i--)
 		a.addByte(0);
-	a.addByte(strlen(args));
+
+	/**
+	 * This is a hack for the jotter app on mx5 pro. (and probably others)
+	 * Jotter seems to read it's arguments one char past normal apps.
+	 * Without this hack, The Drive-Character gets lost. Other apps don't
+	 * seem to be hurt by the additional blank.
+	 */
+	a.addByte(strlen(args) + 1);
+	a.addByte(' ');
+
 	a.addStringT(args);
 	if (!sendCommand(EXEC_PROG, a))
 		return rfsv::E_PSI_FILE_DISC;

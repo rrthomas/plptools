@@ -64,7 +64,7 @@ void bufferStore::init() {
 	len = 0;
 }
 
-void bufferStore::init(const unsigned char*_buff, long _len) {
+void bufferStore::init(const unsigned char *_buff, long _len) {
 	checkAllocd(_len);
 	start = 0;
 	len = _len;
@@ -95,8 +95,8 @@ unsigned int bufferStore::getDWord(long pos) const {
 		(buff[pos+start+3] << 24);
 }
 
-const char* bufferStore::getString(long pos) const {
-	return (const char*)buff + pos + start;
+const char * bufferStore::getString(long pos) const {
+	return (const char *)buff + pos + start;
 }
 
 ostream &operator<<(ostream &s, const bufferStore &m) {
@@ -137,19 +137,19 @@ void bufferStore::addByte(unsigned char cc) {
 	buff[len++] = cc;
 }
 
-void bufferStore::addString(const char* s) {
+void bufferStore::addString(const char *s) {
 	int l = strlen(s);
 	checkAllocd(len + l);
 	memcpy(&buff[len], s, l);
 	len += l;
 }
 
-void bufferStore::addStringT(const char* s) {
+void bufferStore::addStringT(const char *s) {
 	addString(s);
 	addByte(0);
 }
 
-void bufferStore::addBytes(const unsigned char* s, int l) {
+void bufferStore::addBytes(const unsigned char *s, int l) {
 	checkAllocd(len + l);
 	memcpy(&buff[len], s, l);
 	len += l;
