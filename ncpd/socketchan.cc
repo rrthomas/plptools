@@ -69,7 +69,6 @@ getNcpRegisterName()
 bool socketChan::
 ncpCommand(bufferStore & a)
 {
-    cerr << "socketChan:: received NCP command (" << a << ")" << endl;
     // str is guaranteed to begin with NCP$, and all NCP commands are
     // greater than or equal to 8 characters in length.
     const char *str = a.getString();
@@ -112,6 +111,8 @@ ncpCommand(bufferStore & a)
 	// DO ME LATER
 	ok = true;
     }
+    if (!ok)
+	cerr << "socketChan:: received unknown NCP command (" << a << ")" << endl;
     return ok;
 }
 
@@ -129,9 +130,10 @@ ncpConnectAck()
 void socketChan::
 ncpConnectTerminate()
 {
-    connectTry = 0;
-    skt->closeSocket();
-    terminateWhenAsked();
+    bufferStore a;
+    a.addStringT("NAK");
+    skt->sendBufferStore(a);
+    ncpDisconnect();
 }
 
 void socketChan::
