@@ -68,7 +68,7 @@ AC_DEFUN(AC_PATH_QT_1_3,[
 
 		qt_libdir=NONE
 		for dir in $qt_libdirs; do
-			try="ls -1 $dir/libqt*"
+			try="ls -1 $dir/libqt.*so"
 			if eval $try >/dev/null 2>&1 ; then
 				qt_libdir=$dir;
 				break;

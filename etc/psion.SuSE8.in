@@ -18,40 +18,32 @@
 [ -f /etc/sysconfig/psion ] || exit 0
 . /etc/sysconfig/psion
 
-MGETTY_HASPLP=false
-
-if grep -qs ^/PLP/ /etc/mgetty+sendfax/login.config ; then
-	mrun=`pidofproc mgetty`
-	test -n "$mrun" && MGETTY_HASPLP=true
-fi
-
 rc_reset
 
 start() {
-  	if $MGETTY_HASPLP ; then
-		echo "NOT Starting ncpd because mgetty configured for PLP"
-		exit 0
+	echo "Starting Psion support ..."
+	if [ "$START_NCPD" = "yes" ] ; then
+		echo -n "  ncpd: "
+		startproc -f @prefix@/sbin/ncpd $NCPD_ARGS
+		rc_status -v
 	fi
-	echo -n "Starting Psion support (ncpd): "
-	startproc -f @prefix@/sbin/ncpd $NCPD_ARGS
-	if rc_status -v ; then
-		if [ "$START_PLPNFSD" = "yes" ] ; then
-			echo -n "Starting Psion support (plpnfsd): "
-			startproc -f @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
-			rc_status -v
-		fi
-		if [ "$START_PLPPRINTD" = "yes" ] ; then
-			echo -n "Starting Psion support (plpprintd): "
-			startproc -f @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
-			rc_status -v
-		fi
+	if [ "$START_PLPNFSD" = "yes" ] ; then
+		echo -n "  plpnfsd: "
+		startproc -f @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
+		rc_status -v
+	fi
+	if [ "$START_PLPPRINTD" = "yes" ] ; then
+		echo -n "  plpprintd: "
+		startproc -f @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
+		rc_status -v
 	fi
 	rc_status && touch /var/lock/subsys/psion
 }
 
 stop() {
-	echo -n "Stopping Psion support: "
+	echo "Stopping Psion support ..."
 	if [ "$START_PLPNFSD" = "yes" ] ; then
+		echo -n "  plpnfsd: "
 		killproc -HUP @prefix@/sbin/plpnfsd
 		WAIT=5
 		while test $WAIT -gt 0 ; do
@@ -59,16 +51,21 @@ stop() {
 			sleep 1 # allow plpnfsd flushing it's cache
 			WAIT=`expr $WAIT - 1`
 		done
-		test -n "`pidofproc plpnfsd`" && \
+		test -z "`pidofproc plpnfsd`" || \
 			killproc -TERM @prefix@/sbin/plpnfsd
-		rc_status
+		rc_status -v
 	fi
 	if [ "$START_PLPPRINTD" = "yes" ] ; then
+		echo -n "  plpprintd: "
 		killproc -TERM @prefix@/sbin/plpprintd
-		rc_status
+		rc_status -v
 	fi
-	killproc -TERM @prefix@/sbin/ncpd
-	rc_status -v && rm -f /var/lock/subsys/psion
+	if [ "$START_NCPD" = "yes" ] ; then
+		echo -n "  ncpd: "
+		killproc -TERM @prefix@/sbin/ncpd
+		rc_status -v
+	fi
+	rc_status && rm -f /var/lock/subsys/psion
 }
 
 restart() {

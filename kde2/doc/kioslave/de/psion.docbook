@@ -1,5 +1,12 @@
 <article lang="&language;" id="psion">
 <title>psion</title>
+<articleinfo>
+<authorgroup>
+<author><firstname>Fritz</firstname><surname>Elfert</surname>
+<affiliation><address><email>felfert@users.sourceforge.net</email></address></affiliation>
+</author>
+</authorgroup>
+</articleinfo>
 
 <para>
 Das psion-Modul macht den Zugriff auf die Laufwerke eines angeschlossenen
@@ -9,11 +16,11 @@ Psion PDAs möglich.
 <para>
 Um die Laufwerke eines Psion anzuzeigen, verwendet man
 </para>
-<userinput><command>psion:/</command></userinput>
+<para><userinput><command>psion:/</command></userinput></para>
 <para>
 oder (falls der Psion an einem anderen Rechner im Netz angeschlossen ist)
 </para>
-<userinput><command>psion://</command><replaceable>host/</replaceable></userinput>.
+<para><userinput><command>psion://</command><replaceable>host/</replaceable></userinput>.</para>
 
 <para>
 Das psion-Modul stellt die Verbindung zum Psion unter Verwendung des
@@ -24,12 +31,5 @@ plptools. Dieses Packet ist auf <ulink url="http://plptools.sourceforge.net/"
 >http://plptools.sourceforge.net/</ulink> erhältlich.
 </para>
 
-<articleinfo>
-<authorgroup>
-<author><firstname>Fritz</firstname><surname>Elfert</surname>
-<affiliation><address><email>felfert@users.sourceforge.net</email></address></affiliation>
-</author>
-</authorgroup>
-</articleinfo>
 </article>
 

@@ -3,9 +3,21 @@
 
 %define srel /etc/SuSE-release
 %define rrel /etc/redhat-release
+%define mrel /etc/mandrake-release
 %define isSUSE %(test -f %{srel} && echo 1 || echo 0)
-%define isRH %(test -f %{rrel} && echo 1 || echo 0)
+%define isRH %(test -f %{rrel} && echo 2 || echo 0)
+%define isMDK %(test -f %{mrel} && echo 1 || echo 0)
+%if "%{isMDK}" > "0"
+%define isRH 1
+%endif
 %define distro ""
+#
+# Running the above, results in:
+#
+# RedHat:   isSUSE=0 isRH=2 isMDK=0
+# Mandrake: isSUSE=0 isRH=1 isMDK=1
+# SuSE:     isSUSE=1 isRH=0 isMDK=0
+#
 
 %if "%{isSUSE}" > "0"
 %define REL %(grep VERSION %{srel} | sed -e 's/VERSION = //')
@@ -19,11 +31,19 @@
 %endif
 %define distro SuSE%{REL}
 %endif
-%if "%{isRH}" > "0"
-%define REL %(rpm -q --queryformat '%%{version}' redhat-release)
+%define _qtdir ""
+%if "%{isRH}" > "1"
+%define REL %(rpm -qf --queryformat '%%{version}' %{rrel})
 %define distro RH%{REL}
 %define _kdedir /usr
+%define _qtdir %(test -n "$QTDIR" && echo \"--with-qt-dir=$QTDIR\" || echo '""')
 %endif
+%if "%{isMDK}" > "0"
+%define REL %(rpm -qf --queryformat '%%{version}' %{mrel})
+%define distro mdk%{REL}
+%define _kdedir /usr
+%endif
+
 %define _kdebindir %{_kdedir}/bin
 %define _kdelibdir %{_kdedir}/lib
 %define _kdedatadir %{_kdedir}/share
@@ -44,15 +64,12 @@ Buildrequires: readline-devel newt-devel kdelibs-devel >= 2.1
 %if "%{REL}" >= "8.0"
 # aaa_base provides chkconfig
 Requires: aaa_base >= 2002.3.27-0
-Buildrequires: qt3-devel >= 3.0.3
 %else
 Requires: aaa_base >= 2001.10.19-1
-Buildrequires: qt-devel >= 2.2.4
 %endif
 %endif
 %if "%{isRH}" > "0"
 Requires: chkconfig >= 0.9
-Buildrequires: qt-devel >= 2.2.4
 %endif
 BuildRoot: /tmp/plputils-buildroot
 
@@ -62,9 +79,9 @@ Group: Development/Libraries
 Requires: %{name} = %{version}
 
 %package kde
-Summary: Psion support for KDE 2.1.
+Summary: Psion support for KDE.
 Group: User Interface/Desktops
-Requires: %{name} = %{version} kdelibs >= 2.1 qt >= 2.2.4
+Requires: %{name} = %{version}
 
 %description
 This package contains the programs (client and server), necessary to
@@ -86,7 +103,7 @@ programs which can communicate with a Psion palmtop.
 
 %description kde
 This package provides support for a new protocol prefix "psion:/" for
-KDE 2.1. Any KDE application which uses KDE-conforming URLs, can access
+KDE. Any KDE application which uses KDE-conforming URLs, can access
 files on the Psion. Furthermore, a plugin for Konqueror's file-properties
 dialog provides access to Psions proprietary file attributes and information
 about the Psion's drives as well as generic machine information.
@@ -111,16 +128,16 @@ zur Programm-Entwicklung von Kommunikations-software für den Psion.
 
 %description -l de kde
 Dieses Packet stellt Unterstützung für eine neues Protokoll-Präfix "psion:/"
-für KDE 2.1 bereit. Jede KDE Anwendung, die KDE-konforme URLs benutzt, kann
+für KDE bereit. Jede KDE Anwendung, die KDE-konforme URLs benutzt, kann
 damit auf die Dateien eines Psion zugreifen. Weiterhin, liefert ein Plugin
 für Konqueror's Datei-Eigenschaften-Dialog Informationen über proprietäre
 Psion-Dateiattribute und stellt Informationen zum Gerät sowie seiner
 Laufwerke zur Verfügung.
 
 %package -n kpsion
-Summary: Psion utility for KDE 2.1.
+Summary: Psion utility for KDE.
 Group: User Interface/Desktops
-Requires: %{name} = %{version} kdelibs >= 2.1 qt >= 2.2.4
+Requires: %{name} = %{version}
 
 %description -n kpsion
 This package contains a KDE utility program for backup, restore and formatting
@@ -131,9 +148,9 @@ Dieses Packet enthält ein KDE Werkzeug zum Backup, Restore und Formatieren
 von Psion Laufwerken.
 
 %package -n klipsi
-Summary: Psion remote clipboard utility for KDE 2.1.
+Summary: Psion remote clipboard utility for KDE.
 Group: User Interface/Desktops
-Requires: %{name} = %{version} kdelibs >= 2.1 qt >= 2.2.4
+Requires: %{name} = %{version}
 
 %description -n klipsi
 This package contains a KDE utility for using the Psion's remote clipboard
@@ -177,8 +194,14 @@ zwischen Psion und Rechner.
 %configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde2
 %endif
 %endif
+%if "%{isMDK}" > "0"
+# Mandrake's libtool builds, but refuses to install kde modules into
+# a directory not ending with /usr/lib - kinda strange
+#
+%define __libtoolize true
+%endif
 %if "%{isRH}" > "0"
-%configure --enable-kde --with-initdir=%{_initrddir}
+%configure --enable-kde %{_qtdir} --with-initdir=%{_initrddir}
 %endif
 make
 
@@ -192,6 +215,7 @@ install -m 644 conf/kiodoc-update.pl \
 %if "%{REL}" >= "8.0"
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 cat>$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/psion<<EOF
+START_NCPD=yes
 NCPD_ARGS=
 START_PLPNFSD=yes
 PLPNFSD_ARGS=
@@ -207,12 +231,19 @@ install -m755 etc/psion.SuSE $RPM_BUILD_ROOT%{_initrddir}/psion
 install -m755 etc/psion $RPM_BUILD_ROOT%{_initrddir}/psion
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 cat>$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/psion<<EOF
+START_NCPD=yes
 NCPD_ARGS=
 START_PLPNFSD=yes
 PLPNFSD_ARGS=
 START_PLPPRINTD=yes
 PLPPRINTD_ARGS=
 EOF
+%endif
+%if "%{isMDK}" > "0"
+# Mandrake has a different menu structure
+mkdir -p $RPM_BUILD_ROOT%{_kdedatadir}/applnk-mdk/Office/PDA
+mv $RPM_BUILD_ROOT%{_kdedatadir}/applnk/Utilities/*.desktop \
+	$RPM_BUILD_ROOT%{_kdedatadir}/applnk-mdk/Office/PDA
 %endif
 
 %clean
@@ -230,12 +261,14 @@ test ! -d /mnt/psion && mkdir -p /mnt/psion
 %else
 (
 	grep -v START_PSION /etc/rc.config | \
-		grep -v NCPD_ARGS | grep -v START_PLPNFSD | \
-		grep -v PLPNFSD_ARGS | grep -v START_PLPPRINTD | \
-		grep -v PLPPRINTD_ARGS
+		grep -v START_NCPD | grep -v NCPD_ARGS | \
+		grep -v START_PLPNFSD | grep -v PLPNFSD_ARGS | \
+		grep -v START_PLPPRINTD | grep -v PLPPRINTD_ARGS
 	cat<<-EOF
 	# Set START_PSION to yes to start Psion support
 	START_PSION=yes
+	# Set START_NCPD to yes to start ncpd
+	START_NCPD=yes
 	# Specify parameters for ncpd in NCPD_ARGS (if any)
 	NCPD_ARGS=
 	# Set START_PLPNFSD to yes to start plpnfsd
@@ -253,8 +286,13 @@ cp /etc/rc.config /etc/rc.config.old && mv /etc/rc.config.$$ /etc/rc.config
 %endif
 %endif
 
-%if "%{isRH}" > "0"
+%if "%{isRH}" > "1"
 %triggerin kde -- kdebase, kde-i18n-German
+perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
+%endif
+
+%if "%{isMDK}" > "0"
+%triggerin kde -- kdebase, kde-i18n-de
 perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 %endif
 
@@ -331,14 +369,14 @@ fi
 %{_libdir}/libplp.la
 %{_datadir}/locale/*/LC_MESSAGES/plptools.mo
 %{_datadir}/%{name}/*
-%config %{_initrddir}/psion
+%{_initrddir}/psion
 %if "%{isSUSE}" > "0"
 %if "%{REL}" >= "8.0"
-%{_sysconfdir}/sysconfig/psion
+%config %{_sysconfdir}/sysconfig/psion
 %endif
 %endif
 %if "%{isRH}" > "0"
-%{_sysconfdir}/sysconfig/psion
+%config %{_sysconfdir}/sysconfig/psion
 %endif
 
 %files devel
@@ -365,7 +403,11 @@ fi
 %{_kdebindir}/kpsion
 %{_kdelibdir}/libkpsion.so
 %{_kdelibdir}/libkpsion.la
+%if "%{isMDK}" > "0"
+%{_kdedatadir}/applnk-mdk/Office/PDA/kpsion*
+%else
 %{_kdedatadir}/applnk/*/kpsion*
+%endif
 %{_kdedatadir}/apps/kpsion/*
 %{_kdedatadir}/apps/konqueror/*
 %{_kdedatadir}/icons/*/*/apps/kpsion*
@@ -377,7 +419,11 @@ fi
 %{_kdebindir}/klipsi
 %{_kdelibdir}/klipsi.so
 %{_kdelibdir}/klipsi.la
+%if "%{isMDK}" > "0"
+%{_kdedatadir}/applnk-mdk/Office/PDA/klipsi*
+%else
 %{_kdedatadir}/applnk/*/klipsi*
+%endif
 %{_kdedatadir}/apps/klipsi/*
 %{_kdedatadir}/icons/*/*/apps/klipsi*
 %{_kdedatadir}/icons/*/*/actions/klipsi*

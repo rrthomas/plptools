@@ -34,6 +34,12 @@ sub usage {
 	die "Usage: kiodoc-update -a|-r kioslaveName";
 }
 
+sub update_cache($) {
+	my $cache = $_[0];
+	$cache =~ s/index\.docbook/index\.cache\.bz2/;
+	system("meinproc --check --cache $cache $_[0]");
+}
+
 sub add_doc($) {
 	my @files = collect_specified($_[0]);
 	return if ($#files lt 0);
@@ -43,7 +49,7 @@ sub add_doc($) {
 		my $ed = '<!ENTITY kio-' . $id . ' SYSTEM "' .
 			"$_[0].docbook" . '">';
 		my $er = '&kio-' . $id . ';';
-		$idx =~ s/$_[0].docbook/index.docbook/;
+		$idx =~ s/$_[0]\.docbook/index\.docbook/;
 		my @lines = from("$idx");
 		my $state = 0;
 		my @out = ();
@@ -77,6 +83,7 @@ sub add_doc($) {
 		open(F, ">$idx") || die "Can't open $idx for write: $!\n";
 		print F @out;
 		close(F);
+		update_cache($idx);
 	}
 }
 
@@ -85,12 +92,13 @@ sub remove_doc($) {
 	return if ($#files lt 0);
 	my $re = "kio-" . get_id($files[0]) . '[\s;]';
 	foreach $idx (@files) {
-		$idx =~ s/$_[0].docbook/index.docbook/;
+		$idx =~ s/$_[0]\.docbook/index\.docbook/;
 		my @lines = from($idx);
 		@lines = grep(!/$re/, @lines);
 		open(F, ">$idx") || die "Can't open $idx for write: $!\n";
 		print F join("\n", @lines) . "\n";
 		close(F);
+		update_cache($idx);
 	}
 }
 

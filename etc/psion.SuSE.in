@@ -15,49 +15,49 @@ test "$START_PSION" = yes || exit 0
 
 test -f @prefix@/sbin/ncpd || exit 0
 test -f @prefix@/sbin/plpnfsd || exit 0
+test -f @prefix@/sbin/plpprintd || exit 0
 
 # The echo return value for success (defined in /etc/rc.config).
-return=$rc_done
+showresult() {
+	test RETVAL -eq 0 && echo -e $rc_done || echo -e $rc_failed
+}
 
-MGETTY_HASPLP=false
-
-if grep -qs ^/PLP/ /etc/mgetty+sendfax/login.config ; then
-	mrun=`pidofproc mgetty`
-	test -n "$mrun" && MGETTY_HASPLP=true
-fi
+showstatus() {
+	## Check status with checkproc(8), if process is running
+	## checkproc will return with exit status 0.
+	checkproc @prefix@/sbin/$1 && \
+		echo -n "$1 running " ||  \
+		echo -n "No running $1 "
+}
 
 start() {
-	if $MGETTY_HASPLP ; then
-		echo "NOT Starting ncpd because mgetty configured for PLP"
-		exit 0
+	echo "Starting Psion support ..."
+	RETVAL=0
+	if test "$START_NCPD" = "yes" ; then
+		echo -n "  ncpd: "
+		/sbin/startproc @prefix@/sbin/ncpd $NCPD_ARGS
+		RETVAL=$?
+		showresult
 	fi
-	echo -n "Starting Psion support (ncpd): "
-	/sbin/startproc @prefix@/sbin/ncpd $NCPD_ARGS
-	RETVAL=$?
 	if test "$START_PLPNFSD" = "yes" ; then
-		if [ $RETVAL -eq 0 ] ; then
-			echo -e "$return"
-			echo -n "Starting Psion support (plpnfsd): "
-			/sbin/startproc @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
-			RETVAL=$?
-		fi
+		echo -n "  plpnfsd: "
+		/sbin/startproc @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
+		RETVAL=$?
+		showresult
 	fi
 	if test "$START_PLPPRINTD" = "yes" ; then
-		if [ $RETVAL -eq 0 ] ; then
-			echo -e "$return"
-			echo -n "Starting Psion support (plpprintd): "
-			/sbin/startproc @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
-			RETVAL=$?
-		fi
+		echo -n "  plpprintd: "
+		/sbin/startproc @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
+		RETVAL=$?
+		showresult
 	fi
-	test $RETVAL -eq 0 || return=$rc_failed
-	echo -e "$return"
 	return $RETVAL
 }
 
 stop() {
-	echo -n "Stopping Psion support: "
+	echo "Stopping Psion support ..."
 	if test "$START_PLPNFSD" = "yes" ; then
+		echo -n "  plpnfsd: "
 		/bin/killproc -HUP plpnfsd
 		WAIT=5
 		while test $WAIT -gt 0 ; do
@@ -65,15 +65,22 @@ stop() {
 			sleep 1 # allow plpnfsd flushing it's cache
 			WAIT=`expr $WAIT - 1`
 		done
-		test -n "`pidof plpnfsd`" && killproc plpnfsd
+		test -z "`pidof plpnfsd`" || killproc plpnfsd
+		RETVAL=$?
+		showresult
 	fi
 	if test "$START_PLPPRINTD" = "yes" ; then
+		echo -n "  plpprintd: "
 		/sbin/killproc -TERM plpprintd
+		RETVAL=$?
+		showresult
 	fi
-	/sbin/killproc -TERM ncpd
-	RETVAL=$?
-	test $RETVAL -eq 0 || return=$rc_failed
-	echo -e "$return"
+	if test "$START_NCPD" = "yes" ; then
+		echo -n "  ncpd: "
+		/sbin/killproc -TERM ncpd
+		RETVAL=$?
+		showresult
+	fi
 	return $RETVAL
 }
 
@@ -94,14 +101,9 @@ case "$1" in
 
     status)
 	echo -n "Checking for Psion support: "
-	## Check status with checkproc(8), if process is running
-	## checkproc will return with exit status 0.
-	checkproc @prefix@/sbin/ncpd && \
-		echo -n "ncpd running " ||  \
-		echo -n "No running ncpd "
-	checkproc @prefix@/sbin/plpnfsd && \
-		echo -n "plpnfsd running " ||  \
-		echo -n "No running plpnfsd "
+	showstatus ncpd
+	showstatus plpnfsd
+	showstatus plpprintd
 	;;
 
     *)

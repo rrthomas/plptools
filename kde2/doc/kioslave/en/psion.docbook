@@ -1,5 +1,12 @@
 <article lang="&language;" id="psion">
 <title>psion</title>
+<articleinfo>
+<authorgroup>
+<author><firstname>Fritz</firstname><surname>Elfert</surname>
+<affiliation><address><email>felfert@users.sourceforge.net</email></address></affiliation>
+</author>
+</authorgroup>
+</articleinfo>
 
 <para>
 The psion ioslave enables you to browse the drives of a connected Psion PDA.
@@ -8,11 +15,11 @@ The psion ioslave enables you to browse the drives of a connected Psion PDA.
 <para>
 To see the drives of a Psion, enter
 </para>
-<userinput><command>psion:/</command></userinput>
+<para><userinput><command>psion:/</command></userinput></para>
 <para>
 or (if the Psion is connected at a remote machine)
 </para>
-<userinput><command>psion://</command><replaceable>host/</replaceable></userinput>.
+<para><userinput><command>psion://</command><replaceable>host/</replaceable></userinput>.</para>
 
 <para>
 The psion ioslave connects to a Psion using the ncpd daemon. Therefore,
@@ -22,11 +29,4 @@ package. This package is available at <ulink url="http://plptools.sourceforge.ne
 >http://plptools.sourceforge.net/</ulink>.
 </para>
 
-<articleinfo>
-<authorgroup>
-<author><firstname>Fritz</firstname><surname>Elfert</surname>
-<affiliation><address><email>felfert@users.sourceforge.net</email></address></affiliation>
-</author>
-</authorgroup>
-</articleinfo>
 </article>
