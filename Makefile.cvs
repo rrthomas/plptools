@@ -2,6 +2,7 @@ LIBTOOLFILES = conf/config.guess conf/config.sub conf/ltconfig conf/ltmain.sh
 AUTOMAKEFILES = conf/mkinstalldirs conf/missing conf/install-sh
 CONFIGHIN = include/config.h.in
 ACLOCAL = conf/aclocal.m4
+GETTEXT = intl/Makefile.in
 
 all:
 	@echo "Use make devel for development, make dist for distribution"
@@ -10,11 +11,11 @@ build: devel
 	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-kde
 	make
 
-devel: $(LIBTOOLFILES) $(AUTOMAKEFILES)
+devel: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	autoconf
 	touch include/stamp-h.in
 
-dist: $(LIBTOOLFILES) $(AUTOMAKEFILES)
+dist: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	autoconf
 	touch include/stamp-h.in
 	./configure --enable-kde
@@ -27,8 +28,10 @@ $(CONFIGHIN): acconfig.h
 	autoheader
 
 $(LIBTOOLFILES):
-	-gettextize
 	libtoolize
+
+$(GETTEXT): $(ACLOCAL)
+	echo n | gettextize -f
 
 $(AUTOMAKEFILES): $(ACLOCAL) $(CONFIGHIN)
 	automake --add-missing
