@@ -3,7 +3,7 @@ AUTOMAKEFILES = conf/mkinstalldirs conf/missing conf/install-sh
 CONFIGHIN = include/config.h.in
 ACLOCAL = conf/aclocal.m4
 GETTEXT = intl/Makefile.in
-GETTEXTSHIT = Makefile.am.in configure.in.in
+GETTEXTDEP = conf/Makefile.am.in conf/configure.in.in
 GV = $(shell gettextize --version|head -1|cut -d ' ' -f4|cut -d. -f2)
 
 all:
@@ -43,7 +43,7 @@ $(CONFIGHIN): acconfig.h configure.in
 $(LIBTOOLFILES):
 	libtoolize --force
 
-$(GETTEXT): $(GETTEXTSHIT)
+$(GETTEXT): $(GETTEXTDEP)
 	cp conf/configure.in.in configure.in
 	cp conf/Makefile.am.in Makefile.am
 	mkdir -p intl
