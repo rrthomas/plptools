@@ -182,13 +182,13 @@ checkAbortHash(long)
 	return continueRunning;
 }
 
-static void
+static RETSIGTYPE
 sigint_handler(int i) {
 	continueRunning = 0;
 	signal(SIGINT, sigint_handler);
 }
 
-static void
+static RETSIGTYPE
 sigint_handler2(int i) {
 	continueRunning = 0;
 	fclose(stdin);
@@ -245,7 +245,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		int i;
 
 		strcpy(defDrive, "::");
-		if (a.devlist(devbits) == 0) {
+		if (a.devlist(devbits) == rfsv::E_PSI_GEN_NONE) {
 
 			for (i = 0; i < 26; i++) {
 				if ((devbits & 1) && a.devinfo(i, vfree, vtotal, vattr, vuniqueid, NULL) == rfsv::E_PSI_GEN_NONE) {
@@ -805,11 +805,13 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			ifstream ip(argv[1]);
 			char cmd[512];
 			char arg[512];
+
 			if (!ip) {
 				cerr << "Could not read processlist " << argv[1] << endl;
 				continue;
 			}
 			ip >> cmd >> arg;
+			
 			if (strcmp(cmd, "#plpftp") || strcmp(arg, "processlist")) {
 				ip.close();
 				cerr << "Error: " << argv[1] <<
@@ -818,13 +820,41 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			}
 			while (!ip.eof()) {
 				ip >> cmd >> arg;
+				ip.get(&arg[strlen(arg)], sizeof(arg) - strlen(arg), '\n');
+				// cout << "cmd=\"" << cmd << "\" arg=\"" << arg << "\"" << endl;
 				if (strlen(cmd) > 0) {
 					// Workaround for broken programs like Backlite. These do not store
 					// the full program path. In that case we try running the arg1 which
 					// results in starting the program via recog. facility.
-					if (!strchr(cmd, '\\') && !strchr(arg, ' '))
-						strcpy(cmd, arg);
-					if ((res = r.execProgram(cmd, arg)) != rfsv::E_PSI_GEN_NONE) {
+					if ((strlen(arg) > 2) && (arg[1] == ':') && (arg[0] >= 'A') &&
+					    (arg[0] <= 'Z'))
+						res = r.execProgram(arg, "");
+					else
+						res = r.execProgram(cmd, arg);
+					if (res != rfsv::E_PSI_GEN_NONE) {
+						// If we got an error here, that happened probably because
+						// we have no path at all (e.g. Macro5) and the program is not
+						// registered in the Psion's path properly. Now try the ususal
+						// \System\Apps\<AppName>\<AppName>.app on all drives.
+						if (strchr(cmd, '\\') == NULL) {
+							long devbits;
+							char tmp[512];
+							if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
+								int i;
+								for (i = 0; i < 26; i++) {
+									if (devbits & 1) {
+										sprintf(tmp,
+											"%c:\\System\\Apps\\%s\\%s.app",
+											'A' + i, cmd, cmd);
+										res = r.execProgram(tmp, "");
+									}
+									if (res == rfsv::E_PSI_GEN_NONE)
+										break;
+								}
+							}
+						}
+					}
+					if (res != rfsv::E_PSI_GEN_NONE) {
 						cerr << "Could not start " << cmd << " " << arg << endl;
 						cerr << "Error: " << res << endl;
 					}
