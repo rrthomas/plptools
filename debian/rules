@@ -3,7 +3,7 @@
 # GNU copyright 1997 to 1999 by Joey Hess.
 
 # Uncomment this to turn on verbose mode.
-export DH_VERBOSE=1
+#export DH_VERBOSE=1
 
 # This is the debhelper compatability version to use.
 export DH_COMPAT=3
@@ -85,7 +85,10 @@ binary-arch: build install
 	dh_fixperms
 	# You may want to make some executables suid here.
 #	dh_suidregister
-#	dh_makeshlibs
+	dh_makeshlibs -a -V -pplptools
+	dh_makeshlibs -a -V -pplptools-kde
+	dh_makeshlibs -a -V -pkpsion
+	dh_makeshlibs -a -V -pklipsi
 	dh_installdeb
 #	dh_perl
 	dh_shlibdeps

@@ -1,5 +1,5 @@
 Source: plptools
-Build-Depends: debhelper, automake (>= 1:1.4-p4-1.1), autoconf, libtool, gettext, libncurses5-dev, libreadline4-dev, libnewt-dev, kdoc, kdebase-dev
+Build-Depends: debhelper, automake (>= 1:1.4-p4-1.1), autoconf, libtool, gettext, libncurses5-dev, libreadline4-dev, libnewt-dev, kdoc, libqt-dev, kdebase-dev
 Section: otherosfs
 Priority: optional
 Maintainer: John Lines <john@paladin.demon.co.uk>
@@ -26,7 +26,7 @@ Description: plptools (development files)
 
 Package: plptools-kde
 Architecture: any
-Depends: ${shlibs:Depends}, kdebase-libs, konqueror, plptools (= ${Source-Version})
+Depends: ${shlibs:Depends}, kdebase-libs, konqueror
 Description: KDE integration of plptools
  This package provides integrated access to a Psion PDA into KDE
  Using a kioslave, any KDE compliant application can access files on
@@ -36,13 +36,13 @@ Description: KDE integration of plptools
 
 Package: kpsion
 Architecture: any
-Depends: ${shlibs:Depends}, kdebase-libs, plptools (= ${Source-Version})
+Depends: ${shlibs:Depends}, kdebase-libs
 Description: Backup and Restore of a Psion PDA
  This package provides a KDE frontend for backup/restore of a Psion PDA
 
 Package: klipsi
 Architecture: any
-Depends: ${shlibs:Depends}, kdebase-libs, plptools (= ${Source-Version})
+Depends: ${shlibs:Depends}, kdebase-libs
 Description: Remote Cut&Paste for Psion PDA
  This package provides a KDE systray application which allows to share
  KDE's clipboard remotely with a Psion PDA.
