@@ -2,7 +2,7 @@
 <title>psion</title>
 
 <para>
-Der psion ioslave macht den Zugriff auf die Laufwerke eine angeschlossenen
+Das psion-Modul macht den Zugriff auf die Laufwerke eines angeschlossenen
 Psion PDAs möglich.
 </para>
 
@@ -14,16 +14,20 @@ oder (falls der Psion an einem anderen Rechner im Netz angeschlossen ist)
 </para>
 
 <para>
-Der psion ioslave stellt die Verbindung zum Psion unter Verwendung des
+Das psion-Modul stellt die Verbindung zum Psion unter Verwendung des
 ncpd Daemonen her. Daher ist es erforderlich, daß dieser Daemon auf dem
-entsprechenden Rechner am Laufen ist. Der psion ioslave, der Daemon sowie
+entsprechenden Rechner am Laufen ist. Das psion-Modul, der Daemon sowie
 weitere Dienstprogramme für Psion-Konnektivität sind Teil des Packetes
 plptoos. Dieses Packet ist auf <ulink url="http://plptools.sourceforge.net/"
 >http://plptools.sourceforge.net/</ulink> erhältlich.
 </para>
 
-<para>
-Autor: Fritz Elfert <email>felfert@users.sourceforge.net</email>
-</para>
+<articleinfo>
+<authorgroup>
+<author><firstname>Fritz</firstname><surname>Elfert</surname>
+<affiliation><address><email>felfert@users.sourceforge.net</email></address></affiliation>
+</author>
+</authorgroup>
+</articleinfo>
 </article>
 

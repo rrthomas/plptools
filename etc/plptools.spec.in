@@ -164,6 +164,8 @@ make
 mkdir -p $RPM_BUILD_ROOT/%{_prefix} $RPM_BUILD_ROOT%{_initrddir} \
 # rpm's makeinstall doesn't work here!
 make DESTDIR=$RPM_BUILD_ROOT install
+install -m 644 conf/kiodoc-update.pl \
+	$RPM_BUILD_ROOT%{_datadir}/%{name}/kiodoc-update.pl
 %if "%{isSUSE}" > "0"
 %if "%{REL}" >= "8.0"
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
@@ -229,14 +231,29 @@ cp /etc/rc.config /etc/rc.config.old && mv /etc/rc.config.$$ /etc/rc.config
 %endif
 %endif
 
+%if "%{isRH}" > "0"
+%triggerin kde -- kdebase, kde-i18n-German
+perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
+%endif
+
+%if "%{isSUSE}" > "0"
+%if "%{REL}" >= "8.0"
+%triggerin kde -- kdebase3, kde-i18n-de
+perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
+%else
+%triggerin kde -- kdebase, kde-i18n-de
+perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
+%endif
+%endif
+
 %post kde
-%{_initrddir}/psion condrestart
 KONQRC=`kde-config --expandvars --install config`/konquerorrc
-if grep -q '\[Notification Messages\]' $KONQRC ; then
-	cat $KONQRC | grep -v "askSaveinode/x-psion-drive=No" | sed \
+if if test -f $KONQRC && grep -q '\[Notification Messages\]' $KONQRC ; then
+	cp $KONQRC $KONQRC.$$
+	cat $KONQRC.$$ | grep -v "askSaveinode/x-psion-drive=No" | sed \
 		-e '/\[Notification Messages\]/a\' \
-		-e 'askSaveinode/x-psion-drive=No' > /tmp/$$
-	mv /tmp/$$ $KONQRC
+		-e 'askSaveinode/x-psion-drive=No' > $KONQRC && \
+	rm -f $KONQRC.$$
 else
 cat>>$KONQRC<<EOF
 
@@ -245,13 +262,10 @@ askSaveinode/x-psion-drive=No
 EOF
 fi
 
-%preun kde
+%preun
 if [ "$1" = 0 ]
 then
 	%{_initrddir}/psion stop >/dev/null 2>&1
-	KONQRC=`kde-config --expandvars --install config`/konquerorrc
-	grep -v 'askSaveinode/x-psion-drive=' $KONQRC > /tmp/$$
-	mv /tmp/$$ $KONQRC
 %if "%{isSUSE}" > "0"
 %if "%{REL}" >= "8.0"
 	/sbin/chkconfig --del psion
@@ -262,6 +276,18 @@ then
 %if "%{isRH}" > "0"
 	/sbin/chkconfig --del psion
 %endif
+fi
+
+%preun kde
+if [ "$1" = 0 ]
+then
+	perl %{_datadir}/%{name}/kiodoc-update.pl -r psion
+	KONQRC=`kde-config --expandvars --install config`/konquerorrc
+	if test -f $KONQRC ; then
+		cp $KONQRC $KONQRC.$$
+		grep -v 'askSaveinode/x-psion-drive=' $KONQRC.$$ > $KONQRC && \
+		rm -f $KONQRC.$$
+	fi
 fi
 
 %files
@@ -303,6 +329,7 @@ fi
 %{_datadir}/locale/*/LC_MESSAGES/libplpprops.mo
 %{_datadir}/mimelnk/*/*
 %{_datadir}/doc/HTML/*/kioslave/*
+%{_datadir}/%{name}/kiodoc-update.pl
 
 %files -n kpsion
 %{_bindir}/kpsion
