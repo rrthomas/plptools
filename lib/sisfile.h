@@ -40,6 +40,9 @@ class SISFile
 public:
 	/**
 	 * Populate the fields.
+	 *
+	 * @param buf The buffer to read from.
+	 * @param len The length of the buffer.
 	 */
 	SisRC fillFrom(uint8_t* buf, off_t len);
 

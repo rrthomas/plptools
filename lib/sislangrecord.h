@@ -35,10 +35,21 @@ public:
 
 	/**
 	 * Populate the fields.
+	 *
+	 * @param buf The buffer to read from.
+	 * @param base The index to start reading from, which is updated
+	 *   when the record is successfully read.
+	 * @param len The length of the buffer.
 	 */
 	SisRC fillFrom(uint8_t* buf, int* base, off_t len);
 
+	/**
+	 * The language number.
+	 *
+	 * @see langTable
+	 */
 	uint16_t m_lang;
+
 };
 
 #endif

@@ -30,6 +30,11 @@ class SISFile;
 /**
  * The name of the component in this SIS file.
  * A single instance holds the names for all languages.
+ *
+ * There is one name record for each language.
+ * First comes the lengths of all the names, as 32 bit integers.
+ * Second comes pointers to the names, as an index in the complete
+ * SISFile.
  */
 class SISComponentNameRecord
 {
@@ -39,13 +44,19 @@ public:
 
 	/**
 	 * Populate the fields.
+	 *
+	 * @param buf The buffer to read data from.
+	 * @param base The index where we start reading data.
+	 * @param len The length of the buffer, for range checking.
+	 * @param sisFile The container sis file.
 	 */
 	SisRC fillFrom(uint8_t* buf, int base, off_t len, SISFile* sisFile);
 
 	/**
 	 * Return the name for the given language.
-	 * The number is the sequence number in the list of language records
-	 * in the sis file.
+	 *
+	 * @param no The sequence number in the list of language records in
+	 * the sis file.
 	 */
 	uint8_t* getName(int no);
 
@@ -55,7 +66,7 @@ private:
 	uint32_t* m_namePtrs;
 
 	/**
-	 * The extracted names.
+	 * The extracted names, as zero terminated strings.
 	 */
 	uint8_t** m_names;
 

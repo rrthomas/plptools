@@ -26,7 +26,10 @@
 #include "sistypes.h"
 
 /**
- * The first part of a SIS file.
+ * The first part of a SISFile.
+ *
+ * This file header is referenced from most other parts of the sis file,
+ * mainly since it contains the list of languages.
  */
 class SISFileHeader
 {
@@ -34,6 +37,11 @@ public:
 
 	/**
 	 * Populate the fields.
+	 *
+	 * @param buf The buffer to read from.
+	 * @param base The index to start reading from, which is updated
+	 *   when the header is successfully read.
+	 * @param len The length of the buffer.
 	 */
 	SisRC fillFrom(uint8_t* buf, int* base, off_t len);
 

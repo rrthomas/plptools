@@ -37,8 +37,14 @@ public:
 
 	/**
 	 * Populate the fields.
+	 *
+	 * @param buf The buffer to read from.
+	 * @param base The index to start reading from, which is updated
+	 *   when the record is successfully read.
+	 * @param len The length of the buffer.
+	 * @param sisFile The container SISFile.
 	 */
-	SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* file);
+	SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile);
 
 	uint32_t m_uid;
 	uint16_t m_major;
