@@ -33,6 +33,18 @@
 #include <qstringlist.h>
 #include <qtextstream.h>
 
+#include <vector>
+
+typedef struct {
+    u_int32_t timeHi;
+    u_int32_t timeLo;
+    u_int32_t attr;
+    u_int32_t size;
+    QString name;
+} indexData_t;
+
+typedef vector<indexData_t> indexDataList_t;
+
 class KPsionCheckListItem : public QObject, public QCheckListItem {
     Q_OBJECT
 
@@ -70,6 +82,8 @@ public:
     int size();
     time_t when();
     bool isPathChecked(QString path);
+    QString psionpath();
+    virtual void paintCell(QPainter *, const QColorGroup &, int, int, int);
 
 signals:
     void rootToggled(void);
@@ -113,8 +127,7 @@ private slots:
 private:
     void collectEntries(KPsionCheckListItem *i);
     void listTree(KPsionCheckListItem *cli, const KTarEntry *te,
-		  QTextIStream &idx, int level);
-
+		  indexDataList_t &idx, int level);
     QString uid;
     QString backupDir;
     PlpDir toRestore;

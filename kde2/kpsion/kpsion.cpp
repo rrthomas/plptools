@@ -37,6 +37,8 @@
 #include <kmessagebox.h>
 #include <kfileitem.h>
 #include <kprocess.h>
+#include <kstatusbar.h>
+#include <kiconloader.h>
 
 #include <qwhatsthis.h>
 #include <qtimer.h>
@@ -45,6 +47,8 @@
 #include <qheader.h>
 #include <qdir.h>
 #include <qmessagebox.h>
+#include <qregexp.h>
+#include <qstyle.h>
 
 #include <ppsocket.h>
 #include <rfsvfactory.h>
@@ -797,7 +801,7 @@ findTarEntry(const KTarEntry *te, QString path, QString rpath) {
 	    if (tmp.length())
 		tmp += "/";
 	    tmp += *f;
-	    fte = findTarEntry(td->entry(*f), path, tmp);
+	    fte = findTarEntry(td->entry(*f), path, unix2psion(tmp));
 	    if (fte != 0L)
 		break;
 	}
@@ -1203,8 +1207,14 @@ askOverwrite(PlpDirent e) {
 
     lay->addStretch(1);
     QLabel *label1 = new QLabel(contents);
+
+#if (QT_VERSION >= 300)
+    label1->setPixmap(kapp->style().stylePixmap(
+			  kapp->style().SP_MessageBoxWarning));
+#else
     label1->setPixmap(QMessageBox::standardIcon(QMessageBox::Warning,
 						kapp->style().guiStyle()));
+#endif
     lay->add(label1);
     lay->add(new QLabel(i18n(
 	"<QT>The file <B>%1</B> exists already on the Psion with "
@@ -1382,6 +1392,7 @@ slotStartRestore() {
 			    updateProgress(written);
 			} while (len > 0);
 			plpRfsv->fclose(handle);
+
 			if (res != rfsv::E_PSI_GEN_NONE) {
 			    KMessageBox::error(this, i18n(
 				"<QT>Could not write to<BR/>"
@@ -1766,6 +1777,7 @@ createIndex() {
 	PsiTime t = e.getPsiTime();
 	long attr = e.getAttr() &
 	    ~rfsv::PSI_A_ARCHIVE;
+#if (QT_VERSION < 300)
 	os << hex
 	   << setw(8) << setfill('0') <<
 	    t.getPsiTimeHi() << " "
@@ -1776,6 +1788,18 @@ createIndex() {
 	   << setw(8) << setfill('0') <<
 	    attr << " "
 	   << setw(0) << e.getName() << endl;
+#else
+	os << hex
+	   << qSetW(8) << qSetFill('0') <<
+	    t.getPsiTimeHi() << " "
+	   << qSetW(8) << qSetFill('0') <<
+	    t.getPsiTimeLo() << " "
+	   << qSetW(8) << qSetFill('0') <<
+	    e.getSize() << " "
+	   << qSetW(8) << qSetFill('0') <<
+	    attr << " "
+	   << qSetW(0) << e.getName() << endl;
+#endif
 	kapp->processEvents();
     }
     QString idxName =

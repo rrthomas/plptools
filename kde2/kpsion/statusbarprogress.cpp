@@ -28,6 +28,7 @@
 #include <qstring.h>
 #include <qpixmap.h>
 #include <qtooltip.h>
+#include <qstyle.h>
 
 #include <kapp.h>
 #include <kglobal.h>
@@ -230,16 +231,16 @@ styleChange(GUIStyle) {
 
 void KPsionStatusBarProgress::
 adjustStyle(void) {
-    switch(style().guiStyle()) {
-	case WindowsStyle:
-	    setFrameStyle(QFrame::NoFrame);
-	    break;
-
-	case MotifStyle:
-	default:
-	    setFrameStyle(QFrame::Panel|QFrame::Sunken);
-	    setLineWidth(1);
-	    break;
+#if (QT_VERSION < 300)
+    bool isWinStyle = (style().guiStyle() == WindowsStyle);
+#else
+    bool isWinStyle = (style().styleHint(QStyle::SH_GUIStyle) == WindowsStyle);
+#endif
+    if (isWinStyle)
+	setFrameStyle(QFrame::NoFrame);
+    else {
+	setFrameStyle(QFrame::Panel|QFrame::Sunken);
+	setLineWidth(1);
     }
     update();
 }

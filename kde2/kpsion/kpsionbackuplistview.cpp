@@ -48,6 +48,7 @@ private:
 
     bool parentIsKPsionCheckListItem;
     bool dontPropagate;
+    bool gray;
     int backupType;
     int size;
     time_t when;
@@ -63,12 +64,32 @@ KPsionCheckListItem::KPsionCheckListItemMetaData::KPsionCheckListItemMetaData() 
     timeHi = 0;
     timeLo = 0;
     attr = 0;
+    gray = false;
     name = QString::null;
     backupType = KPsionBackupListView::UNKNOWN;
 }
 
 KPsionCheckListItem::~KPsionCheckListItem() {
     delete meta;
+}
+
+/**
+ * Must re-implement this since QT3 does not leave the expansion square
+ * enabled anymore if the item is disabled.
+ */
+void KPsionCheckListItem::
+paintCell(QPainter *p, const QColorGroup &cg, int column, int width, int align)
+{
+    QColorGroup tmp(cg);
+    if (meta->gray)
+	tmp.setColor(QColorGroup::Text,
+		     listView()->palette().color(QPalette::Disabled,
+						 QColorGroup::Text));
+    else
+	tmp.setColor(QColorGroup::Text,
+		     listView()->palette().color(QPalette::Normal,
+						 QColorGroup::Text));
+    QCheckListItem::paintCell(p, tmp, column, width, align);
 }
 
 KPsionCheckListItem *KPsionCheckListItem::
@@ -103,8 +124,9 @@ setMetaData(int type, time_t when, QString name, int size,
 
 void KPsionCheckListItem::
 stateChange(bool state) {
+    if (!state)
+	meta->gray = false;
     QCheckListItem::stateChange(state);
-
     if (meta->dontPropagate)
 	return;
     if (meta->parentIsKPsionCheckListItem)
@@ -119,29 +141,31 @@ propagateDown(bool state) {
     setOn(state);
     KPsionCheckListItem *child = firstChild();
     while (child) {
+	child->meta->dontPropagate = true;
 	child->propagateDown(state);
+	child->meta->dontPropagate = false;
 	child = child->nextSibling();
     }
 }
 
 void KPsionCheckListItem::
 propagateUp(bool state) {
-    bool deactivateThis = false;
+    bool makeGray = false;
 
     KPsionCheckListItem *child = firstChild();
     while (child) {
-	if ((child->isOn() != state) || (!child->isEnabled())) {
-	    deactivateThis = true;
+	if (child->isOn() != state) {
+	    makeGray = true;
 	    break;
 	}
 	child = child->nextSibling();
     }
     meta->dontPropagate = true;
-    if (deactivateThis) {
+    if (makeGray) {
+	meta->gray = true;
 	setOn(true);
-	setEnabled(false);
     } else {
-	setEnabled(true);
+	meta->gray = false;
 	setOn(state);
     }
     // Bug in QListView? It doesn't update, when
@@ -189,6 +213,17 @@ tarname() {
 	return meta->name;
 }
 
+QString KPsionCheckListItem::
+psionpath() {
+    QString tmp = text();
+    QCheckListItem *p = this;
+    while (p->depth() > 1) {
+	p = (QCheckListItem *)p->parent();
+	tmp = p->text() + "/" + tmp;
+    }
+    return KPsionMainWindow::unix2psion(tmp);
+}
+
 int KPsionCheckListItem::
 backupType() {
     if (meta->parentIsKPsionCheckListItem)
@@ -225,6 +260,7 @@ KPsionBackupListView::KPsionBackupListView(QWidget *parent, const char *name)
 	pcfg.getOptionName(KPsionConfig::OPT_BACKUPDIR));
     addColumn(i18n("Available backups"));
     setRootIsDecorated(true);
+    setSorting(-1);
 }
 
 KPsionCheckListItem *KPsionBackupListView::
@@ -240,7 +276,7 @@ readBackups(QString uid) {
     QDir d(bdir);
     kapp->processEvents();
     const QFileInfoList *fil =
-	d.entryInfoList("*.tar.gz", QDir::Files|QDir::Readable, QDir::Name);
+	d.entryInfoList("*.tar.gz", QDir::Files|QDir::Readable, QDir::Time);
     QFileInfoListIterator it(*fil);
     QFileInfo *fi;
     while ((fi = it.current())) {
@@ -284,16 +320,25 @@ readBackups(QString uid) {
 		new KPsionCheckListItem(this, n,
 					KPsionCheckListItem::CheckBox);
 	    i->setMetaData(bType, te->date(), tgz.fileName(), 0, 0, 0, 0);
-	    i->setPixmap(0, KGlobal::iconLoader()->loadIcon("mime_empty",
+	    i->setPixmap(0, KGlobal::iconLoader()->loadIcon("tgz",
 							 KIcon::Small));
 	    connect(i, SIGNAL(rootToggled()), this, SLOT(slotRootToggled()));
+
+	    indexDataList_t idList;
+	    while (!indexData.atEnd()) {
+		indexData_t id;
+
+		indexData >> id.timeHi >> id.timeLo >> id.size >> id.attr;
+		id.name = indexData.readLine().mid(1);
+		idList.push_back(id);
+	    }
 
 	    QStringList files = tgz.directory()->entries();
 	    for (QStringList::Iterator f = files.begin();
 		 f != files.end(); f++)
 		if ((*f != "KPsionFullIndex") &&
 		    (*f != "KPsionIncrementalIndex"))
-		    listTree(i, tgz.directory()->entry(*f), indexData, 0);
+		    listTree(i, tgz.directory()->entry(*f), idList, 0);
 	}
 	tgz.close();
 	++it;
@@ -310,7 +355,7 @@ readBackups(QString uid) {
 }
 
 void KPsionBackupListView::
-listTree(KPsionCheckListItem *cli, const KTarEntry *te, QTextIStream &idx,
+listTree(KPsionCheckListItem *cli, const KTarEntry *te, indexDataList_t &idx,
 	 int level) {
     KPsionCheckListItem *i =
 	new KPsionCheckListItem(cli, te->name(),
@@ -329,17 +374,19 @@ listTree(KPsionCheckListItem *cli, const KTarEntry *te, QTextIStream &idx,
 	for (QStringList::Iterator f = files.begin(); f != files.end(); f++)
 	    listTree(i, td->entry(*f), idx, level + 1);
     } else {
-	uint32_t timeHi;
-	uint32_t timeLo;
-	uint32_t size;
-	uint32_t attr;
-	QString  name;
+	indexDataList_t::iterator ii;
+
+	QString name = i->psionpath();
+	for (ii = idx.begin(); ii != idx.end(); ii++) {
+	    if (ii->name == name) {
+		i->setMetaData(0, 0, name, ii->size, ii->timeHi, ii->timeLo,
+			       ii->attr);
+		break;
+	    }
+	}
 
 	i->setPixmap(0, KGlobal::iconLoader()->loadIcon("mime_empty",
 							KIcon::Small));
-	idx >> timeHi >> timeLo >> size >> attr;
-	name = idx.readLine().mid(1);
-	i->setMetaData(0, 0, name, size, timeHi, timeLo, attr);
     }
 }
 
