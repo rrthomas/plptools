@@ -1,0 +1,128 @@
+.\" Manual page for psidump
+.\" $Id$
+.\" CHECKIN $Date$
+.\"
+.\" Process this file with
+.\" groff -man -Tascii psidump.1 for ASCII output, or
+.\" groff -man -Tps psidump.1 for PostScript output
+.\"
+.TH psidump  1 "2001/1/15" "psidump 0.1" "System Administration"
+.SH NAME
+psidump \- This is an example of a sample man page
+.SH SYNOPSIS
+.B psidump
+.B [-Vvfi]
+.BI "[-D " disk ]
+.BI "[-m " mount_dir ]
+.BI "[-d " dump_dir ]
+
+.SH DESCRIPTION
+.I psidump
+is a command to back up files from a psion or EPOC machine to your linux box.
+By default, it will only backup those files that have changed since it
+was last backed up.
+
+All backups are stored in their own separate files, and a directory is
+maintained which contains the latest version of all files on the system.
+
+.SH OPTIONS
+.TP
+.B \-V
+Display the version and exit
+.TP
+.B \-v
+Produce verbose logging output.
+.TP
+.B \-f
+This option forces a full back up to be done, rather than just backing up
+the files that have changed since the last backup.
+.TP
+.B \-i
+Performs an incremental back up - only backs up the files that have
+changed since the last backup.  This is the default.
+.TP
+.BI "\-D " disk(s)
+Specify the psion disks to be backed up.  This defaults to the 'C' and
+'D' drives.  For reasons of completeness, the 'Z' (ROM drive) can also
+be specified for backup (but there probably isn't any need to - unless
+you plan to do unspeakable things to the insides of you psion!!).
+.TP
+.BI "\-m " mount_dir
+Specify the mount directory.  This defaults to the directory specified
+is your psion configuration - usually /mnt/psion.
+.TP
+.BI "\-d " dump_dir
+Specify the dump directory.  This defaults to $HOME/psion/backups.
+
+.SH ENVIRONMENT
+.TP
+$HOME/psion
+Default directory where psion psion configuration and dump information
+is stored.
+.TP
+$HOME/psion/etc
+Configuration information about your psion(s) is stored here.
+.TP
+$HOME/psion/backups
+All backups are stored under this directory.
+
+.SH FILES
+All files that are used are located in $HOME/psion.  The directories
+are:
+.TP
+$HOME/psion/etc/psitab
+This file is a table of the different EPOC machines which have connected
+to this machine.  The first entry is the machine id, and the second
+entry is the machine name.
+Note that there must be a <tab> between the two fields!                                           
+Any lins starting with a '#' are comments.
+.TP
+$HOME/psion/backups
+Executable files
+.TP
+$HOME/psion/man
+Man pages
+
+.SH SEE ALSO
+.BR man (1),
+.BR groff (1),
+.BR groff_man (7)
+
+.SH AUTHOR
+Alain Trembleau <alain@platodesigns.com>
+ 
+.SH BUGS
+Report bugs to bugs@platodesigns.com.  Include a complete,
+self-contained example that will allow the bug to be reproduced,
+and say which version of
+.I psidump
+you are using.
+ 
+.SH COPYRIGHT
+Copyright (C) 2001 Alain Trembleau.
+
+.I psidump
+is open source software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2, or
+(at your option) any later version.  
+
+.I psidump
+is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+See the GNU General Public License for more details.
+ 
+You should have received a copy of the GNU General Public License
+along with
+.I psidump
+; see the file COPYING.  If not, write to the
+Free Software Foundation,
+59 Temple Place - Suite 330,
+Boston,
+MA 02111-1307,
+USA.
+ 
+.SH AVAILABILITY
+The most recent released version of psidump is always available for
+anonymous ftp from ftp.platodesigns.com in the directory tools/psidump.                                        

@@ -1,0 +1,322 @@
+#!/bin/bash
+# psidump - backup psion files
+# Copyright (C) 2001  Alain Trembleau <alain@platodesigns.com>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# This does an incremental backup of the C:, D: and E: drives (if they exist)
+# The Z: (ROM) drive can also be backed up.
+# The -g option is a gnu tar specific option which will not necessarily
+# work with other versions of tar.
+# The tar files created may not work with other versions of tar.
+#
+# Note: --listed-incremental=SNAPSHOT-FILE = -g SNAPSHOT-FILE
+#
+
+# Function definitions
+
+function usage () {
+
+    OPTIND=1
+    while getopts ":d" option; do
+      case $option in
+        d)  # Detailed output
+            detail=1
+            ;;
+      esac
+    done
+
+    echo "Version $VERSION"
+    echo "Usage : psidump [-fivV] [-D <disk>] [-m <mount_dir>] [-d <dump_dir>]"
+    if [[ $detail ]]; then
+        echo "Options:"
+        echo " d <dir>  unix dump directory"
+        echo " D <disk> psion disks to be backed up"
+        echo " f        forces a full backup"
+        echo " i        perform an incremental backup"
+        echo " m <dir>  psion mount point"
+        echo " v        verbose output"
+        echo " V        display the version and exit"
+    fi
+    exit 1
+
+}
+
+function create_dirs () {
+    # If the required directories do not exist, then create them.
+
+    # Local variable declarations
+    local localdir
+
+    # Grab arguments
+    localdir=$1
+
+    if [[ ! -d "$localdir" ]] ; then
+        mkdir  "$localdir"
+    fi
+    if [[ ! -d "$localdir"/etc ]] ; then
+        mkdir  "$localdir"/etc
+    fi
+    if [[ ! -d "$localdir"/etc ]] ; then
+        mkdir  "$localdir"/etc
+    fi
+    if [[ ! -d "$localdir"/backups ]] ; then
+        mkdir  "$localdir"/backups
+    fi
+    if [[ ! -d "$localdir"/backups/tarfiles ]] ; then
+        mkdir  "$localdir"/backups/tarfiles
+    fi
+
+    if [[ ! -f "$localdir"/etc/psitab ]] ; then
+        cat >  "$localdir"/etc/psitab << END1
+# psitab
+#
+# This file is a table of the different EPOC machines which have connected
+# to this machine.  The first entry is the machine id, and the second
+# entry is the machine name.
+# Note:  There MUST be a TAB between the two fields!
+#
+END1
+    fi
+
+}
+
+function process_drives () {
+    # Determine the drives on the machine, and process one by one
+
+    # Local variable declarations
+    local localdir
+    local psidir
+    local full_backup
+    local machine_name
+    local dump_drive_list
+    local re_drive_list
+
+    # Grab arguments
+    localdir=$1
+    psidir=$2
+    full_backup=$3
+    machine_name=$4
+    dump_drive_list=$5
+
+    # Turn "CDE" into "C|D|E"
+    re_drive_list=`echo $dump_drive_list | sed -e 's/./&|/g' -e 's/|$//'`
+
+    # Determine the current drives on the machine to be backed up
+    drives=`
+        plpftp devs |
+        sed -e '1d' |
+        awk '$1~/'$re_drive_list'/ { print $1 }'
+        
+    `
+
+    # Dump file timestamp
+    now=`date +%Y%m%d.%H%M`
+
+    # Do the dump and loads
+
+    echo "Backing up Machine: $machine_name"
+
+    for drive in $drives
+    do
+        drive_name=`plpftp devs | awk '$1=="'$drive'" { print $3 }'`
+
+        echo "Backing up Drive: $drive Name: $drive_name"
+
+        if [[ -n $drive_name ]] ; then
+            dump_drive "$localdir" "$psidir" $full_backup "$machine_name" \
+                       "$drive:" "$drive_name" "$now"
+            restore_drive "$localdir" "$machine_name" "$drive_name" "$now"
+        fi
+
+        echo "Drive $drive backed up."
+    done
+
+}
+
+function dump_drive () {
+    # Incremental backup of the specified drive
+
+    # Local variable declarations
+    local localdir
+    local psidir
+    local full_backup
+    local machine_name
+    local drive
+    local drive_name
+    local timestamp
+
+    # Grab arguments
+    localdir=$1
+    psidir=$2
+    full_backup=$3
+    machine_name=$4
+    drive=$5
+    drive_name=$6
+    timestamp=$7
+
+    # If doing a full backup, remove dumpinfo file.
+    if [[ $full_backup == 1 ]] ; then
+        rm "$localdir"/etc/dumpinfo."$machine_name"."$drive_name"
+    fi
+
+    tar -c -g "$localdir"/etc/dumpinfo."$machine_name"."$drive_name" -v -z \
+      -f "$localdir"/backups/tarfiles/psion."$machine_name"."$drive_name".$timestamp.tgz \
+      -C "$psidir"/$drive \
+      .
+#      . \
+#     2&>1 | tee -a "$localdir"/etc/dumplog
+
+    # When testing, add this to the above tar command to speed up dumps
+    #  --exclude ./System \
+}
+
+function restore_drive () {
+    # Untar the files into the appropriate directory
+
+    # Local variable declarations
+    local localdir
+    local machine_name
+    local drive_name
+    local timestamp
+
+    # Grab arguments
+    localdir=$1
+    machine_name=$2
+    drive_name=$3
+    timestamp=$4
+
+    # Need to check whether the appropriate directories exist.
+    # If not, create them.
+    if [[ ! -d "$localdir"/backups/"$machine_name"/"$drive_name" ]] ; then
+        mkdir  "$localdir"/backups/"$machine_name"/"$drive_name"
+    fi
+
+    # Now restore the files to an appropriate location.
+    tar -x -g $localdir/etc/dumpinfo."$machine_name"."$drive_name" -v -z \
+      -C $localdir/backups/"$machine_name"/"$drive_name" \
+      -f $localdir/backups/tarfiles/psion."$machine_name"."$drive_name".$timestamp.tgz
+#      | tee -a "$localdir"/etc/dumplog
+}
+
+## Main Program
+
+# Default settings
+psidir="/mnt/psion"
+localdir="$HOME/psion"
+dump_drive_list="CDE"
+full_backup=0
+verbose=0
+
+while getopts ":d:D:fim:vV" option; do
+  case $option in
+    d)  # Set the local dump directory
+        localdir=$OPTARG
+        ;;
+
+    D)  # Specify the disks to be backed up
+        dump_drive_list=$OPTARG
+        ;;
+
+    f)  # Force full backup
+        full_backup=1
+        ;;
+
+    i)  # Perform an incremental backup
+        full_backup=0
+        ;;
+
+    m)  # Set the mount point where the psion files are to be found
+        psidir=$OPTARG
+        ;;
+
+    v)  # Turn on verbose logging
+        verbose=1
+        ;;
+
+    V)  # Display version and exit
+        usage
+        ;;
+
+    ?)  # Invalid option
+        OPTIND=1
+        usage -d
+        ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+# Check arguments
+if [[ $# != 0 ]]; then
+    usage
+fi
+
+# Check whether all the appropriate directories and files exist
+create_dirs "$localdir"
+
+# Determine which psion
+machine_id=`
+  plpftp machinfo |
+  awk -F: '$1=="  Machine UID" { print $2 }' |
+  sed -e 's/ //g'
+`
+
+machine_name=`
+  grep -v "^#" $HOME/psion/etc/psitab |
+  awk -F"\t" '$1=="'$machine_id'" {print $2}'
+`
+
+# Deal with the possibility of no name entry
+if [[ -z $machine_name ]] ; then
+    echo "This is the first time this Psion has been backed up"
+    echo "on this machine."
+    echo "Please enter a machine name - eg: My Psion"
+    read -p "Machine name: " machine_name
+
+    # Should have a check to make sure this name hasn't already been used.
+
+    echo "#"                           >> $localdir/etc/psitab
+    echo "$machine_id	$machine_name" >> $localdir/etc/psitab
+fi
+
+if [[ ! -d "$localdir"/backups/"$machine_name" ]] ; then
+    mkdir  "$localdir"/backups/"$machine_name"
+fi
+
+# Create new entry in log file
+#echo "==================================================" >> "$localdir"/etc/dumplog
+#echo "== Starting backup ===============================" >> "$localdir"/etc/dumplog
+#echo "==================================================" >> "$localdir"/etc/dumplog
+
+# Shut down all processes running on the EPOC machine
+echo killsave \"$localdir/etc/proclist.$machine_name\" |
+  plpftp
+#  plpftp >> "$localdir"/etc/dumplog
+
+# Determine the drives on the machine, and process one by one
+process_drives "$localdir" "$psidir" $full_backup "$machine_name" $dump_drive_list
+
+# Restart all the stopped processes
+echo runrestore \"$localdir/etc/proclist.$machine_name\" |
+  plpftp
+#  plpftp >> "$localdir"/etc/dumplog
+
+# This is a hardwired hack due to Macro5 not restarting correctly
+if [[ `grep -l "^Macro5" $localdir/etc/proclist."$machine_name"` ]] ; then
+    echo "Manually restarting Macro5"
+    echo run 'C:\System\Apps\Macro5\Macro5.app' |
+      plpftp
+#      plpftp >> "$localdir"/etc/dumplog
+fi
