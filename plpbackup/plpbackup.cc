@@ -144,7 +144,7 @@ checkAbort()
 	}
 	cout << endl;
 	cout << _("Abort? (y/N) ") << flush;
-	char *validA = _("Y");
+	const char *validA = _("Y");
 	char answer;
 	cin >> answer;
 	caughtSig = 0;
@@ -485,11 +485,11 @@ runRestore()
 {
     int i;
     ostrstream tarcmd;
-
     for (i = 0; i < archList.size(); i++) {
 	tarcmd << "tar --to-stdout -xzf " << archList[i]
 	       << " 'KPsion*Index'" << '\0';
 	FILE *f = popen(tarcmd.str(), "r");
+
 	pclose(f);
     }
 }
@@ -595,6 +595,7 @@ runBackup()
 	gettimeofday(&cstart_tv, NULL);
 	// copy all files to local temporary dir
 	for (i = 0; i < toBackup.size(); i++) {
+	    struct timeval fstart_tv, fend_tv;
 	    PlpDirent e = toBackup[i];
 	    const char *fn = e.getName();
 
@@ -608,6 +609,7 @@ runBackup()
 		bErr = true;
 		break;
 	    }
+	    gettimeofday(&fstart_tv, NULL);
 	    res = Rfsv->copyFromPsion(fn, dest.c_str(), NULL, cab);
 	    if (checkAbort()) {
 		// remove temporary dir
@@ -617,8 +619,11 @@ runBackup()
 		cout << _("Backup aborted by user") << endl;
 		return;
 	    }
+	    gettimeofday(&fend_tv, NULL);
 	    if (verbose > 1)
-		cout << endl;
+		cout << " "
+		     << (int)((double)fileSize / tdiff(&fstart_tv, &fend_tv))
+		     << " CPS" << endl;
 	    totalBytes += fileSize;
 	    if (res != rfsv::E_PSI_GEN_NONE) {
 		if (skipError) {
@@ -793,15 +798,15 @@ usage(ostream *hlp)
 	    _("Usage: plpbackup OPTIONS [<drive>:] [<drive>:] ...\n"
 	      "\n"
 	      "  Options:\n"
-	      "    -h, --help         Print this message and exit.\n"
-	      "    -V, --version      Print version and exit.\n"
-	      "    -p, --port=<port>  Connect to ncpd using given port.\n"
-	      "    -v, --verbose      Increase verbosity.\n"
-	      "    -q, --quiet        Decrease verbosity.\n"
-	      "    -f, --full         Do a full backup (incremental otherwise).\n"
-	      "    -b, --backup[=TGZ] Backup to specified archive TGZ.\n"
-	      "    -r, --restore=TGZ  Restore from specified archive TGZ.\n"
-	      "    -F, --format       Format drive (can be combined with restore).\n"
+	      "    -h, --help             Print this message and exit.\n"
+	      "    -V, --version          Print version and exit.\n"
+	      "    -p, --port=[HOST:]PORT Connect to ncpd on HOST, PORT.\n"
+	      "    -v, --verbose          Increase verbosity.\n"
+	      "    -q, --quiet            Decrease verbosity.\n"
+	      "    -f, --full             Do a full backup (incremental otherwise).\n"
+	      "    -b, --backup[=TGZ]     Backup to specified archive TGZ.\n"
+	      "    -r, --restore=TGZ      Restore from specified archive TGZ.\n"
+	      "    -F, --format           Format drive (can be combined with restore).\n"
 	      "\n"
 	      "  <drive> A drive character. If none given, scan all drives.\n"
 	      "\n");
@@ -815,7 +820,7 @@ usage(ostream *hlp)
 static struct option opts[] = {
     { "full",    no_argument,       0, 'f' },
     { "help",    no_argument,       0, 'h' },
-    { "port",    required_argument, 0, 'V' },
+    { "port",    required_argument, 0, 'p' },
     { "verbose", no_argument,       0, 'v' },
     { "quiet",   no_argument,       0, 'q' },
     { "backup",  optional_argument, 0, 'b' },
@@ -825,15 +830,47 @@ static struct option opts[] = {
     { 0,         0,                 0, 0   },
 };
 
+static void
+parse_destination(const char *arg, const char **host, int *port)
+{
+    if (!arg)
+	return;
+    // We don't want to modify argv, therefore copy it first ...
+    char *argcpy = strdup(arg);
+    char *pp = strchr(argcpy, ':');
+
+    if (pp) {
+	// host.domain:400
+	// 10.0.0.1:400
+	*pp ++= '\0';
+	*host = argcpy;
+    } else {
+	// 400
+	// host.domain
+	// host
+	// 10.0.0.1
+	if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
+	    *host = argcpy;
+	    pp = 0L;
+	} else
+	    pp = argcpy;
+    }
+    if (pp)
+	*port = atoi(pp);
+}
+
 int
 main(int argc, char **argv)
 {
     ppsocket *skt;
     ppsocket *skt2;
+    const char *host = "127.0.0.1";
     int sockNum = DPORT;
     int op;
 
+#ifdef LC_ALL
     setlocale (LC_ALL, "");
+#endif
     textdomain(PACKAGE);
 
     struct servent *se = getservbyname("psion", "tcp");
@@ -873,7 +910,7 @@ main(int argc, char **argv)
 		doFormat = true;
 		break;
 	    case 'p':
-		sockNum = atoi(optarg);
+		parse_destination(optarg, &host, &sockNum);
 		break;
 	    default:
 		usage(&cerr);
@@ -907,12 +944,12 @@ main(int argc, char **argv)
     signal(SIGINT, sig_handler);
     // Connect to Psion
     skt = new ppsocket();
-    if (!skt->connect(NULL, sockNum)) {
+    if (!skt->connect(host, sockNum)) {
 	cerr << _("plpbackup: could not connect to ncpd") << endl;
 	return 1;
     }
     skt2 = new ppsocket();
-    if (!skt2->connect(NULL, sockNum)) {
+    if (!skt2->connect(host, sockNum)) {
 	cerr << _("plpbackup: could not connect to ncpd") << endl;
 	return 1;
     }
