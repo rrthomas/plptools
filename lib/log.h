@@ -1,3 +1,6 @@
+/* $Id$
+ */
+
 #ifndef _log_h_
 #define _log_h_
 

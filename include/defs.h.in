@@ -21,11 +21,6 @@
 # define PSIONHOSTNAME "localhost"
 #endif
 
-/* See CHANGES for comment */
-#ifdef linux
-#define NO_WRITE_SELECT
-#endif
-
 /*
  * defaults for ncpd
  */
