@@ -337,7 +337,8 @@ listTree(KPsionCheckListItem *cli, const KTarEntry *te, QTextIStream &idx,
 
 	i->setPixmap(0, KGlobal::iconLoader()->loadIcon("mime_empty",
 							KIcon::Small));
-	idx >> timeHi >> timeLo >> size >> attr >> name;
+	idx >> timeHi >> timeLo >> size >> attr;
+	name = idx.readLine().mid(1);
 	i->setMetaData(0, 0, name, size, timeHi, timeLo, attr);
     }
 }
