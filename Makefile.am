@@ -37,7 +37,9 @@ install-data-local:
 dist-hook:
 	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile
 	$(MAKE) -C $(distdir)/kde2 -f Makefile.am am_edit
-	conf/cvs2cl -W 1800 -S --no-wrap --prune --gmt -f $(distdir)/ChangeLog
+	test -f CVS/Root && conf/cvs2cl -W 1800 -S --no-wrap --prune \
+		--gmt -f $(distdir)/ChangeLog || \
+		cp -f ChangeLog $(distdir)/ChangeLog
 
 kdoc:
 	kdoc -d $(TMPDEST)doc/api -n libplp --strip-h-path $(TMPDEST)lib/*.h
