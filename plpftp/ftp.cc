@@ -99,9 +99,11 @@ void ftp::usage() {
 	cout << "  put <unixfile>" << endl;
 	cout << "  mget <shellpattern>" << endl;
 	cout << "  mput <shellpattern>" << endl;
+	cout << "  cp <psionfile> <psionfile>" << endl;
 	cout << "  del|rm <psionfile>" << endl;
 	cout << "  mkdir <psiondir>" << endl;
 	cout << "  rmdir <psiondir>" << endl;
+	cout << "  volname <drive> <name>" << endl;
 	cout << "  prompt" << endl;
 	cout << "  hash" << endl;
 	cout << "  bye" << endl;
@@ -169,13 +171,13 @@ Wildmat(const char *s, char *p)
 }
 
 static int
-checkAbortNoHash(long)
+checkAbortNoHash(void *, long)
 {
 	return continueRunning;
 }
 
 static int
-checkAbortHash(long)
+checkAbortHash(void *, long)
 {
 	if (continueRunning) {
 		printf("#"); fflush(stdout);
@@ -295,12 +297,27 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			cout << "Psion dir: \"" << psionDir << "\"" << endl;
 			continue;
 		}
+		if (!strcmp(argv[0], "volname") && (argc == 3) && (strlen(argv[1]) == 1)) {
+			if ((res = a.setVolumeName(toupper(argv[1][0]), argv[2])) != rfsv::E_PSI_GEN_NONE)
+				cerr << "Error: " << res << endl;
+			continue;
+			
+		}
 		if (!strcmp(argv[0], "ren") && (argc == 3)) {
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
 			strcpy(f2, psionDir);
 			strcat(f2, argv[2]);
 			if ((res = a.rename(f1, f2)) != rfsv::E_PSI_GEN_NONE)
+				cerr << "Error: " << res << endl;
+			continue;
+		}
+		if (!strcmp(argv[0], "cp") && (argc == 3)) {
+			strcpy(f1, psionDir);
+			strcat(f1, argv[1]);
+			strcpy(f2, psionDir);
+			strcat(f2, argv[2]);
+			if ((res = a.copyOnPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			continue;
 		}
@@ -508,7 +525,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			else
 				strcat(f2, argv[2]);
 			gettimeofday(&stime, 0L);
-			if ((res = a.copyFromPsion(f1, f2, cab)) != rfsv::E_PSI_GEN_NONE) {
+			if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
 				if (hash)
 					cout << endl;
 				continueRunning = 1;
@@ -572,7 +589,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 						for (char *p = f2; *p; p++)
 							*p = tolower(*p);
 					}
-					if ((res = a.copyFromPsion(f1, f2, cab)) != rfsv::E_PSI_GEN_NONE) {
+					if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
 						if (hash)
 							cout << endl;
 						continueRunning = 1;
@@ -600,7 +617,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			else
 				strcat(f2, argv[2]);
 			gettimeofday(&stime, 0L);
-			if ((res = a.copyToPsion(f1, f2, cab)) != rfsv::E_PSI_GEN_NONE) {
+			if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
 				if (hash)
 					cout << endl;
 				continueRunning = 1;
@@ -661,7 +678,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 						if (temp[0] == 'y') {
 							strcpy(f2, psionDir);
 							strcat(f2, de->d_name);
-							if ((res = a.copyToPsion(f1, f2, cab)) != rfsv::E_PSI_GEN_NONE) {
+							if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
 								if (hash)
 									cout << endl;
 								continueRunning = 1;
@@ -970,7 +987,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 static char *all_commands[] = {
 	"pwd", "ren", "touch", "gtime", "test", "gattr", "sattr", "devs",
 	"dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
-	"del", "rm", "mkdir", "rmdir", "prompt", "bye",
+	"del", "rm", "mkdir", "rmdir", "prompt", "bye", "cp", "volname",
 	"ps", "kill", "killsave", "runrestore", "run", "machinfo",
 	"ownerinfo", NULL
 };
@@ -995,6 +1012,7 @@ filename_generator(char *text, int state)
 
 
 	if (!state) {
+		char *p;
 		Enum<rfsv::errs> res;
 		len = strlen(text);
 		if (comp_files)
@@ -1002,6 +1020,9 @@ filename_generator(char *text, int state)
 		comp_files = new bufferArray();
 		strcpy(tmpPath, psionDir);
 		strcat(tmpPath, cplPath);
+		for (p = tmpPath; *p; p++)
+			if (*p == '/')
+				*p = '\\';
 		if ((res = comp_a->dir(tmpPath, *comp_files)) != rfsv::E_PSI_GEN_NONE) {
 			cerr << "Error: " << res << endl;
 			return NULL;
@@ -1023,8 +1044,10 @@ filename_generator(char *text, int state)
 		if (!(strncmp(tmpPath, text, len))) {
 			char fnbuf[1024];
 			strcpy(fnbuf, tmpPath);
-			if (attr & rfsv::PSI_A_DIR)
+			if (attr & rfsv::PSI_A_DIR) {
+				rl_completion_append_character = '\0';
 				strcat(fnbuf, "/");
+			}
 			return (strdup(fnbuf));
 		}
 	}
@@ -1060,11 +1083,13 @@ do_completion(char *text, int start, int end)
 	char **matches = NULL;
 
 	rl_completion_entry_function = (Function *)null_completion;
+	rl_completion_append_character = ' ';
 	if (start == 0)
 		matches = completion_matches(text, cmdgen_ptr);
 	else {
 		int idx = 0;
 		char *name;
+		char *p;
 
 		rl_filename_quoting_desired = 1;
 		while ((name = localfile_commands[idx])) {
@@ -1077,21 +1102,15 @@ do_completion(char *text, int start, int end)
 		maskAttr = 0xffff;
 		idx = 0;
 		strcpy(cplPath, text);
-		rl_completion_append_character = ' ';
+		p = strrchr(cplPath, '/');
+		if (p)
+			*(++p) = '\0';
+		else
+			cplPath[0] = '\0';
 		while ((name = remote_dir_commands[idx])) {
 			idx++;
-			if (!strncmp(name, rl_line_buffer, strlen(name))) {
-				char *p = strrchr(cplPath, '/');
-				if (p) {
-					*(++p) = '\0';
-					for (p = cplPath; *p; p++)
-						if (*p == '/')
-							*p = '\\';
-				} else
-					cplPath[0] = '\0';
+			if (!strncmp(name, rl_line_buffer, strlen(name)))
 				maskAttr = rfsv::PSI_A_DIR;
-				rl_completion_append_character = '\0';
-			}
 		}
 		
 		matches = completion_matches(text, fnmgen_ptr);
