@@ -298,7 +298,7 @@ openConnection() {
 	    if ((devbits & 1) != 0) {
 		PlpDrive drive;
 		if (plpRfsv->devinfo('A' + i, drive) == rfsv::E_PSI_GEN_NONE) {
-		    string vname = drive.getName();
+		    std::string vname = drive.getName();
 		    QString name;
 
 		    if (!vname.empty())
@@ -1124,7 +1124,7 @@ special(const QByteArray &a) {
 		return;
 	    }
 
-	    string mtype;
+	    std::string mtype;
 	    drive.getMediaType(mtype);
 
 	    // DriveLetter

@@ -40,7 +40,7 @@
 #include <qdir.h>
 
 class KPsionCheckListItem::KPsionCheckListItemMetaData {
-    friend KPsionCheckListItem;
+    friend class KPsionCheckListItem;
 
 private:
     KPsionCheckListItemMetaData();

@@ -343,7 +343,7 @@ queryPsion() {
 		return;
 	    }
 	    machineUID = 0;
-	    string oi = "";
+	    std::string oi = "";
 	    while (!b.empty()) {
 		oi += b.pop().getString();
 		oi += "\n";

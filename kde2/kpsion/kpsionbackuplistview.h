@@ -43,7 +43,7 @@ typedef struct {
     QString name;
 } indexData_t;
 
-typedef vector<indexData_t> indexDataList_t;
+typedef std::vector<indexData_t> indexDataList_t;
 
 class KPsionCheckListItem : public QObject, public QCheckListItem {
     Q_OBJECT

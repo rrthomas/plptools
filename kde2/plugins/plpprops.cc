@@ -66,6 +66,8 @@ static inline const char *N_(const char *t) { return t; }
 #define KIO_ARGS QByteArray packedArgs; \
 QDataStream stream( packedArgs, IO_WriteOnly ); stream
 
+using namespace std;
+
 class PlpPropsPlugin::PlpPropsPluginPrivate {
 public:
     PlpPropsPluginPrivate() { }
