@@ -852,11 +852,12 @@ msgstr ""
 msgid "Got namelength %d\n"
 msgstr ""
 
-#: lib/sisreqrecord.cpp:56
+#: lib/sisreqrecord.cpp:66
 #, fuzzy, c-format
 msgid "Got namepos %d\n"
 msgstr "Hittade källnamn %.*s\n"
 
+#: lib/sisreqrecord.cpp:69
 #, c-format
 msgid "Position/length too large for req record %d.\n"
 msgstr "Position/längd för stor för kravpost %d.\n"
@@ -1662,24 +1663,7 @@ msgstr "Backup kan bara skapa ett arkiv i taget."
 msgid "plpbackup: could not connect to ncpd"
 msgstr "plpbackup: fick ingen kontakt med ncpd"
 
-#: sisinstall/sismain.cpp:43
-msgid ""
-"Usage: sisinstall [OPTIONS]... SISFILE\n"
-"\n"
-"Supported options:\n"
-"\n"
-" -h, --help              Display this text.\n"
-" -V, --version           Print version and exit.\n"
-" -l, --loglevel=LEVEL    Set the log level, by default 0.\n"
-" -n, --dry-run           Just parse file file.\n"
-" -w, --newt              Use the Newt interface.\n"
-msgstr ""
-
-#: sisinstall/sismain.cpp:98
-msgid "sisinstall version 0.1\n"
-msgstr ""
-
-#: sisinstall/sismain.cpp:117 sisinstall/sismain.cpp:125
+#: sisinstall/sismain.cpp:31
 msgid "Got an error, Press any key to exit."
 msgstr ""
 
@@ -1699,6 +1683,10 @@ msgid ""
 " -v, --verbose=LEVEL     Set the verbosity level, by default 0.\n"
 " -n, --dry-run           Just parse file file.\n"
 " -w, --newt              Use the Newt interface.\n"
+msgstr ""
+
+#: sisinstall/sismain.cpp:109
+msgid "sisinstall version 0.1\n"
 msgstr ""
 
 #: sisinstall/sismain.cpp:128 sisinstall/sismain.cpp:136

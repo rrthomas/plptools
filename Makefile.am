@@ -9,7 +9,7 @@ endif
 
 SUBDIRS = intl po lib ncpd plpnfsd plpftp plpbackup plpprint sisinstall \
 	$(KDESUB) doc .
-EXTRA_DIST = CHANGES COPYING README TODO INSTALL README.mjg ABOUT-NLS include/*.h* etc/*magic etc/*.in patches conf/m4/kde/*.m4 conf/m4/plptools/*.m4 conf/[a-l]* conf/missing conf/mkinstalldirs
+EXTRA_DIST = CHANGES COPYING README TODO INSTALL ABOUT-NLS include/*.h* etc/*magic etc/*.in patches conf/m4/kde/*.m4 conf/m4/plptools/*.m4 conf/[a-l]* conf/missing conf/mkinstalldirs
 DISTCLEANFILES = etc/psion
 AUTOMAKE_OPTIONS = foreign
 
