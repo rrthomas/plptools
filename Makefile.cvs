@@ -11,6 +11,10 @@ build: devel
 	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-kde
 	make
 
+buildnox: devel
+	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug
+	make
+
 devel: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	autoconf
 	touch include/stamp-h.in
