@@ -32,6 +32,7 @@
 #include <strstream>
 #include <iomanip>
 #include <vector>
+#include <set>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -61,6 +62,8 @@ bool doBackup = false;
 bool doFormat = false;
 bool skipError = false;
 bool doAbort = false;
+bool overWriteAll = false;
+
 
 int    verbose = 0;
 int    caughtSig = 0;
@@ -74,6 +77,7 @@ PlpDir toRestore;
 vector<string> driveList;
 vector<string> archList;
 vector<string> savedCommands;
+set<string> overWriteList;
 rfsv *Rfsv;
 rpcs *Rpcs;
 
@@ -101,17 +105,76 @@ generateBackupName()
 {
     time_t now = time(0);
     Enum<rfsv::errs> res;
+    u_int64_t machineUID;
     char tstr[80];
     static char nbuf[4096];
 
-    rpcs::machineInfo mi;
-    if ((res = Rpcs->getMachineInfo(mi)) != rfsv::E_PSI_GEN_NONE) {
-	cerr << _("Could not get machine UID") << endl;
-	exit(1);
+    Enum<rpcs::machs> machType;
+
+    Rpcs->getMachineType(machType);
+    if (machType == rpcs::PSI_MACH_S5) {
+	rpcs::machineInfo mi;
+	if ((res = Rpcs->getMachineInfo(mi)) != rfsv::E_PSI_GEN_NONE) {
+	    cerr << _("Could not get machine UID") << endl;
+	    exit(1);
+	}
+	machineUID = mi.machineUID;
+    } else {
+	// On a SIBO, first check for a file 'SYS$PT.CFG' on the default
+	// directory. If it exists, read the UID from it. Otherwise
+	// calculate a virtual machine UID from the OwnerInfo data and
+	// write it to that file.
+	bufferArray b;
+	u_int32_t handle;
+	u_int32_t count;
+
+	res = Rfsv->fopen(Rfsv->opMode(rfsv::PSI_O_RDONLY),
+			  "SYS$PT.CFG", handle);
+	if (res == rfsv::E_PSI_GEN_NONE) {
+	    res = Rfsv->fread(handle, (unsigned char *)&machineUID,
+			      sizeof(machineUID), count);
+	    Rfsv->fclose(handle);
+	    if ((res != rfsv::E_PSI_GEN_NONE) || (count != sizeof(machineUID))) {
+		cerr << _("Could not read SIBO UID file") << endl;
+		exit(1);
+	    }
+	} else {
+	    if ((res = Rpcs->getOwnerInfo(b)) != rfsv::E_PSI_GEN_NONE) {
+		cerr << _("Could not get Psion owner info") << endl;
+		exit(1);
+	    }
+	    machineUID = 0;
+	    string oi = "";
+	    while (!b.empty()) {
+		oi += b.pop().getString();
+		oi += "\n";
+	    }
+	    const char *p = oi.c_str();
+	    unsigned long long z;
+	    int i = 0;
+
+	    while (*p) {
+                z = *p;
+                machineUID ^= (z << i);
+                p++; i++;
+                i &= ((sizeof(machineUID) * 8) - 1);
+	    }
+	    res = Rfsv->fcreatefile(Rfsv->opMode(rfsv::PSI_O_RDWR),
+				    "SYS$PT.CFG", handle);
+	    if (res == rfsv::E_PSI_GEN_NONE) {
+		res = Rfsv->fwrite(handle, (const unsigned char *)&machineUID,
+				   sizeof(machineUID), count);
+		Rfsv->fclose(handle);
+	    }
+	    if (res != rfsv::E_PSI_GEN_NONE) {
+		cerr << _("Could not write SIBO UID file ") << res << endl;
+		exit(1);
+	    }
+        }
     }
     strftime(tstr, sizeof(tstr), "-%Y-%m-%d-%H-%M-%S", localtime(&now));
     sprintf(nbuf, "%s/plpbackup/%16llx/%c%s.tar.gz", getHomeDir(),
-	    mi.machineUID, full ? 'F' : 'I', tstr);
+	    machineUID, full ? 'F' : 'I', tstr);
     return nbuf;
 }
 
@@ -419,35 +482,35 @@ static void
 startMessage(const char *arch)
 {
     if (verbose >= 0) {
-	cout << "Performing ";
+	cout << _("Performing ");
 	if (doFormat)
-	    cout << "format";
+	    cout << _("format");
 	if (doRestore) {
 	    if (doFormat)
-		cout << " and ";
-	    cout << "restore";
+		cout << _(" and ");
+	    cout << _("restore");
 	} else
-	    cout << (full ? "full" : "incremental") << " backup";
-	cout << " of ";
+	    cout << (full ? _("full") : _("incremental")) << _(" backup");
+	cout << _(" of ");
 	if (driveList.empty())
-	    cout << "all drives";
+	    cout << _("all drives");
 	else {
-	    cout << "Drive ";
+	    cout << _("Drive ");
 	    for (unsigned int i = 0; i < driveList.size(); i++) {
 		cout << driveList[i++];
 		if (i < (driveList.size() - 1))
 		    cout << ", ";
 		else {
 		    if (driveList.size() > 1)
-			cout << " and ";
+			cout << _(" and ");
 		}
 	    }
 	}
 	if (arch) {
 	    if (doBackup)
-		cout << " to " << arch;
+		cout << _(" to ") << arch;
 	    if (doRestore)
-		cout << " from " << arch;
+		cout << _(" from ") << arch;
 	}
 	cout << endl;
     }
@@ -647,14 +710,14 @@ collectIndex(FILE *f, const char *archname)
     // drives now contains the drive-chars of all drives found in
     // the backup.
     if (!drives.empty()) {
-	cout << "It contains Backups of drive ";
+	cout << _("It contains Backups of drive ");
 	for (i = 0; i < drives.size(); i++) {
 	    if (i>0) {
 		if (i < (drives.size() - 1))
 		    cout << ", ";
 		else
 		    if (drives.size() > 1)
-			cout << " and ";
+			cout << _(" and ");
 	    }
 	    cout << drives[i] << ":";
 	}
@@ -667,70 +730,124 @@ collectIndex(FILE *f, const char *archname)
 		select = true;
 	}
 	if (select) {
-	    cout << "Do you want to select individual files from this archive? (y/N)" << endl;
-	    const char *validA = _("Y");
+	    cout << _("Select (I)ndividual files, (W)hole archive, (N)one "
+		      "from this archive? (I/W/N) ") << flush;
+	    string validA = _("IWA");
 	    char answer;
 	    cin >> answer;
-	    if (toupper(answer) == *validA) {
-		strcpy(buf, "/tmp/plpbackupL_XXXXXX");
-		int fd = mkstemp(buf);
-		if (fd == -1) {
-		    perror("mkstemp");
-		    exit(-1);
-		}
-		FILE *tf = fdopen(fd, "w");
-		fprintf(tf, "# Edit this file to you needs and save it\n");
-		fprintf(tf, "# Change the 'N' in the first column to 'Y'\n");
-		fprintf(tf, "# if you want a file to be restored.\n");
-		fprintf(tf, "# DO NOT INSERT ANY LINES!\n");
-		for (i = 0; i < indexSel.size(); i++)
-		    for (int j = 0; j < driveList.size(); j++)
-			if (*(indexSel[i].getName()) == driveList[j][0])
-			    fprintf(tf, "N %s\n", indexSel[i].getName());
-		fclose(tf);
-		if (editfile(buf) == -1) {
-		    perror("Could not run external editor");
-		    unlink(buf);
-		    exit(-1);
-		}
-		tf = fopen(buf, "r");
-		if (!tf) {
-		    perror(buf);
-		    unlink(buf);
-		    exit(-1);
-		}
-		unlink(buf);
-		while (fgets(buf, sizeof(buf), tf)) {
-		    char *p = strrchr(buf, '\n');
-		    if (p)
-			*p = '\0';
-		    if (buf[0] == 'Y') {
-			for (i = 0; i < indexSel.size(); i++)
-			    if (!strcmp(indexSel[i].getName(), &buf[2]))
-				indexRestore.push_back(indexSel[i]);
+	    FILE *tf;
+	    int fd;
+	    switch (validA.find(toupper(answer))) {
+		case 0:
+		    strcpy(buf, "/tmp/plpbackupL_XXXXXX");
+		    fd = mkstemp(buf);
+		    if (fd == -1) {
+			perror("mkstemp");
+			exit(-1);
 		    }
-		}
-		fclose(tf);
-	    } else {
-		for (i = 0; i < indexSel.size(); i++)
-		    for (int j = 0; j < driveList.size(); j++)
-			if (*(indexSel[i].getName()) == driveList[j][0])
-			    indexRestore.push_back(indexSel[i]);
+		    tf = fdopen(fd, "w");
+		    fprintf(tf, "# Edit this file to you needs and save it\n");
+		    fprintf(tf, "# Change the 'N' in the first column to 'Y'\n");
+		    fprintf(tf, "# if you want a file to be restored.\n");
+		    fprintf(tf, "# DO NOT INSERT ANY LINES!\n");
+		    for (i = 0; i < indexSel.size(); i++)
+			for (int j = 0; j < driveList.size(); j++)
+			    if (*(indexSel[i].getName()) == driveList[j][0])
+				fprintf(tf, "N %s\n", indexSel[i].getName());
+		    fclose(tf);
+		    if (editfile(buf) == -1) {
+			perror(_("Could not run external editor"));
+			unlink(buf);
+			exit(-1);
+		    }
+		    tf = fopen(buf, "r");
+		    if (!tf) {
+			perror(buf);
+			unlink(buf);
+			exit(-1);
+		    }
+		    unlink(buf);
+		    while (fgets(buf, sizeof(buf), tf)) {
+			char *p = strrchr(buf, '\n');
+			if (p)
+			    *p = '\0';
+			if (buf[0] == 'Y') {
+			    for (i = 0; i < indexSel.size(); i++)
+				if (!strcmp(indexSel[i].getName(), &buf[2]))
+				    indexRestore.push_back(indexSel[i]);
+			}
+		    }
+		    fclose(tf);
+		    break;
+		case 1:
+		    for (i = 0; i < indexSel.size(); i++)
+			for (int j = 0; j < driveList.size(); j++)
+			    if (*(indexSel[i].getName()) == driveList[j][0])
+				indexRestore.push_back(indexSel[i]);
+		    break;
+		case 2:
+		    return;
 	    }
 	} else
-	    cout << "Archive skipped, because it does not contain any files on selected drives" << endl;
+	    cout << _("Archive skipped, because it does not contain any "
+		      "files on selected drives") << endl;
     }
     if (!indexRestore.empty()) {
 	PlpDirent e(0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef, archname);
+	toRestore.push_back(e);
 	for (i = 0; i < indexRestore.size(); i++)
 	    toRestore.push_back(indexRestore[i]);
     }
 }
 
 static bool
-askOverwrite(const char *name)
+askOverwrite(PlpDirent e)
 {
-    return true;
+    if (overWriteAll)
+	return true;
+    const char *fn = e.getName();
+    if (overWriteList.find(string(fn)) != overWriteList.end())
+	return true;
+    PlpDirent old;
+    Enum<rfsv::errs> res = Rfsv->fgeteattr(fn, old);
+    if (res != rfsv::E_PSI_GEN_NONE) {
+	cerr << "Could not get attributes of " << fn << ": " << res << endl;
+	return false;
+    }
+
+    // Don't ask if size and attribs are same
+    if ((old.getSize() == e.getSize()) &&
+	((old.getAttr() & ~rfsv::PSI_A_ARCHIVE) ==
+	 (e.getAttr() & ~rfsv::PSI_A_ARCHIVE)))
+	return true;
+
+    cout << "The file " << fn << endl;
+    cout << "already exists on the Psion with different attributes/size"
+	 << endl;
+    cout << "On the psion:" << endl;
+    cout << "  Size: " << old.getSize() << endl;
+    cout << "  Date: " << old.getPsiTime() << endl;
+    cout << "  Attr: " << Rfsv->attr2String(old.getAttr()).c_str() << endl;
+    cout << "In the backup:" << endl;
+    cout << "  Size: " << e.getSize() << endl;
+    cout << "  Date: " << e.getPsiTime() << endl;
+    cout << "  Attr: " << Rfsv->attr2String(e.getAttr()).c_str() << endl;
+    while (1) {
+	cout << "(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) " << flush;
+	string validA = _("OAS");
+	char answer;
+	cin >> answer;
+	switch (validA.find(toupper(answer))) {
+	    case 0:
+		return true;
+	    case 1:
+		overWriteAll = true;
+		return true;
+	    case 2:
+		return false;
+	}
+    }
+    return false; // Default
 }
 
 static int
@@ -750,15 +867,15 @@ runRestore()
     char indexbuf[40];
     ostrstream tarcmd;
     string dstPath;
-    struct timeval start_tv, end_tv, cstart_tv, cend_tv, sstart_tv, send_tv;
+    struct timeval start_tv, end_tv, cstart_tv, cend_tv;
 
     for (i = 0; i < archList.size(); i++) {
 	tarcmd << "tar --to-stdout -xzf " << archList[i]
-	       << " 'KPsion*Index'" << '\0';
+	       << " 'KPsion*Index'" << ends;
 	char backupType = '?';
 	FILE *f = popen(tarcmd.str(), "r");
 	if (!f) {
-	    perror("Could not get backup index");
+	    perror(_("Could not get backup index"));
 	    continue;
 	}
 	fgets(indexbuf, sizeof(indexbuf), f);
@@ -766,33 +883,37 @@ runRestore()
 	    backupType = indexbuf[17];
 	switch (backupType) {
 	    case 'F':
-		cout << "'" << archList[i] << "' is a full backup" << endl;
+		cout << "'" << archList[i] << _("' is a full backup") << endl;
 		collectIndex(f, archList[i].c_str());
 		break;
 	    case 'I':
-		cout << "'" << archList[i] << "' is a incremental backup" << endl;
+		cout << "'" << archList[i] << _("' is an incremental backup")
+		     << endl;
 		collectIndex(f, archList[i].c_str());
 		break;
 	    default:
-		cerr << "'" << archList[i] << "' is NOT a plpbackup" << endl;
+		cerr << "'" << archList[i] << _("' is NOT a plpbackup") << endl;
 		break;
 	}
 	pclose(f);
     }
-    if (!toBackup.empty()) {
+    if (!toRestore.empty()) {
+	gettimeofday(&start_tv, NULL);
 	dstPath = "";
 	backupSize = backupCount = 0;
 	// Calculate number of files and total bytecount
 	for (i = 0; i < toRestore.size(); i++) {
-	    backupSize += toBackup[i].getSize();
-	    backupCount++;
+	    if (toRestore[i].getSize() != 0xdeadbeef) {
+		backupSize += toRestore[i].getSize();
+		backupCount++;
+	    }
 	}
 	// Stop all programs on Psion
 	stopPrograms();
 	string dest;
 	string pDir;
-	for (i = 0; i < toBackup.size(); i++) {
-	    PlpDirent e = toBackup[i];
+	for (i = 0; i < toRestore.size(); i++) {
+	    PlpDirent e = toRestore[i];
 	    Enum<rfsv::errs> res;
 	    u_int32_t handle;
 	    struct timeval fstart_tv, fend_tv;
@@ -801,12 +922,18 @@ runRestore()
 	    if ((e.getSize() == 0xdeadbeef) && (e.getAttr() == 0xdeadbeef) &&
 		(e.getPsiTime().getPsiTimeLo() == 0xdeadbeef) &&
 		(e.getPsiTime().getPsiTimeHi() == 0xdeadbeef)) {
+
 		if (!dstPath.empty())
 		    rmrf(dstPath.c_str());
 		dstPath = generateTmpDir();
-		tarcmd.flush();
-		tarcmd << "tar xCf " << dstPath << " " << fn << '\0';
-		system(tarcmd.str());
+		tarcmd.seekp(0);
+		tarcmd << "tar xzCf " << dstPath << " " << fn << ends;
+		if (verbose > 0)
+		    cout << _("Extracting tar archive ...") << endl;
+		if (system(tarcmd.str()) != 0)
+		    cerr << _("Execution of ") << tarcmd.str() << " failed."
+			 << endl;
+		continue;
 	    }
 	    if (checkAbort()) {
 		// remove temporary dir
@@ -830,25 +957,27 @@ runRestore()
 
 	    if (pDir != cpDir) {
 		pDir = cpDir;
-		res = Rfsv->mkdir(pDir.c_str());
-		if ((res != rfsv::E_PSI_GEN_NONE) &&
-		    (res != rfsv::E_PSI_FILE_EXIST)) {
-		    cerr << "Could not create directory " << pDir << ": "
-			 << res << endl;
-		    continue;
+		if (pDir.size() > 2) {
+		    res = Rfsv->mkdir(pDir.c_str());
+		    if ((res != rfsv::E_PSI_GEN_NONE) &&
+			(res != rfsv::E_PSI_FILE_EXIST)) {
+			cerr << _("Could not create directory ") << pDir << ": "
+			     << res << endl;
+			continue;
+		    }
 		}
 	    }
 
 	    res = Rfsv->fcreatefile(
 		Rfsv->opMode(rfsv::PSI_O_RDWR), fn, handle);
 	    if (res == rfsv::E_PSI_FILE_EXIST) {
-		if (!askOverwrite(fn))
+		if (!askOverwrite(e))
 		    continue;
 		res = Rfsv->freplacefile(
 		    Rfsv->opMode(rfsv::PSI_O_RDWR), fn, handle);
 	    }
 	    if (res != rfsv::E_PSI_GEN_NONE) {
-		cerr << "Could not create " << fn << ": " << res << endl;
+		cerr << _("Could not create ") << fn << ": " << res << endl;
 		continue;
 	    }
 	    Rfsv->fclose(handle);
@@ -858,7 +987,8 @@ runRestore()
 		u_int32_t oldattr;
 		res = Rfsv->fgetattr(fn, oldattr);
 		if (res != rfsv::E_PSI_GEN_NONE) {
-		    cerr << "Could not get attributes of " << fn << ": " << res << endl;
+		    cerr << _("Could not get attributes of ") << fn << ": "
+			 << res << endl;
 		    continue;
 		}
 		u_int32_t mask = e.getAttr() ^ oldattr;
@@ -874,7 +1004,7 @@ runRestore()
 		    retry--;
 		} while ((res != rfsv::E_PSI_GEN_NONE) && (retry > 0));
 		if (res != rfsv::E_PSI_GEN_NONE) {
-		    cerr << "Could not set attributes of" << fn << ": "
+		    cerr << _("Could not set attributes of") << fn << ": "
 			 << res << endl;
 		    continue;
 		}
@@ -886,17 +1016,18 @@ runRestore()
 		    retry--;
 		} while ((res != rfsv::E_PSI_GEN_NONE) && (retry > 0));
 		if (res != rfsv::E_PSI_GEN_NONE) {
-		    cerr << "Could not set modification time of " << fn << ": "
-			 << res << endl;
+		    cerr << _("Could not set modification time of ") << fn
+			 << ": " << res << endl;
 		    continue;
 		}
+		overWriteList.insert(string(fn));
 	    }
 	    if (checkAbort()) {
 		// remove temporary dir
 		rmrf(dstPath.c_str());
 		// restart previously killed programs
 		startPrograms();
-		cout << _("Backup aborted by user") << endl;
+		cout << _("Restore aborted by user") << endl;
 		return;
 	    }
 	    gettimeofday(&fend_tv, NULL);
@@ -931,14 +1062,14 @@ runRestore()
 				    askLoop = false;
 				    break;
 				case 2:
-				    i = toBackup.size();
+				    i = toRestore.size();
 				    askLoop = false;
 				    break;
 				case 3:
 				    if (verbose > 1)
 					cout << _("Restore ") << fn << flush;
 				    break;
-				    res = Rfsv->copyFromPsion(fn, dest.c_str(), NULL, cab);
+				    res = Rfsv->copyToPsion(dest.c_str(), fn, NULL, cab);
 				    if (checkAbort()) {
 					// remove temporary dir
 					rmrf(dstPath.c_str());
@@ -963,6 +1094,15 @@ runRestore()
 		    }
 		}
 	    }
+	}
+	// remove temporary dir
+	rmrf(dstPath.c_str());
+	// restart previously killed programs
+	startPrograms();
+	gettimeofday(&end_tv, NULL);
+	if (!checkAbort() && verbose > 0) {
+	    cout << _("Total time elapsed:     ") << setprecision(4)
+		 << setw(6) << tdiff(&start_tv, &end_tv) << " sec." << endl;
 	}
     }
 }
@@ -1210,7 +1350,7 @@ runBackup()
 	    tarcmd << (full ? "Full" : "Incremental") << "Index";
 	    for (i = 0; i < backupDrives.size(); i++)
 		tarcmd << " " << backupDrives[i];
-	    tarcmd << '\0';
+	    tarcmd << ends;
 
 	    mkdirp(archPath.c_str());
 	    if (system(tarcmd.str())) {
