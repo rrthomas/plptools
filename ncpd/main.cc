@@ -34,6 +34,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <pthread.h>
 
 #include "ncp.h"
 #include "bufferstore.h"
@@ -47,6 +48,15 @@
 
 static bool verbose = false;
 static bool active = true;
+static bool autoexit = false;
+
+static ncp *theNCP = NULL;
+static IOWatch iow;
+static IOWatch accept_iow;
+static ppsocket skt;
+static int numScp = 0;
+static socketChan *scp[257]; // MAX_CHANNELS_PSION + 1
+
 
 static RETSIGTYPE
 term_handler(int)
@@ -65,15 +75,19 @@ int_handler(int)
 };
 
 void
-checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp * a)
+checkForNewSocketConnection()
 {
     string peer;
-    ppsocket *next = skt.accept(&peer);
+    if (accept_iow.watch(5,0) <= 0) {
+	return;
+    }
+    ppsocket *next = skt.accept(&peer, &iow);
     if (next != NULL) {
+	next->setWatch(&iow);
 	// New connect
 	if (verbose)
 	    cout << "New socket connection from " << peer << endl;
-	if ((numScp >= a->maxLinks()) || (!a->gotLinkChannel())) {
+	if ((numScp >= theNCP->maxLinks()) || (!theNCP->gotLinkChannel())) {
 	    bufferStore a;
 
 	    // Give the client time to send it's version request.
@@ -87,49 +101,68 @@ checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp 
 	    if (verbose)
 		cout << "rejected" << endl;
 	} else
-	    scp[numScp++] = new socketChan(next, a);
+	    scp[numScp++] = new socketChan(next, theNCP);
     }
 }
 
-void
-pollSocketConnections(int &numScp, socketChan ** scp)
+void *
+pollSocketConnections(void *)
 {
-    for (int i = 0; i < numScp; i++) {
-	scp[i]->socketPoll();
-	if (scp[i]->terminate()) {
-	    // Requested channel termination
-	    delete scp[i];
-	    numScp--;
-	    for (int j = i; j < numScp; j++)
-		scp[j] = scp[j + 1];
-	    i--;
-	}
+    while (active) {
+        iow.watch(0, 10000);
+        for (int i = 0; i < numScp; i++) {
+	    scp[i]->socketPoll();
+	    if (scp[i]->terminate()) {
+	        // Requested channel termination
+	        delete scp[i];
+	        numScp--;
+	        for (int j = i; j < numScp; j++)
+		    scp[j] = scp[j + 1];
+	        i--;
+	    }
+        }
     }
+    return NULL;
 }
 
 void
 usage()
 {
-    cerr << "Usage : ncpd [-V] [-v logclass] [-d] [-e] [-p <port>] [-s <device>] [-b <baudrate>]\n";
+    cerr << "Usage : ncpd [-V] [-v logclass] [-d] [-e] [-p [<host>:]<port>] [-s <device>] [-b <baudrate>]\n";
     exit(1);
+}
+
+static void *
+link_thread(void *arg)
+{
+    while (active) {
+        // psion
+        iow.watch(1, 0);
+        if (theNCP->hasFailed()) {
+            if (autoexit) {
+		active = false;
+                break;
+	    }
+            iow.watch(5, 0);
+            if (verbose)
+                cout << "ncp: restarting\n";
+            theNCP->reset();
+        }
+    }
+    return NULL;
 }
 
 int
 main(int argc, char **argv)
 {
-    ppsocket skt;
-    IOWatch iow;
     int pid;
     bool dofork = true;
-    bool autoexit = false;
 
     int sockNum = DPORT;
     int baudRate = DSPEED;
     const char *host = "127.0.0.1";
     const char *serialDevice = NULL;
-    short int nverbose = 0;
-    short int pverbose = 0;
-    short int lverbose = 0;
+    unsigned short nverbose = 0;
 
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
@@ -169,22 +202,21 @@ main(int argc, char **argv)
 	    if (!strcmp(argv[i], "nd"))
 		nverbose |= NCP_DEBUG_DUMP;
 	    if (!strcmp(argv[i], "ll"))
-		lverbose |= LNK_DEBUG_LOG;
+		nverbose |= LNK_DEBUG_LOG;
 	    if (!strcmp(argv[i], "ld"))
-		lverbose |= LNK_DEBUG_DUMP;
+		nverbose |= LNK_DEBUG_DUMP;
 	    if (!strcmp(argv[i], "pl"))
-		pverbose |= PKT_DEBUG_LOG;
+		nverbose |= PKT_DEBUG_LOG;
 	    if (!strcmp(argv[i], "pd"))
-		pverbose |= PKT_DEBUG_DUMP;
+		nverbose |= PKT_DEBUG_DUMP;
 	    if (!strcmp(argv[i], "ph"))
-		pverbose |= PKT_DEBUG_HANDSHAKE;
+	        nverbose |= PKT_DEBUG_HANDSHAKE;
 	    if (!strcmp(argv[i], "m"))
 		verbose = true;
 	    if (!strcmp(argv[i], "all")) {
-		nverbose = NCP_DEBUG_LOG | NCP_DEBUG_DUMP;
-		lverbose = LNK_DEBUG_LOG | LNK_DEBUG_DUMP;
-		pverbose = PKT_DEBUG_LOG | PKT_DEBUG_DUMP |
-		    PKT_DEBUG_HANDSHAKE;
+		nverbose = NCP_DEBUG_LOG | NCP_DEBUG_DUMP |
+		    LNK_DEBUG_LOG | LNK_DEBUG_DUMP |
+		    PKT_DEBUG_LOG | PKT_DEBUG_DUMP | PKT_DEBUG_HANDSHAKE;
 		verbose = true;
 	    }
 	} else if (!strcmp(argv[i], "-b") && i + 1 < argc) {
@@ -217,9 +249,10 @@ main(int argc, char **argv)
 	case 0:
 	    signal(SIGTERM, term_handler);
 	    signal(SIGINT, int_handler);
-	    skt.setWatch(&iow);
+	    skt.setWatch(&accept_iow);
 	    if (!skt.listen(host, sockNum))
-		cerr << "listen on " << host << ":" << sockNum << ": " << strerror(errno) << endl;
+		cerr << "listen on " << host << ":" << sockNum << ": "
+		     << strerror(errno) << endl;
 	    else {
 		if (dofork || autoexit) {
 		    logbuf dlog(LOG_DEBUG);
@@ -230,8 +263,8 @@ main(int argc, char **argv)
 		    cerr = lerr;
 		    openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
 		    syslog(LOG_INFO,
-			   "daemon started. Listening at %s:%d, using device %s\n",
-			   host, sockNum, serialDevice);
+			   "daemon started. Listening at %s:%d, "
+			   "using device %s\n", host, sockNum, serialDevice);
 		    setsid();
 		    chdir("/");
 		    int devnull =
@@ -244,37 +277,28 @@ main(int argc, char **argv)
 			    close(devnull);
 		    }
 		}
-		ncp *a = new ncp(serialDevice, baudRate, &iow);
-		int numScp = 0;
-		socketChan *scp[257]; // MAX_CHANNELS_PSION + 1
-
-		a->setVerbose(nverbose);
-		a->setLinkVerbose(lverbose);
-		a->setPktVerbose(pverbose);
-		while (active) {
-		    // sockets
-		    pollSocketConnections(numScp, scp);
-		    checkForNewSocketConnection(skt, numScp, scp, a);
-
-		    // psion
-		    a->poll();
-
-		    if (a->stuffToSend())
-			iow.watch(0, 100000);
-		    else
-			iow.watch(1, 0);
-
-		    if (a->hasFailed()) {
-			if (autoexit)
-			    break;
-
-			iow.watch(5, 0);
-			if (verbose)
-			    cout << "ncp: restarting\n";
-			a->reset();
-		    }
+		memset(scp, 0, sizeof(scp));
+		theNCP = new ncp(serialDevice, baudRate, nverbose);
+		if (!theNCP) {
+		    cerr << "Could not create NCP object" << endl;
+		    exit(-1);
 		}
-		delete a;
+		pthread_t thr_a, thr_b;
+		if (pthread_create(&thr_a, NULL, link_thread, NULL) != 0) {
+		    cerr << "Could not create Link thread" << endl;
+		    exit(-1);
+		}
+		if (pthread_create(&thr_a, NULL,
+				   pollSocketConnections, NULL) != 0) {
+		    cerr << "Could not create Socket thread" << endl;
+		    exit(-1);
+		}
+		while (active)
+		    checkForNewSocketConnection();
+		void *ret;
+		pthread_join(thr_a, &ret);
+		pthread_join(thr_b, &ret);
+		delete theNCP;
 	    }
 	    skt.closeSocket();
 	    break;

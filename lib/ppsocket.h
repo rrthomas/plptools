@@ -101,7 +101,7 @@ public:
     * @returns A pointer to a new instance for the accepted connection or NULL
     *          if an error happened.
     */
-    ppsocket *accept(string *Peer);
+    ppsocket *accept(string *Peer, IOWatch *);
 
     /**
     * Check and optionally wait for incoming data.

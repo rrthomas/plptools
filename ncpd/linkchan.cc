@@ -26,12 +26,15 @@
 #include <string>
 
 #include "linkchan.h"
+#include "ncp.h"
 #include "bufferstore.h"
 #include "bufferarray.h"
 
-linkChan::linkChan(ncp * _ncpController):channel(_ncpController)
+linkChan::linkChan(ncp * _ncpController, int _ncpChannel):channel(_ncpController)
 {
     registerSer = 0x1234;
+    if (_ncpChannel != -1)
+	setNcpChannel(_ncpChannel);
     ncpConnect();
 }
 

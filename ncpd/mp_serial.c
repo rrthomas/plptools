@@ -67,7 +67,7 @@
 int
 init_serial(const char *dev, int speed, int debug)
 {
-    int fd, baud, clocal;
+    int fd, baud;
     int uid, euid;
     struct termios ti;
 #ifdef hpux
@@ -127,12 +127,11 @@ init_serial(const char *dev, int speed, int debug)
 #define seteuid(a) setresuid(-1, a, -1)
 #endif
 
-    clocal = CLOCAL;
     if (seteuid(uid)) {
 	perror("seteuid");
 	exit(1);
     }
-    if ((fd = open(dev, O_RDWR | O_NDELAY | O_NOCTTY, 0)) < 0) {
+    if ((fd = open(dev, O_RDWR /*FRITZTEST | O_NDELAY */ | O_NOCTTY, 0)) < 0) {
 	perror(dev);
 	exit(1);
     }
@@ -150,12 +149,12 @@ init_serial(const char *dev, int speed, int debug)
 
     memset(&ti, 0, sizeof(struct termios));
 #if defined(hpux) || defined(_IBMR2)
-    ti.c_cflag = CS8 | HUPCL | clocal | CREAD;
+    ti.c_cflag = CS8 | HUPCL | CLOCAL | CREAD;
 #endif
 #if defined(sun) || defined(linux) || defined(__sgi) || \
 	defined(__NetBSD__) || defined(__FreeBSD__)
-    ti.c_cflag = CS8 | HUPCL | clocal | CRTSCTS | CREAD;
-    ti.c_iflag = IGNBRK | IGNPAR | IXON | IXOFF;
+    ti.c_cflag = CS8 | HUPCL | CLOCAL | CRTSCTS | CREAD;
+    ti.c_iflag = IGNBRK | IGNPAR /*| IXON | IXOFF */;
     ti.c_cc[VMIN] = 1;
     ti.c_cc[VTIME] = 0;
 #endif

@@ -216,7 +216,7 @@ public:
     *               whole content of @p b is appended.
     */
     void addBuff(const bufferStore &b, long maxLen = -1);
-  
+
     /**
     * Truncates the buffer.
     * If the buffer is smaller, does nothing.
@@ -224,7 +224,21 @@ public:
     * @param newLen The new length of the buffer.
     */
     void truncate(long newLen);
-  
+
+    /**
+    * Prepends a byte to the content of this instance.
+    *
+    * @param c The byte to append.
+    */
+    void prependByte(unsigned char c);
+
+    /**
+    * Prepends a word to the content of this instance.
+    *
+    * @param w The word to append.
+    */
+    void prependWord(int);
+
 private:
     void checkAllocd(long newLen);
 

@@ -28,52 +28,82 @@
 #include <config.h>
 #endif
 #include <stdio.h>
+#include <pthread.h>
 
-class bufferStore;
-class IOWatch;
+#include "bufferstore.h"
+#include "bufferarray.h"
 
-#define PKT_DEBUG_LOG  1
-#define PKT_DEBUG_DUMP 2
-#define PKT_DEBUG_HANDSHAKE 4
+#define PKT_DEBUG_LOG       16
+#define PKT_DEBUG_DUMP      32
+#define PKT_DEBUG_HANDSHAKE 64
 
-class packet {
-	public:
-		packet(const char *fname, int baud, IOWatch *iow, short int verbose = 0);
-		~packet();
-		void send(unsigned char type, const bufferStore &b);
-		bool get(unsigned char &type, bufferStore &b);
-		void setVerbose(short int);
-		short int getVerbose();
-		bool linkFailed();
-		void reset();
-  
-	private:
-		bool terminated();
-		void addToCrc(unsigned short a, unsigned short *crc);
-		void opByte(unsigned char a);
-		void realWrite();
+extern "C" {
+    static void *pump_run(void *);
+}
 
-		unsigned short crcOut;
-		unsigned short crcIn;
-		unsigned char *inPtr;
-		unsigned char *outPtr;
-		unsigned char *endPtr;
-		unsigned char *inBuffer;
-		unsigned char *outBuffer;
-		bufferStore rcv;
-		int inLen;
-		int outLen;
-		int termLen;
-		int foundSync;
-		int fd;
-		int serialStatus;
-		short int verbose;
-		bool esc;
-		bool lastFatal;
-		bool iowLocal;
-		char *devname;
-		int baud;
-		IOWatch *iow;
+class Link;
+
+class packet
+{
+public:
+    packet(const char *fname, int baud, Link *_link, unsigned short verbose = 0);
+    ~packet();
+
+    /**
+     * Send a buffer out to serial line
+     */
+    void send(bufferStore &b);
+
+    void setEpoc(bool);
+    void setVerbose(short int);
+    short int getVerbose();
+    bool linkFailed();
+    void reset();
+
+private:
+    friend void * ::pump_run(void *);
+
+    inline void addToCrc(unsigned char a, unsigned short *crc) {
+	*crc =  (*crc << 8) ^ crc_table[((*crc >> 8) ^ a) & 0xff];
+    }
+
+    void findSync();
+    void opByte(unsigned char a);
+    void opCByte(unsigned char a, unsigned short *crc);
+    void realWrite();
+
+    Link *theLINK;
+    pthread_t datapump;
+    pthread_t thisThread;
+    unsigned int   crc_table[256];
+
+    unsigned short crcOut;
+    unsigned short crcIn;
+    unsigned short receivedCRC;
+    unsigned short inCRCstate;
+
+    unsigned char *inBuffer;
+    int inWrite;
+    int inRead;
+
+    unsigned char *outBuffer;
+    int outWrite;
+    int outRead;
+
+    int startPkt;
+    int lastSYN;
+
+    bufferArray inQueue;
+    bufferStore rcv;
+    int foundSync;
+    int fd;
+    int serialStatus;
+    short int verbose;
+    bool esc;
+    bool lastFatal;
+    bool isEPOC;
+    char *devname;
+    int baud;
 };
 
 #endif

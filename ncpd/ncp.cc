@@ -39,15 +39,17 @@
 #define MAX_CHANNELS_SIBO  8
 #define NCP_SENDLEN 250
 
-ncp::ncp(const char *fname, int baud, IOWatch *iow)
+ncp::ncp(const char *fname, int baud, unsigned short _verbose)
 {
     channelPtr = new channel*[MAX_CHANNELS_PSION + 1];
+    assert(channelPtr);
     messageList = new bufferStore[MAX_CHANNELS_PSION + 1];
+    assert(messageList);
     remoteChanList = new int[MAX_CHANNELS_PSION + 1];
+    assert(remoteChanList);
 
-    l = new link(fname, baud, iow);
     failed = false;
-    verbose = 0;
+    verbose = _verbose;
 
     // until detected on receipt of INFO we use these.
     maxChannels = MAX_CHANNELS_SIBO;
@@ -56,13 +58,16 @@ ncp::ncp(const char *fname, int baud, IOWatch *iow)
     // init channels
     for (int i = 0; i < MAX_CHANNELS_PSION; i++)
 	channelPtr[i] = NULL;
+
+    l = new Link(fname, baud, this, verbose);
+    assert(l);
 }
 
 ncp::~ncp()
 {
     bufferStore b;
     for (int i = 0; i < maxLinks(); i++) {
-	if (channelPtr[i]) {
+	if (isValidChannel(i)) {
 	    bufferStore b2;
 	    b2.addByte(remoteChanList[i]);
 	    controlChannel(i, NCON_MSG_CHANNEL_DISCONNECT, b2);
@@ -84,7 +89,7 @@ maxLinks() {
 void ncp::
 reset() {
     for (int i = 0; i < maxLinks(); i++) {
-	if (channelPtr[i])
+	if (isValidChannel(i))
 	    channelPtr[i]->terminateWhenAsked();
 	channelPtr[i] = NULL;
     }
@@ -94,40 +99,17 @@ reset() {
     l->reset();
 }
 
-short int ncp::
+unsigned short ncp::
 getVerbose()
 {
     return verbose;
 }
 
 void ncp::
-setVerbose(short int _verbose)
+setVerbose(unsigned short _verbose)
 {
     verbose = _verbose;
-}
-
-short int ncp::
-getLinkVerbose()
-{
-    return l->getVerbose();
-}
-
-void ncp::
-setLinkVerbose(short int _verbose)
-{
-    l->setVerbose(_verbose);
-}
-
-short int ncp::
-getPktVerbose()
-{
-    return l->getPktVerbose();
-}
-
-void ncp::
-setPktVerbose(short int _verbose)
-{
-    l->setPktVerbose(_verbose);
+    l->setVerbose(verbose);
 }
 
 short int ncp::
@@ -137,34 +119,29 @@ getProtocolVersion()
 }
 
 void ncp::
-poll()
-{
-    bufferArray res(l->poll());
-    while (!res.empty()) {
-	bufferStore s = res.pop();
-	if (s.getLen() > 1) {
-	    int channel = s.getByte(0);
-	    s.discardFirstBytes(1);
-	    if (channel == 0) {
-		decodeControlMessage(s);
+receive(bufferStore s) {
+    if (s.getLen() > 1) {
+	int channel = s.getByte(0);
+	s.discardFirstBytes(1);
+	if (channel == 0) {
+	    decodeControlMessage(s);
+	} else {
+	    int allData = s.getByte(1);
+	    s.discardFirstBytes(2);
+	    if (!isValidChannel(channel)) {
+		cerr << "ncp: Got message for unknown channel\n";
 	    } else {
-		int allData = s.getByte(1);
-		s.discardFirstBytes(2);
-		if (channelPtr[channel] == NULL) {
-		    cerr << "ncp: Got message for unknown channel\n";
-		} else {
-		    messageList[channel].addBuff(s);
-		    if (allData == LAST_MESS) {
-			channelPtr[channel]->ncpDataCallback(messageList[channel]);
-			messageList[channel].init();
-		    } else if (allData != NOT_LAST_MESS) {
-			cerr << "ncp: bizarre third byte!\n";
-		    }
+		messageList[channel].addBuff(s);
+		if (allData == LAST_MESS) {
+		    channelPtr[channel]->ncpDataCallback(messageList[channel]);
+		    messageList[channel].init();
+		} else if (allData != NOT_LAST_MESS) {
+		    cerr << "ncp: bizarre third byte!\n";
 		}
 	    }
-	} else
-	    cerr << "Got null message\n";
-    }
+	}
+    } else
+	cerr << "Got null message\n";
 }
 
 void ncp::
@@ -206,7 +183,7 @@ decodeControlMessage(bufferStore & buff)
 	    // Ack with connect response
 	    localChan = getFirstUnusedChan();
 	    b.addByte(remoteChan);
-	    b.addByte(0x0);
+	    b.addByte(0);
 	    controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
 
 	    // NOTE: we don't allow connections from the
@@ -219,10 +196,9 @@ decodeControlMessage(bufferStore & buff)
 		    failed = true;
 		if (verbose & NCP_DEBUG_LOG)
 		    cout << "ncp: Link UP" << endl;
-		channelPtr[localChan] = lChan = new linkChan(this);
-		lChan->setNcpChannel(localChan);
-		lChan->ncpConnectAck();
+		channelPtr[localChan] = lChan = new linkChan(this, localChan);
 		lChan->setVerbose(verbose);
+		lChan->ncpConnectAck();
 	    } else {
 		if (verbose & NCP_DEBUG_LOG)
 		    cout << "ncp: REJECT connect" << endl;
@@ -242,7 +218,7 @@ decodeControlMessage(bufferStore & buff)
 	    if (buff.getByte(1) == 0) {
 		if (verbose & NCP_DEBUG_LOG)
 		    cout << "OK" << endl;
-		if (channelPtr[forChan]) {
+		if (isValidChannel(forChan)) {
 		    remoteChanList[forChan] = remoteChan;
 		    channelPtr[forChan]->ncpConnectAck();
 		} else {
@@ -252,7 +228,7 @@ decodeControlMessage(bufferStore & buff)
 	    } else {
 		if (verbose & NCP_DEBUG_LOG)
 		    cout << "Unknown " << (int) buff.getByte(1) << endl;
-		if (channelPtr[forChan])
+		if (isValidChannel(forChan))
 		    channelPtr[forChan]->ncpConnectNak();
 	    }
 	    break;
@@ -322,10 +298,17 @@ getFirstUnusedChan()
 	if (channelPtr[cNum] == NULL) {
 	    if (verbose & NCP_DEBUG_LOG)
 		cout << "ncp: getFirstUnusedChan=" << cNum << endl;
+	    channelPtr[cNum] = (channel *)0xdeadbeef;
 	    return cNum;
 	}
     }
     return 0;
+}
+
+bool ncp::
+isValidChannel(int channel)
+{
+    return (channelPtr[channel] && ((int)channelPtr[channel] != 0xdeadbeef));
 }
 
 void ncp::
@@ -415,7 +398,7 @@ send(int channel, bufferStore & a)
 void ncp::
 disconnect(int channel)
 {
-    if (channelPtr[channel] == NULL) {
+    if (!isValidChannel(channel)) {
 	cerr << "ncp: Ignored disconnect for unknown channel #" << channel << endl;
 	return;
     }

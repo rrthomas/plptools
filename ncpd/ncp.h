@@ -29,16 +29,15 @@
 #endif
 #include "bufferstore.h"
 #include "linkchan.h"
-class link;
+class Link;
 class channel;
-class IOWatch;
 
 #define NCP_DEBUG_LOG  1
 #define NCP_DEBUG_DUMP 2
 
 class ncp {
 public:
-    ncp(const char *fname, int baud, IOWatch *iow);
+    ncp(const char *fname, int baud, unsigned short _verbose = 0);
     ~ncp();
 
     int connect(channel *c); // returns channel, or -1 if failure
@@ -46,22 +45,19 @@ public:
     void RegisterAck(int, const char *);
     void disconnect(int channel);
     void send(int channel, bufferStore &a);
-    void poll();
     void reset();
     int  maxLinks();
     bool stuffToSend();
     bool hasFailed();
     bool gotLinkChannel();
 
-    void setVerbose(short int);
-    short int getVerbose();
-    void setLinkVerbose(short int);
-    short int getLinkVerbose();
-    void setPktVerbose(short int);
-    short int getPktVerbose();
+    void setVerbose(unsigned short);
+    unsigned short getVerbose();
     short int getProtocolVersion();
 
 private:
+    friend class Link;
+
     enum c { MAX_LEN = 200, LAST_MESS = 1, NOT_LAST_MESS = 2 };
     enum interControllerMessageType {
 	// Inter controller message types
@@ -75,12 +71,14 @@ private:
 	NCON_MSG_NCP_END=8
     };
     enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
+    void receive(bufferStore s);
     int getFirstUnusedChan();
+    bool isValidChannel(int);
     void decodeControlMessage(bufferStore &buff);
     void controlChannel(int chan, enum interControllerMessageType t, bufferStore &command);
     char * ctrlMsgName(unsigned char);
 
-    link *l;
+    Link *l;
     unsigned short verbose;
     channel **channelPtr;
     bufferStore *messageList;

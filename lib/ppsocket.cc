@@ -83,8 +83,11 @@ ppsocket::~ppsocket()
 
 void ppsocket::
 setWatch(IOWatch *watch) {
-    if (watch)
+    if (watch) {
+	if (myWatch && (m_Socket != INVALID_SOCKET))
+	   myWatch->remIO(m_Socket);
 	myWatch = watch;
+    }
 }
 
 bool ppsocket::
@@ -192,14 +195,11 @@ listen(const char * const Host, int Port)
 	m_LastError = errno;
 	return (false);
     }
-    // Our accept member function relies on non-blocking accepts,
-    // so set the flag here (rather than every time around the loop)
-    fcntl(m_Socket, F_SETFL, O_NONBLOCK);
     return (true);
 }
 
 ppsocket *ppsocket::
-accept(string *Peer)
+accept(string *Peer, IOWatch *iow)
 {
 #ifdef sun
     int len;
@@ -214,6 +214,8 @@ accept(string *Peer)
     //*****************************************************
     accepted = new ppsocket;
 
+    if (!iow)
+	iow = myWatch;
     if (!accepted) {
 	m_LastError = errno;
 	return NULL;
@@ -251,9 +253,9 @@ accept(string *Peer)
 	if (peer)
 	    *Peer = peer;
     }
-    if (accepted && myWatch) {
-	accepted->setWatch(myWatch);
-	myWatch->addIO(accepted->m_Socket);
+    if (accepted && iow) {
+	accepted->setWatch(iow);
+	iow->addIO(accepted->m_Socket);
     }
     return accepted;
 }

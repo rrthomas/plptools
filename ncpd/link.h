@@ -4,7 +4,7 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,44 +27,148 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <pthread.h>
+
 #include "bufferstore.h"
 #include "bufferarray.h"
+#include <vector>
 
-#define LNK_DEBUG_LOG  1
-#define LNK_DEBUG_DUMP 2
+#define LNK_DEBUG_LOG  4
+#define LNK_DEBUG_DUMP 8
 
+class ncp;
 class packet;
-class IOWatch;
 
-class link {
-	public:
-  		link(const char *fname, int baud, IOWatch *iow, unsigned short _verbose = 0);
-  		~link();
-  		void send(const bufferStore &buff);
-  		bufferArray poll();
-  		bool stuffToSend();
-  		bool hasFailed();
-		void reset();
-		void flush();
-		void purgeQueue(int);
-		void setVerbose(short int);
-		short int getVerbose();
-		void setPktVerbose(short int);
-		short int getPktVerbose();
-  
-	private:
-  		packet *p;
-  		int idSent;
-  		int countToResend;
-  		int timesSent;
-  		bufferArray sendQueue;
-  		bufferStore toSend;
-  		int idLastGot;
-  		bool newLink;
-  		unsigned short verbose;
-  		bool somethingToSend;
-  		bool failed;
-		bool xoff[256];
+/**
+ * Describes a transmitted packet which has not yet
+ * been acknowledged by the peer.
+ */
+typedef struct {
+    /**
+     * Original sequence number.
+     */
+    int seq;
+    /**
+     * Number of remaining transmit retries.
+     */
+    int txcount;
+    /**
+     * Time of last transmit.
+     */
+    struct timeval stamp;
+    /**
+     * Packet content.
+     */
+    bufferStore data;
+} ackWaitQueueElement;
+
+extern "C" {
+    static void *expire_check(void *);
+}
+
+class Link {
+public:
+
+    /**
+     * Construct a new link instance.
+     *
+     * @param fname Name of serial device.
+     * @param baud  Speed of serial device.
+     * @param ncp   The calling ncp instance.
+     * @_verbose    Verbosity (for debugging/troubleshooting)
+     */
+    Link(const char *fname, int baud, ncp *_ncp, unsigned short _verbose = 0);
+
+    /**
+     * Disconnects from device and destroys instance.
+     */
+    ~Link();
+
+    /**
+     * Send a PLP packet to the Peer.
+     *
+     * @param buff The contents of the PLP packet.
+     */
+    void send(const bufferStore &buff);
+
+    /**
+     * Query outstanding packets.
+     *
+     * @returns true, if packets are outstanding (not yet acknowledged), false
+     *  otherwise.
+     */
+    bool stuffToSend();
+
+    /**
+     * Query connection failure.
+     *
+     * @returns true, if the peer could not be contacted or did not response,
+     *  false if everything is ok.
+     */
+    bool hasFailed();
+
+    /**
+     * Reset connection and attempt to reconnect to the peer.
+     */
+    void reset();
+
+    /**
+     * Wait, until all outstanding packets are acknowledged or timed out.
+     */
+    void flush();
+
+    /**
+     * Purge all outstanding packets for a specified remote channel.
+     *
+     * @param channel The of the channel for which to remove outstanding
+     *  packets.
+     */
+    void purgeQueue(int channel);
+
+    /**
+     * Set verbosity of Link and underlying packet instance.
+     *
+     * @param _verbose Verbosity (a bitmapped value, see LINK_DEBUG_.. constants)
+     */
+    void setVerbose(unsigned short _verbose);
+
+    /**
+     * Get current verbosity of Link.
+     *
+     * @returns The verbosity, specified at construction or last call to
+     *  setVerbosity();
+     */
+    unsigned short getVerbose();
+
+private:
+    friend class packet;
+    friend void * ::expire_check(void *);
+
+    void receive(bufferStore buf);
+    void transmit(bufferStore buf);
+    void sendAck(int seq);
+    void sendCon();
+    void multiAck(struct timeval);
+    void retransmit();
+    void transmitHoldQueue(int channel);
+
+    pthread_t checkthread;
+    pthread_mutex_t queueMutex;
+
+    ncp *theNCP;
+    packet *p;
+    int txSequence;
+    int rxSequence;
+    int seqMask;
+    int maxOutstanding;
+    unsigned long retransTimeout;
+    unsigned long conMagic;
+    unsigned short verbose;
+    bool failed;
+
+    vector<ackWaitQueueElement> ackWaitQueue;
+    vector<bufferStore> holdQueue;
+    bool xoff[256];
 };
 
 #endif

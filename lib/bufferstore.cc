@@ -22,36 +22,45 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <stream.h>
 // Should be iostream.h, but won't build on Sun WorkShop C++ 5.0
 #include <iomanip>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <assert.h>
 
 #include "bufferstore.h"
 
-bufferStore::bufferStore() {
-    lenAllocd = 0;
-    buff = 0L;
-    len = 0;
-    start = 0;
+bufferStore::bufferStore()
+    : len(0)
+    , lenAllocd(0)
+    , start(0)
+    , buff(0)
+{
 }
 
-bufferStore::bufferStore(const bufferStore &a) {
+bufferStore::bufferStore(const bufferStore &a)
+    : start(0)
+{
     lenAllocd = (a.getLen() > MIN_LEN) ? a.getLen() : MIN_LEN;
     buff = (unsigned char *)malloc(lenAllocd);
+    assert(buff);
     len = a.getLen();
     memcpy(buff, a.getString(0), len);
-    start = 0;
 }
 
-bufferStore::bufferStore(const unsigned char *_buff, long _len) {
+bufferStore::bufferStore(const unsigned char *_buff, long _len)
+    : start(0)
+{
     lenAllocd = (_len > MIN_LEN) ? _len : MIN_LEN;
     buff = (unsigned char *)malloc(lenAllocd);
+    assert(buff);
     len = _len;
     memcpy(buff, _buff, len);
-    start = 0;
 }
 
 bufferStore &bufferStore::operator =(const bufferStore &a) {
@@ -77,8 +86,8 @@ void bufferStore::init(const unsigned char *_buff, long _len) {
 }
 
 bufferStore::~bufferStore() {
-    if (buff != 0L)
-	free(buff);
+    if (buff)
+	::free(buff);
 }
 
 unsigned long bufferStore::getLen() const {
@@ -133,7 +142,9 @@ void bufferStore::checkAllocd(long newLen) {
 	do {
 	    lenAllocd = (lenAllocd < MIN_LEN) ? MIN_LEN : (lenAllocd * 2);
 	} while (newLen >= lenAllocd);
+	assert(lenAllocd);
 	buff = (unsigned char *)realloc(buff, lenAllocd);
+	assert(buff);
     }
 }
 
@@ -188,6 +199,20 @@ void bufferStore::addDWord(long a) {
 void bufferStore::truncate(long newLen) {
     if (newLen < len)
 	len = newLen;
+}
+
+void bufferStore::prependByte(unsigned char cc) {
+    checkAllocd(len + 1);
+    memmove(&buff[1], buff, len++);
+    buff[0] = cc;
+}
+
+void bufferStore::prependWord(int a) {
+    checkAllocd(len + 2);
+    memmove(&buff[2], buff, len);
+    len += 2;
+    buff[0] = a & 0xff;
+    buff[1] = (a>>8) & 0xff;
 }
 
 /*
