@@ -1,0 +1,83 @@
+.\" Manual page for plpprintd
+.\" $Id$
+.\" CHECKIN $Date$
+.\"
+.\" Process this file with
+.\" groff -man -Tascii plpprintd.1 for ASCII output, or
+.\" groff -man -Tps plpprintd.1 for PostScript output
+.\"
+.TH plpprintd 8 "@MANDATE@" "plptools @VERSION@" local
+.SH NAME
+plpprintd \- Daemon for printing via PC from a Psion.
+.SH SYNOPSIS
+.B plpprintd
+.B [-d]
+.B [-h]
+.B [-v]
+.B [-V]
+.BI [-s " spooldir" ]
+.BI [-c " printcmd" ]
+.BI "[-p [" host :] port ]
+.BI [ long-options ]
+
+.SH DESCRIPTION
+
+plpprintd provides a print server for a Psion, connected to the PC.
+Using plpprintd, you can use the Psion's "Print via PC" feature to
+access any printer, available on your PC. When receiving a print job,
+the data is converted to PostScript®
+
+.SH OPTIONS
+
+.TP
+.B \-d, --debug
+Enable additional debug messages and stay in foreground (do not fork).
+.TP
+.B \-h, --help
+Display a short help text and exit.
+.TP
+.B \-v, --verbose
+Increase verbosity
+.TP
+.B \-V, --version
+Display the version and exit
+.TP
+.BI "\-s, --spooldir=" dir
+Specify a directory to use for temporary spool files. If this option is
+missing, a builtin default
+.I /var/spool/plpprint
+is used.
+.TP
+.BI "\-c, --printcmd=" cmd
+Specify a command for actually sending a print job to the printer. The
+specified command must receive the data from its standard input. If this
+option is missing, a builtin default
+.I lpr \-Ppsion
+is used.
+.TP
+.BI "\-p, --port=[" host :] port
+Specify the host and port to connect to (e.g. The port where ncpd is
+listening on) - by default the host is 127.0.0.1 and the port is looked up
+in /etc/services. If it is not found there, a builtin value of @DPORT@ is used.
+.TP
+
+.SH FILES
+.TP
+@PKGDATA@/prolog.ps
+contains the PostScript® dictionary, needed for printing the jobs.
+.TP
+@PKGDATA@/fontmap
+specifies the font mapping to be used. This file is used to convert the
+Psion's font names into valid PostScript® font names. It's format is
+described at the beginning of it. If a Psion font name is received which
+can not be found in this file, a builtin default Courier is used.
+
+.SH BUGS
+Using patterns in diagrams gives ugly results.
+
+.SH SEE ALSO
+ncpd(8), plpnfsd(8), plpprintd(8), plpftp(1) and sisinstall(1)
+
+.SH AUTHOR
+Fritz Elfert
+

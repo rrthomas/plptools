@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-10 19:55+0200\n"
+"POT-Creation-Date: 2002-07-11 06:17+0200\n"
 "PO-Revision-Date: 2002-07-08 00:06CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"

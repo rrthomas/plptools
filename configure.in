@@ -256,6 +256,7 @@ AC_SUBST(DMOUNTPOINT)
 test "x$prefix" = xNONE && prefix="$ac_default_prefix"
 eval PKGDATA="${datadir}/${PACKAGE}"
 AC_DEFINE_UNQUOTED(PKGDATA,"$PKGDATA",[This defines the dir for support files])
+AC_SUBST(PKGDATA)
 
 AC_ARG_WITH(initdir,
     [  --with-initdir=DIR      override default init dir [/etc/rc.d/init.d]],
@@ -347,4 +348,6 @@ AC_OUTPUT(
 	doc/plpnfsd.man
 	doc/plpftp.man
 	doc/sisinstall.man
+	doc/plpprintd.man
+	doc/plpbackup.man
 )

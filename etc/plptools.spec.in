@@ -7,9 +7,9 @@
 %define REL %(grep VERSION %{srel} | sed -e 's/VERSION = //')
 %if "%{REL}" >= "8.0"
 # Bug in SuSE8.0's rpm setup: _initrddir has wrong value
-%_initrddir %{_sysconfdir}/init.d
+%define _initrddir %{_sysconfdir}/init.d
 %else
-%_initrddir %{_sysconfdir}/init.d
+%define _initrddir %{_sysconfdir}/init.d
 %endif
 %endif
 %if "%{isRH}" > "0"

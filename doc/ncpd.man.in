@@ -97,7 +97,7 @@ is specified, ncpd cycles through baudrates of 115200, 57600, 38400, 19200
 and 9600 baud. Default setting is @DSNAME@.
 
 .SH SEE ALSO
-plpftp(1), plpnfsd(8)
+ncpd(8), plpnfsd(8), plpprintd(8), plpftp(1) and sisinstall(1)
 
 .SH AUTHOR
 Fritz Elfert
