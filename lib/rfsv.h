@@ -405,7 +405,8 @@ public:
     * @param to Name of the destination file on the local machine.
     * @param func Pointer to a function which gets called on every read.
     * 	This function can be used to show some progress etc. May be set
-    * 	to NULL, where no callback is performed.
+    * 	to NULL, where no callback is performed. If the callback function
+    * 	returns 0, the operation is aborted and E_PSI_FILE_CANCEL is returned.
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
@@ -418,7 +419,8 @@ public:
     * @param to Name of the destination file on the Psion.
     * @param func Pointer to a function which gets called on every read.
     * 	This function can be used to show some progress etc. May be set
-    * 	to NULL, where no callback is performed.
+    * 	to NULL, where no callback is performed. If the callback function
+    * 	returns 0, the operation is aborted and E_PSI_FILE_CANCEL is returned.
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
@@ -434,7 +436,8 @@ public:
     * @param to Name of the destination file.
     * @param func Pointer to a function which gets called on every read.
     * 	This function can be used to show some progress etc. May be set
-    * 	to NULL, where no callback is performed.
+    * 	to NULL, where no callback is performed. If the callback function
+    * 	returns 0, the operation is aborted and E_PSI_FILE_CANCEL is returned.
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
