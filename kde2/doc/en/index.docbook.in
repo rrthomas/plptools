@@ -58,6 +58,7 @@ handling backup, restore and formatting of Psion PDAs.
 <keyword>plptools</keyword>
 <keyword>KPsion</keyword>
 <keyword>Psion</keyword>
+<keyword>EPOC</keyword>
 <keyword>PDA</keyword>
 <keyword>backup</keyword>
 <keyword>restore</keyword>
@@ -520,7 +521,139 @@ consists of three tabs:
 <chapter id="Internals">
 <title>Internals</title>
 
-<para>TBD</para>
+<sect1 id="backupformat">
+<title>The backup files</title>
+
+<para>The backup files, created by &kpsion; are simply gzipped tar files.
+The files follow the following naming scheme:
+<variablelist>
+<varlistentry>
+<term>TYPE-YYYY-MO-DD-HH-MI-SS.tar.gz</term>
+<listitem><para>
+  where
+  <variablelist>
+  <varlistentry>
+  <term>TYPE</term>
+  <listitem><para>
+    is a single character, representing the backup type. 'I' stands for
+    incremental and 'F' stands for full.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>YYYY</term>
+  <listitem><para>
+    is the year of creation.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>MO</term>
+  <listitem><para>
+    is the month of creation.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>DD</term>
+  <listitem><para>
+    is the day of creation.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>HH</term>
+  <listitem><para>
+    is the hour of creation.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>MI</term>
+  <listitem><para>
+    is the minute of creation.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>SS</term>
+  <listitem><para>
+    is the second of creation.
+  </para></listitem>
+  </varlistentry>
+  </variablelist>
+</para></listitem>
+</varlistentry>
+</variablelist>
+The file names in the tar archives are converted to fit into general
+naming scheme. All occurences of the character '%' are changed into the
+string '%25', all ocurrences of '/' are changed into '%2f' and all
+occurences of '\' are changed into '/'.
+</para>
+<para>
+In addition to the data files on the psion, every archive contains a
+special index file, where the original file attributes and the Psion's
+64-bit hires filetime is stored. This file is named KPsionIncrementalIndex
+for incremental backups or KPsionFullIndex for full backups. The index
+file is stored in the archive's toplevel directory and is an ASCII file,
+containing one line per data file with the following fields:
+<variablelist>
+<varlistentry>
+<term>hhhhhhhh llllllll ssssssss aaaaaaaa fn</term>
+<listitem><para>
+  where
+  <variablelist>
+  <varlistentry>
+  <term>hhhhhhhh</term>
+  <listitem><para>
+    is an 8-digit hexadecimal number, representing the upper half of the
+    file's modification time.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>llllllll</term>
+  <listitem><para>
+    is an 8-digit hexadecimal number, representing the lower half of the
+    file's modification time.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>ssssssss</term>
+  <listitem><para>
+    is an 8-digit hexadecimal number, representing the size of the file.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>aaaaaaaa</term>
+  <listitem><para>
+    is an 8-digit hexadecimal number, representing the native attributes of
+    the file.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>fn</term>
+  <listitem><para>
+    is the unconverted original absolute file name.
+  </para></listitem>
+  </varlistentry>
+  </variablelist>
+</para></listitem>
+</varlistentry>
+</variablelist>
+The first line of the index file contains a header of the following format:
+<variablelist>
+<varlistentry>
+<term>#plpbackup index T</term>
+<listitem><para>
+  where
+  <variablelist>
+  <varlistentry>
+  <term>T</term>
+  <listitem><para>
+    is a single character, representing the backup type. 'I' stands for
+    incremental and 'F' stands for full.
+  </para></listitem>
+  </varlistentry>
+  </variablelist>
+</para></listitem>
+</varlistentry>
+</variablelist>
+</para>
+</sect1>
 </chapter>
 
 <chapter id="faq">

@@ -58,6 +58,7 @@ von Psion PDAs, sowie zum Formatieren von Lauferken derselben.
 <keyword>plptools</keyword>
 <keyword>KPsion</keyword>
 <keyword>Psion</keyword>
+<keyword>EPOC</keyword>
 <keyword>PDA</keyword>
 <keyword>Sicherung</keyword>
 <keyword>Rücksicherung</keyword>
@@ -532,7 +533,143 @@ modifizieren. Der Dialog Einstellungen besteht aus drei Seiten:
 <chapter id="Interna">
 <title>Internals</title>
 
-<para>TBD</para>
+<sect1 id="backupformat">
+<title>Die Backup-Dateien</title>
+
+<para>Bei den Backup-Dateien die von &kpsion; angelegt werden, handelt es
+sich um simple, mit gzip koprimierte tar-Archive.
+Die Dateien sind nach folgendem Schema benannt:
+<variablelist>
+<varlistentry>
+<term>TYP-YYYY-MO-DD-HH-MI-SS.tar.gz</term>
+<listitem><para>
+  wobei
+  <variablelist>
+  <varlistentry>
+  <term>TYP</term>
+  <listitem><para>
+    ein einzelnes Zeichen ist und den Backup-Typ repräsentiert. 'I' steht für
+    incrementell und 'F' steht für englisch 'full' (Komplett-Backup).
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>YYYY</term>
+  <listitem><para>
+    das Jahr des Backups angibt.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>MO</term>
+  <listitem><para>
+    den Monat des Backups angibt.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>DD</term>
+  <listitem><para>
+    den Tag des Backups angibt.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>HH</term>
+  <listitem><para>
+    die Stunde des Backups angibt.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>MI</term>
+  <listitem><para>
+    die Minute des Backups angibt.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>SS</term>
+  <listitem><para>
+    Die Sekunde des Backups angibt.
+  </para></listitem>
+  </varlistentry>
+  </variablelist>
+</para></listitem>
+</varlistentry>
+</variablelist>
+Die Dateinamen innerhalb des tar-Archives sind konvertiert um den
+allgemein unter Unix gültigen Namens-Schemata zu genügen: Alle Vorkommen
+des Zeichens '%' sind in die Zeichenkette '%25' umgewandelt, alle Vorkommen
+des Zeichens '/' sind in die Zeichenkette '%2f' umgewandelt und alle
+Vorkommen von '\' sind nach '/' gewandelt.
+</para>
+<para>
+Zusätzlich zu den gesicherten Dateien des Psion, enthält jedes tar-Archiv
+eine spezielle Indexdatei, in der die original-Dateiattribute und die
+64-bit Dateizeit des Psion gespeichert werden. Diese Indexdatei hat den
+Namen KPsionIncrementalIndex (für incrementelle Backups) oder
+KPsionFullIndex (für Komplett-Backups). Die Indexdatei befindet sich im
+Wurzelverzeichnis des Archivs und ist eine ASCII-Datei mit folgendem
+Aufbau:
+<variablelist>
+<varlistentry>
+<term>hhhhhhhh llllllll ssssssss aaaaaaaa fn</term>
+<listitem><para>
+  wobei
+  <variablelist>
+  <varlistentry>
+  <term>hhhhhhhh</term>
+  <listitem><para>
+    eine 8-stellige Hexadezimalzahl ist, die die obere Hälfte des
+    Datei-Modifikationsdatums enthält.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>llllllll</term>
+  <listitem><para>
+    eine 8-stellige Hexadezimalzahl ist, die die untere Hälfte des
+    Datei-Modifikationsdatums enthält.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>ssssssss</term>
+  <listitem><para>
+    eine 8-stellige Hexadezimalzahl ist, die die Dateigrösse enthält.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>aaaaaaaa</term>
+  <listitem><para>
+    eine 8-stellige Hexadezimalzahl ist, die die Dateiattribute enthält.
+  </para></listitem>
+  </varlistentry>
+  <varlistentry>
+  <term>fn</term>
+  <listitem><para>
+    der unkonvertierte Original-Dateiname ist (Absoluter Pfad).
+  </para></listitem>
+  </varlistentry>
+  </variablelist>
+</para></listitem>
+</varlistentry>
+</variablelist>
+Die erste Zeile der Indexdatei enthält einen Header mit dem folgenden
+Format:
+<variablelist>
+<varlistentry>
+<term>#plpbackup index T</term>
+<listitem><para>
+  wobei
+  <variablelist>
+  <varlistentry>
+  <term>T</term>
+  <listitem><para>
+    ein einzelnes Zeichen ist, welches den Backup-Typ repräsentiert.
+    'I' steht für incrementell und 'F' steht für englisch 'full'
+    (Komplett-Backup).
+  </para></listitem>
+  </varlistentry>
+  </variablelist>
+</para></listitem>
+</varlistentry>
+</variablelist>
+</para>
+</sect1>
 </chapter>
 
 <chapter id="faq">
