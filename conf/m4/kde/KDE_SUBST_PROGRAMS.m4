@@ -14,7 +14,6 @@ AC_DEFUN([KDE_SUBST_PROGRAMS],
         KDE_FIND_PATH(dcopidl, DCOPIDL, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(dcopidl)])
         KDE_FIND_PATH(dcopidl2cpp, DCOPIDL2CPP, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(dcopidl2cpp)])
         KDE_FIND_PATH(mcopidl, MCOPIDL, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(mcopidl)])
-        KDE_FIND_PATH(kdb2html, KDB2HTML, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(kdb2html)])
         KDE_FIND_PATH(artsc-config, ARTSCCONFIG, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(artsc-config)])
         KDE_FIND_PATH(kde-config, KDECONFIG, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(kde-config)])
 
@@ -23,7 +22,6 @@ AC_DEFUN([KDE_SUBST_PROGRAMS],
         AC_SUBST(DCOPIDL2CPP)
         AC_SUBST(DCOP_DEPENDENCIES)
         AC_SUBST(MCOPIDL)
-        AC_SUBST(KDB2HTML)
         AC_SUBST(ARTSCCONFIG)
         AC_SUBST(KDECONFIG)
 
