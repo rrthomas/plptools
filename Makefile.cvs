@@ -44,15 +44,15 @@ $(LIBTOOLFILES):
 	libtoolize --force
 
 $(GETTEXT): $(GETTEXTSHIT)
-ifeq ($(GV),11)
-	cp configure.in.in configure.in
-	cp Makefile.am.in Makefile.am
+	cp conf/configure.in.in configure.in
+	cp conf/Makefile.am.in Makefile.am
 	mkdir -p intl
+ifeq ($(GV),11)
 	echo n | gettextize --force --intl --no-changelog
 	cp po/Makevars.template po/Makevars
 	rm -f ChangeLog *~
 else
-	echo n | gettextize $(GP)
+	echo n | gettextize -f
 endif
 	-test -f po/ChangeLog~ && mv -f po/ChangeLog~ po/ChangeLog
 

@@ -10,8 +10,9 @@ maintainer-clean:
 	cd .. && rm -rf intl
 
 EOF
-cat<<EOF>m4/Makefile
+test -d m4 && cat<<EOF>m4/Makefile
 maintainer-clean:
 	cd .. && rm -rf m4
 
 EOF
+exit 0

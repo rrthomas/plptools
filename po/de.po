@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-16 21:28+0200\n"
+"POT-Creation-Date: 2002-07-17 01:06+0200\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -466,12 +466,12 @@ msgstr "Österreichisch"
 msgid "New Zealand"
 msgstr "Neuseeländisch"
 
-#. FIXME: not shure about ISO code
+#  FIXME: not shure about ISO code
 #: lib/rpcs.cc:90
 msgid "International French"
 msgstr "Internationales Französisch"
 
-#. FIXME: not shure about ISO code
+#  FIXME: not shure about ISO code
 #: lib/rpcs.cc:91
 msgid "Czech"
 msgstr "Tschechisch"
@@ -1424,8 +1424,10 @@ msgid "Could not run external editor"
 msgstr "Konnte externen Editor nicht starten"
 
 #: plpbackup/plpbackup.cc:794
-msgid "Archive skipped, because it does not contain any files on selected drives"
-msgstr "Archiv übersprungen, da es keine Dateien von den gewählten Lauferken enthält"
+msgid ""
+"Archive skipped, because it does not contain any files on selected drives"
+msgstr ""
+"Archiv übersprungen, da es keine Dateien von den gewählten Lauferken enthält"
 
 #: plpbackup/plpbackup.cc:838
 msgid "(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) "
@@ -1774,8 +1776,10 @@ msgid "                         Default: "
 msgstr "                         Vorgabe: "
 
 #: ncpd/main.cc:174
-msgid "                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n"
-msgstr "                         Vorgabe: Automatisch 115.2k, 57.6k 38.4k, 19.2k\n"
+msgid ""
+"                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n"
+msgstr ""
+"                         Vorgabe: Automatisch 115.2k, 57.6k 38.4k, 19.2k\n"
 
 #: ncpd/main.cc:177
 msgid ""
@@ -1856,4 +1860,3 @@ msgstr "ncpd Version "
 #: plpprint/plpprintd.cc:1016
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: Konnte ncpd nicht kontaktieren."
-
