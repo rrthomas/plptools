@@ -133,7 +133,7 @@ static void
 help()
 {
     cout << _(
-	"Usage: plpnfsd [OPTIONS]...\n"
+	"Usage: ncpd [OPTIONS]...\n"
 	"\n"
 	"Supported options:\n"
 	"\n"
@@ -261,7 +261,7 @@ main(int argc, char **argv)
 		usage();
 		return -1;
 	    case 'V':
-		cout << _("plpnfsd Version ") << VERSION << endl;
+		cout << _("ncpd Version ") << VERSION << endl;
 		return 0;
 	    case 'h':
 		help();
