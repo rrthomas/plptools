@@ -24,7 +24,6 @@ set -e
 
 case "$1" in
     configure)
-	/sbin/ldconfig
 
     ;;
 

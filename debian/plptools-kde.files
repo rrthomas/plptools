@@ -8,3 +8,4 @@ usr/share/icons/*/*/devices/*
 usr/share/icons/*/*/apps/psion*
 usr/share/locale/*/LC_MESSAGES/libplpprops.mo
 usr/share/mimelnk/*/*
+usr/share/lintian/overrides/plptools-kde

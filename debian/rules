@@ -9,6 +9,7 @@ export DH_VERBOSE=1
 export DH_COMPAT=3
 
 tmp = $(shell pwd)/debian/tmp
+ltmp = $(tmp)/usr/share/lintian/overrides
 
 %.1: %.1.in
 	MANDATE=`grep CHECKIN $< | awk '{print $$4}'` ; \
@@ -57,13 +58,19 @@ install: build debian/kpsion.1 debian/klipsi.1
 	# install into debian/tmp.
 	$(MAKE) DESTDIR=$(tmp) install
 	install -d $(tmp)/etc
+	install -d $(ltmp)
 	install -m 644 debian/plptools.conf $(tmp)/etc
 	install -m 644 debian/kpsion.1 $(tmp)/usr/share/man/man1
 	install -m 644 debian/klipsi.1 $(tmp)/usr/share/man/man1
 	cp CHANGES obsolete-changes
 	cp ChangeLog changelog
+	for i in debian/*.override ; do \
+		mv $$i $(ltmp)/`basename $$i .override` ; \
+	done
+	for i in `find debian/ -type l -name "common"`; do \
+		rm -f $$i && ln -s ../common $$i ; \
+	done
 	# Split into sub-packages
-	cat CHANGES ChangeLog > changelog
 	dh_movefiles -pplptools
 	dh_movefiles -pplptools-dev
 	dh_movefiles -pplptools-kde
@@ -97,10 +104,7 @@ binary-arch: build install
 	dh_fixperms
 	# You may want to make some executables suid here.
 #	dh_suidregister
-	dh_makeshlibs -a -V -pplptools
-	dh_makeshlibs -a -V -pplptools-kde
-	dh_makeshlibs -a -V -pkpsion
-	dh_makeshlibs -a -V -pklipsi
+	dh_makeshlibs -a -V
 	dh_installdeb
 #	dh_perl
 	dh_shlibdeps
