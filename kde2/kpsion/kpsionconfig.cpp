@@ -24,6 +24,7 @@
 #include "kpsionconfig.h"
 
 #include <klocale.h>
+#include <kstddirs.h>
 
 #include <iostream.h>
 
@@ -38,12 +39,33 @@ KPsionConfig::KPsionConfig() {
     optionNames.insert(OPT_UIDS, QString("Psion/MachineUIDs"));
     optionNames.insert(OPT_MACHNAME, QString("Psion/Name_%1"));
     optionNames.insert(OPT_BACKUPDRIVES, QString("Psion/BackupDrives_%1"));
+
+    defaults.insert(DEF_INCINTERVAL, QString("1"));
+    defaults.insert(DEF_FULLINTERVAL, QString("7"));
+    defaults.insert(DEF_CONNRETRY, QString("30"));
+    defaults.insert(DEF_SERIALDEV, QString("0"));
+    defaults.insert(DEF_SERIALSPEED, QString("4"));
+    defaults.insert(DEF_BACKUPGEN, QString("3"));
+}
+
+const QString KPsionConfig::
+getStrDefault(int optIdx) {
+    if (optIdx != DEF_BACKUPDIR)
+	return QString::null;
+    return locateLocal("data", "kpsion/backups");
+}
+
+int KPsionConfig::
+getIntDefault(int optIdx) {
+    cfgMap::Iterator it = defaults.find(optIdx);
+    if (it == defaults.end())
+	return 0;
+    return (*it).toInt();
 }
 
 const QString KPsionConfig::
 getOptionName(int optIdx) {
-
-    optMap::Iterator it = optionNames.find(optIdx);
+    cfgMap::Iterator it = optionNames.find(optIdx);
     if (it == optionNames.end())
 	return QString::null;
     int slash = (*it).find('/');
@@ -52,7 +74,7 @@ getOptionName(int optIdx) {
 
 const QString KPsionConfig::
 getSectionName(int optIdx) {
-    optMap::Iterator it = optionNames.find(optIdx);
+    cfgMap::Iterator it = optionNames.find(optIdx);
     if (it == optionNames.end())
 	return QString::null;
     int slash = (*it).find('/');
@@ -64,14 +86,14 @@ getConfigDevices() {
     QStringList l;
 
     l += i18n("off");
-    l += i18n("/dev/ttyS0");
-    l += i18n("/dev/ttyS1");
-    l += i18n("/dev/ttyS2");
-    l += i18n("/dev/ttyS3");
-    l += i18n("/dev/ircomm0");
-    l += i18n("/dev/ircomm1");
-    l += i18n("/dev/ircomm2");
-    l += i18n("/dev/ircomm3");
+    l += QString("/dev/ttyS0");
+    l += QString("/dev/ttyS1");
+    l += QString("/dev/ttyS2");
+    l += QString("/dev/ttyS3");
+    l += QString("/dev/ircomm0");
+    l += QString("/dev/ircomm1");
+    l += QString("/dev/ircomm2");
+    l += QString("/dev/ircomm3");
 
     return l;
 }
@@ -85,6 +107,25 @@ getConfigSpeeds() {
     l += QString("38400");
     l += QString("57600");
     l += QString("115200");
+
+    return l;
+}
+
+QStringList KPsionConfig::
+getConfigBackupInterval() {
+    QStringList l;
+
+    l += i18n("none");
+    l += i18n("daily");
+    l += i18n("every 2 days");
+    l += i18n("every 3 days");
+    l += i18n("every 4 days");
+    l += i18n("every 5 days");
+    l += i18n("every 6 days");
+    l += i18n("weekly");
+    l += i18n("every 2 weeks");
+    l += i18n("every 3 weeks");
+    l += i18n("monthly");
 
     return l;
 }

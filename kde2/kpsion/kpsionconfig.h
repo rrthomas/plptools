@@ -26,7 +26,7 @@
 #include <qstringlist.h>
 #include <qmap.h>
 
-typedef QMap<int,QString> optMap;
+typedef QMap<int,QString> cfgMap;
 
 class KPsionConfig {
 public:
@@ -44,15 +44,29 @@ public:
 	OPT_BACKUPDRIVES = 9,
     };
 
+    enum cfgDefaults {
+	DEF_BACKUPDIR = 0,
+	DEF_INCINTERVAL = 1,
+	DEF_FULLINTERVAL = 2,
+	DEF_CONNRETRY = 3,
+	DEF_SERIALDEV = 4,
+	DEF_SERIALSPEED = 5,
+	DEF_BACKUPGEN = 6,
+    };
+
     KPsionConfig();
 
     QStringList getConfigDevices();
     QStringList getConfigSpeeds();
+    QStringList getConfigBackupInterval();
     const QString getOptionName(int);
     const QString getSectionName(int);
+    const QString getStrDefault(int);
+    int getIntDefault(int);
 
 private:
-    optMap optionNames;
+    cfgMap optionNames;
+    cfgMap defaults;
 
 };
 #endif

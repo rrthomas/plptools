@@ -186,8 +186,8 @@ setupActions() {
 			    actionCollection());
     KStdAction::showStatusbar(this, SLOT(slotToggleStatusbar()),
 			      actionCollection());
-    KStdAction::saveOptions(this, SLOT(slotSaveOptions()),
-			    actionCollection());
+//    KStdAction::saveOptions(this, SLOT(slotSaveOptions()),
+//			    actionCollection());
     KStdAction::preferences(this, SLOT(slotPreferences()),
 			    actionCollection());
     new KAction(i18n("Start &Format"), 0L, 0, this,

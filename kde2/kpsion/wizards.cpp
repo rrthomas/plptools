@@ -38,7 +38,6 @@
 #include <klocale.h>
 #include <kfiledialog.h>
 #include <kmessagebox.h>
-#include <kstddirs.h>
 
 #include <qlayout.h>
 #include <qwhatsthis.h>
@@ -58,7 +57,7 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
     QWhatsThis::add(cancelButton(),
 		    i18n("<QT>If you click this button, the setup of <B>KPSion</B> will be aborted and next time you start <B>KPsion</B>, it will run this setup again.</QT>"));
 
-    bdirDefault = locateLocal("data", "kpsion/backups");
+    bdirDefault = pcfg.getStrDefault(KPsionConfig::DEF_BACKUPDIR);
     bdirCreated = "";
 
     // Page 1
@@ -135,7 +134,7 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
 	"<QT>"
 	"Next, please specify some information regarding "
 	"backup policy:<UL><LI>How many generations of backups "
-	"do you want to keep?</LI><LI>Shall i remind you about "
+	"do you want to keep?</LI><LI>Shall i perform automatic "
 	"backups?</LI><LI>If yes, in what intervals do you want "
 	"to happen backups?</LI></UL>"
 	"</QT>"
@@ -143,45 +142,27 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
     grid->addMultiCellWidget(l, 1, 1, 1, 2, Qt::AlignTop);
 
     l = new QLabel(
-	i18n("&Incremental backup reminder"), page3, "iBackupIntLabel");
+	i18n("&Incremental backup interval"), page3, "iBackupIntLabel");
     grid->addWidget(l, 3, 1);
     iIntCombo = new KComboBox(false, page3, "iIntCombo");
-    iIntCombo->insertItem(i18n("none"));
-    iIntCombo->insertItem(i18n("daily"));
-    iIntCombo->insertItem(i18n("every 2 days"));
-    iIntCombo->insertItem(i18n("every 3 days"));
-    iIntCombo->insertItem(i18n("every 4 days"));
-    iIntCombo->insertItem(i18n("every 5 days"));
-    iIntCombo->insertItem(i18n("every 6 days"));
-    iIntCombo->insertItem(i18n("weekly"));
-    iIntCombo->insertItem(i18n("every 2 weeks"));
-    iIntCombo->insertItem(i18n("every 3 weeks"));
-    iIntCombo->insertItem(i18n("monthly"));
-    iIntCombo->setCurrentItem(1);
+    iIntCombo->insertStringList(pcfg.getConfigBackupInterval());
+    iIntCombo->setCurrentItem(pcfg.getIntDefault(KPsionConfig::DEF_INCINTERVAL));
     grid->addWidget(iIntCombo, 3, 2);
     l->setBuddy(iIntCombo);
 
-    l = new QLabel(i18n("&Full backup reminder"), page3, "fBackupIntLabel");
+    l = new QLabel(i18n("&Full backup interval"), page3, "fBackupIntLabel");
     grid->addWidget(l, 5, 1);
     fIntCombo = new KComboBox(false, page3, "fIntCombo");
-    fIntCombo->insertItem(i18n("none"));
-    fIntCombo->insertItem(i18n("daily"));
-    fIntCombo->insertItem(i18n("every 2 days"));
-    fIntCombo->insertItem(i18n("every 3 days"));
-    fIntCombo->insertItem(i18n("every 4 days"));
-    fIntCombo->insertItem(i18n("every 5 days"));
-    fIntCombo->insertItem(i18n("every 6 days"));
-    fIntCombo->insertItem(i18n("weekly"));
-    fIntCombo->insertItem(i18n("every 2 weeks"));
-    fIntCombo->insertItem(i18n("every 3 weeks"));
-    fIntCombo->insertItem(i18n("monthly"));
-    fIntCombo->setCurrentItem(7);
+    fIntCombo->insertStringList(pcfg.getConfigBackupInterval());
+    fIntCombo->setCurrentItem(pcfg.getIntDefault(KPsionConfig::DEF_FULLINTERVAL));
     grid->addWidget(fIntCombo, 5, 2);
     l->setBuddy(fIntCombo);
 
     l = new QLabel(i18n("Backup &generations"), page3, "backupGenLabel");
     grid->addWidget(l, 7, 1);
-    genSpin = new KIntSpinBox(0, 10, 1, 3, 10, page3, "backupGenSpin");
+    genSpin = new KIntSpinBox(0, 10, 1,
+			      pcfg.getIntDefault(KPsionConfig::DEF_BACKUPGEN),
+			      10, page3, "backupGenSpin");
     grid->addWidget(genSpin, 7, 2);
     l->setBuddy(genSpin);
 
@@ -223,7 +204,9 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
     l = new QLabel(
 	i18n("&Connection retry interval (sec.)"), page4, "rconLabel");
     grid->addWidget(l, 3, 1);
-    rconSpin = new KIntSpinBox(0, 600, 1, 30, 10, page4, "rconSpin");
+    rconSpin = new KIntSpinBox(0, 600, 1,
+			       pcfg.getIntDefault(KPsionConfig::DEF_CONNRETRY),
+			       10, page4, "rconSpin");
     grid->addWidget(rconSpin, 3, 2);
     l->setBuddy(rconSpin);
 
@@ -232,7 +215,7 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
     devCombo = new KComboBox(false, page4, "devCombo");
     sl = pcfg.getConfigDevices();
     devCombo->insertStringList(sl);
-    devCombo->setCurrentItem(0);
+    devCombo->setCurrentItem(pcfg.getIntDefault(KPsionConfig::DEF_SERIALDEV));
     grid->addWidget(devCombo, 5, 2);
     l->setBuddy(devCombo);
 
@@ -241,7 +224,7 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
     speedCombo = new KComboBox(false, page4, "speedCombo");
     sl = pcfg.getConfigSpeeds();
     speedCombo->insertStringList(sl);
-    speedCombo->setCurrentItem(4);
+    speedCombo->setCurrentItem(pcfg.getIntDefault(KPsionConfig::DEF_SERIALSPEED));
     grid->addWidget(speedCombo, 7, 2);
     l->setBuddy(speedCombo);
 
