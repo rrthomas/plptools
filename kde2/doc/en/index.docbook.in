@@ -1,0 +1,220 @@
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook V3.1-Based Variant V1.0//EN" [
+  <!ENTITY kpsion  "<application>KPsion</application>"
+    -- delete this, if kpsion is in global KDE entities -->
+  <!ENTITY kappname "&kpsion;" -- this only *seems* redundant -->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % English "INCLUDE">
+  <!ENTITY % ents PUBLIC "-//KDE//ENTITIES Documentation V1.0//EN">
+  <!-- DO NOT DELETE! $Revision$ -->
+  <!-- DO NOT DELETE! $Date$ -->
+  %ents;
+]>
+
+<book lang="&language;">
+<bookinfo>
+
+<title>The &kpsion; handbook</title>
+
+<authorgroup>
+<author>
+<firstname>Fritz</firstname>
+<surname>Elfert</surname>
+<affiliation>
+<address><email>felfert@to.com</email></address>
+</affiliation>
+</author>
+
+<!--
+<othercredit role="reviewer">
+<firstname>Whoever</firstname>
+<surname>Lastname</surname>
+<affiliation>
+<address><email>mail@somewhere.org</email></address>
+</affiliation>
+<contrib>Reviewer</contrib>
+</othercredit>
+-->
+
+</authorgroup>
+
+<copyright>
+<year>2001</year>
+<holder>Fritz Elfert</holder>
+</copyright>
+
+<legalnotice>&FDLNotice;</legalnotice>
+
+<date>__DATE__</date>
+<releaseinfo>__VERSION__</releaseinfo>
+
+
+<abstract><para>
+&kpsion; is an application for
+handling backup, restore and formatting of Psion PDAs.
+</para></abstract>
+
+<keywordset>
+<keyword>KDE</keyword>
+<keyword>plptools</keyword>
+<keyword>KPsion</keyword>
+<keyword>Psion</keyword>
+<keyword>PDA</keyword>
+<keyword>backup</keyword>
+<keyword>restore</keyword>
+<keyword>format</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="Introduction">
+<title>Introduction</title>
+
+<para>Welcome to &kpsion;! &kpsion; is an application
+handling backup, restore and formatting of Psion PDAs
+for the K Desktop Environment. It uses the daemon <command>ncpd</command>
+and the libraries from the plptools package.
+</para>
+
+<para>This program is meant to be started from the command line or from
+<filename>.desktop</filename> files.
+</para>
+
+</chapter>
+
+<chapter id="installation">
+<title>Installation</title>
+
+<sect1 id="downloading">
+<title>Downloading</title>
+
+<para>&kpsion; is part of the plptools package. The plptools package is
+available at <ulink url="http://plptools.sourceforge.net/">http://plptools.sourceforge.net/</ulink>.</para>
+
+</sect1>
+
+<sect1 id="compiling">
+<title>Compiling</title>
+
+<para>The plptools package is not focussed on KDE application. Therefore, to
+enable the build of KDE related stuff (&kpsion; is part of that) you have to
+use the option <option>--enable-kde</option> when running plptools configure.</para>
+
+<para>The build process usual works like this:</para>
+
+<screen>
+<prompt>$</prompt> <command>./configure <option>--enable-kde</option></command>
+<prompt>$</prompt> <command>make</command>
+<prompt>$</prompt> <command>make <option>install</option></command>
+</screen>
+
+<para>You will have to execute the last step as root. The installation process
+needs to be able to write to the system wide KDE directories.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="using-kpsion">
+<title>Using &kpsion;</title>
+
+<para>Usage of &kpsion; is easy. The syntax is one of the following:</para>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+    </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+      <arg>--autobackup</arg>
+    </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+      <arg>--backup <replaceable>DRIVE</replaceable></arg>
+    </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+      <arg>--restore <replaceable>DRIVE</replaceable></arg>
+    </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+      <arg>--format <replaceable>DRIVE</replaceable></arg>
+    </cmdsynopsis>
+
+<para>If started without any options, &kpsion; starts up in interactive
+mode. If started with any of the above options, &kpsion; performs the
+given task non interactively.</para>
+
+<variablelist>
+<varlistentry>
+<term><option>--autobackup</option></term>
+<listitem><para>
+This specifies to run a scheduled backup of the connected
+Psion. If no psion is connected, nothing happens.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--backup <replaceable>DRIVE</replaceable></option></term>
+<listitem><para>
+This option starts backup of the specified <replaceable>DRIVE</replaceable>.
+<replaceable>DRIVE</replaceable> is a single drive letter.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--restore <replaceable>DRIVE</replaceable></option></term>
+<listitem><para>
+This option starts restore of the specified <replaceable>DRIVE</replaceable>.
+<replaceable>DRIVE</replaceable> is a single drive letter.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--format <replaceable>DRIVE</replaceable></option></term>
+<listitem><para>
+This option starts format of the specified <replaceable>DRIVE</replaceable>.
+<replaceable>DRIVE</replaceable> is a single drive letter.
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Configuration">
+<title>Configuration</title>
+
+<para>TBD</para>
+</chapter>
+
+<chapter id="Internals">
+<title>Internals</title>
+
+<para>TBD</para>
+</chapter>
+
+<chapter id="Author">
+<title>Author</title>
+
+<para>Copyright 2001 Fritz Elfert</para>
+
+<para>&kpsion; is written by Fritz Elfert.</para>
+
+<para>The author can be reached through email at
+<email>felfert@to.com</email>.  Please report any bugs you find to me so
+that I can fix them. If you have a suggestion, feel free to contact me.</para>
+
+&underFDL;
+&underGPL;
+
+</chapter>
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->

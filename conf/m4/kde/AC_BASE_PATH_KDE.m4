@@ -128,14 +128,4 @@ AC_SUBST(all_libraries)
 
 AC_SUBST(AUTODIRS)
 
-if test -z "$DCOPIDL"; then
-  DCOPIDL='$(kde_bindir)/dcopidl'
-fi
-if test -z "$DCOPIDL2CPP"; then
-  DCOPIDL2CPP='$(kde_bindir)/dcopidl2cpp'
-fi
-DCOP_DEPENDENCIES='$(DCOPIDL)'
-AC_SUBST(DCOPIDL)
-AC_SUBST(DCOPIDL2CPP)
-AC_SUBST(DCOP_DEPENDENCIES)
 ])

@@ -1,7 +1,7 @@
 # $Id$
 #
 
-SUBDIRS = kioslave plugins mime kpsion po
+SUBDIRS = kioslave plugins mime kpsion po doc
 
 POFILES =
 #

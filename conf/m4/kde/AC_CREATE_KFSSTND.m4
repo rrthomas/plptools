@@ -91,4 +91,6 @@ fi
 
 bindir=$kde_bindir
 
+KDE_SUBST_PROGRAMS
+
 ])
