@@ -1,0 +1,16 @@
+Index: kfileitem.cpp
+===================================================================
+RCS file: /home/kde/kdelibs/kio/kfileitem.cpp,v
+retrieving revision 1.89
+diff -u -p -r1.89 kfileitem.cpp
+--- kfileitem.cpp       2001/02/10 12:58:21     1.89
++++ kfileitem.cpp       2001/03/25 12:52:53
+@@ -92,6 +92,7 @@ KFileItem::KFileItem( const KIO::UDSEntr
+ 
+         case KIO::UDS_MIME_TYPE:
+           m_pMimeType = KMimeType::mimeType((*it).m_str);
++          d->bMimeTypeKnown = true;
+           break;
+ 
+         case KIO::UDS_GUESSED_MIME_TYPE:
+
