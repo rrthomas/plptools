@@ -18,8 +18,11 @@ checkAbortHash(void *, u_int32_t)
 {
 	if (continueRunning)
 		{
-		printf("#");
-		fflush(stdout);
+		if (logLevel >= 1)
+			{
+			printf("#");
+			fflush(stdout);
+			}
 		}
 	return continueRunning;
 }
@@ -75,7 +78,10 @@ SISInstaller::createDirs(char* filename)
 void
 SISInstaller::copyFile(SISFileRecord* fileRecord)
 {
-	if (m_buf[fileRecord->m_destPtr] == '!')
+	uint8_t* destptr = fileRecord->getDestPtr();
+	if (destptr == 0)
+		return;
+	if (destptr[0] == '!')
 		{
 		if (m_drive == 0)
 			selectDrive();
@@ -83,7 +89,7 @@ SISInstaller::copyFile(SISFileRecord* fileRecord)
 		}
 	int len = fileRecord->m_destLength;
 	char dest[256];
-	memcpy(dest, m_buf + fileRecord->m_destPtr, len);
+	memcpy(dest, destptr, len);
 	dest[len] = 0;
 	if (dest[0] == '!')
 		{
@@ -91,12 +97,11 @@ SISInstaller::copyFile(SISFileRecord* fileRecord)
 		fileRecord->setMainDrive(m_drive);
 		if (logLevel >= 2)
 			printf("Setting drive at index %d to %c\n",
-				   fileRecord->m_destPtr, m_drive);
-//		m_buf[fileRecord->m_destPtr] = m_drive;
+				   destptr, m_drive);
 		}
 	printf("Copying %d bytes to %s\n",
 		   fileRecord->m_fileLengths[m_fileNo], dest);
-	copyBuf(m_buf + fileRecord->m_filePtrs[m_fileNo],
+	copyBuf(fileRecord->getFilePtr(m_fileNo),
 			fileRecord->m_fileLengths[m_fileNo],
 			dest);
 }
@@ -122,13 +127,15 @@ SISInstaller::copyBuf(const uint8_t* buf, int len, char* name)
 	res = m_psion->copyToPsion(srcName, name, NULL, checkAbortHash);
 	if (res == rfsv::E_PSI_GEN_NONE)
 		{
-		printf(" -> Success.\n");
+		if (logLevel >= 1)
+			printf(" -> Success.\n");
 		}
 	else
 		{
 		printf(" -> Fail: %s\n", (const char*)res);
 		}
 	unlink(srcName);
+	//sleep(10);
 }
 
 int
@@ -143,7 +150,7 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 		case 1:
 			printf("Info:\n%.*s\n",
 				   fileRecord->m_fileLengths[m_fileNo],
-				   m_buf + fileRecord->m_filePtrs[m_fileNo]);
+				   fileRecord->getFilePtr(m_fileNo));
 			switch (fileRecord->m_fileDetails)
 				{
 				case 0:
@@ -176,11 +183,10 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 			if (logLevel >= 1)
 				printf("Recursive sis file...\n");
 			SISFile sisFile;
-			int fileptr = fileRecord->m_filePtrs[m_fileNo];
-			uint8_t* buf2 = m_buf + fileptr;
+			uint8_t* buf2 = fileRecord->getFilePtr(m_fileNo);
 			off_t len = fileRecord->m_fileLengths[m_fileNo];
-			if (m_lastSisFile < fileptr + len)
-				m_lastSisFile = fileptr + len;
+//			if (m_lastSisFile < fileptr + len)
+//				m_lastSisFile = fileptr + len;
 			SisRC rc = sisFile.fillFrom(buf2, len);
 			if (rc != SIS_OK)
 				{
@@ -203,13 +209,13 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 			}
 		case 3:
 			printf("Run %.*s during installation/remove\n",
-				   fileRecord->m_destLength, m_buf + fileRecord->m_destPtr);
+				   fileRecord->m_destLength, fileRecord->getDestPtr());
 			break;
 		case 4:
 			if (logLevel >= 2)
 				printf("Running the app will create %.*s\n",
 					   fileRecord->m_destLength,
-					   m_buf + fileRecord->m_destPtr);
+					   fileRecord->getDestPtr());
 			break;
 		}
 	return FILE_OK;
@@ -232,7 +238,8 @@ SISInstaller::loadInstalled()
 		while (!files.empty())
 			{
 			PlpDirent file = files[0];
-			printf("Loading sis file `%s'\n", file.getName());
+			if (logLevel >= 1)
+				printf("Loading sis file `%s'\n", file.getName());
 			char sisname[256];
 			sprintf(sisname, "%s%s", SYSTEMINSTALL, file.getName());
 			loadPsionSis(sisname);
@@ -289,6 +296,7 @@ SISInstaller::loadPsionSis(const char* name)
 		}
 	close(fd);
 	unlink(srcName);
+	//sleep(10);
 }
 
 void
@@ -370,7 +378,8 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 
 	// Check previous version.
 	//
-	printf(
+	if (logLevel >= 1)
+		printf(
   "Checking if this app (uid %08x) exists with a version less than %d.%d.\n",
 		   m_file->m_header.m_uid1,
 		   m_file->m_header.m_major,
@@ -439,9 +448,9 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 			   fileRecord->m_filePtrs[m_fileNo],
 			   fileRecord->m_fileLengths[m_fileNo]);
 #endif
-		if ((firstFile == -1) ||
-			(firstFile >= fileRecord->m_filePtrs[m_fileNo]))
-			firstFile = fileRecord->m_filePtrs[m_fileNo];
+		int fileIx = fileRecord->getFilePtr(m_fileNo) - m_buf;
+		if ((firstFile == -1) || (firstFile >= fileIx))
+			firstFile = fileIx;
 
 //		 We can only do this if we search all files...
 //		 fileRecord->m_filePtrs[m_fileNo] + fileRecord->m_fileLengths[m_fileNo]

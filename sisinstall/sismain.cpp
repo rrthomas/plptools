@@ -27,7 +27,6 @@ static struct option opts[] = {
 	{ "version",  no_argument,       0, 'V' },
 	{ "loglevel", required_argument, 0, 'l' },
 	{ "dry-run",  no_argument,       0, 'n' },
-	{ "force",    no_argument,       0, 'f' },
 	{ NULL,       0,                 0, 0 },
 };
 
@@ -42,7 +41,6 @@ void printHelp()
 	" -V, --version           Print version and exit.\n"
 	" -l, --loglevel=LEVEL    Set the log level, by default 0.\n"
 	" -n, --dry-run           Just parse file file.\n"
-	" -f, --force             Ignore any earlier installations.\n"
 	));
 }
 
@@ -51,7 +49,6 @@ void main(int argc, char* argv[])
 	char* filename = 0;
 	char option;
 	bool dryrun = false;
-	bool forced = false;
 
 #ifdef LC_ALL
 	setlocale(LC_ALL, "");
@@ -60,7 +57,7 @@ void main(int argc, char* argv[])
 
 	while (1)
 		{
-		option = getopt_long(argc, argv, "fhnl:", opts, NULL);
+		option = getopt_long(argc, argv, "hnl:", opts, NULL);
 		if (option == -1)
 			break;
 		switch (option)
@@ -69,9 +66,6 @@ void main(int argc, char* argv[])
 			case '?':
 				printHelp();
 				exit(0);
-			case 'f':
-				forced = true;
-				break;
 			case 'l':
 				logLevel = atoi(optarg);
 				break;
@@ -118,7 +112,6 @@ void main(int argc, char* argv[])
 			{
 			SISInstaller installer;
 			installer.setPsion(psion);
-			installer.setForced(forced);
 			installer.run(&sisFile, buf, len);
 			}
 		}

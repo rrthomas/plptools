@@ -29,6 +29,8 @@
 
 SISComponentNameRecord::~SISComponentNameRecord()
 {
+	for (int i = 0; i < m_nameCount; ++i)
+		delete[] m_names[i];
 	delete[] m_names;
 }
 
@@ -62,6 +64,7 @@ SISComponentNameRecord::fillFrom(uint8_t* buf, int base, off_t len,
 	// Then read ptrs.
 	//
 	m_names = new uint8_t*[n];
+	m_nameCount = n;
 	for (int i = 0; i < n; ++i)
 		{
 		m_namePtrs[i] = read32(p + size);

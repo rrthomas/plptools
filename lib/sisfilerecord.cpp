@@ -32,7 +32,9 @@ SISFileRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 	if (*base + 28 + 4 * 2 > len)
 		return SIS_TRUNCATED;
 
+	SisRC rc = SIS_OK;
 	m_buf = buf;
+	m_len = len;
 	uint8_t* p = buf + *base;
 	int size = 0;
 	m_flags = read32(p);
@@ -89,16 +91,16 @@ SISFileRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 			for (int i = 0; i < n; ++i)
 				{
 				m_fileLengths[i] = read32(p + size);
-				if (m_fileLengths[i] > len)
-					return SIS_TRUNCATED;
+//				if (m_fileLengths[i] > len)
+//					rc = SIS_TRUNCATEDDATA;
 				size += 4;
 				}
 			for (int i = 0; i < n; ++i)
 				{
 				m_filePtrs[i] = read32(p + size);
 				int fileLen = m_fileLengths[i];
-				if (m_filePtrs[i] + fileLen > len)
-					return SIS_TRUNCATED;
+//				if (m_filePtrs[i] + fileLen > len)
+//					rc = SIS_TRUNCATEDDATA;
 				size += 4;
 				if (logLevel >= 2)
 					printf(_("File %d (for %s) is %d bytes long (at %d)\n"),
@@ -122,7 +124,17 @@ SISFileRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 				printf(_("Unknown file flags %d\n"), m_flags);
 		}
 	*base += size;
-	return SIS_OK;
+	return rc;
+}
+
+uint8_t*
+SISFileRecord::getFilePtr(int fileNo)
+{
+	if (fileNo < 0)
+		return 0;
+	if (m_filePtrs[fileNo] >= m_len)
+		return 0;
+	return &m_buf[m_filePtrs[fileNo]];
 }
 
 void

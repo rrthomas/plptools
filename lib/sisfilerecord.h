@@ -50,8 +50,14 @@ public:
 
 	uint8_t* getDestPtr()
 		{
-		return &m_buf[m_destPtr];
+		return m_destPtr < m_len ? &m_buf[m_destPtr] : 0;
 		}
+
+	/**
+	 * Return a pointer to the file data for the file for the specified
+	 * language.
+	 */
+	uint8_t* getFilePtr(int fileNo);
 
 	void setMainDrive(char drive);
 
@@ -90,17 +96,20 @@ public:
 	uint32_t m_sourceLength;
 	uint32_t m_sourcePtr;
 	uint32_t m_destLength;
-	uint32_t m_destPtr;
 	uint32_t* m_fileLengths;
-	uint32_t* m_filePtrs;
 
 private:
+
+	uint32_t m_destPtr;
+	uint32_t* m_filePtrs;
 
 	/**
 	 * The buffer we belong to.
 	 * Used for updating the destination file name.
 	 */
 	uint8_t* m_buf;
+
+	int m_len;
 
 };
 

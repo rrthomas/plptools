@@ -70,6 +70,11 @@ private:
 	 */
 	uint8_t** m_names;
 
+	/**
+	 * The number of names, so we know how much to delete.
+	 */
+	int m_nameCount;
+
 };
 
 #endif
