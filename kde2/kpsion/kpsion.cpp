@@ -897,6 +897,8 @@ doBackup() {
 	progressLocalCount = 0;
 	progressLocalPercent = -1;
 	emit setProgress(0);
+	kapp->processEvents();
+	progressTotal = 0;
 	for (int i = 0; i < toBackup.size(); i++) {
 	    PlpDirent e = toBackup[i];
 	    const char *fn = e.getName();
