@@ -970,6 +970,18 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 }
 
 #if HAVE_LIBREADLINE
+#if (READLINE_VERSION >= 402)
+#define NULL_COMPLETION_RETTYPE char*
+#define NULL_COMPLETION_RETVAL ""
+#define FUNCAST(f) (CPFunction *)f
+#define MATCHFUNCTION rl_completion_matches
+#else
+#define NULL_COMPLETION_RETTYPE int
+#define NULL_COMPLETION_RETVAL 0
+#define FUNCAST(f) (Function *)f
+#define MATCHFUNCTION completion_matches
+#endif
+
 static char *all_commands[] = {
     "pwd", "ren", "touch", "gtime", "test", "gattr", "sattr", "devs",
     "dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
@@ -1045,9 +1057,9 @@ command_generator(char *text, int state)
     return NULL;
 }
 
-static int
+static NULL_COMPLETION_RETTYPE
 null_completion() {
-    return 0;
+    return NULL_COMPLETION_RETVAL;
 }
 
 static char **
@@ -1055,10 +1067,10 @@ do_completion(char *text, int start, int end)
 {
     char **matches = NULL;
 
-    rl_completion_entry_function = (Function *)null_completion;
+    rl_completion_entry_function = FUNCAST(null_completion);
     rl_completion_append_character = ' ';
     if (start == 0)
-	matches = completion_matches(text, cmdgen_ptr);
+	matches = MATCHFUNCTION(text, cmdgen_ptr);
     else {
 	int idx = 0;
 	char *name;
@@ -1086,7 +1098,7 @@ do_completion(char *text, int start, int end)
 		maskAttr = rfsv::PSI_A_DIR;
 	}
 
-	matches = completion_matches(text, fnmgen_ptr);
+	matches = MATCHFUNCTION(text, fnmgen_ptr);
     }
     return matches;
 }
@@ -1097,7 +1109,7 @@ initReadline(void)
 {
 #if HAVE_LIBREADLINE
     rl_readline_name = "plpftp";
-    rl_completion_entry_function = (Function *)null_completion;
+    rl_completion_entry_function = FUNCAST(null_completion);
     rl_attempted_completion_function = (CPPFunction *)do_completion;
     rlcrap_setpointers(command_generator, filename_generator);
 #endif

@@ -29,13 +29,41 @@ AC_DEFUN(PLP_CHECK_READLINE,
 			ac_cv_addcurses=true
 			AC_DEFINE_UNQUOTED(HAVE_LIBREADLINE)
 			AC_MSG_RESULT([yes, and needs libcurses])
+			PLP_READLINE_402
 			;;
 		1*)
 			ac_cv_have_libreadline=true;
 			AC_DEFINE_UNQUOTED(HAVE_LIBREADLINE)
 			AC_MSG_RESULT(yes)
+			PLP_READLINE_402
 			;;
 	esac
 	AM_CONDITIONAL(HAVE_LIBREADLINE, test x$ac_cv_have_libreadline = xtrue)
 	AM_CONDITIONAL(ADD_LIBCURSES, test x$ac_cv_addcurses = xtrue)
+])
+
+dnl
+dnl Check for readline version.
+dnl Those readline developers change their API too frequently
+dnl and don't provide a version number in the headers :-(
+dnl
+AC_DEFUN(PLP_READLINE_402,
+[
+	AC_MSG_CHECKING(for readline version)
+	saved_libs=$LIBS
+	if $ac_cv_addcurses ; then
+		LIBS="$LIBS -lreadline -lcurses"
+	else
+		LIBS="$LIBS -lreadline"
+	fi
+	rl42=false
+	AC_TRY_LINK(,[extern void rl_set_prompt(void); rl_set_prompt();],rl42=true)
+	LIBS="$saved_LIBS"
+	if $rl42 ; then
+		AC_MSG_RESULT(4.2 or greater)
+		AC_DEFINE_UNQUOTED(READLINE_VERSION,402)
+	else
+		AC_DEFINE_UNQUOTED(READLINE_VERSION,401)
+		AC_MSG_RESULT(4.1 or less)
+	fi
 ])

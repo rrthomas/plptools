@@ -69,6 +69,15 @@
 /* Define this to enable debugging code */
 #undef DEBUG
 
+/* Define this, if sys/int_types.h is on your system */
+#undef HAVE_SYS_INT_TYPES_H
+
+/* Define this, if your int-types have an underscore after the first u/s */
+#undef GNU_INTTYPES
+
+/* Define to 401 or 402, depending on readline version 4.1 or 4.2 */
+#define READLINE_VERSION 401
+
 @BOTTOM@
 
 /* Some reasonable defaults */
