@@ -1,28 +1,26 @@
-// $Id$
-//
-//  PLP - An implementation of the PSION link protocol
-//
-//  Copyright (C) 1999  Philip Proudman
-//  Modifications for plptools:
-//    Copyright (C) 1999 Fritz Elfert <felfert@to.com>
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-//  e-mail philip.proudman@btinternet.com
-
-
+/*-*-c++-*-
+ * $Id$
+ *
+ * This file is part of plptools.
+ *
+ *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
+ *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -83,10 +81,10 @@ void packet::reset()
 	inPtr = inBuffer;
 	outPtr = outBuffer;
 	foundSync = 0;
-	serialStatus = -1;
 	esc = false;
+	lastFatal = false;
+	serialStatus = -1;
 	crcIn = crcOut = 0;
-
 	fd = init_serial(devname, baud, 0);
 	if (fd != -1) {
 		iow.addIO(fd);
@@ -273,7 +271,7 @@ terminated()
 	}
 	if (!foundSync)
 	    return false;
-	
+
 	if (verbose & PKT_DEBUG_LOG) {
 	    if (foundSync != 3)
 		cout << "packet: terminated found sync at " << foundSync << endl;
@@ -339,12 +337,16 @@ linkFailed()
 		}
 		serialStatus = arg;
 	}
-#ifdef sun
-	if ((arg & TIOCM_CTS) == 0)
-#else
-	if (((arg & TIOCM_DSR) == 0) || ((arg & TIOCM_CTS) == 0))
+	if (((arg & TIOCM_CTS) == 0)
+#ifndef sun
+	    || ((arg & TIOCM_DSR) == 0)
 #endif
-		failed = true;
+	    ) {
+	    // eat possible junk on line
+	    while (read(fd, &res, sizeof(res)) > 0)
+		;
+	    failed = true;
+	}
 	if ((verbose & PKT_DEBUG_LOG) && lastFatal)
 		cout << "packet: linkFATAL\n";
 	if ((verbose & PKT_DEBUG_LOG) && failed)
@@ -352,3 +354,8 @@ linkFailed()
 	return lastFatal || failed;
 }
 
+/*
+ * Local variables:
+ * c-basic-offset: 4
+ * End:
+ */

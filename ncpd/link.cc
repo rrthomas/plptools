@@ -293,7 +293,7 @@ flush() {
 bool link::
 stuffToSend()
 {
-    return (somethingToSend || !sendQueue.empty());
+    return (!failed && (somethingToSend || !sendQueue.empty()));
 }
 
 bool link::
