@@ -187,6 +187,13 @@ class rfsv {
 		/**
 		 * Opens a file.
 		 *
+		 * @param attr   The open mode. Use @ref opMode to convert a combination of @ref open_flags
+		 *               and @ref open_mode to the machine-specific representation.
+		 * @param name   The name of the file to open.
+		 * @param handle The handle for usage with @ref fread,
+		 *               @ref frwrite, @ref fseek @ref fclose is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
 		virtual Enum<errs> fopen(const long attr, const char * const name, long &handle) = 0;
 
@@ -194,8 +201,9 @@ class rfsv {
 		 * Creates a unique temporary file.
 		 * The file is opened for reading and writing.
 		 *
-		 * @param handle The handle for usage with @ref fread, @ref frwrite, @ref fseek @ref fclose is returned here.
-		 * @param name The name of the temporary file is returned here.
+		 * @param handle The handle for usage with @ref fread,
+		 *               @ref frwrite, @ref fseek @ref fclose is returned here.
+		 * @param name   The name of the temporary file is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
@@ -203,11 +211,27 @@ class rfsv {
 
 		/**
 		 * Creates a named file.
+		 *
+		 * @param attr   The open mode. Use @ref opMode to convert a combination of @ref open_flags
+		 *               and @ref open_mode to the machine-specific representation.
+		 * @param name   The name of the file to create.
+		 * @param handle The handle for usage with @ref fread,
+		 *               @ref frwrite, @ref fseek @ref fclose is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
 		virtual Enum<errs> fcreatefile(const long attr, const char * const name, long &handle) = 0;
 
 		/**
 		 * Creates an named file, overwriting an existing file.
+		 *
+		 * @param attr   The open mode. Use @ref opMode to convert a combination of @ref open_flags
+		 *               and @ref open_mode to the machine-specific representation.
+		 * @param name   The name of the file to create.
+		 * @param handle The handle for usage with @ref fread,
+		 *               @ref frwrite, @ref fseek @ref fclose is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
 		virtual Enum<errs> freplacefile(const long attr, const char * const name, long &handle) = 0;
 
@@ -222,15 +246,8 @@ class rfsv {
 		/**
 		 * Reads a directory on the Psion.
 		 * The returned array of @ref bufferArray contains one @ref bufferStore element
-		 * for each directory entry.
-		 * The layout of information data is as follows:
-		 * <pre>
-		 * 	offset		size	value
-		 * 	0		4	Pointer to a PsiTime object, representing the file's modification.
-		 * 	4		4	Size in bytes.
-		 * 	8		4	Attributes.
-		 * 	12		?	Zero terminated file name.
-		 * </pre>
+		 * for each directory entry. For a description of the layout of the elements
+		 * in each directory entry, see @ref readdir.
 		 *
 		 * @param name The name of the directory
 		 * @param ret Array of @ref bufferStore containing information for directory entries.
@@ -297,9 +314,31 @@ class rfsv {
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
 		virtual Enum<errs> dircount(const char * const name, long &count) = 0;
-		virtual Enum<errs> devlist(long &devbits) = 0;
-		virtual Enum<errs> devinfo(const int dev, long &free, long &total, long &attr, long &uniqueid, char * const name) = 0;
 
+		/**
+		 * Retrieves available drives on the Psion.
+		 *
+		 * @param devbits On return, for every exiting drive, a bit is set in this
+		 *                variable. The lowest bit represents drive A:.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> devlist(long &devbits) = 0;
+
+		/**
+		 * Retrieves details about a drive.
+		 *
+		 * @param dev   An integer, representing the drive to get details from.
+		 *              (0 represents A:, 1 is B: and so on ...)
+		 * @param free     On return, the free space in bytes is returned here.
+		 * @param total    On return, the total capacity in bytes is returned here.
+		 * @param attr     On return, the attributes of the drive are returned here.
+		 * @param uniqueid On return, the unique Id of the drive is returned here.
+		 * @param name     On return, the volume name is copied to this pointer's destination.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> devinfo(const int dev, long &free, long &total, long &attr, long &uniqueid, char * const name) = 0;
 
 		/**
 		 * Reads from a file on the Psion.
@@ -353,6 +392,9 @@ class rfsv {
 
 		/**
 		 * Copies a file from the Psion to the Psion.
+		 * On the EPOC variants, this runs much faster than reading
+		 * data from the Psion and then writing it back to the Psion, since
+		 * data transfer is handled locally on the Psion.
 		 *
 		 * @param from Name of the file to be copied.
 		 * @param to Name of the destination file.
@@ -363,6 +405,7 @@ class rfsv {
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
 		virtual Enum<errs> copyOnPsion(const char * const from, const char * const to, void *, cpCallback_t func) = 0;
+
 		/**
 		 * Resizes an open file on the Psion.
 		 * If the new size is greater than the file's
@@ -426,9 +469,56 @@ class rfsv {
 		 */
 		virtual Enum<errs> remove(const char * const name) = 0;
 
+		/**
+		 * Open a directory for reading with readdir.
+		 *
+		 * @param attr   A combination of PSI_A_.. flags, representing the desired types
+		 *               of entries to be returned when calling @ref readdir.
+		 * @param name   The name of the directory
+		 * @param handle A handle to be used with @ref readdir and @ref closedir.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
 		virtual Enum<errs> opendir(const long attr, const char * const name, rfsvDirhandle &handle) = 0;
+
+		/**
+		 * Read directory entries.
+		 * This method reads entries of a directory, previously
+		 * opened with @ref opendir.
+		 *
+		 * The entry is returned in the buff parameter as follows:
+		 * <pre>
+		 * 	offset		size	value
+		 * 	0		4	Pointer to a PsiTime object, representing the file's modification.
+		 * 	4		4	Size in bytes.
+		 * 	8		4	Attributes.
+		 * 	12		?	Zero terminated file name.
+		 * </pre>
+		 *
+		 * @param handle A handle, obtained by calling @see opendir.
+		 * @param buff   The entry information is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
 		virtual Enum<errs> readdir(rfsvDirhandle &handle, bufferStore &buff) = 0;
+
+		/**
+		 * Close a directory, previously opened with @ref opendir.
+		 *
+		 * @param handle A handle, obtained by calling @see opendir.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
 		virtual Enum<errs> closedir(rfsvDirhandle &handle) = 0;
+
+		/**
+		 * Set the name of a Psion Volume (Drive).
+		 *
+		 * @param drive The drive character of the Volume, whose name should be set.
+		 * @param name  The new name for that drive.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
 		virtual Enum<errs> setVolumeName(const char drive, const char * const name) = 0;
 
 		/**
@@ -460,6 +550,16 @@ class rfsv {
 		 *
 		 */
 		const char * const attr2String(const long attr);
+
+		/**
+		 * Converts an open-mode (A combination of the PSI_O_ constants.)
+		 * from generic representation to the machine-specific representation.
+		 *
+		 * @param mode The generic open mode.
+		 *
+		 * @returns The machine specific representation for use with
+		 *          @ref fopen, @ref fcreatefile and @freplacefile.
+		 */
 		virtual long opMode(const long mode) = 0;
 protected:
 		/**
