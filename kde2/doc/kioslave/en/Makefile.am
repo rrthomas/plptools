@@ -1,0 +1,4 @@
+KDE_LANG = en
+
+kiodocdir = $(kde_libs_htmldir)/$(KDE_LANG)/kioslave
+kiodoc_DATA = psion.docbook

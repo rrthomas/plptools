@@ -1,0 +1,27 @@
+<article lang="&language;" id="psion">
+<title>psion</title>
+
+<para>
+The psion ioslave enables you to browse the drives of a connected Psion PDA.
+</para>
+
+<para>
+To see the drives of a Psion, enter
+<userinput><command>psion:/</command></userinput>
+or (if the Psion is connected at a remote machine)
+<userinput><command>psion://</command><replaceable>host</replaceable></userinput>.
+</para>
+
+<para>
+The psion ioslave connects to a Psion using the ncpd daemon. Therefore,
+this daemon must be running on the machine. The psion ioslave, the daemon
+as well as other tools for Psion connectivity are part of the plptools
+package. This package is available at <ulink url="http://plptools.sourceforge.net/"
+>http://plptools.sourceforge.net/</ulink>.
+</para>
+
+<para>
+Author: Fritz Elfert <email>felfert@users.sourceforge.net</email>
+</para>
+</article>
+
