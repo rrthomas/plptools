@@ -1,4 +1,6 @@
+%define version @VERSION@
 %define myrelease 1
+
 %define srel /etc/SuSE-release
 %define rrel /etc/redhat-release
 %define isSUSE %(test -f %{srel} && echo 1 || echo 0)
@@ -10,20 +12,25 @@
 %if "%{REL}" >= "8.0"
 # Bug in SuSE8.0's rpm setup: _initrddir has wrong value
 %define _initrddir %{_sysconfdir}/init.d
+%define _kdedir /opt/kde3
 %else
 %define _initrddir %{_sysconfdir}/init.d
+%define _kdedir /opt/kde2
 %endif
 %define distro SuSE%{REL}
 %endif
 %if "%{isRH}" > "0"
 %define REL %(rpm -q --queryformat '%%{version}' redhat-release)
 %define distro RH%{REL}
+%define _kdedir /usr
 %endif
+%define _kdebindir %{_kdedir}/bin
+%define _kdelibdir %{_kdedir}/lib
+%define _kdedatadir %{_kdedir}/share
 %define realrelease %{myrelease}%{distro}
 
 Summary: Connectivity for psion series 5.
 Name: plptools
-%define version @VERSION@
 Version: %{version}
 Release: %{realrelease}
 Vendor: The plptools project
@@ -32,8 +39,21 @@ URL: http://plptools.sourceforge.net/
 Source0: http://download.sourceforge.net/plptools/plptools-%{version}.tar.gz
 Copyright: GPL
 Group: Networking/Utilities
+Buildrequires: readline-devel newt-devel kdelibs-devel >= 2.1
+%if "%{isSUSE}" > "0"
+%if "%{REL}" >= "8.0"
+# aaa_base provides chkconfig
+Requires: aaa_base >= 2002.3.27-0
+Buildrequires: qt3-devel >= 3.0.3
+%else
+Requires: aaa_base >= 2001.10.19-1
+Buildrequires: qt-devel >= 2.2.4
+%endif
+%endif
+%if "%{isRH}" > "0"
 Requires: chkconfig >= 0.9
-Buildrequires: readline-devel newt-devel kdelibs-devel >= 2.1 qt-devel >= 2.2.4
+Buildrequires: qt-devel >= 2.2.4
+%endif
 BuildRoot: /tmp/plputils-buildroot
 
 %package devel
@@ -150,6 +170,8 @@ zwischen Psion und Rechner.
 %build
 %if "%{isSUSE}" > "0"
 %if "%{REL}" >= "8.0"
+# SuSE's libtool breaks everything
+%define __libtoolize true
 %configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde3
 %else
 %configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde2
@@ -239,15 +261,20 @@ perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 %if "%{isSUSE}" > "0"
 %if "%{REL}" >= "8.0"
 %triggerin kde -- kdebase3, kde-i18n-de
+export PATH=%{_kdebindir}:$PATH
 perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 %else
+export PATH=%{_kdebindir}:$PATH
 %triggerin kde -- kdebase, kde-i18n-de
 perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 %endif
 %endif
 
 %post kde
-KONQRC=`kde-config --expandvars --install config`/konquerorrc
+%if "%{isSUSE}" > "0"
+export PATH=%{_kdebindir}:$PATH
+%endif
+KONQRC=`%{_kdebindir}/kde-config --expandvars --install config`/konquerorrc
 if test -f $KONQRC && grep -q '\[Notification Messages\]' $KONQRC ; then
 	cp $KONQRC $KONQRC.$$
 	cat $KONQRC.$$ | grep -v "askSaveinode/x-psion-drive=No" | sed \
@@ -279,9 +306,12 @@ then
 fi
 
 %preun kde
+%if "%{isSUSE}" > "0"
+export PATH=%{_kdebindir}:$PATH
+%endif
 if [ "$1" = 0 ]
 then
-	perl %{_datadir}/%{name}/kiodoc-update.pl -r psion
+	/usr/bin/perl %{_datadir}/%{name}/kiodoc-update.pl -r psion
 	KONQRC=`kde-config --expandvars --install config`/konquerorrc
 	if test -f $KONQRC ; then
 		cp $KONQRC $KONQRC.$$
@@ -318,37 +348,37 @@ fi
 %{_includedir}/%{name}/*
 
 %files kde
-%{_libdir}/kde*/kio_plp.so*
-%{_libdir}/kde*/kio_plp.la
-%{_libdir}/kde*/libplpprops.so*
-%{_libdir}/kde*/libplpprops.la
-%{_datadir}/services/*
-%{_datadir}/icons/*/*/mimetypes/*
-%{_datadir}/icons/*/*/devices/*
-%{_datadir}/icons/*/*/apps/psion*
-%{_datadir}/locale/*/LC_MESSAGES/libplpprops.mo
-%{_datadir}/mimelnk/*/*
-%{_datadir}/doc/HTML/*/kioslave/*
+%{_kdelibdir}/kde*/kio_plp.so*
+%{_kdelibdir}/kde*/kio_plp.la
+%{_kdelibdir}/kde*/libplpprops.so*
+%{_kdelibdir}/kde*/libplpprops.la
+%{_kdedatadir}/services/*
+%{_kdedatadir}/icons/*/*/mimetypes/*
+%{_kdedatadir}/icons/*/*/devices/*
+%{_kdedatadir}/icons/*/*/apps/psion*
+%{_kdedatadir}/locale/*/LC_MESSAGES/libplpprops.mo
+%{_kdedatadir}/mimelnk/*/*
+%{_kdedatadir}/doc/HTML/*/kioslave/*
 %{_datadir}/%{name}/kiodoc-update.pl
 
 %files -n kpsion
-%{_bindir}/kpsion
-%{_libdir}/libkpsion.so
-%{_libdir}/libkpsion.la
-%{_datadir}/applnk/*/kpsion*
-%{_datadir}/apps/kpsion/*
-%{_datadir}/apps/konqueror/*
-%{_datadir}/icons/*/*/apps/kpsion*
-%{_datadir}/icons/*/*/actions/psion*
-%{_datadir}/locale/*/LC_MESSAGES/kpsion.mo
-%{_datadir}/doc/HTML/*/kpsion
+%{_kdebindir}/kpsion
+%{_kdelibdir}/libkpsion.so
+%{_kdelibdir}/libkpsion.la
+%{_kdedatadir}/applnk/*/kpsion*
+%{_kdedatadir}/apps/kpsion/*
+%{_kdedatadir}/apps/konqueror/*
+%{_kdedatadir}/icons/*/*/apps/kpsion*
+%{_kdedatadir}/icons/*/*/actions/psion*
+%{_kdedatadir}/locale/*/LC_MESSAGES/kpsion.mo
+%{_kdedatadir}/doc/HTML/*/kpsion
 
 %files -n klipsi
-%{_bindir}/klipsi
-%{_libdir}/klipsi.so
-%{_libdir}/klipsi.la
-%{_datadir}/applnk/*/klipsi*
-%{_datadir}/apps/klipsi/*
-%{_datadir}/icons/*/*/apps/klipsi*
-%{_datadir}/icons/*/*/actions/klipsi*
-%{_datadir}/locale/*/LC_MESSAGES/klipsi.mo
+%{_kdebindir}/klipsi
+%{_kdelibdir}/klipsi.so
+%{_kdelibdir}/klipsi.la
+%{_kdedatadir}/applnk/*/klipsi*
+%{_kdedatadir}/apps/klipsi/*
+%{_kdedatadir}/icons/*/*/apps/klipsi*
+%{_kdedatadir}/icons/*/*/actions/klipsi*
+%{_kdedatadir}/locale/*/LC_MESSAGES/klipsi.mo

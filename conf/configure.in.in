@@ -281,6 +281,13 @@ AC_ARG_ENABLE(kde,
 )
 PLP_HELP_MSG([Options, only needed when building KDE stuff:])
 if test "x$ac_enable_kde" = "xyes" ; then
+	AC_ARG_WITH(kdedir,
+	[  --with-kdedir=DIR       specify KDE directory [${prefix:-${ac_default_prefix}}]],
+	[
+		kde_prefix=${withval}
+		kde_exec_prefix=${withval}
+	]
+	)
 	AC_PATH_KDE
 	if test -n "${kde_cv_path_kde_config}" ; then
 			kde_prefix=`${kde_cv_path_kde_config} --prefix`
@@ -297,13 +304,6 @@ if test "x$ac_enable_kde" = "xyes" ; then
 			kde_exec_prefix=${kde_prefix}
 		fi
 	fi
-	AC_ARG_WITH(kdedir,
-	[  --with-kdedir=DIR       specify KDE directory [${prefix:-${ac_default_prefix}}]],
-	[
-		kde_prefix=${withval}
-		kde_exec_prefix=${withval}
-	]
-	)
 	AC_MSG_RESULT(KDE stuff will be installed below $kde_prefix)
 	AC_SUBST(kde_prefix)
 	AC_SUBST(kde_exec_prefix)
