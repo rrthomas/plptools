@@ -139,6 +139,14 @@ hup_handler SIGARG
 	exiting = 5;
 };
 
+static void
+term_handler SIGARG
+{
+	if (debug > 1)
+		debuglog("Got TERM signal\n");
+	exiting = 5;
+};
+
 static void doexit() {
 #ifndef DONT_UPDATE_MTAB
 	FILE *fpin, *fpout;
@@ -567,6 +575,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 	 */
 	signal(SIGUSR1, usr1_handler);
 	signal(SIGHUP, hup_handler);
+	signal(SIGTERM, term_handler);
 	signal(SIGPIPE, SIG_IGN);
 
 	for (;;) {
