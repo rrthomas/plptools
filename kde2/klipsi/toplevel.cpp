@@ -189,21 +189,29 @@ slotClipboardChanged()
 
     Enum<rfsv::errs> res;
 
-    QString clipData = clip->text();
-    if (clipData.isEmpty() || (clipData == lastClipData))
-        return;
-
     if (!checkConnection())
 	return;
 
-    lastClipData = clipData;
+    QImage clipImage = clip->image();
+    QString clipData = clip->text();
 
-    inSend = true;
-    mustListen = true;
-    char *p = strdup(clipData.latin1());
-    ascii2PsiText(p, clipData.length());
-    putClipData(p);
-    free(p);
+    if (clipImage.isNull()) {
+	if (clipData.isEmpty() || (clipData == lastClipData))
+	    return;
+	lastClipData = clipData;
+
+	inSend = true;
+	mustListen = true;
+	char *p = strdup(clipData.latin1());
+	ascii2PsiText(p, clipData.length());
+	putClipText(p);
+	free(p);
+    } else {
+	inSend = true;
+	mustListen = true;
+	putClipImage(clipImage);
+    }
+
     res = rc->notify();
     inSend = false;
 
@@ -285,7 +293,7 @@ ascii2PsiText(char *buf, int len) {
 }
 
 void TopLevel::
-putClipData(char *data) {
+putClipText(char *data) {
     Enum<rfsv::errs> res;
     u_int32_t fh;
     u_int32_t l;
@@ -316,10 +324,142 @@ putClipData(char *data) {
 
 	// Data
 	b.addDWord(strlen(data)); // @1e Section (String) length
-	b.addStringT(data);       // @22 Data
+	b.addString(data);        // @22 Data
 
 	p = (const unsigned char *)b.getString(0);
-	rf->fwrite(fh, p, 0x22 + strlen(data), l);
+	rf->fwrite(fh, p, b.getLen(), l);
+	rf->fclose(fh);
+	rf->fsetattr(CLIPFILE, 0x20, 0x07);
+    } else
+	closeConnection();
+}
+
+void TopLevel::
+putClipImage(QImage &img) {
+    Enum<rfsv::errs> res;
+    u_int32_t fh;
+    u_int32_t l;
+    const unsigned char *p;
+    bufferStore b;
+
+    res = rf->freplacefile(0x200, CLIPFILE, fh);
+    if (res == rfsv::E_PSI_GEN_NONE) {
+	while ((res = rc->checkNotify()) != rfsv::E_PSI_GEN_NONE) {
+	    if (res != rfsv::E_PSI_FILE_EOF) {
+		rf->fclose(fh);
+		closeConnection();
+		return;
+	    }
+	}
+
+	// Base Header
+	b.addDWord(0x10000037);   // @00 UID 0
+	b.addDWord(0x1000003b);   // @04 UID 1
+	b.addDWord(0);            // @08 UID 3
+	b.addDWord(0x4739d53b);   // @0c Checksum the above
+
+	// Section Table
+	b.addDWord(0x00000014);   // @10 Offset of Section Table
+	b.addByte(2);             // @14 Section Table, length in DWords
+	b.addDWord(0x1000003d);   // @15 Section Type (Image)
+	b.addDWord(0x0000001d);   // @19 Section Offset
+
+	// Data
+	bufferStore ib;
+	int wx = img.width();
+	int wy = img.height();
+
+	ib.addDWord(0x00000028);   // hdrlen
+	ib.addDWord(wx);           // xPixels
+	ib.addDWord(wy);           // yPixels
+	ib.addDWord(0);            // xTwips (unspecified)
+	ib.addDWord(0);            // yTwips (unspecified)
+	ib.addDWord(2);            // bitsPerPixel
+	ib.addDWord(0);            // unknown1
+	ib.addDWord(0);            // unknown2
+	ib.addDWord(0);            // RLEflag
+
+
+	bufferStore rawBuf;
+	for (int y = 0; y < wy; y++) {
+	    int ov = 0;
+	    int shift = 0;
+	    int bc = 0;
+
+	    for (int x = 0; x < wx; x++) {
+		int v = qGray(img.pixel(x, y)) / 85;
+		ov |= (v << shift);
+		if (shift == 6) {
+		    rawBuf.addByte(ov);
+		    bc++;
+		    shift = 0;
+		    ov = 0;
+		} else
+		    shift += 2;
+	    }
+	    if (shift != 0) {
+		rawBuf.addByte(ov);
+		shift = 0;
+		ov = 0;
+		bc++;
+	    }
+	    while (bc % 4) {
+		rawBuf.addByte(0);
+		bc++;
+	    }
+	}
+
+#if 1
+	ib.addBuff(rawBuf);
+#else
+  TODO: RLE encoding
+
+	int rawLen = rawBuf.getLen();
+	int eqCount = 1;
+	int lastByte = rawBuf.getByte(0);
+	bufferStore diBuf;
+
+	for (int i = 1; i <= rawLen; i++) {
+	    int v;
+	    if (i < rawLen)
+		v = rawBuf.getByte(i);
+	    else
+		v = lastByte + 1;
+	    if (v == lastByte) {
+		if (diBuf.getLen()) {
+		    ib.addByte(0x100 - diBuf.getLen());
+		    ib.addBuff(diBuf);
+		    diBuf.init();
+		}
+		eqCount++;
+		if (eqCount > 0x7f) {
+		    ib.addByte(0x7f);
+		    ib.addByte(v);
+		    eqCount = 1;
+		}
+	    } else {
+		if (eqCount > 1) {
+		    ib.addByte(eqCount);
+		    ib.addByte(lastByte);
+		    eqCount = 1;
+		} else {
+		    diBuf.addByte(lastByte);
+		    if ((diBuf.getLen() > 0x7f) || (i == rawLen)) {
+			ib.addByte(0x100 - diBuf.getLen());
+			ib.addBuff(diBuf);
+			diBuf.init();
+		    }
+		}
+	    }
+	    lastByte = v;
+	}
+#endif
+
+	b.addDWord(ib.getLen() + 4);
+	b.addBuff(ib);
+
+	p = (const unsigned char *)b.getString(0);
+	rf->fwrite(fh, p, b.getLen(), l);
 	rf->fclose(fh);
 	rf->fsetattr(CLIPFILE, 0x20, 0x07);
     } else

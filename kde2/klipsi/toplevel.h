@@ -74,7 +74,8 @@ private:
 
     void psiText2ascii(char *, int);
     void ascii2PsiText(char *, int);
-    void putClipData(char *);
+    void putClipText(char *);
+    void putClipImage(QImage &);
     void getClipData();
     void closeConnection();
     bool checkConnection();
