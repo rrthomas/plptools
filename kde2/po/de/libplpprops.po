@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-03-20 02:52+0100\n"
+"POT-Creation-Date: 2002-07-07 23:27+0200\n"
 "PO-Revision-Date: 2002-03-20 02:55CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -14,19 +14,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: plpprops.cc:153
+#: plpprops.cc:154
 msgid "&Permissions"
 msgstr "&Berechtigungen"
 
-#: plpprops.cc:155 plpprops.cc:671
+#: plpprops.cc:156 plpprops.cc:672
 msgid "&General"
 msgstr "&Allgemein"
 
-#: plpprops.cc:217
+#: plpprops.cc:218
 msgid "Readable"
 msgstr "Lesen"
 
-#: plpprops.cc:218
+#: plpprops.cc:219
 msgid ""
 "If this is checked, read permission is granted. On series 5, this cannot "
 "swiched off."
@@ -34,21 +34,21 @@ msgstr ""
 "Wird dieser Schalter aktiviert, so wird die Berechtigung zum Lesen erteilt. "
 "Auf einem Serie 5 kann dieser Schalter <B>nicht</B> abgeschaltet werden."
 
-#: plpprops.cc:223
+#: plpprops.cc:224
 msgid "Writeable"
 msgstr "Schreiben"
 
-#: plpprops.cc:224
+#: plpprops.cc:225
 msgid "If this is checked, write permission is granted."
 msgstr ""
 "Ist dieser Schalter aktiviert, so wird die Berechtigung zum Schreiben "
 "erteilt."
 
-#: plpprops.cc:229
+#: plpprops.cc:230
 msgid "Hidden"
 msgstr "Versteckt"
 
-#: plpprops.cc:230 plpprops.cc:236
+#: plpprops.cc:231 plpprops.cc:237
 msgid ""
 "If this is checked, the file is not shown when displaying the directory on "
 "the Psion."
@@ -56,25 +56,26 @@ msgstr ""
 "Ist dieser Schalter aktiviert, so wird die Datei bei der Anzeige des Ordners "
 "auf dem Psion nicht angezeigt."
 
-#: plpprops.cc:235
+#: plpprops.cc:236
 msgid "System"
 msgstr "System"
 
-#: plpprops.cc:241
+#: plpprops.cc:242
 msgid "Archive"
 msgstr "Archiv"
 
-#: plpprops.cc:242
-msgid "If this is checked, the file will be included in the next incremental backup."
+#: plpprops.cc:243
+msgid ""
+"If this is checked, the file will be included in the next incremental backup."
 msgstr ""
 "Ist dieser Schalter aktiviert, so wird die Datei in die nächste "
 "inkrementelle Sicherung einbezogen."
 
-#: plpprops.cc:250
+#: plpprops.cc:251
 msgid "Executable"
 msgstr "Ausführen"
 
-#: plpprops.cc:251
+#: plpprops.cc:252
 msgid ""
 "If this is checked, the file can be executed on the Psion. This Attribute "
 "does not apply to directories."
@@ -82,11 +83,11 @@ msgstr ""
 "Ist dieser Schalter aktiviert, so kann die Datei auf dem Psion ausgeführt "
 "werden. Dieses Attribut ist nicht auf Ordner anwendbar."
 
-#: plpprops.cc:256
+#: plpprops.cc:257
 msgid "Stream"
 msgstr "Stream"
 
-#: plpprops.cc:257
+#: plpprops.cc:258
 msgid ""
 "If this is checked, the file is a stream. This Attribute does not apply to "
 "directories."
@@ -94,11 +95,11 @@ msgstr ""
 "Ist dieser Schalter aktiviert, so ist die Datei ein Stream. Dieses Attribut "
 "ist nicht auf Ordner anwendbar."
 
-#: plpprops.cc:262
+#: plpprops.cc:263
 msgid "Text"
 msgstr "Text"
 
-#: plpprops.cc:263
+#: plpprops.cc:264
 msgid ""
 "If this is checked, the file is opened in text mode. This Attribute does not "
 "apply to directories."
@@ -106,11 +107,11 @@ msgstr ""
 "Ist dieser Schalter aktiviert, so wird die Datei im Text-Modus geöffnet. "
 "Dieses Attribut ist nicht auf Ordner anwendbar."
 
-#: plpprops.cc:271
+#: plpprops.cc:272
 msgid "Normal"
 msgstr "Normal"
 
-#: plpprops.cc:272
+#: plpprops.cc:273
 msgid ""
 "If this is checked, the file is considered regular. This Attribute does not "
 "apply to directories."
@@ -118,11 +119,11 @@ msgstr ""
 "Ist dieser Schalter aktiviert, so wird die Datei als normal angesehen. "
 "Dieses Attribut ist nicht auf Ordner anwendbar."
 
-#: plpprops.cc:277
+#: plpprops.cc:278
 msgid "Temporary"
 msgstr "Temporär"
 
-#: plpprops.cc:278
+#: plpprops.cc:279
 msgid ""
 "If this is checked, the file considered temporary. This Attribute does not "
 "apply to directories."
@@ -130,11 +131,11 @@ msgstr ""
 "Ist dieser Schalter aktiviert, so wird die Datei als temporär angesehen. "
 "Dieses Attribut ist nicht auf Ordner anwendbar."
 
-#: plpprops.cc:283
+#: plpprops.cc:284
 msgid "Compressed"
 msgstr "Komprimiert"
 
-#: plpprops.cc:284
+#: plpprops.cc:285
 msgid ""
 "If this is checked, the file is stored in compressed mode. This Attribute "
 "does not apply to directories."
@@ -142,69 +143,69 @@ msgstr ""
 "Ist dieser Schalter aktiviert, so wird die Datei komprimiert gespeichert. "
 "Dieses Attribut ist nicht auf Ordner anwendbar."
 
-#: plpprops.cc:304
+#: plpprops.cc:305
 msgid "Psion &Attributes"
 msgstr "Psion &Attribute"
 
-#: plpprops.cc:309
+#: plpprops.cc:310
 msgid "Path on Psion:"
 msgstr "Pfad auf dem Psion:"
 
-#: plpprops.cc:316
+#: plpprops.cc:317
 msgid "Generic attributes"
 msgstr "Allgemeine Attribute"
 
-#: plpprops.cc:330
+#: plpprops.cc:331
 msgid "Machine specific attributes"
 msgstr "Geräte-spezifische Attribute"
 
-#: plpprops.cc:514
+#: plpprops.cc:515
 msgid "Psion &Drive"
 msgstr "Psion &Laufwerk"
 
-#: plpprops.cc:524
+#: plpprops.cc:525
 msgid "Information"
 msgstr "Information"
 
-#: plpprops.cc:530
+#: plpprops.cc:531
 msgid "Type"
 msgstr "Typ"
 
-#: plpprops.cc:536
+#: plpprops.cc:537
 msgid "The type of the drive is shown here."
 msgstr "Der Laufwerkstyp wird hier angezeigt."
 
-#: plpprops.cc:538
+#: plpprops.cc:539
 msgid "Total capacity"
 msgstr "Gesamtkapazität"
 
-#: plpprops.cc:541 plpprops.cc:549 plpprops.cc:557
+#: plpprops.cc:542 plpprops.cc:550 plpprops.cc:558
 msgid " "
 msgstr " "
 
-#: plpprops.cc:544
+#: plpprops.cc:545
 msgid "This shows the total capacity of the drive."
 msgstr "Hier wird die Gesamtkapazität des Laufwerks angezeigt."
 
-#: plpprops.cc:546
+#: plpprops.cc:547
 msgid "Free space"
 msgstr "Freier Speicherplatz"
 
-#: plpprops.cc:552
+#: plpprops.cc:553
 msgid "This shows the available space of the drive."
 msgstr "Hier können Sie den freien Speicherplatz des Laufwerks ablesen."
 
-#: plpprops.cc:554
+#: plpprops.cc:555
 msgid "Unique ID"
 msgstr "Eindeutige ID"
 
-#: plpprops.cc:560
+#: plpprops.cc:561
 msgid "This shows unique ID of the drive. For ROM drives, this is always 0."
 msgstr ""
 "Hier wird die eindeutige ID des Laufwerks angezeigt. Für ROM-Laufwerke ist "
 "dies stets 0."
 
-#: plpprops.cc:564
+#: plpprops.cc:565
 msgid ""
 "Here, the usage of the drive is shown in a pie diagram. The purple area "
 "shows used space, the blue area shows free space."
@@ -213,11 +214,11 @@ msgstr ""
 "Bereich kennzeichnet den belegten Speicherplatz, der blaue Bereich "
 "repräsentiert den freien Speicherplatz."
 
-#: plpprops.cc:572
+#: plpprops.cc:573
 msgid "Backup"
 msgstr "Sicherung"
 
-#: plpprops.cc:576
+#: plpprops.cc:577
 msgid ""
 "Click here, to do a backup of this drive. This launches KPsion to perform "
 "that task."
@@ -225,11 +226,11 @@ msgstr ""
 "Klicken Sie hier, um eine Sicherung dieses Laufwerks durchzuführen. Zu "
 "diesem Zweck wird KPsion gestartet."
 
-#: plpprops.cc:578
+#: plpprops.cc:579
 msgid "Restore"
 msgstr "Rücksicherung"
 
-#: plpprops.cc:583
+#: plpprops.cc:584
 msgid ""
 "Click here, to do a restore of this drive. This launches KPsion to perform "
 "that task."
@@ -237,95 +238,98 @@ msgstr ""
 "Klicken Sie hier, um eine Rücksicherung dieses Laufwerks durchzuführen. Zu "
 "diesem Zweck wird KPsion gestartet."
 
-#: plpprops.cc:585
+#: plpprops.cc:586
 msgid "Format"
 msgstr "Formatieren"
 
-#: plpprops.cc:590
-msgid "Click here, to format this drive. This launches KPsion to perform that task."
+#: plpprops.cc:591
+msgid ""
+"Click here, to format this drive. This launches KPsion to perform that task."
 msgstr ""
 "Klicken Sie hier, um dieses Laufwerk zu formatieren. Zu diesem Zweck wird "
 "KPsion gestartet."
 
-#: plpprops.cc:676
+#: plpprops.cc:677
 msgid "Information for Psion drive %1: (%2)"
 msgstr "Information zum Psion Laufwerk %1: (%2)"
 
-#: plpprops.cc:751
+#: plpprops.cc:752
 msgid "Psion &Machine"
 msgstr "Psion &Gerät"
 
-#: plpprops.cc:754
+#: plpprops.cc:755
 msgid "General"
 msgstr "Allgemein"
 
-#: plpprops.cc:759
+#: plpprops.cc:760
 msgid "Machine type:"
 msgstr "Gerätetyp"
 
-#: plpprops.cc:761
+#: plpprops.cc:762
 msgid "Here, the type of the connected device is shown."
 msgstr "Dies ist der Typ des angeschlossenen Geräts."
 
-#: plpprops.cc:762
+#: plpprops.cc:763
 msgid "Model name:"
 msgstr "Modellbezeichnung:"
 
-#: plpprops.cc:764
+#: plpprops.cc:765
 msgid "Here, the model name of the connected device is shown."
 msgstr "Dies ist die Modellbezeichnung des gerade angeschlossenen Geräts."
 
-#: plpprops.cc:765
+#: plpprops.cc:766
 msgid "Machine UID:"
 msgstr "Gerätenummer:"
 
-#: plpprops.cc:767
+#: plpprops.cc:768
 msgid "Here, the unique ID of the connected device is shown."
 msgstr "Dies ist die Seriennummer des gerade angeschlossenen Geräts."
 
-#: plpprops.cc:768
+#: plpprops.cc:769
 msgid "UI language:"
 msgstr "Schnittstellensprache:"
 
-#: plpprops.cc:770
+#: plpprops.cc:771
 msgid "Here, the user interface language of the connected device is shown."
 msgstr ""
 "Hier wird die Sprache der Benutzerschnittstelle des angeschlossenen Geräts "
 "angezeigt."
 
-#: plpprops.cc:771
+#: plpprops.cc:772
 msgid "Display geometry:"
 msgstr "Anzeigeformat:"
 
-#: plpprops.cc:773
-msgid "Here, the display geometry of the connected device is shown."
-msgstr "Hier sehen Sie die Größe der Anzeigeeinheit des angeschlossenen Geräts."
-
 #: plpprops.cc:774
+msgid "Here, the display geometry of the connected device is shown."
+msgstr ""
+"Hier sehen Sie die Größe der Anzeigeeinheit des angeschlossenen Geräts."
+
+#: plpprops.cc:775
 msgid "Registry size:"
 msgstr "Registrierdatenbank:"
 
-#: plpprops.cc:776
+#: plpprops.cc:777
 msgid "Here, the size of the registry data is shown."
 msgstr "Hier wird die Größe der Registrierdatenbank angezeigt."
 
-#: plpprops.cc:781
+#: plpprops.cc:782
 msgid "Time"
 msgstr "Zeit"
 
-#: plpprops.cc:785
+#: plpprops.cc:786
 msgid "Date/Time:"
 msgstr "Datum/Zeit:"
 
-#: plpprops.cc:787
-msgid "Here, the current time setting of the connected device is shown."
-msgstr "Hier wird die aktuell eingestellte Zeit des angeschlossenen Geräts angezeigt."
-
 #: plpprops.cc:788
+msgid "Here, the current time setting of the connected device is shown."
+msgstr ""
+"Hier wird die aktuell eingestellte Zeit des angeschlossenen Geräts angezeigt."
+
+#: plpprops.cc:789
 msgid "UTC offset"
 msgstr "UTC-Abweichung:"
 
-#: plpprops.cc:790
+#: plpprops.cc:791
 msgid ""
 "Here, the offset of the connected device's time zone relative to GMT is "
 "shown."
@@ -333,11 +337,11 @@ msgstr ""
 "Hier sehen Sie die Zeitdifferenz der auf dem angeschlossenen Gerät "
 "eingestellten Zeitzone relativ zur Greenwich Medium Time."
 
-#: plpprops.cc:791
+#: plpprops.cc:792
 msgid "Daylight saving"
 msgstr "Sommerzeit:"
 
-#: plpprops.cc:793
+#: plpprops.cc:794
 msgid ""
 "Here, you can see, if daylight saving time is currently active on the "
 "connected device."
@@ -345,191 +349,194 @@ msgstr ""
 "Hier können Sie ablesen, ob auf dem angeschlossenen Gerät gerade Sommerzeit "
 "aktiv ist."
 
-#: plpprops.cc:799
+#: plpprops.cc:800
 msgid "Psion &Battery"
 msgstr "Psion &Batterie"
 
-#: plpprops.cc:801
+#: plpprops.cc:802
 msgid "Main battery"
 msgstr "Haupt-Batterie"
 
-#: plpprops.cc:805
+#: plpprops.cc:806
 msgid "Changed at:"
 msgstr "Gewechselt am:"
 
-#: plpprops.cc:807
+#: plpprops.cc:808
 msgid "This shows the time of last battery change."
 msgstr "Hier wird die Zeit des letzten Batteriewechsels angezeigt."
 
-#: plpprops.cc:808 plpprops.cc:854
+#: plpprops.cc:809 plpprops.cc:855
 msgid "Usage time:"
 msgstr "Nutzungszeit:"
 
-#: plpprops.cc:810
+#: plpprops.cc:811
 msgid "This shows the accumulated time of running on battery power."
 msgstr "Hier wird die aufsummierte Nutzungszeit mit Batteriestrom angezeigt."
 
-#: plpprops.cc:811 plpprops.cc:834
+#: plpprops.cc:812 plpprops.cc:835
 msgid "Status:"
 msgstr "Status:"
 
-#: plpprops.cc:813
+#: plpprops.cc:814
 msgid "This shows current status of the battery."
 msgstr "Dies zeigt den aktuellen Zustand der Batterie an."
 
-#: plpprops.cc:814
+#: plpprops.cc:815
 msgid "Total consumed power:"
 msgstr "Leistungsverbrauch:"
 
-#: plpprops.cc:816
+#: plpprops.cc:817
 msgid "This shows accumulated power consumtion of the device."
 msgstr "Hier wird die aufsummierte Leistungsaufnahme des Geräts angezeigt."
 
-#: plpprops.cc:817
+#: plpprops.cc:818
 msgid "Current:"
 msgstr "Strom:"
 
-#: plpprops.cc:819
+#: plpprops.cc:820
 msgid "This shows the current, drawn from power supply (battery or mains)."
 msgstr "Hier wird die Stromaufnahme (Batterie oder Netz) angezeigt."
 
-#: plpprops.cc:820 plpprops.cc:837
+#: plpprops.cc:821 plpprops.cc:838
 msgid "Voltage:"
 msgstr "Spannung:"
 
-#: plpprops.cc:822
+#: plpprops.cc:823
 msgid "This shows the current battery voltage."
 msgstr "Hier sehen Sie die aktuelle Batteriespannung."
 
-#: plpprops.cc:823 plpprops.cc:840
+#: plpprops.cc:824 plpprops.cc:841
 msgid "Max. voltage:"
 msgstr "Max. Spannung:"
 
-#: plpprops.cc:825
+#: plpprops.cc:826
 msgid "This shows the maximum battery voltage."
 msgstr "Hier wird die maximale Batteriespannung angezeigt."
 
-#: plpprops.cc:830
+#: plpprops.cc:831
 msgid "Backup battery"
 msgstr "Sicherungs-Batterie"
 
-#: plpprops.cc:836
+#: plpprops.cc:837
 msgid "This shows current status of the backup battery."
 msgstr "Hier Sehen Sie den aktuellen Zustand der Sicherungsbatterie."
 
-#: plpprops.cc:839
+#: plpprops.cc:840
 msgid "This shows the current backup battery voltage."
 msgstr "Hier wird die aktuelle Spannung der Sicherungsbatterie angezeigt."
 
-#: plpprops.cc:842
+#: plpprops.cc:843
 msgid "This shows the maximum backup battery voltage."
 msgstr "Hier wird die maximale Spannung der Sicherungsbatterie angezeigt."
 
-#: plpprops.cc:847
+#: plpprops.cc:848
 msgid "External power"
 msgstr "Externe Stromversorgung"
 
-#: plpprops.cc:851
+#: plpprops.cc:852
 msgid "Supplied:"
 msgstr "Angeschlossen:"
 
-#: plpprops.cc:853
+#: plpprops.cc:854
 msgid "This shows whether external power is currently supplied."
 msgstr "Hier wird angezeigt, ob der Psion im Moment extern versort wird."
 
-#: plpprops.cc:856
+#: plpprops.cc:857
 msgid "This shows the accumulated time of running on external power."
-msgstr "Hier wird die aufsummierte Nutzungszeit mit externer Versorgung angezeigt."
+msgstr ""
+"Hier wird die aufsummierte Nutzungszeit mit externer Versorgung angezeigt."
 
-#: plpprops.cc:862
+#: plpprops.cc:863
 msgid "Psion M&emory"
 msgstr "Psion &Speicher"
 
-#: plpprops.cc:865
+#: plpprops.cc:866
 msgid "ROM"
 msgstr "ROM"
 
-#: plpprops.cc:869
+#: plpprops.cc:870
 msgid "Version:"
 msgstr "Version:"
 
-#: plpprops.cc:871
+#: plpprops.cc:872
 msgid "This shows the firmware version."
 msgstr "Hier wird die Firmware-Version angezeigt."
 
-#: plpprops.cc:872 plpprops.cc:886
+#: plpprops.cc:873 plpprops.cc:887
 msgid "Size:"
 msgstr "Größe:"
 
-#: plpprops.cc:874
+#: plpprops.cc:875
 msgid "This shows the size of the ROM."
 msgstr "Hier wird die Speicherkapazität des ROM angezeigt."
 
-#: plpprops.cc:875
+#: plpprops.cc:876
 msgid "Programmable:"
 msgstr "Programmierbar:"
 
-#: plpprops.cc:877
+#: plpprops.cc:878
 msgid "This shows, whether the ROM is flashable or not."
 msgstr "Hier wird angezeigt, ob das ROM programmierbar (flashbar) ist."
 
-#: plpprops.cc:882
+#: plpprops.cc:883
 msgid "RAM"
 msgstr "RAM"
 
-#: plpprops.cc:888
+#: plpprops.cc:889
 msgid "This shows the total capacity of the RAM."
 msgstr "Hier wird die Gesamt-Speicherkapazität des RAM angezeigt."
 
-#: plpprops.cc:889
+#: plpprops.cc:890
 msgid "Free:"
 msgstr "Frei:"
 
-#: plpprops.cc:891
+#: plpprops.cc:892
 msgid "This shows the free capacity of the RAM."
 msgstr "Dies zeigt die freie Speicherkapazität des RAM an."
 
-#: plpprops.cc:892
+#: plpprops.cc:893
 msgid "Max. free:"
 msgstr "Max. frei:"
 
-#: plpprops.cc:894
-msgid "This shows the size of the largest free block of the RAM."
-msgstr "Dies zeigt die Speicherkapazität des größten freien Speicherblocks im RAM an."
-
 #: plpprops.cc:895
+msgid "This shows the size of the largest free block of the RAM."
+msgstr ""
+"Dies zeigt die Speicherkapazität des größten freien Speicherblocks im RAM an."
+
+#: plpprops.cc:896
 msgid "RAMDisk size:"
 msgstr "RAMDisk Größe:"
 
-#: plpprops.cc:897
+#: plpprops.cc:898
 msgid "This shows, how much RAM is currently used for the RAMDisc."
-msgstr "Hier wird angezeigt, wieviel Speicher gerade von der RAMDisk belegt wird."
+msgstr ""
+"Hier wird angezeigt, wieviel Speicher gerade von der RAMDisk belegt wird."
 
-#: plpprops.cc:951 plpprops.cc:974
+#: plpprops.cc:952 plpprops.cc:975
 msgid "yes"
 msgstr "ja"
 
-#: plpprops.cc:951 plpprops.cc:974
+#: plpprops.cc:952 plpprops.cc:975
 msgid "no"
 msgstr "nein"
 
-#: plpprops.cc:972
+#: plpprops.cc:973
 msgid "%1 seconds"
 msgstr "%1 Sekunden"
 
-#: plpprops.cc:1010
+#: plpprops.cc:1011
 msgid "Yes"
 msgstr "Ja"
 
-#: plpprops.cc:1010
+#: plpprops.cc:1011
 msgid "No"
 msgstr "Nein"
 
-#: plpprops.cc:1035
+#: plpprops.cc:1036
 msgid "Psion &Owner"
 msgstr "Psion &Eigner"
 
-#: plpprops.cc:1041
+#: plpprops.cc:1042
 msgid "This shows the owner's information of the connected device."
-msgstr "Hier wird die Eigentümer-Information des angeschlossenen Geräts angezeigt."
-
+msgstr ""
+"Hier wird die Eigentümer-Information des angeschlossenen Geräts angezeigt."

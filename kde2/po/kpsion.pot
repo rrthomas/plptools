@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-03-20 02:52+0100\n"
+"POT-Creation-Date: 2002-07-07 23:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,33 +14,33 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: kpsionbackuplistview.cpp:226
+#: kpsionbackuplistview.cpp:261
 msgid "Available backups"
 msgstr ""
 
-#: kpsionbackuplistview.cpp:260
+#: kpsionbackuplistview.cpp:296
 msgid "Full"
 msgstr ""
 
-#: kpsionbackuplistview.cpp:267
+#: kpsionbackuplistview.cpp:303
 msgid "Incremental"
 msgstr ""
 
-#: kpsionbackuplistview.cpp:274
+#: kpsionbackuplistview.cpp:310
 msgid "%1 backup, created at %2"
 msgstr ""
 
-#: kpsionbackuplistview.cpp:306
+#: kpsionbackuplistview.cpp:351
 msgid ""
 "<qt>Here, you can select the available backups. Select the items you want to "
 "restore, the click on <b>Start</b> to start restoring these items.</qt>"
 msgstr ""
 
-#: kpsionbackuplistview.moc.cpp:42 kpsionbackuplistview.moc.cpp:47
+#: kpsionbackuplistview.moc.cpp:34 kpsionbackuplistview.moc.cpp:42
 msgid "KPsionCheckListItem"
 msgstr ""
 
-#: kpsionbackuplistview.moc.cpp:109 kpsionbackuplistview.moc.cpp:114
+#: kpsionbackuplistview.moc.cpp:120 kpsionbackuplistview.moc.cpp:128
 msgid "KPsionBackupListView"
 msgstr ""
 
@@ -92,11 +92,11 @@ msgstr ""
 msgid "monthly"
 msgstr ""
 
-#: kpsion.cpp:61
+#: kpsion.cpp:65
 msgid "Idle"
 msgstr ""
 
-#: kpsion.cpp:127
+#: kpsion.cpp:131
 msgid ""
 "<qt>Here, you see your Psion's drives.<br/>Every drive is represented by an "
 "Icon. If you click on it, it gets selected for the next operation. E.g.: "
@@ -104,213 +104,213 @@ msgid ""
 ">Select as many drives a you want, then choose an operation.</qt>"
 msgstr ""
 
-#: kpsion.cpp:193
+#: kpsion.cpp:197
 msgid "Start &Format"
 msgstr ""
 
-#: kpsion.cpp:195
+#: kpsion.cpp:199
 msgid "Start Full &Backup"
 msgstr ""
 
-#: kpsion.cpp:198
+#: kpsion.cpp:202
 msgid "Start &Incremental Backup"
 msgstr ""
 
-#: kpsion.cpp:200
+#: kpsion.cpp:204
 msgid "Start &Restore"
 msgstr ""
 
-#: kpsion.cpp:210
+#: kpsion.cpp:214
 msgid "Full backup of selected drive(s)"
 msgstr ""
 
-#: kpsion.cpp:212
+#: kpsion.cpp:216
 msgid "Incremental backup of selected drive(s)"
 msgstr ""
 
-#: kpsion.cpp:214
+#: kpsion.cpp:218
 msgid "Restore selected drive(s)"
 msgstr ""
 
-#: kpsion.cpp:216
+#: kpsion.cpp:220
 msgid "Format selected drive(s)"
 msgstr ""
 
-#: kpsion.cpp:293
+#: kpsion.cpp:297
 msgid "Retrieving machine info ..."
 msgstr ""
 
-#: kpsion.cpp:298
+#: kpsion.cpp:302
 msgid "Could not get Psion machine type"
 msgstr ""
 
-#: kpsion.cpp:306
+#: kpsion.cpp:310
 msgid "Could not get Psion machine info"
 msgstr ""
 
-#: kpsion.cpp:329
+#: kpsion.cpp:333
 msgid "Could not read SIBO UID file"
 msgstr ""
 
-#: kpsion.cpp:336
+#: kpsion.cpp:340
 msgid "Could not get Psion owner info"
 msgstr ""
 
-#: kpsion.cpp:365
+#: kpsion.cpp:369
 #, c-format
 msgid "Could not write SIBO UID file %1"
 msgstr ""
 
-#: kpsion.cpp:381
+#: kpsion.cpp:385
 msgid "an unknown machine"
 msgstr ""
 
-#: kpsion.cpp:392
+#: kpsion.cpp:396
 msgid "Retrieving drive list ..."
 msgstr ""
 
-#: kpsion.cpp:395
+#: kpsion.cpp:399
 msgid "Could not get list of drives"
 msgstr ""
 
-#: kpsion.cpp:426 kpsion.cpp:847 kpsion.cpp:870 kpsion.cpp:894 kpsion.cpp:1031
-#: kpsion.cpp:1281 kpsion.cpp:1442 kpsion.cpp:1451 kpsion.cpp:1482
-#: kpsion.cpp:1500 kpsion.cpp:1511
+#: kpsion.cpp:430 kpsion.cpp:851 kpsion.cpp:874 kpsion.cpp:898 kpsion.cpp:1035
+#: kpsion.cpp:1291 kpsion.cpp:1453 kpsion.cpp:1462 kpsion.cpp:1493
+#: kpsion.cpp:1511 kpsion.cpp:1522
 #, c-format
 msgid "Connected to %1"
 msgstr ""
 
-#: kpsion.cpp:542
+#: kpsion.cpp:546
 msgid ""
 "<QT>The selected drive <B>Z:</B> is a <B>ROM</B> drive and therefore cannot "
 "be restored.</QT>"
 msgstr ""
 
-#: kpsion.cpp:594
+#: kpsion.cpp:598
 msgid ""
 "A backup is running.\n"
 "Do you really want to quit?"
 msgstr ""
 
-#: kpsion.cpp:596
+#: kpsion.cpp:600
 msgid ""
 "A restore is running.\n"
 "Do you really want to quit?"
 msgstr ""
 
-#: kpsion.cpp:598
+#: kpsion.cpp:602
 msgid ""
 "A format is running.\n"
 "Do you really want to quit?"
 msgstr ""
 
-#: kpsion.cpp:618
+#: kpsion.cpp:622
 msgid "Starting ncpd daemon ..."
 msgstr ""
 
-#: kpsion.cpp:654
+#: kpsion.cpp:658
 msgid "Connecting ..."
 msgstr ""
 
-#: kpsion.cpp:660
+#: kpsion.cpp:664
 msgid "RFSV could not connect to ncpd at %1:%2. "
 msgstr ""
 
-#: kpsion.cpp:663 kpsion.cpp:689 kpsion.cpp:716 kpsion.cpp:745
+#: kpsion.cpp:667 kpsion.cpp:693 kpsion.cpp:720 kpsion.cpp:749
 msgid " (Retry in %1 seconds.)"
 msgstr ""
 
-#: kpsion.cpp:684
+#: kpsion.cpp:688
 #, c-format
 msgid "RFSV could not establish link: %1."
 msgstr ""
 
-#: kpsion.cpp:709
+#: kpsion.cpp:713
 msgid "RPCS could not connect to ncpd at %1:%2."
 msgstr ""
 
-#: kpsion.cpp:736
+#: kpsion.cpp:740
 #, c-format
 msgid "RPCS could not establish link: %1."
 msgstr ""
 
-#: kpsion.cpp:851
+#: kpsion.cpp:855
 #, c-format
 msgid "Could not retrieve drive details for drive %1"
 msgstr ""
 
-#: kpsion.cpp:856
+#: kpsion.cpp:860
 #, c-format
 msgid "Scanning drive %1"
 msgstr ""
 
-#: kpsion.cpp:866
+#: kpsion.cpp:870
 msgid "%1 files need backup"
 msgstr ""
 
-#: kpsion.cpp:874
+#: kpsion.cpp:878
 msgid "No files need backup"
 msgstr ""
 
-#: kpsion.cpp:896
+#: kpsion.cpp:900
 #, c-format
 msgid "Could not create backup folder %1"
 msgstr ""
 
-#: kpsion.cpp:919
+#: kpsion.cpp:923
 #, c-format
 msgid "Backup %1% done"
 msgstr ""
 
-#: kpsion.cpp:956
+#: kpsion.cpp:960
 msgid ""
 "<QT>Could not backup<BR/><B>%1</B><BR/><FONT COLOR=RED>%2</FONT><BR/></QT>"
 msgstr ""
 
-#: kpsion.cpp:959
+#: kpsion.cpp:963
 msgid "Retry"
 msgstr ""
 
-#: kpsion.cpp:959
+#: kpsion.cpp:963
 msgid "Ignore"
 msgstr ""
 
-#: kpsion.cpp:984
+#: kpsion.cpp:988
 msgid "Resetting archive attributes"
 msgstr ""
 
-#: kpsion.cpp:999
+#: kpsion.cpp:1003
 msgid ""
 "<QT>Could not set attributes of<BR/><B>%1</B><BR/><FONT COLOR=red>%2</"
 "FONT><BR/>Continue?</QT>"
 msgstr ""
 
-#: kpsion.cpp:1024
+#: kpsion.cpp:1028
 msgid ""
 "<QT>Could not rename backup archive from<BR/><B>%1</B> to<BR/><B>%2</B></QT>"
 msgstr ""
 
-#: kpsion.cpp:1035
+#: kpsion.cpp:1039
 msgid "Backup done"
 msgstr ""
 
-#: kpsion.cpp:1071
+#: kpsion.cpp:1075
 msgid "Removing old backups ..."
 msgstr ""
 
-#: kpsion.cpp:1165 kpsion.cpp:1395
+#: kpsion.cpp:1169 kpsion.cpp:1406
 msgid "<QT>Could not get attributes of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1194
+#: kpsion.cpp:1198
 msgid "Overwrite"
 msgstr ""
 
-#: kpsion.cpp:1197
+#: kpsion.cpp:1201
 msgid "Overwrite &All"
 msgstr ""
 
-#: kpsion.cpp:1210
+#: kpsion.cpp:1220
 msgid ""
 "<QT>The file <B>%1</B> exists already on the Psion with different size and/"
 "or attributes.<P><B>On the Psion:</B><BR/>  Size: %2<BR/>  Date: %3<BR/>  "
@@ -318,97 +318,97 @@ msgid ""
 "Attributes: %7</P>Do you want to overwrite it?</QT>"
 msgstr ""
 
-#: kpsion.cpp:1248
+#: kpsion.cpp:1258
 msgid "Reading backups ..."
 msgstr ""
 
-#: kpsion.cpp:1253
+#: kpsion.cpp:1263
 msgid "Selecting backups ..."
 msgstr ""
 
-#: kpsion.cpp:1286 kpsion.cpp:1334
+#: kpsion.cpp:1296 kpsion.cpp:1344
 #, c-format
 msgid "Restore %1% done"
 msgstr ""
 
-#: kpsion.cpp:1350
+#: kpsion.cpp:1360
 msgid "<QT>Could not create directory<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1365
+#: kpsion.cpp:1375
 msgid "<QT>Could not create<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1387
+#: kpsion.cpp:1398
 msgid "<QT>Could not write to<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1413
+#: kpsion.cpp:1424
 msgid "<QT>Could not set attributes of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1426
+#: kpsion.cpp:1437
 msgid ""
 "<QT>Could not set modification time of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1453
+#: kpsion.cpp:1464
 msgid "Restore done"
 msgstr ""
 
-#: kpsion.cpp:1467
+#: kpsion.cpp:1478
 msgid "Formatting drive %1:"
 msgstr ""
 
-#: kpsion.cpp:1478
+#: kpsion.cpp:1489
 msgid "<QT>Could not format drive %1:<BR/>%2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1495
+#: kpsion.cpp:1506
 msgid "<QT>Error during format of drive %1:<BR/>%2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1513
+#: kpsion.cpp:1524
 msgid "Format done"
 msgstr ""
 
-#: kpsion.cpp:1519
+#: kpsion.cpp:1530
 msgid ""
 "<QT>This erases <B>ALL</B> data on the drive(s).<BR/>Do you really want to "
 "proceed?"
 msgstr ""
 
-#: kpsion.cpp:1540
+#: kpsion.cpp:1551
 msgid "Assign drive name"
 msgstr ""
 
-#: kpsion.cpp:1549
+#: kpsion.cpp:1560
 msgid ""
 "<QT>Formatting of drive %1: finished. Please assign a name for that drive.</"
 "QT>"
 msgstr ""
 
-#: kpsion.cpp:1553
+#: kpsion.cpp:1564
 msgid "New name of drive %1:"
 msgstr ""
 
-#: kpsion.cpp:1684
+#: kpsion.cpp:1695
 #, c-format
 msgid "Stopping %1"
 msgstr ""
 
-#: kpsion.cpp:1702
+#: kpsion.cpp:1713
 msgid ""
 "<QT>Could not stop all processes.<BR/>Please stop running programs manually "
 "on the Psion, then klick <B>Ok</B>."
 msgstr ""
 
-#: kpsion.cpp:1725
+#: kpsion.cpp:1736
 #, c-format
 msgid "Starting %1"
 msgstr ""
 
-#: kpsion.moc.cpp:42 kpsion.moc.cpp:47
+#: kpsion.moc.cpp:34 kpsion.moc.cpp:42
 msgid "KPsionMainWindow"
 msgstr ""
 
@@ -430,7 +430,7 @@ msgstr ""
 msgid "Format drive before restore"
 msgstr ""
 
-#: kpsionrestoredialog.moc.cpp:42 kpsionrestoredialog.moc.cpp:47
+#: kpsionrestoredialog.moc.cpp:34 kpsionrestoredialog.moc.cpp:42
 msgid "KPsionRestoreDialog"
 msgstr ""
 
@@ -679,17 +679,17 @@ msgstr ""
 msgid "Could not move existing backup for machine %1 to %2."
 msgstr ""
 
-#: setupdialog.moc.cpp:42 setupdialog.moc.cpp:47
+#: setupdialog.moc.cpp:34 setupdialog.moc.cpp:42
 msgid "SetupDialog"
 msgstr ""
 
-#: statusbarprogress.cpp:357 statusbarprogress.cpp:370
-#: statusbarprogress.cpp:379 statusbarprogress.cpp:392
-#: statusbarprogress.cpp:401 statusbarprogress.cpp:412
+#: statusbarprogress.cpp:358 statusbarprogress.cpp:371
+#: statusbarprogress.cpp:380 statusbarprogress.cpp:393
+#: statusbarprogress.cpp:402 statusbarprogress.cpp:413
 msgid "%1 %2 of %3"
 msgstr ""
 
-#: statusbarprogress.moc.cpp:42 statusbarprogress.moc.cpp:47
+#: statusbarprogress.moc.cpp:34 statusbarprogress.moc.cpp:42
 msgid "KPsionStatusBarProgress"
 msgstr ""
 
@@ -845,10 +845,10 @@ msgid ""
 "choose a different name.</QT>"
 msgstr ""
 
-#: wizards.moc.cpp:42 wizards.moc.cpp:47
+#: wizards.moc.cpp:34 wizards.moc.cpp:42
 msgid "FirstTimeWizard"
 msgstr ""
 
-#: wizards.moc.cpp:111 wizards.moc.cpp:116
+#: wizards.moc.cpp:116 wizards.moc.cpp:124
 msgid "NewPsionWizard"
 msgstr ""

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-03-20 02:52+0100\n"
+"POT-Creation-Date: 2002-07-07 23:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,30 +22,34 @@ msgstr ""
 msgid "Psion remote clipboard utility"
 msgstr ""
 
-#: main.cpp:43
+#: main.cpp:44
 msgid "Original Developer/Maintainer"
 msgstr ""
 
-#: toplevel.cpp:71
+#: toplevel.cpp:77
 msgid "Klipsi - Psion Clipboard"
 msgstr ""
 
-#: toplevel.cpp:73
+#: toplevel.cpp:79
+msgid "&About Klipsi"
+msgstr ""
+
+#: toplevel.cpp:80
 msgid "&Quit"
 msgstr ""
 
-#: toplevel.cpp:562
+#: toplevel.cpp:574
 msgid ""
 "<QT>Your Psion is reported to be a <B>Series 3</B> machine. This type of "
 "machine does <B>not support</B> the remote clipboard protocol; Sorry.<BR/"
 "><B>Klipsi</B> will now terminate.</QT>"
 msgstr ""
 
-#: toplevel.cpp:566 toplevel.cpp:591
+#: toplevel.cpp:578 toplevel.cpp:603
 msgid "Protocol not supported"
 msgstr ""
 
-#: toplevel.cpp:582
+#: toplevel.cpp:594
 msgid ""
 "<QT>Your Psion does not support the remote clipboard protocol.<BR/>The "
 "reason for that is usually a missing server library on your Psion.<BR/>Make "
@@ -56,6 +60,6 @@ msgid ""
 "QT>"
 msgstr ""
 
-#: toplevel.moc.cpp:42 toplevel.moc.cpp:47
+#: toplevel.moc.cpp:34 toplevel.moc.cpp:42
 msgid "TopLevel"
 msgstr ""

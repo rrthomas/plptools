@@ -5,14 +5,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-03-20 02:52+0100\n"
-"PO-Revision-Date: 2002-03-20 03:00CET\n"
+"POT-Creation-Date: 2002-07-07 23:25+0200\n"
+"PO-Revision-Date: 2002-07-07 23:38CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 0.9.5\n"
+"X-Generator: KBabel 0.9.6\n"
 
 #: main.cpp:36
 msgid "Klipsi"
@@ -22,33 +22,37 @@ msgstr "Klipsi"
 msgid "Psion remote clipboard utility"
 msgstr "Psion Zwischenablage"
 
-#: main.cpp:43
+#: main.cpp:44
 msgid "Original Developer/Maintainer"
 msgstr "Original Entwickler/Betreuer"
 
-#: toplevel.cpp:71
+#: toplevel.cpp:77
 msgid "Klipsi - Psion Clipboard"
 msgstr "Klipsi - Psion Zwischenablage"
 
-#: toplevel.cpp:73
+#: toplevel.cpp:79
+msgid "&About Klipsi"
+msgstr "&Über Klipsi"
+
+#: toplevel.cpp:80
 msgid "&Quit"
 msgstr "B&eenden"
 
-#: toplevel.cpp:562
+#: toplevel.cpp:574
 msgid ""
 "<QT>Your Psion is reported to be a <B>Series 3</B> machine. This type of "
 "machine does <B>not support</B> the remote clipboard protocol; Sorry.<BR/"
 "><B>Klipsi</B> will now terminate.</QT>"
 msgstr ""
 "<QT>Ihr Psion wurde als <B>Serie 3</B> Gerät erkannt. Dieser Gerätetyp "
-"unterstützt leider <B>nicht</B> das nötige Protokoll; Sorry.<BR/> "
-"<B>Klipsi</B> wird sich nun beenden.</QT>"
+"unterstützt leider <B>nicht</B> das nötige Protokoll; Sorry.<BR/> <B>Klipsi</"
+"B> wird sich nun beenden.</QT>"
 
-#: toplevel.cpp:566 toplevel.cpp:591
+#: toplevel.cpp:578 toplevel.cpp:603
 msgid "Protocol not supported"
 msgstr "Protokoll nicht unterstützt"
 
-#: toplevel.cpp:582
+#: toplevel.cpp:594
 msgid ""
 "<QT>Your Psion does not support the remote clipboard protocol.<BR/>The "
 "reason for that is usually a missing server library on your Psion.<BR/>Make "
@@ -66,7 +70,7 @@ msgstr ""
 "aktivieren. Sie können sie auch manuell aus dem PsiWin-Installationsordner "
 "auf Ihren Psion kopieren.<BR/> <B>Klipsi</B> wird sich nun beenden.</QT>"
 
-#: toplevel.moc.cpp:42 toplevel.moc.cpp:47
+#: toplevel.moc.cpp:34 toplevel.moc.cpp:42
 msgid "TopLevel"
 msgstr "TopLevel"
 
