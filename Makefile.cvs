@@ -4,7 +4,6 @@ CONFIGHIN = include/config.h.in
 ACLOCAL = conf/aclocal.m4
 GETTEXT = intl/Makefile.in
 GETTEXTDEP = conf/Makefile.am.in conf/configure.in.in
-GV = $(shell gettextize --version|head -1|cut -d ' ' -f4|cut -d. -f2)
 
 all:
 	@echo "Use make devel for development, make dist for distribution"
@@ -54,13 +53,9 @@ $(GETTEXT): $(GETTEXTDEP)
 	cp conf/configure.in.in configure.in
 	cp conf/Makefile.am.in Makefile.am
 	mkdir -p intl
-ifeq ($(GV),11)
 	echo n | gettextize --force --intl --no-changelog
 	test -e po/Makevars || cp po/Makevars.template po/Makevars
 	rm -f ChangeLog *~
-else
-	echo n | gettextize -f
-endif
 	-test -f po/ChangeLog~ && mv -f po/ChangeLog~ po/ChangeLog
 
 $(AUTOMAKEFILES): $(ACLOCAL) $(CONFIGHIN)
