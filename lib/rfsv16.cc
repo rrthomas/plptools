@@ -541,9 +541,10 @@ fread(const u_int32_t handle, unsigned char * const buf, const u_int32_t len, u_
 {
     Enum<rfsv::errs> res;
     unsigned char *p = buf;
+    long l;
 
     count = 0;
-    while (count < len) {
+    do {
 	bufferStore a;
 
 	// Read in blocks of 291 bytes; the maximum payload for
@@ -564,11 +565,12 @@ fread(const u_int32_t handle, unsigned char * const buf, const u_int32_t len, u_
 		return E_PSI_GEN_NONE;
 	    return res;
 	}
-	long l = a.getLen();
-	memcpy(buf, a.getString(), l);
-	count += l;
-	p += l;
-    }
+	if ((l = a.getLen()) > 0) {
+	    memcpy(p, a.getString(), l);
+	    count += l;
+	    p += l;
+	}
+    } while ((count < len) && (l > 0));
     return res;
 }
 
