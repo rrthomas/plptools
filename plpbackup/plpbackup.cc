@@ -289,21 +289,21 @@ startPrograms() {
 		// If we got an error here, that happened probably because
 		// we have no path at all (e.g. Macro5) and the program is
 		// not registered in the Psion's path properly. Now try
-		// the ususal \System\Apps\<AppName>\<AppName>.app
+		// the usual \System\Apps\<AppName>\<AppName>.app
 		// on all drives.
 		if (cmd.find('\\') == cmd.npos) {
 		    u_int32_t devbits;
 		    if ((res = Rfsv->devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 			int i;
 			for (i = 0; i < 26; i++) {
-			    if (devbits & 1) {
+			    if (devbits & (1 << i)) {
 				ostringstream tmp;
-				tmp << 'A' + i << "\\System\\Apps\\"
-				    << cmd << "\\" << cmd << ".app";
+				tmp << (char)('A' + i) << ":\\System\\Apps\\" <<
+                                  cmd << "\\" << cmd << ".app" << '\0';
 				res = Rpcs->execProgram(tmp.str().c_str(), "");
+                                if (res == rfsv::E_PSI_GEN_NONE)
+                                    break;
 			    }
-			    if (res == rfsv::E_PSI_GEN_NONE)
-				break;
 			}
 		    }
 		}
@@ -999,7 +999,7 @@ runRestore()
 		u_int32_t sattr = e.getAttr() & mask;
 		u_int32_t dattr = ~sattr & mask;
 		int retry = 10;
-		// Retry, because file somtimes takes some time
+		// Retry, because file sometimes takes some time
 		// to close;
 		do {
 		    res = Rfsv->fsetattr(fn, sattr, dattr);
