@@ -65,36 +65,36 @@ who is running plpnfsd. If the user running plpnfsd is
 also specify a different user.
 
 .SH FILES
-Below the special directory @MOUNTPOINT@/proc there are several special
+Below the special directory @DMOUNTPOINT@/proc there are several special
 files which can be used to control plpnfsd and/or view some information
 of the connected Psion.
 .TP
-@MOUNTPOINT@/proc/exit
+@DMOUNTPOINT@/proc/exit
 can be used to shutdown plpnfsd gracefully. To shutdown plpnfsd write
 the string "stop" into that file.
 .TP
-@MOUNTPOINT@/proc/owner
+@DMOUNTPOINT@/proc/owner
 shows the Psion's owner information.
 .TP
-@MOUNTPOINT@/proc/unixowner
+@DMOUNTPOINT@/proc/unixowner
 The superuser (root) can set the owner of the mounted directory-tree
 during runtime by writing the desired username into this file.
 .TP
-@MOUNTPOINT@/proc/debuglevel
+@DMOUNTPOINT@/proc/debuglevel
 Reading/writing from/to this file shows resp. sets the debug level.
 .TP
-@MOUNTPOINT@/proc/acache
+@DMOUNTPOINT@/proc/acache
 Reading/writing from/to this file shows resp. sets the timeout value
 for the attribute cache in seconds.
 .TP
-@MOUNTPOINT@/proc/dcache
+@DMOUNTPOINT@/proc/dcache
 Reading/writing from/to this file shows resp. sets the timeout value
 for the data cache in seconds.
 .TP
-@MOUNTPOINT@/proc/<number>/cmd
+@DMOUNTPOINT@/proc/<number>/cmd
 Shows the name of the corresponding process on the Psion.
 .TP
-@MOUNTPOINT@/proc/<number>/args
+@DMOUNTPOINT@/proc/<number>/args
 Shows the arguments of the corresponding process on the Psion.
 
 .SH SEE ALSO
