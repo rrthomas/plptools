@@ -142,7 +142,7 @@ public:
 
 private:
     friend class packet;
-    friend void * ::expire_check(void *);
+    friend void * expire_check(void *);
 
     void receive(bufferStore buf);
     void transmit(bufferStore buf);
