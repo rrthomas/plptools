@@ -2,8 +2,7 @@ Makefile.in
 Makefile.am
 Makefile
 aclocal.m4
-autom4ate.cache
-
+autom4te.cache
 configure
 configure.in
 libtool
