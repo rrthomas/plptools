@@ -2,7 +2,7 @@
 #
 # psion        Starts ncpd/plpnfsd.
 #
-# chkconfig: 2345 30 70
+# chkconfig: 2345 45 70
 # description: This facility enables connectivity to a Psion series 5.
 
 # Source function library.
@@ -12,8 +12,10 @@
 [ -f @prefix@/sbin/plpnfsd ] || exit 0
 
 MGETTY_HASPLP=false
+
 if grep -qs ^/PLP/ /etc/mgetty+sendfax/login.config ; then
-	MGETTY_HASPLP=true
+	mrun=`pidofproc mgetty`
+	test -n "$mrun" && MGETTY_HASPLP=true
 fi
 
 # See how we were called.
@@ -31,9 +33,11 @@ case "$1" in
 	;;
   stop)
 	echo -n "Shutting down Psion support: "
-	if [ killproc plpnfsd -HUP ] ; then
-		sleep 10 # allow plpnfsd flushing it's cache
-	fi
+	killproc plpnfsd -HUP
+	while true ; do
+		test -z "`pidofproc plpnfsd`" && break;
+		sleep 1 # allow plpnfsd flushing it's cache
+	done
 	killproc ncpd
 	echo
 	rm -f /var/lock/subsys/psion
