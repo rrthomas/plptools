@@ -54,6 +54,7 @@ public:
     virtual void chmod(const KURL& url, int permissions);
     virtual void rename(const KURL &src, const KURL &dest, bool overwrite);
     virtual void copy(const KURL& src, const KURL &dest, int mode, bool overwrite );
+    virtual void slave_status(void);
     virtual void special(const QByteArray &a);
 
     void calcprogress(long total);

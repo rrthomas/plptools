@@ -37,6 +37,7 @@
 
 #include <kinstance.h>
 #include <kdebug.h>
+#include <kglobal.h>
 #include <klocale.h>
 #include <kconfig.h>
 
@@ -66,7 +67,7 @@ extern "C" {
 
 int
 kdemain( int argc, char **argv ) {
-    KInstance instance( "kio_nfs" );
+    KInstance instance("kio_plp");
 
     if (argc != 4) {
 	fprintf(stderr, "Usage: kio_plp protocol domain-socket1 domain-socket2\n");
@@ -74,6 +75,7 @@ kdemain( int argc, char **argv ) {
     }
     kdDebug(PLP_DEBUGAREA) << "PLP: kdemain: starting" << endl;
 
+    KGlobal::locale()->insertCatalogue(QString::fromLatin1("plptools"));
     PLPProtocol slave(argv[2], argv[3]);
     slave.dispatchLoop();
     return 0;
@@ -113,7 +115,9 @@ removeFirstPart(const QString& path, QString &removed) {
 }
 
 PLPProtocol::PLPProtocol (const QCString &pool, const QCString &app)
-    :SlaveBase("psion", pool, app), plpRfsv(0), plpRfsvSocket(0) {
+    :SlaveBase("psion", pool, app), plpRfsv(0), plpRfsvSocket(0),
+     plpRpcs(0), plpRpcsSocket(0)
+{
 
     kdDebug(PLP_DEBUGAREA) << "PLPProtocol::PLPProtocol(" << pool << ","
 			   << app << ")" << endl;
@@ -168,8 +172,14 @@ closeConnection() {
 	delete(plpRfsv);
     if (plpRfsvSocket)
 	delete(plpRfsvSocket);
+    if (plpRpcs)
+	delete(plpRpcs);
+    if (plpRpcsSocket)
+	delete(plpRpcsSocket);
     plpRfsv = 0;
     plpRfsvSocket = 0;
+    plpRpcs = 0;
+    plpRpcsSocket = 0;
 }
 
 bool PLPProtocol::
@@ -237,27 +247,33 @@ openConnection() {
     closeConnection();
 
     plpRfsvSocket = new ppsocket();
-    QString estr = i18n("Could not connect to ncpd at %1:%2").arg(currentHost).arg(currentPort);
+    QString estr = QString("%1:%2").arg(currentHost).arg(currentPort);
     if (!plpRfsvSocket->connect((char *)(currentHost.data()), currentPort)) {
+	closeConnection();
 	error(ERR_COULD_NOT_CONNECT, estr);
 	return;
     }
     rfsvfactory factory(plpRfsvSocket);
     plpRfsv = factory.create(false);
     if (plpRfsv == 0L) {
-	error(ERR_COULD_NOT_CONNECT, estr);
+	closeConnection();
+	error(ERR_COULD_NOT_CONNECT, estr + ": " +
+	      KGlobal::locale()->translate((const char *)factory.getError()));
 	return;
     }
 
     plpRpcsSocket = new ppsocket();
     if (!plpRpcsSocket->connect((char *)(currentHost.data()), currentPort)) {
+	closeConnection();
 	error(ERR_COULD_NOT_CONNECT, estr);
 	return;
     }
     rpcsfactory factory2(plpRpcsSocket);
     plpRpcs = factory2.create(false);
     if (plpRpcs == 0L) {
-	error(ERR_COULD_NOT_CONNECT, estr);
+	closeConnection();
+	error(ERR_COULD_NOT_CONNECT, estr + ": " +
+	      KGlobal::locale()->translate((const char *)factory2.getError()));
 	return;
     }
 
@@ -271,6 +287,9 @@ openConnection() {
 	if (machType == rpcs::PSI_MACH_S5)
 	    plpRpcs->getMachineInfo(machInfo);
     }
+
+    drives.clear();
+    drivechars.clear();
 
     u_int32_t devbits;
 
@@ -298,6 +317,12 @@ openConnection() {
     }
     connected();
     kdDebug(PLP_DEBUGAREA) << "openConnection succeeded" << endl;
+}
+
+void PLPProtocol::
+slave_status() {
+    kdDebug(PLP_DEBUGAREA) << "PLP::slave_status " << (plpRfsv != 0) << endl;
+    slaveStatus(QString::null, (plpRfsv != 0));
 }
 
 bool PLPProtocol::
@@ -1109,7 +1134,7 @@ special(const QByteArray &a) {
 	    kdDebug(PLP_DEBUGAREA) << "get Ownerinfo" << endl;
 	    bufferArray b;
 
-	    Enum<rfsv::errs> res = plpRpcs->getOwnerInfo(b);
+	    Enum<rfsv::errs>res = plpRpcs->getOwnerInfo(b);
 	    if (res != rfsv::E_PSI_GEN_NONE) {
 		error(ERR_COULD_NOT_STAT, "Owner");
 		return;
