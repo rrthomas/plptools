@@ -835,7 +835,7 @@ askOverwrite(PlpDirent e)
     cout << "  Date: " << e.getPsiTime() << endl;
     cout << "  Attr: " << Rfsv->attr2String(e.getAttr()).c_str() << endl;
     while (1) {
-	cout << "(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) " << flush;
+	cout << _("(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) ") << flush;
 	string validA = _("OAS");
 	char answer;
 	cin >> answer;
@@ -933,7 +933,7 @@ runRestore()
 		if (verbose > 0)
 		    cout << _("Extracting tar archive ...") << endl;
 		if (system(tarcmd.str()) != 0)
-		    cerr << _("Execution of ") << tarcmd.str() << " failed."
+		    cerr << _("Execution of ") << tarcmd.str() << _(" failed.")
 			 << endl;
 		continue;
 	    }

@@ -61,7 +61,7 @@ void printHelp()
 	" -h, --help              Display this text.\n"
 	" -V, --version           Print version and exit.\n"
 	" -v, --verbose=LEVEL     Set the verbosity level, by default 0.\n"
-	" -n, --dry-run           Just parse file file.\n"
+	" -n, --dry-run           Just parse the file.\n"
 #if HAVE_LIBNEWT
 	" -w, --newt              Use the Newt interface.\n"
 #endif
