@@ -13,9 +13,12 @@ plpnfsd \- Daemon to mount a Psion an nfs like filesystem
 .B plpnfsd
 .B [-V]
 .B [-v]
-.BI "[-p " port ]
+.B [-D]
+.B [-h]
+.BI "[-p [" host :] port ]
 .BI "[-d " mountdir ]
 .BI "[-u " user ]
+.BI [ long-options ]
 
 .SH DESCRIPTION
 plpnfsd is a daemon, which provides NFS-like access to your Psion.
@@ -38,26 +41,28 @@ will reappear. (possibly with a few secs delay)
 
 .SH OPTIONS
 .TP
-.B \-V
+.B \-V, --version
 Display the version and exit
 .TP
-.B \-v
+.B \-h, --help
+Display a short help text and exit.
+.TP
+.B \-v, --verbose
 Produce verbose logging output. Can be specified more than once to increase the
 debug level (up to 3 times)
-
 .TP
-.BI "\-p " port
-Specify the port to connect to (e.g. the port where ncpd is listening on) - by
-default, the port is looked up in /etc/services. If it is not found there,
-a fallback builtin of
+.BI "\-p, --port=[" host :] port
+Specify the host and port to connect to (e.g. the port where ncpd is listening
+on) - by default the host is 127.0.0.1 and the port is looked up in
+/etc/services. If it is not found there, a fallback builtin of
 .I @DPORT@.
 .TP
-.BI "\-d " mountdir
+.BI "\-d, --mountpoint=" mountdir
 Specify the directory to mount the psion file system on. This defaults
 to
 .I @DMOUNTPOINT@
 .TP
-.BI "\-u " user
+.BI "\-u, --user=" user
 Specify the user who will own the psion files. This defaults to the user
 who is running plpnfsd. If the user running plpnfsd is
 .I root

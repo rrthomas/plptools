@@ -11,7 +11,10 @@
 plpftp \- FTP-like program for manipulating files on the Psion.
 .SH SYNOPSIS
 .B plpftp
-.BI "[-p " port ]
+.B [-h]
+.B [-V]
+.BI "[-p [" host :] port ]
+.BI [ long-options ]
 .BI "[ " ftpcommand " [" parameters ]]
 
 .SH DESCRIPTION
@@ -25,10 +28,16 @@ enter "help".
 .SH OPTIONS
 
 .TP
-.BI "\-p " port
-Specify the port to connect to (e.g. The port where ncpd is listening on) -
-by default this is looked up in /etc/services. If it is not found there,
-a builtin value of @DPORT@ is used.
+.B \-V, --version
+Display the version and exit
+.TP
+.B \-h, --help
+Display a short help text and exit.
+.TP
+.BI "\-p, --port=[" host :] port
+Specify the host and port to connect to (e.g. The port where ncpd is
+listening on) - by default the host is 127.0.0.1 and the port is looked up
+in /etc/services. If it is not found there, a builtin value of @DPORT@ is used.
 .TP
 .I ftpcommand parameters
 Allows you to specify an plpftp command on the command line. If specified,
@@ -36,7 +45,7 @@ plpftp enters non interactive mode and terminates after executing the
 command.
 
 .SH SEE ALSO
-ncpd(8), plpncpd(8)
+ncpd(8), plpnfsd(8)
 
 .SH AUTHOR
 Fritz Elfert

@@ -12,11 +12,14 @@ ncpd \- Daemon which handles the serial link to a Psion
 .SH SYNOPSIS
 .B ncpd
 .B [-V]
+.B [-h]
 .BI "[-v " logclass ]
 .B [-d]
-.BI "[-p " port ]
+.B [-e]
+.BI "[-p [" host ":]" port ]
 .BI "[-s " device ]
 .BI "[-b " baudrate ]
+.BI [ long-options ]
 
 .SH DESCRIPTION
 ncpd is the daemon which handles the serial link to your Psion.
@@ -27,12 +30,22 @@ can run always in background (if you have a spare serial-device)
 
 .SH OPTIONS
 .TP
-.B \-V
+.B \-V, --version
 Display the version and exit
 .TP
-.BI "\-v " logclass
+.B \-h, --help
+Display a short help text and exit.
+.TP
+.B \-e, --autoexit
+Exit automatically, if the device is disconnected. Furthermore, use the
+current tty as I/O device. This option is intended for starting ncpd on
+demand using mgetty's auto-detect function. (A patch for mgetty is needed
+for that).
+.TP
+.BI "\-v, --verbose=" logclass
 Increase the logging level of the program. the possible values for logclass
 are:
+.RS
 .TP
 .I nl
 Set NCP debug level to LOG
@@ -60,20 +73,24 @@ Set overall debug level to verbose
 .TP
 .I all
 Turn on all the above logging on.
-
+.RE
 .TP
-.B \-d
+.B "\-d, --dontfork"
 Do not background the daemon.
 .TP
-.BI "\-p " port
-Specify the port to listen on - by default this is looked up in
-/etc/services. If it is not found there, a builtin value of @DPORT@ is used.
+.BI "\-p, --port=[" host: ] port
+Specify the port to listen on - by default the value for the host is
+127.0.0.1 and the value for the port is looked up in /etc/services using
+the key
+.B psion/tcp.
+If it is not found there, a builtin value of @DPORT@
+is used.
 .TP
-.BI "\-s " device
+.BI "\-s, --serial=" device
 Specify the serial device to use to connect to the Psion - this defaults to
 @DDEV@
 .TP
-.BI "\-b " baudrate
+.BI "\-b, --baudrate=" baudrate
 Specify the baud rate to use for the serial connection - this defaults to
 @DSPEED@ baud.
 
