@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <signal.h>
 
 #include "defs.h"
 #include "bool.h"
@@ -56,9 +57,13 @@ main(int argc, char **argv)
 {
 	ppsocket *skt;
 	bool res;
+	sigset_t sigset;
 
 	// Command line parameter processing
 	int sockNum = DPORT;
+	sigemptyset(&sigset);
+	sigaddset(&sigset, SIGPIPE);
+	sigprocmask(SIG_BLOCK, &sigset, 0L);
 
 	if ((argc > 2) && !strcmp(argv[1], "-s")) {
 		sockNum = atoi(argv[2]);
@@ -70,7 +75,6 @@ main(int argc, char **argv)
 	if (argc < 2)
 		ftpHeader();
 	skt = new ppsocket();
-	skt->startup();
 	res = skt->connect(NULL, sockNum);
 	if (!res) {
 		delete skt;

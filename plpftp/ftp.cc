@@ -236,8 +236,33 @@ session(rfsv32 & a, int xargc, char **xargv)
 			continue;
 		}
 		if ((!strcmp(argv[0], "ls")) || (!strcmp(argv[0], "dir"))) {
-			if ((res = a.dir(psionDir, NULL)) != 0)
+			bufferArray files;
+			if ((res = a.dir(psionDir, &files)) != 0)
 				errprint(res, a);
+			else
+				while (!files.empty()) {
+					bufferStore s;
+					s = files.popBuffer();
+					long date = s.getDWord(0);
+					long size = s.getDWord(4);
+					long attr = s.getDWord(8);
+					char dateBuff[100];
+                                	struct tm *t;
+                                	t = localtime(&date);
+                                	strftime(dateBuff, 100, "%c", t);
+                                	cout << ((attr & rfsv32::PSI_ATTR_DIRECTORY) ? "d" : "-");
+                                	cout << ((attr & rfsv32::PSI_ATTR_RONLY) ? "-" : "w");
+                                	cout << ((attr & rfsv32::PSI_ATTR_HIDDEN) ? "h" : "-");
+                                	cout << ((attr & rfsv32::PSI_ATTR_SYSTEM) ? "s" : "-");
+                                	cout << ((attr & rfsv32::PSI_ATTR_ARCHIVE) ? "a" : "-");
+                                	cout << ((attr & rfsv32::PSI_ATTR_VOLUME) ? "v" : "-");
+                                	cout << ((attr & rfsv32::PSI_ATTR_NORMAL) ? "n" : "-");
+                                	cout << ((attr & rfsv32::PSI_ATTR_TEMPORARY) ? "t" : "-");
+                                	cout << ((attr & rfsv32::PSI_ATTR_COMPRESSED) ? "c" : "-");
+                                	cout << " " << dec << setw(10) << setfill(' ') << size;
+                                	cout << " " << dateBuff;
+					cout << " " << s.getString(12) << endl;
+				}
 			continue;
 		}
 		if (!strcmp(argv[0], "lcd")) {
@@ -460,7 +485,7 @@ session(rfsv32 & a, int xargc, char **xargv)
 		if (strcmp(argv[0], "bye") && strcmp(argv[0], "quit"))
 			usage();
 	} while (strcmp(argv[0], "bye") && strcmp(argv[0], "quit") &&
-		 (a.getStatus() == 0) && (once == 0));
+		 ((a.getStatus() == 0) || (once == 0)));
 	return a.getStatus();
 }
 
