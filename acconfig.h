@@ -24,6 +24,9 @@
 /* Define this to your temporary mtab's path */
 #undef MTAB_TMP
 
+/* Define this this if you want to prevent plpnfsd from updating mtab */
+#undef DONT_UPDATE_MTAB
+
 /* Define this to your serial device node */
 #undef DDEV
 

@@ -213,7 +213,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 
 	if (xargc > 1) {
 		once = true;
-		argc = (xargc<10)?xargc:10;
+		argc = (xargc<11)?xargc-1:10;
 		for (int i = 0; i < argc; i++)
 			argv[i] = xargv[i+1];
 	}
@@ -751,6 +751,16 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			r.execProgram(cmdbuf, argbuf);
 			continue;
 		}
+		if (!strcmp(argv[0], "ownerinfo")) {
+			bufferArray b;
+			if ((res = r.getOwnerInfo(b)) != rfsv::E_PSI_GEN_NONE) {
+				cerr << "Error: " << res << endl;
+				continue;
+			}
+			while (!b.empty())
+				cout << "  " << b.pop().getString() << endl;
+			continue;
+		}
 		if (!strcmp(argv[0], "machinfo")) {
 			rpcs::machineInfo mi;
 			if ((res = r.getMachineInfo(mi)) != rfsv::E_PSI_GEN_NONE) {
@@ -960,7 +970,8 @@ static char *all_commands[] = {
 	"pwd", "ren", "touch", "gtime", "test", "gattr", "sattr", "devs",
 	"dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
 	"del", "rm", "mkdir", "rmdir", "prompt", "bye",
-	"ps", "kill", "killsave", "runrestore", "run", "machinfo", NULL
+	"ps", "kill", "killsave", "runrestore", "run", "machinfo",
+	"ownerinfo", NULL
 };
 
 static char *localfile_commands[] = {
@@ -973,6 +984,8 @@ static char *remote_dir_commands[] = {
 
 static bufferArray *comp_files = NULL;
 static long maskAttr;
+static char tmpPath[1024];
+static char cplPath[1024];
 
 static char*
 filename_generator(char *text, int state)
@@ -986,21 +999,29 @@ filename_generator(char *text, int state)
 		if (comp_files)
 			delete comp_files;
 		comp_files = new bufferArray();
-		if ((res = comp_a->dir(psionDir, *comp_files)) != rfsv::E_PSI_GEN_NONE) {
+		strcpy(tmpPath, psionDir);
+		strcat(tmpPath, cplPath);
+		if ((res = comp_a->dir(tmpPath, *comp_files)) != rfsv::E_PSI_GEN_NONE) {
 			cerr << "Error: " << res << endl;
 			return NULL;
 		}
 	}
 	while (!comp_files->empty()) {
 		bufferStore s;
+		char *p;
 		s = comp_files->pop();
 		long attr = s.getDWord(8);
 
 		if ((attr & maskAttr) == 0)
 			continue;
-		if (!(strncmp(s.getString(12), text, len))) {
-			char fnbuf[512];
-			strcpy(fnbuf, s.getString(12));
+		strcpy(tmpPath, cplPath);
+		strcat(tmpPath, s.getString(12));
+		for (p = tmpPath; *p; p++)
+			if (*p == '\\')
+				*p = '/';
+		if (!(strncmp(tmpPath, text, len))) {
+			char fnbuf[1024];
+			strcpy(fnbuf, tmpPath);
 			if (attr & rfsv::PSI_A_DIR)
 				strcat(fnbuf, "/");
 			return (strdup(fnbuf));
@@ -1054,10 +1075,22 @@ do_completion(char *text, int start, int end)
 		}
 		maskAttr = 0xffff;
 		idx = 0;
+		strcpy(cplPath, text);
+		rl_completion_append_character = ' ';
 		while ((name = remote_dir_commands[idx])) {
 			idx++;
-			if (!strncmp(name, rl_line_buffer, strlen(name)))
+			if (!strncmp(name, rl_line_buffer, strlen(name))) {
+				char *p = strrchr(cplPath, '/');
+				if (p) {
+					*(++p) = '\0';
+					for (p = cplPath; *p; p++)
+						if (*p == '/')
+							*p = '\\';
+				} else
+					cplPath[0] = '\0';
 				maskAttr = rfsv::PSI_A_DIR;
+				rl_completion_append_character = '\0';
+			}
 		}
 		
 		matches = completion_matches(text, fnmgen_ptr);
