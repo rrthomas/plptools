@@ -2,6 +2,7 @@
 #include "sisinstaller.h"
 
 #include "sisfile.h"
+#include "sisfilelink.h"
 #include "sisfilerecord.h"
 #include "sisreqrecord.h"
 #include "psion.h"
@@ -21,6 +22,11 @@ checkAbortHash(void *, u_int32_t)
 		fflush(stdout);
 		}
 	return continueRunning;
+}
+
+SISInstaller::SISInstaller()
+{
+	m_installed = 0;
 }
 
 void
@@ -161,6 +167,7 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 				}
 			SISInstaller installer;
 			installer.setPsion(m_psion);
+			installer.setInstalled(m_installed);
 			rc = installer.run(&sisFile, buf2, len, m_file);
 			if (0 == m_drive)
 				{
@@ -186,10 +193,72 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 	return FILE_OK;
 }
 
-void
-SISInstaller::setPsion(Psion* psion)
+#define SYSTEMINSTALL "c:\\system\\install\\"
+
+SisRC
+SISInstaller::loadInstalled()
 {
-	m_psion = psion;
+	PlpDir files;
+	Enum<rfsv::errs> res;
+
+	if ((res = m_psion->dir(SYSTEMINSTALL, files)) != rfsv::E_PSI_GEN_NONE)
+		{
+		return SIS_FAILED;
+		}
+	else
+		{
+		while (!files.empty())
+			{
+			PlpDirent file = files[0];
+			printf("Loading sis file `%s'\n", file.getName());
+			char sisname[256];
+			sprintf(sisname, "%s%s", SYSTEMINSTALL, file.getName());
+			loadPsionSis(sisname);
+			files.pop_front();
+			}
+		}
+}
+
+void
+SISInstaller::loadPsionSis(const char* name)
+{
+	char srcName[32];
+	strcpy(srcName, "/tmp/plptools-sis-XXXXXX");
+	int fd = mkstemp(srcName);
+	if (-1 == fd)
+		{
+		printf("Couldn't create temp file: %s\n", strerror(errno));
+		return;
+		}
+	Enum<rfsv::errs> res;
+	continueRunning = 1;
+	if (logLevel >= 2)
+		printf("Copying from %s to temp file %s\n", name, srcName);
+	res = m_psion->copyFromPsion(name, fd, checkAbortHash);
+	if (res == rfsv::E_PSI_GEN_NONE)
+		{
+		off_t fileLen = lseek(fd, 0, SEEK_END);
+		if (logLevel >= 2)
+			printf("Read %d bytes from the Psion file %s\n",
+				   (int)fileLen, name);
+		lseek(fd, SEEK_SET, 0);
+		uint8_t* sisbuf = new uint8_t[fileLen];
+		int rc = read(fd, sisbuf, fileLen);
+		if (rc == fileLen)
+			{
+			SISFile* sisFile = new SISFile();
+			SisRC rc2 = sisFile->fillFrom(sisbuf, fileLen);
+			if (rc2 == SIS_OK)
+				{
+				if (logLevel >= 1)
+					printf(" Ok.\n");
+				SISFileLink* link = new SISFileLink(sisFile);
+				link->m_next = m_installed;
+				m_installed = link;
+				}
+			}
+		}
+	close(fd);
 }
 
 SisRC
@@ -240,6 +309,8 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	// library has been loaded, since the sis file names could be just
 	// about anything.
 	//
+	if (m_installed == 0)
+		loadInstalled();
 
 	// Check Requisites.
 	//
@@ -262,76 +333,38 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 		   m_file->m_header.m_uid1,
 		   m_file->m_header.m_major,
 		   m_file->m_header.m_minor);
-	char* resname = new char[256];
-	int namelen = 0;
-	while (compName[namelen] != 0)
-		{
-		if (compName[namelen] == ' ')
-			break;
-		namelen++;
-		}
-	sprintf(resname, "C:\\System\\Install\\%.*s.sis", namelen, compName);
 
-#if 0
-	char srcName[32];
-	strcpy(srcName, "/tmp/plptools-sis-XXXXXX");
-	int fd = mkstemp(srcName);
-	if (-1 == fd)
+	bool uninstallFirst;
+	SISFileLink* curr = m_installed;
+	while (curr)
 		{
-		printf("Couldn't create temp file: %s\n", strerror(errno));
-		return SIS_FAILED;
-		}
-	Enum<rfsv::errs> res;
-	continueRunning = 1;
-	printf("Copying from %s to temp file %s\n", resname, srcName);
-	res = m_psion->copyFromPsion(resname, fd, checkAbortHash);
-	if (res == rfsv::E_PSI_GEN_NONE)
-		{
-		off_t fileLen = lseek(fd, SEEK_END, 0);
-		if (logLevel >= 2)
-			printf("Read %d bytes from the Psion file %s\n",
-				   fileLen, resname);
-		lseek(fd, SEEK_SET, 0);
-		uint8_t* sisbuf = new uint8_t[fileLen];
-		int rc = read(fd, sisbuf, fileLen);
-		if (rc == fileLen)
+		SISFile* sisFile = curr->m_file;
+		switch (sisFile->compareApp(m_file))
 			{
-			bool uninstallFirst = false;
-			SISFile sisFile;
-			SisRC rc2 = sisFile.fillFrom(sisbuf, fileLen);
-			if (rc2 == SIS_OK)
-				{
-				switch (sisFile.compareApp(m_file))
-					{
-					case SIS_DIFFERENT_APP:
-						// NOW WHAT?
-						return SIS_DIFFERENT_APP;
+			case SIS_VER_EARLIER:
+				uninstallFirst = true;
+				break;
 
-					case SIS_VER_EARLIER:
-						uninstallFirst = true;
-						break;
+			case SIS_SAME_OR_LATER:
+				// Ask for confirmation.
+				uninstallFirst = true;
+				break;
 
-					case SIS_SAME_OR_LATER:
-						// Ask for confirmation.
-						uninstallFirst = true;
-						break;
-
-					case SIS_OTHER_VARIANT:
-						// Ask for confirmation.
-						uninstallFirst = true;
-						break;
-
-					}
-				if (uninstallFirst)
-					{
-					// Not yet...
-				//	uninstall(&sisFile);
-					}
-				}
+			case SIS_OTHER_VARIANT:
+				// Ask for confirmation.
+				uninstallFirst = true;
+				break;
 			}
+		curr = curr->m_next;
 		}
-	close(fd);
-#endif
+
+	if (uninstallFirst)
+		{
+		printf("You should uninstall the previous version first.\n");
+		return SIS_ABORTED;
+		// Not yet...
+	//	uninstall(&sisFile);
+		}
 
 	// Install file components.
 	//
@@ -398,6 +431,15 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 
 	// Copy the updated sis file to the epoc machine.
 	//
+	char* resname = new char[256];
+	int namelen = 0;
+	while (compName[namelen] != 0)
+		{
+		if (compName[namelen] == ' ')
+			break;
+		namelen++;
+		}
+	sprintf(resname, "C:\\System\\Install\\%.*s.sis", namelen, compName);
 	printf("Creating residual sis file %s\n", resname);
 	copyBuf(buf, firstFile, resname);
 	delete[] resname;
@@ -465,5 +507,11 @@ SISInstaller::selectDrive()
 				}
 			}
 		}
+}
+
+void
+SISInstaller::setPsion(Psion* psion)
+{
+	m_psion = psion;
 }
 

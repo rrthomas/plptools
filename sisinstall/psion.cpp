@@ -90,6 +90,12 @@ Psion::devlist(u_int32_t& devbits)
 	return res;
 }
 
+Enum<rfsv::errs>
+Psion::dir(const char* dir, PlpDir& files)
+{
+	return m_rfsv->dir(dir, files);
+}
+
 bool
 Psion::dirExists(const char* name)
 {

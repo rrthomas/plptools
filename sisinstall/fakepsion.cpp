@@ -33,6 +33,12 @@ FakePsion::devlist(u_int32_t& devbits)
 	return rfsv::E_PSI_GEN_FAIL;
 }
 
+Enum<rfsv::errs>
+FakePsion::dir(const char* dir, PlpDir& files)
+{
+	return rfsv::E_PSI_GEN_NONE;
+}
+
 bool
 FakePsion::dirExists(const char* name)
 {

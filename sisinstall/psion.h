@@ -31,6 +31,8 @@ public:
 
 	virtual Enum<rfsv::errs> devlist(u_int32_t& devbits);
 
+	virtual Enum<rfsv::errs> dir(const char* dir, PlpDir& files);
+
 	virtual bool dirExists(const char* name);
 
 	virtual void disconnect();

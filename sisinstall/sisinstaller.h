@@ -7,6 +7,7 @@
 
 class Psion;
 class SISFile;
+class SISFileLink;
 class SISFileRecord;
 
 /**
@@ -17,6 +18,8 @@ class SISInstaller
 {
 public:
 
+	SISInstaller();
+
 	SisRC run(SISFile* file, uint8_t* buf, off_t len);
 
 	SisRC run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent);
@@ -25,6 +28,11 @@ public:
 	 * Ask the user which drive to install to.
 	 */
 	void selectDrive();
+
+	void setInstalled(SISFileLink* installed)
+		{
+		m_installed = installed;
+		}
 
 	/**
 	 * Set the Psion manager.
@@ -42,6 +50,8 @@ private:
 	uint8_t* m_buf;
 
 	SISFile* m_file;
+
+	SISFileLink* m_installed;
 
 	enum {
 		FILE_OK,
@@ -62,6 +72,10 @@ private:
 	void createDirs(char* filename);
 
 	int installFile(SISFileRecord* fileRecord);
+
+	SisRC loadInstalled();
+
+	void loadPsionSis(const char* name);
 
 	void uninstall(SISFile* sisFile);
 
