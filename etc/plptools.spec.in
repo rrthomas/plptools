@@ -169,9 +169,9 @@ zwischen Psion und Rechner.
 
 %build
 %if "%{isSUSE}" > "0"
-%if "%{REL}" >= "8.0"
-# SuSE's libtool breaks everything
+# SuSE's libtools are breaking everything
 %define __libtoolize true
+%if "%{REL}" >= "8.0"
 %configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde3
 %else
 %configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde2
