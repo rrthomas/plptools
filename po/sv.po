@@ -1409,8 +1409,8 @@ msgstr "plpbackup: fick ingen kontakt med ncpd"
 
 #: sisinstall/sismain.cpp:48
 #, c-format
-msgid "Installing sis file %s%s\n"
-msgstr "Installerar sisfil %s%s\n"
+msgid "Installing sis file %s%s.\n"
+msgstr "Installerar sisfil %s%s.\n"
 
 #: sisinstall/sismain.cpp:49
 msgid ", not really"
