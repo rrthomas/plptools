@@ -4,29 +4,30 @@
 .\"
 .\" Process this file with
 .\" groff -man -Tascii ncpd.8 for ASCII output, or
-.\" groff -man -Tps ncpd.8 for PostScript output
+.\" groff -man -Tps ncpd.8 for Postscript output
 .\"
-.TH ncpd 8 "@MANDATE@" "plptools @VERSION@" "System Administration"
+.TH ncpd 8 "@MANDATE@" "plptools @VERSION@" "System administration commands"
 .SH NAME
 ncpd \- Daemon which handles the serial link to a Psion
 .SH SYNOPSIS
 .B ncpd
 .B [-V]
 .B [-h]
-.BI "[-v " logclass ]
+.BI "[-v " log-class ]
 .B [-d]
 .B [-e]
 .BI "[-p [" host ":]" port ]
 .BI "[-s " device ]
-.BI "[-b " baudrate ]
+.BI "[-b " baud-rate ]
 .BI [ long-options ]
 
 .SH DESCRIPTION
 ncpd is the daemon which handles the serial link to your Psion.
 It listens at port @DPORT@ for local connections and provides
-basic PLP/NCP services for plpnfsd and plpftp. It autoconnects
-to the psion, even after unplugging/switching off therefore it
-can run always in background (if you have a spare serial-device)
+basic PLP/NCP services for plpnfsd and plpftp and other front-ends.
+It auto-connects to the psion, even after unplugging/switching off
+therefore it can run always in background (if you have a spare
+serial-device)
 
 .SH OPTIONS
 .TP
@@ -42,8 +43,8 @@ current tty as I/O device. This option is intended for starting ncpd on
 demand using mgetty's auto-detect function. (A patch for mgetty is needed
 for that).
 .TP
-.BI "\-v, --verbose=" logclass
-Increase the logging level of the program. the possible values for logclass
+.BI "\-v, --verbose=" log-class
+Increase the logging level of the program. the possible values for log-class
 are:
 .RS
 .TP
@@ -90,10 +91,10 @@ is used.
 Specify the serial device to use to connect to the Psion - this defaults to
 @DDEV@
 .TP
-.BI "\-b, --baudrate=" baudrate
+.BI "\-b, --baudrate=" baud-rate
 Specify the baud rate to use for the serial connection. If the word
 .B auto
-is specified, ncpd cycles through baudrates of 115200, 57600, 38400, 19200
+is specified, ncpd cycles through baud-rates of 115200, 57600, 38400, 19200
 and 9600 baud. Default setting is @DSNAME@.
 
 .SH SEE ALSO

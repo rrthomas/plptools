@@ -4,11 +4,11 @@
 .\"
 .\" Process this file with
 .\" groff -man -Tascii plpnfsd.8 for ASCII output, or
-.\" groff -man -Tps plpnfsd.8 for PostScript output
+.\" groff -man -Tps plpnfsd.8 for Postscripts output
 .\"
-.TH plpnfsd 8 "@MANDATE@" "plptools @VERSION@" "System Administration"
+.TH plpnfsd 8 "@MANDATE@" "plptools @VERSION@" "System administration commands"
 .SH NAME
-plpnfsd \- Daemon to mount a Psion an nfs like filesystem
+plpnfsd \- Daemon to mount a Psion like an NFS file-system
 .SH SYNOPSIS
 .B plpnfsd
 .B [-V]
@@ -16,27 +16,27 @@ plpnfsd \- Daemon to mount a Psion an nfs like filesystem
 .B [-D]
 .B [-h]
 .BI "[-p [" host :] port ]
-.BI "[-d " mountdir ]
+.BI "[-d " mount-dir ]
 .BI "[-u " user ]
 .BI [ long-options ]
 
 .SH DESCRIPTION
 plpnfsd is a daemon, which provides NFS-like access to your Psion.
-It automatically makes the psion's filesystems available below
-an NFS-mounted directory (default /mnt/psion).
+It automatically makes the Psion's file-systems available below
+an NFS-mounted directory (default @DMOUNTPOINT@).
 By default, plpnfsd is installed suid-root, so any normal user
-can start it and get's the mounted directory owned by himself.
+can start it and gets the mounted directory owned by himself.
 As this program is usually used on single-user machines, this
-does not hurt security. Like the others, this program
+does not hurt security. Like the other front-ends, this program
 auto-reconnects after a link-failure, so you can keep the
 psion mounted all the time, even when it is not connected.
 Due to Rudolf Koenig's clever error-handling, you don't need to
 worry about blocked io-processes if the psion isn't available.
 You simply will get an "device not configured" error, when
 accessing a file on a previously connected psion which has been
-disconnected. After that, the mount-point will appear empty.
-As soon as the psion is connected again, the subdirectories
-will reappear. (possibly with a few secs delay)
+disconnected. After that, the mount-point will appear with the
+drives missing. As soon as the psion is connected again, the
+subdirectories will reappear (possibly with a few seconds delay).
 
 
 .SH OPTIONS
@@ -54,10 +54,10 @@ debug level (up to 3 times)
 .BI "\-p, --port=[" host :] port
 Specify the host and port to connect to (e.g. the port where ncpd is listening
 on) - by default the host is 127.0.0.1 and the port is looked up in
-/etc/services. If it is not found there, a fallback builtin of
+/etc/services. If it is not found there, a fall-back builtin of
 .I @DPORT@.
 .TP
-.BI "\-d, --mountpoint=" mountdir
+.BI "\-d, --mountpoint=" mount-dir
 Specify the directory to mount the psion file system on. This defaults
 to
 .I @DMOUNTPOINT@
@@ -83,7 +83,7 @@ shows the Psion's owner information.
 .TP
 @DMOUNTPOINT@/proc/unixowner
 The superuser (root) can set the owner of the mounted directory-tree
-during runtime by writing the desired username into this file.
+during runtime by writing the desired user-name into this file.
 .TP
 @DMOUNTPOINT@/proc/debuglevel
 Reading/writing from/to this file shows resp. sets the debug level.

@@ -4,9 +4,9 @@
 .\"
 .\" Process this file with
 .\" groff -man -Tascii plpbackup.1 for ASCII output, or
-.\" groff -man -Tps plpbackup.1 for PostScript output
+.\" groff -man -Tps plpbackup.1 for Postscript output
 .\"
-.TH plpbackup 1 "@MANDATE@" "plptools @VERSION@" local
+.TH plpbackup 1 "@MANDATE@" "plptools @VERSION@" "User commands"
 .SH NAME
 plpbackup \- Backup and restore for Psion data.
 .SH SYNOPSIS
@@ -15,8 +15,8 @@ plpbackup \- Backup and restore for Psion data.
 .B [-v]
 .B [-q]
 .B [-f]
-.BI "[-b [" archivename ]]
-.BI "[-r " archivename ]
+.BI "[-b [" archive-name ]]
+.BI "[-r " archive-name ]
 .B [-F]
 .B [-V]
 .BI "[-p [" host :] port ]
@@ -46,10 +46,10 @@ is missing, an incremental backup is done based on the archive bit in the
 file attributes on the Psion. Archive bits of backed-up files are cleared
 after any successful backup operation.
 .TP
-.BI "\-b, --backup[=" archivename ]
+.BI "\-b, --backup[=" archive-name ]
 Select backup mode. This mode and restore mode are mutually exclusive.
 If
-.I archivename
+.I archive-name
 is missing, plpbackup automatically selects an archive name using the
 following scheme:
 .BI $HOME/plpbackup/ PsionUID / T \- YYYY \- MM \- DD \- hh \- mm \- ss .tar.gz
@@ -90,7 +90,7 @@ is the current minute.
 is the current second.
 .RE
 .TP
-.BI "\-r, --restore=" archivename
+.BI "\-r, --restore=" archive-name
 Select restore mode. This mode and backup mode are mutually exclusive.
 Before restoring data, plpbackup asks interactively, if you want to
 restore individual files or the whole contents of the archive. If you

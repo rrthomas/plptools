@@ -4,9 +4,9 @@
 .\"
 .\" Process this file with
 .\" groff -man -Tascii plpprintd.1 for ASCII output, or
-.\" groff -man -Tps plpprintd.1 for PostScript output
+.\" groff -man -Tps plpprintd.1 for Postscript output
 .\"
-.TH plpprintd 8 "@MANDATE@" "plptools @VERSION@" local
+.TH plpprintd 8 "@MANDATE@" "plptools @VERSION@" "System administration commands"
 .SH NAME
 plpprintd \- Daemon for printing via PC from a Psion.
 .SH SYNOPSIS
@@ -16,7 +16,7 @@ plpprintd \- Daemon for printing via PC from a Psion.
 .B [-v]
 .B [-V]
 .BI [-s " spooldir" ]
-.BI [-c " printcmd" ]
+.BI [-c " print-cmd" ]
 .BI "[-p [" host :] port ]
 .BI [ long-options ]
 
@@ -25,7 +25,7 @@ plpprintd \- Daemon for printing via PC from a Psion.
 plpprintd provides a print server for a Psion, connected to the PC.
 Using plpprintd, you can use the Psion's "Print via PC" feature to
 access any printer, available on your PC. When receiving a print job,
-the data is converted to PostScript®
+the data is converted to Postscript® and then send to a printer.
 
 .SH OPTIONS
 
@@ -64,11 +64,11 @@ in /etc/services. If it is not found there, a builtin value of @DPORT@ is used.
 .SH FILES
 .TP
 @PKGDATA@/prolog.ps
-contains the PostScript® dictionary, needed for printing the jobs.
+contains the Postscript® dictionary, needed for printing the jobs.
 .TP
 @PKGDATA@/fontmap
 specifies the font mapping to be used. This file is used to convert the
-Psion's font names into valid PostScript® font names. It's format is
+Psion's font names into valid Postscript® font names. It's format is
 described at the beginning of it. If a Psion font name is received which
 can not be found in this file, a builtin default Courier is used.
 
