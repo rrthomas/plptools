@@ -81,12 +81,66 @@ void ftp::usage() {
 	cerr << "  !<system command>" << endl;
 	cerr << "  get <psionfile>" << endl;
 	cerr << "  put <unixfile>" << endl;
-	cerr << "  mget (works on whole directory, interactively, no wildcarding)" << endl;
-	cerr << "  mput (works on whole directory, interactively, no wildcarding)" << endl;
+	cerr << "  mget <shellpattern>" << endl;
+	cerr << "  mput <shellpattern>" << endl;
 	cerr << "  del|rm <psionfile>" << endl;
 	cerr << "  mkdir <psiondir>" << endl;
 	cerr << "  rmdir <psiondir>" << endl;
+	cerr << "  prompt" << endl;
 	cerr << "  bye" << endl;
+}
+
+static int Wildmat(const char *s, char *p);
+
+static int
+Star(const char *s, char *p)
+{
+	while (Wildmat(s, p) == 0)
+		if (*++s == '\0')
+			return 0;
+        return 1;
+}
+
+static int
+Wildmat(const char *s, char *p)
+{
+	register int last;
+	register int matched;
+	register int reverse;
+
+	for (; *p; s++, p++)
+		switch (*p) {
+			case '\\':
+				/*
+				 * Literal match with following character,
+				 * fall through.
+				 */
+				p++;
+			default:
+				if (*s != *p)
+					return (0);
+				continue;
+			case '?':
+				/* Match anything. */
+				if (*s == '\0')
+					return (0);
+				continue;
+			case '*':
+				/* Trailing star matches everything. */
+				return (*++p ? Star(s, p) : 1);
+			case '[':
+				/* [^....] means inverse character class. */
+				if ((reverse = (p[1] == '^')))
+					p++;
+				for (last = 0, matched = 0; *++p && (*p != ']'); last = *p)
+					/* This next line requires a good C compiler. */
+					if (*p == '-' ? *s <= *++p && *s >= last : *s == *p)
+						matched = 1;
+				if (matched == reverse)
+					return (0);
+				continue;
+		}
+	return (*s == '\0');
 }
 
 int ftp::
@@ -97,10 +151,11 @@ session(rfsv32 & a, int xargc, char **xargv)
 	char f1[256];
 	char f2[256];
 	long res;
-	int  once = 0;
+	bool prompt = true;
+	bool once = false;
 
 	if (xargc > 1) {
-		once = 1;
+		once = true;
 		argc = (xargc<10)?xargc:10;
 		for (int i = 0; i < argc; i++)
 			argv[i] = xargv[i+1];
@@ -109,6 +164,11 @@ session(rfsv32 & a, int xargc, char **xargv)
 		if (!once)
 			getCommand(argc, argv);
 
+		if (!strcmp(argv[0], "prompt")) {
+			prompt = !prompt;
+			cout << "Prompting now " << (prompt?"on":"off") << endl;
+			continue;
+		}
 		if (!strcmp(argv[0], "pwd")) {
 			cout << "Local dir: \"" << localDir << "\"" << endl;
 			cout << "Psion dir: \"" << psionDir << "\"" << endl;
@@ -313,7 +373,7 @@ session(rfsv32 & a, int xargc, char **xargv)
 			}
 			continue;
 		}
-		if (!strcmp(argv[0], "get")) {
+		if ((!strcmp(argv[0], "get")) && (argc > 1)) {
 			struct timeval stime;
 			struct timeval etime;
 			struct stat stbuf;
@@ -347,7 +407,8 @@ session(rfsv32 & a, int xargc, char **xargv)
 					<< dhse << " secs = " << cps << " cps)\n";
 			}
 			continue;
-		} else if (!strcmp(argv[0], "mget")) {
+		} else if ((!strcmp(argv[0], "mget")) && (argc == 2)) {
+			char *pattern = argv[1];
 			bufferArray files;
 			if ((res = a.dir(psionDir, &files)) != 0) {
 				errprint(res, a);
@@ -361,11 +422,20 @@ session(rfsv32 & a, int xargc, char **xargv)
 
 				if (attr & 0x10)
 					continue;
+				if (!Wildmat(s.getString(12), pattern))
+					continue;
 				do {
-					cout << "Get \"" << s.getString(12) << "\" y,n, or l (lowercase filename): ";
-					cout.flush();
-					cin.getline(temp, 100);
-				} while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n' && temp[0] != 'l'));
+					cout << "Get \"" << s.getString(12) << "\" (y,n): ";
+					if (prompt) {
+						cout.flush();
+						cin.getline(temp, 100);
+					} else {
+						temp[0] = 'y';
+						temp[1] = 0;
+						cout << "y ";
+						cout.flush();
+					}
+				} while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
 				if (temp[0] != 'n') {
 					strcpy(f1, psionDir);
 					strcat(f1, s.getString());
@@ -419,7 +489,8 @@ session(rfsv32 & a, int xargc, char **xargv)
 			}
 			continue;
 		}
-		if (!strcmp(argv[0], "mput")) {
+		if ((!strcmp(argv[0], "mput")) && (argc == 2)) {
+			char *pattern = argv[1];
 			DIR *d = opendir(localDir);
 			if (d) {
 				struct dirent *de;
@@ -427,14 +498,29 @@ session(rfsv32 & a, int xargc, char **xargv)
 					de = readdir(d);
 					if (de) {
 						char temp[100];
+						struct stat st;
+
+						if (!Wildmat(de->d_name, pattern))
+							continue;
+						strcpy(f1, localDir);
+						strcat(f1, de->d_name);
+						if (stat(f1, &st) != 0)
+							continue;
+						if (!S_ISREG(st.st_mode))
+							continue;
 						do {
 							cout << "Put \"" << de->d_name << "\" y,n: ";
-							cout.flush();
-							cin.getline(temp, 100);
+							if (prompt) {
+								cout.flush();
+								cin.getline(temp, 100);
+							} else {
+								temp[0] = 'y';
+								temp[1] = 0;
+								cout << "y ";
+								cout.flush();
+							}
 						} while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
 						if (temp[0] == 'y') {
-							strcpy(f1, localDir);
-							strcat(f1, de->d_name);
 							strcpy(f2, psionDir);
 							strcat(f2, de->d_name);
 							if ((res = a.copyToPsion(f1, f2)) != 0) {
@@ -446,7 +532,7 @@ session(rfsv32 & a, int xargc, char **xargv)
 					}
 				} while (de);
 				closedir(d);
-			}
+			} else
 				cerr << "Error in directory name \"" << localDir << "\"\n";
 			continue;
 		}
@@ -484,8 +570,7 @@ session(rfsv32 & a, int xargc, char **xargv)
 		}
 		if (strcmp(argv[0], "bye") && strcmp(argv[0], "quit"))
 			usage();
-	} while (strcmp(argv[0], "bye") && strcmp(argv[0], "quit") &&
-		 (once == 0));
+	} while (strcmp(argv[0], "bye") && strcmp(argv[0], "quit") && !once);
 	return a.getStatus();
 }
 
