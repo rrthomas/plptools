@@ -1008,7 +1008,7 @@ do_completion(char *text, int start, int end)
 
 	rl_completion_entry_function = (Function *)null_completion;
 	if (start == 0)
-		matches = completion_matches(text, command_generator);
+		matches = completion_matches(text, (CPFunction *)command_generator);
 	else {
 		int idx = 0;
 		char *name;
@@ -1029,7 +1029,7 @@ do_completion(char *text, int start, int end)
 				maskAttr = rfsv::PSI_A_DIR;
 		}
 		
-		matches = completion_matches(text, filename_generator);
+		matches = completion_matches(text, (CPFunction *)filename_generator);
 	}
 	return matches;
 }

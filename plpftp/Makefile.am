@@ -2,12 +2,16 @@
 #
 INCLUDES=-I$(top_srcdir)/lib
 
-#if HAVE_LIBREADLINE
+if HAVE_LIBREADLINE
+if ADD_LIBCURSES
+LIBREADLINE=-lreadline -lcurses
+else
 LIBREADLINE=-lreadline
-#endif
-#if HAVE_LIBHISTORY
+endif
+endif
+if HAVE_LIBHISTORY
 LIBHISTORY=-lhistory
-#endif
+endif
 
 bin_PROGRAMS = plpftp
 plpftp_LDADD = $(top_srcdir)/lib/libplp.la $(LIBREADLINE) $(LIBHISTORY)

@@ -251,7 +251,7 @@ long rfsv_mkdir(const char *file) {
 	return a->mkdir(file);
 }
 
-static long rfsv_closecached() {
+long rfsv_closecached() {
 	if (!a)
 		return -1;
 	if (!a_filename)
