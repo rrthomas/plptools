@@ -67,6 +67,8 @@ reset(void)
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
 	if (skt->getBufferStore(a) == 1) {
+	    if (!strcmp(a.getString(0), "NAK"))
+		status = rfsv::E_PSI_GEN_NSUP;
 	    if (!strcmp(a.getString(0), "Ok"))
 		status = rfsv::E_PSI_GEN_NONE;
 	}
@@ -96,6 +98,9 @@ sendCommand(enum commands cc)
 	if (status == rfsv::E_PSI_FILE_DISC)
 	    return false;
     }
+    if (status != rfsv::E_PSI_GEN_NONE)
+	return false;
+
     bool result;
     bufferStore a;
     a.addByte(cc);
@@ -174,6 +179,9 @@ initClipbd() {
     Enum<rfsv::errs> ret;
     bufferStore a;
 
+    if (status != rfsv::E_PSI_GEN_NONE)
+	return status;
+
     sendCommand(RCLIP_INIT);
     if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
 	if ((a.getLen() != 3) || (a.getByte(0) != RCLIP_INIT) ||
@@ -187,6 +195,10 @@ Enum<rfsv::errs> rclip::
 getResponse(bufferStore & data)
 {
     Enum<rfsv::errs> ret = rfsv::E_PSI_GEN_NONE;
+
+    if (status == rfsv::E_PSI_GEN_NSUP)
+	return status;
+
     if (skt->getBufferStore(data) == 1)
 	return ret;
     else
