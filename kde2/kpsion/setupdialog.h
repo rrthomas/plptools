@@ -71,6 +71,7 @@ private:
 
     QString bdirDefault;
     QString bdirCreated;
+    QString oldBDir;
 };
 
 #endif

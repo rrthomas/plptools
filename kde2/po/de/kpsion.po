@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.7\n"
-"POT-Creation-Date: 2001-03-13 10:57+0100\n"
-"PO-Revision-Date: 2001-03-13 10:59CET\n"
+"POT-Creation-Date: 2001-03-13 11:35+0100\n"
+"PO-Revision-Date: 2001-03-13 11:36CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -468,15 +468,15 @@ msgstr ""
 msgid "Backup &folder"
 msgstr "Sicherungs &Ordner"
 
-#: setupdialog.cpp:62 wizards.cpp:107
+#: setupdialog.cpp:63 wizards.cpp:107
 msgid "Browse"
 msgstr "Durchsuchen"
 
-#: setupdialog.cpp:65 wizards.cpp:110
+#: setupdialog.cpp:66 wizards.cpp:110
 msgid "This is the name of the backup folder."
 msgstr "Dies ist der Name des Sicherungs-Ordners."
 
-#: setupdialog.cpp:67 wizards.cpp:112
+#: setupdialog.cpp:68 wizards.cpp:112
 msgid ""
 "Click here, for opening a dialog which lets you easily select the backup "
 "folder."
@@ -484,53 +484,53 @@ msgstr ""
 "Aktivieren Sie diese Schaltfläche, um einen Dialog zu öffnen welcher es "
 "Ihnen auf einfache Weise erlaubt, den Sicherungs-Ordner zu wählen."
 
-#: setupdialog.cpp:75
+#: setupdialog.cpp:76
 msgid "Backup &policy"
 msgstr "Sicherungs &Strategie"
 
-#: setupdialog.cpp:78 wizards.cpp:145
+#: setupdialog.cpp:79 wizards.cpp:145
 msgid "&Incremental backup interval"
 msgstr "Invervall für &inkrementelle Sicherung"
 
-#: setupdialog.cpp:90 wizards.cpp:153
+#: setupdialog.cpp:91 wizards.cpp:153
 msgid "&Full backup interval"
 msgstr "Intervall für &Komplett-Sicherung"
 
-#: setupdialog.cpp:101 wizards.cpp:161
+#: setupdialog.cpp:102 wizards.cpp:161
 msgid "Backup &generations"
 msgstr "Sicherungs-&Generationen"
 
-#: setupdialog.cpp:113
+#: setupdialog.cpp:114
 msgid "&Connection"
 msgstr "&Verbindung"
 
-#: setupdialog.cpp:116 wizards.cpp:205
+#: setupdialog.cpp:117 wizards.cpp:205
 msgid "&Connection retry interval (sec.)"
 msgstr "&Verbindungsaufbau-Intervall (in sek.)"
 
-#: setupdialog.cpp:126 wizards.cpp:213
+#: setupdialog.cpp:127 wizards.cpp:213
 msgid "Serial &device"
 msgstr "&Serielle Schnittstelle"
 
-#: setupdialog.cpp:145 wizards.cpp:222
+#: setupdialog.cpp:146 wizards.cpp:222
 msgid "Serial &speed"
 msgstr "Schnittstellen-&Geschwindigkeit"
 
-#: setupdialog.cpp:184 wizards.cpp:279
+#: setupdialog.cpp:185 wizards.cpp:279
 msgid "Backup folder"
 msgstr "Sicherungs-Ordner"
 
-#: setupdialog.cpp:260 wizards.cpp:365
+#: setupdialog.cpp:263 wizards.cpp:365
 msgid "<QT>The folder <B>%1</B> does <B>not</B> exist.<BR/>Shall it be created?</QT>"
 msgstr ""
 "<QT>Der Ordner <B>%1</B> existiert <B>nicht</B>.<BR/>Soll er angelegt "
 "werden?</QT>"
 
-#: setupdialog.cpp:265 wizards.cpp:370
+#: setupdialog.cpp:268 wizards.cpp:370
 msgid "<QT>The specified folder<BR/><B>%1</B><BR/>could <B>not</B> be created"
 msgstr "<QT>Der angegebene Ordner<BR/><B>%1</B><BR/>konnte nicht angelegt werden"
 
-#: setupdialog.cpp:270 wizards.cpp:375
+#: setupdialog.cpp:273 wizards.cpp:375
 msgid ""
 ", because you either don't have sufficient rights to do that, or the "
 "filesystem is readonly."
@@ -538,15 +538,15 @@ msgstr ""
 ", weil Sie entweder nicht die nötigen Rechte besitzen, oder das Dateisystem "
 "nur lesbar ist."
 
-#: setupdialog.cpp:274 wizards.cpp:379
+#: setupdialog.cpp:277 wizards.cpp:379
 msgid ", because the filesystem has not enough space."
 msgstr ", weil auf dem Dateisystem kein Platz mehr ist."
 
-#: setupdialog.cpp:280 wizards.cpp:385
+#: setupdialog.cpp:283 wizards.cpp:385
 msgid ", because there already exists another object with the same name."
 msgstr ", weil schon ein anderes Objekt mit dem selben Namen existiert."
 
-#: setupdialog.cpp:290 wizards.cpp:395
+#: setupdialog.cpp:293 wizards.cpp:395
 msgid ""
 ", because you specified a path which probably contains a dangling symbolic "
 "link."
@@ -554,7 +554,7 @@ msgstr ""
 ", weil Sie eine Pfad angegeben haben, der eine nicht aufgelöste symbolische "
 "Verknüpfung enthält."
 
-#: setupdialog.cpp:293 wizards.cpp:398
+#: setupdialog.cpp:296 wizards.cpp:398
 msgid ""
 ", because you specified a path which contains an element which is not a "
 "folder."
@@ -562,15 +562,19 @@ msgstr ""
 ", weil Sie eine Pfad angegeben haben, der ein Element enthält, welches kein "
 "Ordner ist."
 
-#: setupdialog.cpp:297 wizards.cpp:402
+#: setupdialog.cpp:300 wizards.cpp:402
 msgid ", because you specified a path which contains too many symbolic links."
 msgstr ""
 ", weil Sie eine Pfad angegeben haben, der zu viele symbolische "
 "Verknüpfungen enthält."
 
-#: setupdialog.cpp:304 wizards.cpp:409
+#: setupdialog.cpp:307 wizards.cpp:409
 msgid "<BR/>Please select another folder.</QT>"
 msgstr "<BR/>Bitte wählen Sie einen anderen Ordner.</QT>"
+
+#: setupdialog.cpp:330
+msgid "Could not move existing backup for machine %1 to %2."
+msgstr "Konnte bestehende Sicherung für Gerät %1 nicht nach %2 verlagern."
 
 #: setupdialog.moc.cpp:42 setupdialog.moc.cpp:47
 msgid "SetupDialog"
@@ -651,8 +655,8 @@ msgid ""
 msgstr ""
 "<QT>Als nächstes geben Sie bitte einige Informationen zur "
 "Sicherungs-Strategie an:<UL><LI>Wie viele Sicherungs-Generationen wollen Sie "
-"aufheben?</LI><LI>Soll ich automatische Sicherungen vornehmen?</LI><LI>Wenn ja, in "
-"welchen Intervallen?</LI></UL></QT>"
+"aufheben?</LI><LI>Soll ich automatische Sicherungen vornehmen?</LI><LI>Wenn "
+"ja, in welchen Intervallen?</LI></UL></QT>"
 
 #: wizards.cpp:181
 msgid "<QT><BIG><B>Step 2</B></BIG> - Backup policy</QT>"

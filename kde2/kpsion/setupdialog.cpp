@@ -57,6 +57,7 @@ SetupDialog::SetupDialog(QWidget *parent, rfsv *plpRfsv, rpcs *plpRpcs)
 
     config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_BACKUPDIR));
     tmp = config->readEntry(pcfg.getOptionName(KPsionConfig::OPT_BACKUPDIR));
+    oldBDir = tmp;
     bdirLabel = new QLabel(page1, "bdirLabel");
     bdirLabel->setText(tmp);
     bdirButton = new QPushButton(i18n("Browse"), page1);
@@ -247,9 +248,11 @@ checkBackupDir(QString &dir) {
     QString tmp =
 	config->readEntry(pcfg.getOptionName(KPsionConfig::OPT_BACKUPDIR));
 
+    bool rmFlag = false;
+
     if (!bdirCreated.isEmpty()) {
 	if (bdirCreated != dir) {
-	    ::rmdir(bdirCreated.data());
+	    rmFlag = true;
 	    bdirCreated = "";
 	}
     }
@@ -307,7 +310,35 @@ checkBackupDir(QString &dir) {
 	    }
 	    bdirCreated = dir;
 	}
+	QDir od(oldBDir);
+	if ((!oldBDir.isEmpty()) && (oldBDir != dir) && (od.exists())) {
+	    QStringList entries = od.entryList();
+	    QStringList::Iterator ui;
+	    QStringList::Iterator ei;
+	    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_UIDS));
+	    QStringList uids = config->readListEntry(
+		pcfg.getOptionName(KPsionConfig::OPT_UIDS));
+	    for (ei = entries.begin(); ei != entries.end(); ++ei) {
+		for (ui = uids.begin(); ui != uids.end(); ++ui) {
+		    if ((*ei) == (*ui)) {
+			QString from = oldBDir;
+			QString to = dir;
+			
+			from += "/"; from += *ui;
+			to += "/"; to += *ui;
+			if (::rename(from.latin1(), to.latin1()) != 0) {
+			    KMessageBox::error(this,
+					       i18n("Could not move existing backup "
+						    "for machine %1 to %2.").arg(*ui).arg(to));
+			}
+		    }
+		}
+	    }
+	}
+	if (rmFlag)
+	    ::rmdir(oldBDir.latin1());
 	bdirLabel->setText(dir);
+	oldBDir = dir;
 	return true;
     }
     bdirLabel->setText(tmp);
