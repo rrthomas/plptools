@@ -27,6 +27,15 @@ typedef unsigned short uint16;
 typedef unsigned int uint32;
 typedef unsigned char uchar;
 
+/**
+ * Return Codes.
+ */
+enum SisRC {
+	SIS_OK = 0,
+	SIS_TRUNCATED,
+	SIS_CORRUPTED,
+};
+
 extern uint16 read16(uchar* p);
 
 extern uint32 read32(uchar* p);

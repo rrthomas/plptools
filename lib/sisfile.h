@@ -27,6 +27,8 @@
 #include "sisfileheader.h"
 #include "siscomponentrecord.h"
 
+#include <sys/types.h>
+
 class SISLangRecord;
 class SISFileRecord;
 class SISReqRecord;
@@ -41,7 +43,7 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	void fillFrom(uchar* buf);
+	SisRC fillFrom(uchar* buf, off_t len);
 
 	/**
 	 * Return the currently selected installation language.

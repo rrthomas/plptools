@@ -25,9 +25,12 @@
 
 #include <stdio.h>
 
-void
-SISFileRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
+SisRC
+SISFileRecord::fillFrom(uchar* buf, int* base, off_t len, SISFile* sisFile)
 {
+	if (*base + 28 + 4 * 2 > len)
+		return SIS_TRUNCATED;
+
 	uchar* p = buf + *base;
 	int size = 0;
 	m_flags = read32(p);
@@ -79,27 +82,33 @@ SISFileRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
 			int n = sisFile->m_header.m_nlangs;
 			m_fileLengths = new uint32[n];
 			m_filePtrs = new uint32[n];
+			if (*base + size + n * 8 > len)
+				return SIS_TRUNCATED;
 			for (int i = 0; i < n; ++i)
 				{
 				m_fileLengths[i] = read32(p + size);
+				if (m_fileLengths[i] > len)
+					return SIS_TRUNCATED;
 				size += 4;
 				}
 			for (int i = 0; i < n; ++i)
 				{
 				m_filePtrs[i] = read32(p + size);
+				int fileLen = m_fileLengths[i];
+				if (m_filePtrs[i] + fileLen > len)
+					return SIS_TRUNCATED;
 				size += 4;
-				int len = m_fileLengths[i];
 				if (logLevel >= 2)
 					printf("File %d (for %s) is %d bytes long (at %d)\n",
 						   i,
 						   sisFile->getLanguage(i)->m_name,
-						   len,
+						   fileLen,
 						   m_filePtrs[i]);
 				if (logLevel >= 1)
 					printf("%d .. %d (%d bytes): File record (%s) for %.*s\n",
 						   m_filePtrs[i],
-						   m_filePtrs[i] + len,
-						   len,
+						   m_filePtrs[i] + fileLen,
+						   fileLen,
 						   sisFile->getLanguage(i)->m_name,
 						   m_destLength, buf + m_destPtr);
 				}
@@ -111,5 +120,6 @@ SISFileRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
 				printf("Unknown file flags %d\n", m_flags);
 		}
 	*base += size;
+	return SIS_OK;
 }
 

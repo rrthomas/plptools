@@ -25,6 +25,8 @@
 
 #include "sistypes.h"
 
+#include <sys/types.h>
+
 class SISFile;
 
 /**
@@ -38,7 +40,7 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	void fillFrom(uchar* buf, int* base, SISFile* file);
+	SisRC fillFrom(uchar* buf, int* base, off_t len, SISFile* file);
 
 	uint32 m_uid;
 	uint16 m_major;

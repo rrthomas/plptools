@@ -5,8 +5,7 @@ INCLUDES=-I$(top_srcdir)/lib
 bin_PROGRAMS = sisinstall
 sisinstall_LDADD = $(top_srcdir)/lib/libplp.la
 sisinstall_SOURCES = psion.cpp sisinstaller.cpp sismain.cpp \
-	fakepsion.cpp
-sisinstall_HEADERS = fakepsion.h
+	fakepsion.cpp fakepsion.h
 EXTRA_DIST = psion.h sisinstaller.h
 
 maintainer-clean-local:

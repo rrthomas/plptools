@@ -23,6 +23,8 @@
 #ifndef _SISFILEHEADER_H
 #define _SISFILEHEADER_H
 
+#include <sys/types.h>
+
 #include "sistypes.h"
 
 /**
@@ -35,7 +37,7 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	void fillFrom(uchar* buf, int* base);
+	SisRC fillFrom(uchar* buf, int* base, off_t len);
 
 	/**
 	 * Update the drive letter, and patch the parsed buffer.

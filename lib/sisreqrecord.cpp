@@ -25,9 +25,13 @@
 
 #include <stdio.h>
 
-void
-SISReqRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
+SisRC
+SISReqRecord::fillFrom(uchar* buf, int* base, off_t len, SISFile* sisFile)
 {
+	int n = sisFile->m_header.m_nreqs;
+	if (*base + 12 + n * 4 * 2)
+		return SIS_TRUNCATED;
+
 	uchar* p = buf + *base;
 	int size = 0;
 
@@ -35,7 +39,6 @@ SISReqRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
 	m_major = read16(p + 4);
 	m_minor = read16(p + 6);
 	m_variant = read32(p + 8);
-	int n = sisFile->m_header.m_nreqs;
 	m_nameLengths = new uint32[n];
 	m_namePtrs = new uint32[n];
 
@@ -53,6 +56,11 @@ SISReqRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
 	for (int i = 0; i < n; ++i)
 		{
 		m_namePtrs[i] = read32(p + size);
+		if (m_namePtrs[i] + m_nameLengths[i] > len)
+			{
+			printf("Position/length too large for req record %d.\n", i);
+			return SIS_CORRUPTED;
+			}
 		size += 4;
 		if (logLevel >= 2)
 			printf("Name %d (for %s) is %.*s\n",
@@ -65,5 +73,6 @@ SISReqRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
 		printf("%d .. %d (%d bytes): Req record\n",
 			   *base, *base + size, size);
 	*base += size;
+	return SIS_OK;
 }
 

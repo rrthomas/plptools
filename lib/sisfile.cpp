@@ -27,11 +27,16 @@
 
 #include <stdio.h>
 
-void
-SISFile::fillFrom(uchar* buf)
+SisRC
+SISFile::fillFrom(uchar* buf, off_t len)
 {
 	int ix = 0;
-	m_header.fillFrom(buf, &ix);
+	SisRC rc = m_header.fillFrom(buf, &ix, len);
+	if (rc != SIS_OK)
+		{
+		printf("Could not read header, rc = %d\n", rc);
+		return rc;
+		}
 	if (logLevel >= 2)
 		printf("Ate header, got ix = %d\n", ix);
 	int n;
@@ -42,7 +47,16 @@ SISFile::fillFrom(uchar* buf)
 	m_langRecords = new SISLangRecord[n];
 	ix = m_header.m_languagePtr;
 	for (int i = 0; i < n; ++i)
-		m_langRecords[i].fillFrom(buf, &ix);
+		{
+		if (ix >= len)
+			return SIS_TRUNCATED;
+		rc = m_langRecords[i].fillFrom(buf, &ix, len);
+		if (rc != SIS_OK)
+			{
+			printf("Problem reading language record %d, rc = %d.\n", i, rc);
+			return rc;
+			}
+		}
 
 	// Read requisites.
 	//
@@ -50,12 +64,26 @@ SISFile::fillFrom(uchar* buf)
 	m_reqRecords = new SISReqRecord[n];
 	ix = m_header.m_reqPtr;
 	for (int i = 0; i < n; ++i)
-		m_reqRecords[i].fillFrom(buf, &ix, this);
+		{
+		if (ix >= len)
+			return SIS_TRUNCATED;
+		rc = m_reqRecords[i].fillFrom(buf, &ix, len, this);
+		if (rc != SIS_OK)
+			{
+			printf("Problem reading requisite record %d, rc = %d.\n", i, rc);
+			return rc;
+			}
+		}
 
 	// Read component names, by language.
 	//
 	ix = m_header.m_componentPtr;
-	m_componentRecord.fillFrom(buf, ix, this);
+	rc = m_componentRecord.fillFrom(buf, ix, len, this);
+	if (rc != SIS_OK)
+		{
+		printf("Problem reading the name record, rc = %d.\n", rc);
+		return rc;
+		}
 
 	// Read files.
 	//
@@ -63,8 +91,18 @@ SISFile::fillFrom(uchar* buf)
 	m_fileRecords = new SISFileRecord[n];
 	ix = m_header.m_filesPtr;
 	for (int i = 0; i < n; ++i)
-		m_fileRecords[i].fillFrom(buf, &ix, this);
+		{
+		if (ix >= len)
+			return SIS_TRUNCATED;
+		rc = m_fileRecords[i].fillFrom(buf, &ix, len, this);
+		if (rc != SIS_OK)
+			{
+			printf("Problem reading file record %d, rc = %d.\n", i, rc);
+			return rc;
+			}
+		}
 
+	return SIS_OK;
 }
 
 int

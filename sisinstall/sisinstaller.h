@@ -3,6 +3,8 @@
 
 #include "sistypes.h"
 
+#include <sys/types.h>
+
 class Psion;
 class SISFile;
 class SISFileRecord;
@@ -15,9 +17,9 @@ class SISInstaller
 {
 public:
 
-	void run(SISFile* file, uchar* buf);
+	SisRC run(SISFile* file, uchar* buf, off_t len);
 
-	void run(SISFile* file, uchar* buf, SISFile* parent);
+	SisRC run(SISFile* file, uchar* buf, off_t len, SISFile* parent);
 
 	/**
 	 * Ask the user which drive to install to.

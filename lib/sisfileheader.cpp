@@ -28,9 +28,11 @@
 const int OFF_NUMBER_OF_FILES = 26;
 const int OFF_INSTALLATION_DRIVE = 28;
 
-void
-SISFileHeader::fillFrom(uchar* buf, int* base)
+SisRC
+SISFileHeader::fillFrom(uchar* buf, int* base, off_t len)
 {
+	if (*base + 68 > len)
+		return SIS_TRUNCATED;
 	uchar* start = buf + *base;
 	m_buf = buf;
 	m_uid1 = read32(start);
@@ -40,7 +42,7 @@ SISFileHeader::fillFrom(uchar* buf, int* base)
 	if (m_uid2 != 0x1000006d)
 		{
 		printf("Got bad uid2.\n");
-		exit(1);
+		return SIS_CORRUPTED;
 		}
 	if (logLevel >= 2)
 		printf("Got uid2 = %08x\n", m_uid2);
@@ -48,7 +50,7 @@ SISFileHeader::fillFrom(uchar* buf, int* base)
 	if (m_uid3 != 0x10000419)
 		{
 		printf("Got bad uid3.\n");
-		exit(1);
+		return SIS_CORRUPTED;
 		}
 	if (logLevel >= 2)
 		printf("Got uid3 = %08x\n", m_uid3);
@@ -66,7 +68,7 @@ SISFileHeader::fillFrom(uchar* buf, int* base)
 	if ((crc2 << 16 | crc1) != m_uid4)
 		{
 		printf("Got bad crc.\n");
-		exit(1);
+		return SIS_CORRUPTED;
 		}
 	m_crc = read16(start + 16);
 	m_nlangs = read16(start + 18);
@@ -108,17 +110,26 @@ SISFileHeader::fillFrom(uchar* buf, int* base)
 	m_languagePtr = read32(start + 48);
 	if (logLevel >= 2)
 		printf("Languages begin at %d\n", m_languagePtr);
+	if (m_languagePtr >= len)
+		return SIS_TRUNCATED;
 	m_filesPtr = read32(start + 52);
 	if (logLevel >= 2)
 		printf("Files begin at %d\n", m_filesPtr);
+	if (m_filesPtr >= len)
+		return SIS_TRUNCATED;
 	m_reqPtr = read32(start + 56);
 	if (logLevel >= 2)
 		printf("Requisites begin at %d\n", m_reqPtr);
+	if (m_reqPtr >= len)
+		return SIS_TRUNCATED;
 	m_unknown = read32(start + 60);
 	m_componentPtr = read32(start + 64);
 	if (logLevel >= 2)
 		printf("Components begin at %d\n", m_componentPtr);
+	if (m_componentPtr >= len)
+		return SIS_TRUNCATED;
 	*base += 68;
+	return SIS_OK;
 }
 
 void

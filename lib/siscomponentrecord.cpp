@@ -31,30 +31,44 @@ SISComponentNameRecord::~SISComponentNameRecord()
 	delete[] m_names;
 }
 
-void
-SISComponentNameRecord::fillFrom(uchar* buf, int base, SISFile* sisFile)
+SisRC
+SISComponentNameRecord::fillFrom(uchar* buf, int base, off_t len,
+								 SISFile* sisFile)
 {
+	int n = sisFile->m_header.m_nlangs;
+	if (base + 8 + n * 4 * 2)
+		return SIS_TRUNCATED;
+
 	uchar* p = buf + base;
 	int size = 0;
 
-	int n = sisFile->m_header.m_nlangs;
 	m_nameLengths = new uint32[n];
 	m_namePtrs = new uint32[n];
-	m_names = new uchar*[n];
 
 	// First read lengths.
 	//
 	for (int i = 0; i < n; ++i)
 		{
 		m_nameLengths[i] = read32(p + size);
+		if (m_nameLengths[i] > len)
+			{
+			printf("Length too large for name record %d.\n", i);
+			return SIS_TRUNCATED;
+			}
 		size += 4;
 		}
 
 	// Then read ptrs.
 	//
+	m_names = new uchar*[n];
 	for (int i = 0; i < n; ++i)
 		{
 		m_namePtrs[i] = read32(p + size);
+		if (m_namePtrs[i] + m_nameLengths[i] > len)
+			{
+			printf("Position/length too large for name record %d.\n", i);
+			return SIS_TRUNCATED;
+			}
 		size += 4;
 		if (logLevel >= 2)
 			printf("Name %d (for %s) is %.*s\n",
@@ -69,6 +83,7 @@ SISComponentNameRecord::fillFrom(uchar* buf, int base, SISFile* sisFile)
 		}
 	if (logLevel >= 1)
 		printf("%d .. %d (%d bytes): Name records\n", base, base + size, size);
+	return SIS_OK;
 }
 
 uchar*

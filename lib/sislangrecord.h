@@ -23,6 +23,8 @@
 #ifndef _SISLANGRECORD_H
 #define _SISLANGRECORD_H
 
+#include <sys/types.h>
+
 #include "sistypes.h"
 
 /**
@@ -36,7 +38,7 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	void fillFrom(uchar* buf, int* base);
+	SisRC fillFrom(uchar* buf, int* base, off_t len);
 
 	uint16 m_lang;
 };

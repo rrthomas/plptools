@@ -25,6 +25,8 @@
 
 #include "sistypes.h"
 
+#include <sys/types.h>
+
 class SISFile;
 
 /**
@@ -40,7 +42,7 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	void fillFrom(uchar* buf, int base, SISFile* sisFile);
+	SisRC fillFrom(uchar* buf, int base, off_t len, SISFile* sisFile);
 
 	/**
 	 * Return the name for the given language.

@@ -152,10 +152,16 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 				printf("Recursive sis file...\n");
 			SISFile sisFile;
 			uchar* buf2 = m_buf + fileRecord->m_filePtrs[m_fileNo];
-			sisFile.fillFrom(buf2);
+			off_t len = fileRecord->m_fileLengths[m_fileNo];
+			SisRC rc = sisFile.fillFrom(buf2, len);
+			if (rc != SIS_OK)
+				{
+				printf("Could not read contained sis file, rc = %d\n", rc);
+				break;
+				}
 			SISInstaller installer;
 			installer.setPsion(m_psion);
-			installer.run(&sisFile, buf2, m_file);
+			rc = installer.run(&sisFile, buf2, len, m_file);
 			if (0 == m_drive)
 				{
 				m_drive = sisFile.m_header.m_installationDrive;
@@ -186,14 +192,14 @@ SISInstaller::setPsion(Psion* psion)
 	m_psion = psion;
 }
 
-void
-SISInstaller::run(SISFile* file, uchar* buf)
+SisRC
+SISInstaller::run(SISFile* file, uchar* buf, off_t len)
 {
-	run(file, buf, 0);
+	return run(file, buf, len, 0);
 }
 
-void
-SISInstaller::run(SISFile* file, uchar* buf, SISFile* parent)
+SisRC
+SISInstaller::run(SISFile* file, uchar* buf, off_t len, SISFile* parent)
 {
 	int n;
 	int lang;
@@ -318,6 +324,7 @@ SISInstaller::run(SISFile* file, uchar* buf, SISFile* parent)
 	printf("Creating residual sis file %s\n", resname);
 	copyBuf(buf, firstFile, resname);
 	delete[] resname;
+	return SIS_OK;
 }
 
 void

@@ -67,12 +67,19 @@ void main(int argc, char* argv[])
 		}
 	createCRCTable();
 	SISFile sisFile;
-	sisFile.fillFrom(buf);
-	if (!dryrun)
+	SisRC rc = sisFile.fillFrom(buf, len);
+	if (rc == SIS_OK)
 		{
-		SISInstaller installer;
-		installer.setPsion(psion);
-		installer.run(&sisFile, buf);
+		if (!dryrun)
+			{
+			SISInstaller installer;
+			installer.setPsion(psion);
+			installer.run(&sisFile, buf, len);
+			}
+		}
+	else
+		{
+		printf("Could not parse the sis file.\n");
 		}
 	psion->disconnect();
 
