@@ -152,7 +152,7 @@ bool PlpPropsPlugin::supports(KFileItemList _items) {
     for (KFileItemListIterator it(_items); it.current(); ++it) {
 	KFileItem *fi = it.current();
 
-	if (fi->url().protocol() != QString::fromLatin1("psion"))
+	if (fi->url().protocol() != "psion")
 	    return false;
     }
     return true;
@@ -170,6 +170,7 @@ class PlpFileAttrPage::PlpFileAttrPagePrivate {
 
     typedef struct {
 	const char * const lbl;
+	const char * const tip;
 	const u_int32_t mask;
 	bool inverted;
 	bool direnabled;
@@ -201,24 +202,79 @@ PlpFileAttrPage::PlpFileAttrPagePrivate::PlpFileAttrPagePrivate() {
     int i;
 
     static const UIelem _generic[] = {
-	{ "Readable",  rfsv::PSI_A_READ,    false, false, false }, // Fake for S5
-	{ "Writeable", rfsv::PSI_A_RDONLY,  true,  true,  true  },
-	{ "Hidden",    rfsv::PSI_A_HIDDEN,  false, true,  true  },
-	{ "System",    rfsv::PSI_A_SYSTEM,  false, false, true  },
-	{ "Archive",   rfsv::PSI_A_ARCHIVE, false, true,  true  },
-	{ 0L,          0L,                  false, false, true  },
+	{
+	    I18N_NOOP("Readable"),
+	    I18N_NOOP("If this is checked, read permission is granted. On series 5, this cannot swiched off."),
+	    rfsv::PSI_A_READ,
+	    false, false, false
+	}, // Fake for S5
+	{
+	    I18N_NOOP("Writeable"),
+	    I18N_NOOP("If this is checked, write permission is granted."),
+	    rfsv::PSI_A_RDONLY,
+	    true,  true,  true
+	},
+	{
+	    I18N_NOOP("Hidden"),
+	    I18N_NOOP("If this is checked, the file is not shown when displaying the directory on the Psion."),
+	    rfsv::PSI_A_HIDDEN,
+	    false, true,  true
+	},
+	{
+	    I18N_NOOP("System"),
+	    I18N_NOOP("If this is checked, the file is not shown when displaying the directory on the Psion."),
+	    rfsv::PSI_A_SYSTEM,
+	    false, false, true
+	},
+	{
+	    I18N_NOOP("Archive"),
+	    I18N_NOOP("If this is checked, the file will be included in the next incremental backup."),
+	    rfsv::PSI_A_ARCHIVE,
+	    false, true,  true
+	},
+	{ 0L, 0L, 0L, false, false, true  },
     };
     static const UIelem _s3[] = {
-	{ "Executable", rfsv::PSI_A_EXEC,   false, false, true },
-	{ "Stream",     rfsv::PSI_A_STREAM, false, false, true },
-	{ "Text",       rfsv::PSI_A_TEXT,   false, false, true },
-	{ 0L,           0L,                 false, false, true },
+	{
+	    I18N_NOOP("Executable"),
+	    I18N_NOOP("If this is checked, the file can be executed on the Psion. This Attribute does not apply to directories."),
+	    rfsv::PSI_A_EXEC,
+	    false, false, true
+	},
+	{
+	    I18N_NOOP("Stream"),
+	    I18N_NOOP("If this is checked, the file is a stream. This Attribute does not apply to directories."),
+	    rfsv::PSI_A_STREAM,
+	    false, false, true
+	},
+	{
+	    I18N_NOOP("Text"),
+	    I18N_NOOP("If this is checked, the file is opened in text mode. This Attribute does not apply to directories."),
+	    rfsv::PSI_A_TEXT,
+	    false, false, true
+	},
+	{ 0L, 0L, 0L, false, false, true },
     };
     static const UIelem _s5[] = {
-	{ "Normal",     rfsv::PSI_A_NORMAL,     false, false, true },
-	{ "Temporary",  rfsv::PSI_A_TEMP,       false, false, true },
-	{ "Compressed", rfsv::PSI_A_COMPRESSED, false, false, true },
-	{ 0L,          0L,                      false, false, true },
+	{
+	    I18N_NOOP("Normal"),
+	    I18N_NOOP("If this is checked, the file is considered regular. This Attribute does not apply to directories."),
+	    rfsv::PSI_A_NORMAL,
+	    false, false, true
+	},
+	{
+	    I18N_NOOP("Temporary"),
+	    I18N_NOOP("If this is checked, the file considered temporary. This Attribute does not apply to directories."),
+	    rfsv::PSI_A_TEMP,
+	    false, false, true
+	},
+	{
+	    I18N_NOOP("Compressed"),
+	    I18N_NOOP("If this is checked, the file is stored in compressed mode. This Attribute does not apply to directories."),
+	    rfsv::PSI_A_COMPRESSED,
+	    false, false, true
+	},
+	{ 0L, 0L, 0L, false, false, true },
     };
     generic = _generic;
     s3 = _s3;
@@ -242,7 +298,7 @@ PlpFileAttrPage::PlpFileAttrPage(KPropertiesDialog *_props) {
     l = new QLabel(i18n("Path on Psion:"), d->frame, "psiPathLabel");
     mgl->addWidget(l, 0, 0);
 
-    d->psiPath = new QLabel(QString::fromLatin1("?"), d->frame, "psiPath");
+    d->psiPath = new QLabel(QString("?"), d->frame, "psiPath");
     mgl->addWidget(d->psiPath, 0, 1);
     mgl->setColStretch(1, 1);
 
@@ -253,6 +309,8 @@ PlpFileAttrPage::PlpFileAttrPage(KPropertiesDialog *_props) {
     for (i = 0; d->generic[i].lbl; i++) {
 	QString lbl = KGlobal::locale()->translate(d->generic[i].lbl);
 	d->genCb[i] = new QCheckBox(lbl, gb, d->generic[i].lbl);
+	QWhatsThis::add(d->genCb[i],
+			KGlobal::locale()->translate(d->generic[i].tip));
 	d->genCb[i]->setEnabled(false);
 	connect(d->genCb[i], SIGNAL(toggled(bool)), SLOT(slotCbToggled(bool)));
 	gl->addWidget(d->genCb[i], 0, i);
@@ -328,8 +386,6 @@ void PlpFileAttrPage::applyChanges() {
 	u_int32_t mask = d->attr ^ attr;
 	u_int32_t sattr = attr & mask;
 	u_int32_t dattr = ~sattr & mask;
-	cout << "apply: old=" << hex << d->attr << " new=" << attr << endl;
-	cout << "apply: m=" << hex << mask << " s=" << sattr << " d=" << dattr << endl;
 
 	KIO_ARGS << int(PLP_CMD_SETATTR) << sattr << dattr
 		 << d->props->item()->url().path();
@@ -398,6 +454,8 @@ void PlpFileAttrPage::slotGetSpecialFinished(KIO::Job *job) {
 	    if (isS5)
 		for (i = 0; d->s5[i].lbl; i++) {
 		    bool val = ((attr & d->s5[i].mask) != 0);
+		    QWhatsThis::add(d->specCb[i],
+				    KGlobal::locale()->translate(d->s5[i].tip));
 		    d->specCb[i]->setChecked(val);
 		    if ((!isRom) && (noDir || d->s5[i].direnabled))
 			d->specCb[i]->setEnabled(true);
@@ -407,6 +465,8 @@ void PlpFileAttrPage::slotGetSpecialFinished(KIO::Job *job) {
 		    bool val = ((attr & d->s3[i].mask) != 0);
 		    QString lbl = KGlobal::locale()->translate(d->s3[i].lbl);
 		    d->specCb[i]->setText(lbl);
+		    QWhatsThis::add(d->specCb[i],
+				    KGlobal::locale()->translate(d->s3[i].tip));
 		    d->specCb[i]->setChecked(val);
 		    if ((!isRom) && (noDir || d->s3[i].direnabled))
 			d->specCb[i]->setEnabled(true);
@@ -485,10 +545,12 @@ PlpDriveAttrPage::PlpDriveAttrPage(KPropertiesDialog *_props) {
 
     d->uidLabel = new QLabel(i18n(" "), d->gb, "uidValue");
     gl->addWidget(d->uidLabel, 2, 3);
-    QWhatsThis::add(d->freeLabel,
+    QWhatsThis::add(d->uidLabel,
 		    i18n("This shows unique ID of the drive. For ROM drives, this is always 0."));
 
     d->pie = new Pie3DWidget(d->gb, "pie");
+    QWhatsThis::add(d->pie,
+		    i18n("Here, the usage of the drive is shown in a pie diagram. The purple area shows used space, the blue area shows free space."));
 
     gl->addMultiCellWidget(d->pie, 3, 4, 1, 2);
 
@@ -539,7 +601,7 @@ bool PlpDriveAttrPage::supports(KFileItemList _items) {
 	QString path = fi->url().path(-1);
 	if (path.contains('/') != 1)
 	    return false;
-	if (fi->url().path() == QString::fromLatin1("/"))
+	if (fi->url().path() == "/")
 	    return false;
     }
     return true;
@@ -548,19 +610,19 @@ bool PlpDriveAttrPage::supports(KFileItemList _items) {
 void PlpDriveAttrPage::slotBackupClicked() {
     if (!d->driveLetter.isEmpty())
 	KRun::runCommand(
-	    QString::fromLatin1("kpsion --backup %1").arg(d->driveLetter));
+	    QString("kpsion --backup %1").arg(d->driveLetter));
 }
 
 void PlpDriveAttrPage::slotRestoreClicked() {
     if (!d->driveLetter.isEmpty())
 	KRun::runCommand(
-	    QString::fromLatin1("kpsion --restore %1").arg(d->driveLetter));
+	    QString("kpsion --restore %1").arg(d->driveLetter));
 }
 
 void PlpDriveAttrPage::slotFormatClicked() {
     if (!d->driveLetter.isEmpty())
 	KRun::runCommand(
-	    QString::fromLatin1("kpsion --format %1").arg(d->driveLetter));
+	    QString("kpsion --format %1").arg(d->driveLetter));
 }
 
 void PlpDriveAttrPage::slotSpecialFinished(KIO::Job *job) {
@@ -586,12 +648,12 @@ void PlpDriveAttrPage::slotSpecialFinished(KIO::Job *job) {
 	    }
 	    if ((*it).m_uds == KIO::UDS_CREATION_TIME) {
 		unsigned long uid = (unsigned long)((*it).m_long);
-		d->uidLabel->setText(QString::fromLatin1("%1").arg(uid, 8, 16));
+		d->uidLabel->setText(QString("%1").arg(uid, 8, 16));
 	    }
 	    if ((*it).m_uds == KIO::UDS_NAME) {
 		QString name = ((*it).m_str);
 		d->typeLabel->setText(name);
-		if (name == QString::fromLatin1("ROM")) {
+		if (name == "ROM") {
 		    d->restoreButton->setEnabled(false);
 		    d->formatButton->setEnabled(false);
 		    // Can't change anything
@@ -604,8 +666,8 @@ void PlpDriveAttrPage::slotSpecialFinished(KIO::Job *job) {
 	    }
 	}
 	if (total_found && free_found) {
-	    d->totalLabel->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(total)).arg(KGlobal::locale()->formatNumber(total, 0)));
-	    d->freeLabel->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(unused)).arg(KGlobal::locale()->formatNumber(unused, 0)));
+	    d->totalLabel->setText(QString("%1 (%2)").arg(KIO::convertSize(total)).arg(KGlobal::locale()->formatNumber(total, 0)));
+	    d->freeLabel->setText(QString("%1 (%2)").arg(KIO::convertSize(unused)).arg(KGlobal::locale()->formatNumber(unused, 0)));
 	    d->pie->addPiece(total - unused, d->usedColor);
 	    d->pie->addPiece(unused, d->freeColor);
 	}
@@ -700,6 +762,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     QWhatsThis::add(d->regSize,
 		    i18n("Here, the size of the registry data is shown."));
     d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(0, 1);
     d->g->setColStretch(1, 1);
 
     gb = new QGroupBox(i18n("Time"), d->f, "timeInfBox");
@@ -716,6 +779,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     QWhatsThis::add(d->machDST,
 		    i18n("Here, you can see, if daylight saving time is currently active on the connected device."));
     d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(0, 1);
     d->g->setColStretch(1, 1);
     box->addStretch(10);
 
@@ -747,6 +811,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     QWhatsThis::add(d->mbattMaxVoltage,
 		    i18n("This shows the maximum battery voltage."));
     d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(0, 1);
     d->g->setColStretch(1, 1);
 
     gb = new QGroupBox(i18n("Backup battery"), d->f, "bbatInfBox");
@@ -766,6 +831,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     QWhatsThis::add(d->bbattMaxVoltage,
 		    i18n("This shows the maximum backup battery voltage."));
     d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(0, 1);
     d->g->setColStretch(1, 1);
     box->addStretch(10);
 
@@ -786,6 +852,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     QWhatsThis::add(d->romProg,
 		    i18n("This shows, whether the ROM is flashable or not."));
     d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(0, 1);
     d->g->setColStretch(1, 1);
 
     gb = new QGroupBox(i18n("RAM"), d->f, "ramInfBox");
@@ -802,9 +869,10 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     QWhatsThis::add(d->ramMaxFree,
 		    i18n("This shows the size of the largest free block of the RAM."));
     d->ramDiskSz  = makeEntry(i18n("RAMDisk size:"), gb, 4);
-    QWhatsThis::add(d->ramMaxFree,
+    QWhatsThis::add(d->ramDiskSz,
 		    i18n("This shows, how much RAM is currently used for the RAMDisc."));
     d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(0, 1);
     d->g->setColStretch(1, 1);
     box->addStretch(10);
 
@@ -824,7 +892,7 @@ bool PlpMachinePage::supports(KFileItemList _items) {
     for (KFileItemListIterator it(_items); it.current(); ++it) {
 	KFileItem *fi = it.current();
 
-	if (fi->url().path() != QString::fromLatin1("/"))
+	if (fi->url().path() != "/")
 	    return false;
     }
     return true;
@@ -837,26 +905,26 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 	cout << "got machInfo" << endl;
 
 	d->machType->setText(KGlobal::locale()->translate(d->mi.machineType));
-	d->machName->setText(QString::fromLatin1(d->mi.machineName));
+	d->machName->setText(QString(d->mi.machineName));
 	// ??! None of QString's formatting methods knows about long long.
 	ostrstream s;
 	s << hex << setw(16) << d->mi.machineUID << '\0';
-	d->machUID->setText(QString::fromLatin1(s.str()));
+	d->machUID->setText(QString(s.str()));
 	d->machLang->setText(KGlobal::locale()->translate(d->mi.uiLanguage));
-	d->dispGeo->setText(QString::fromLatin1("%1x%2").arg(d->mi.displayWidth).arg(d->mi.displayHeight));
-	d->regSize->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.registrySize)).arg(KGlobal::locale()->formatNumber(d->mi.registrySize, 0)));
+	d->dispGeo->setText(QString("%1x%2").arg(d->mi.displayWidth).arg(d->mi.displayHeight));
+	d->regSize->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.registrySize)).arg(KGlobal::locale()->formatNumber(d->mi.registrySize, 0)));
 
 	QString rev;
 	rev.sprintf("%d.%02d(%d)", d->mi.romMajor, d->mi.romMinor,
 		    d->mi.romBuild);
 	d->romVersion->setText(rev);
-	d->romSize->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.romSize)).arg(KGlobal::locale()->formatNumber(d->mi.romSize, 0)));
+	d->romSize->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.romSize)).arg(KGlobal::locale()->formatNumber(d->mi.romSize, 0)));
 	d->romProg->setText(d->mi.romProgrammable ? i18n("yes") : i18n("no"));
 
-	d->ramSize->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.ramSize)).arg(KGlobal::locale()->formatNumber(d->mi.ramSize, 0)));
-	d->ramFree->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.ramFree)).arg(KGlobal::locale()->formatNumber(d->mi.ramFree, 0)));
-	d->ramMaxFree->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.ramMaxFree)).arg(KGlobal::locale()->formatNumber(d->mi.ramMaxFree, 0)));
-	d->ramDiskSz->setText(QString::fromLatin1("%1 (%2)").arg(KIO::convertSize(d->mi.ramDiskSize)).arg(KGlobal::locale()->formatNumber(d->mi.ramDiskSize, 0)));
+	d->ramSize->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramSize)).arg(KGlobal::locale()->formatNumber(d->mi.ramSize, 0)));
+	d->ramFree->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramFree)).arg(KGlobal::locale()->formatNumber(d->mi.ramFree, 0)));
+	d->ramMaxFree->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramMaxFree)).arg(KGlobal::locale()->formatNumber(d->mi.ramMaxFree, 0)));
+	d->ramDiskSz->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramDiskSize)).arg(KGlobal::locale()->formatNumber(d->mi.ramDiskSize, 0)));
 
 
 	PsiTime pt(&d->mi.time, &d->mi.tz);
@@ -868,24 +936,24 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 
 	ostrstream mbs;
 	mbs << d->mi.mainBatteryUsedTime << '\0';
-	d->mbattUsage->setText(QString::fromLatin1(mbs.str()));
+	d->mbattUsage->setText(QString(mbs.str()));
 	pt.setPsiTime(&d->mi.mainBatteryInsertionTime);
 	dt.setTime_t(pt.getTime());
 	d->mbattChanged->setText(KGlobal::locale()->formatDateTime(dt, false));
 	d->mbattStatus->setText(
 	    KGlobal::locale()->translate(d->mi.mainBatteryStatus));
-	d->mbattPower->setText(QString::fromLatin1("%1 mAs").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryUsedPower, 0)));
-	d->mbattCurrent->setText(QString::fromLatin1("%1 mA").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryCurrent, 0)));
-	d->mbattVoltage->setText(QString::fromLatin1("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryVoltage, 0)));
-	d->mbattMaxVoltage->setText(QString::fromLatin1("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryMaxVoltage, 0)));
+	d->mbattPower->setText(QString("%1 mAs").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryUsedPower, 0)));
+	d->mbattCurrent->setText(QString("%1 mA").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryCurrent, 0)));
+	d->mbattVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryVoltage, 0)));
+	d->mbattMaxVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryMaxVoltage, 0)));
 
 	ostrstream bbs;
 	bbs << d->mi.backupBatteryUsedTime << '\0';
-	d->bbattUsage->setText(QString::fromLatin1(bbs.str()));
+	d->bbattUsage->setText(QString(bbs.str()));
 	d->bbattStatus->setText(
 	    KGlobal::locale()->translate(d->mi.backupBatteryStatus));
-	d->bbattVoltage->setText(QString::fromLatin1("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryVoltage, 0)));
-	d->bbattMaxVoltage->setText(QString::fromLatin1("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryMaxVoltage, 0)));
+	d->bbattVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryVoltage, 0)));
+	d->bbattMaxVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryMaxVoltage, 0)));
     }
 }
 
@@ -935,7 +1003,7 @@ bool PlpOwnerPage::supports(KFileItemList _items) {
     for (KFileItemListIterator it(_items); it.current(); ++it) {
 	KFileItem *fi = it.current();
 
-	if (fi->url().path() != QString::fromLatin1("/"))
+	if (fi->url().path() != "/")
 	    return false;
     }
     return true;

@@ -10,12 +10,18 @@ Source0: http://download.sourceforge.net/plptools/plptools-%{version}.tar.gz
 Copyright: GPL
 Group: Networking/Utilities
 Requires: chkconfig >= 0.9
-Buildrequires: readline-devel
+Buildrequires: readline-devel kdelibs-devel >= 2.1 qt-devel >= 2.2.4
 BuildRoot: /tmp/plputils-buildroot
 
 %package devel
 Summary: Static library and includes for psion series 5 communication.
 Group: Development/Libraries
+Requires: %{name} = %{version}
+
+%package kde
+Summary: Psion support for KDE 2.1.
+Group: User Interface/Desktops
+Requires: %{name} = %{version}
 
 %description
 This package contains the programs (client and server), necessary to
@@ -31,6 +37,13 @@ psion and some other useful stuff.
 This package contains the static library and include files for building
 programs which can communicate with a psion series 5.
 
+%description kde
+This package provides support for a new protocol prefix "psion:/" for
+KDE 2.1. Any KDE application which uses KDE-conforming URLs, can access
+files on the Psion. Furthermore, a plugin for Konqueror's file-properties
+dialog provides access to Psions proprietary file attributes and information
+about the Psion's drives as well as generic machine information.
+
 %description -l de
 Dieses Packet enthält Programme zur Kommunikation mit einem Psion 5.
 Das Dateisystem des Psion wird beim Anschließen automatisch unter
@@ -44,7 +57,18 @@ bietet.
 Dieses Packet enthält die statische Bibliothek und include-Dateien
 zur Programm-Entwicklung von Kommunikations-software für den Psion 5.
 
+%description -l de kde
+Dieses Packet stellt Unterstützung für eine neues Protokoll-Präfix "psion:/"
+für KDE 2.1 bereit. Jede KDE Anwendung, die KDE-konforme URLs benutzt, kann
+damit auf die Dateien eines Psion zugreifen. Weiterhin, liefert ein Plugin
+für Konqueror's Datei-Eigenschaften-Dialog Informationen über proprietäre
+Psion-Dateiattribute und stellt Informationen zum Gerät sowie seiner
+Laufwerke zur Verfügung.
+
 %changelog
+* Thu Mar  1 2001 Fritz Elfert <fritz.elfert@to.com>
+- Added KDE sub-packages
+
 * Sat Jan 20 2001 Fritz Elfert <fritz.elfert@to.com>
 - Updated to latest version
 - Using RPM 4 (RH 7.0)
@@ -60,7 +84,7 @@ zur Programm-Entwicklung von Kommunikations-software für den Psion 5.
 %setup -q
 
 %build
-%configure
+%configure --enable-kde
 make
 
 %install
@@ -90,9 +114,16 @@ fi
 %{_sbindir}/*
 %{_mandir}/*/*
 %{_libdir}/libplp.so*
+%{_libdir}/libplp.la
 %config /etc/rc.d/init.d/psion
 
 %files devel
 %doc doc/api etc/*.spec
 %{_libdir}/libplp.a
 %{_includedir}/%{name}/*
+
+%files kde
+%{_libdir}/kio_plp.so*
+%{_libdir}/kio_plp.la
+%{_libdir}/libplpprops.so*
+%{_libdir}/libplpprops.la

@@ -25,8 +25,9 @@ plppropsFactory::plppropsFactory(QObject *parent, const char *name)
 	: KLibFactory(parent, name) {
 	s_global = new KInstance("plpprops");
 	// Install the translations
-	KGlobal::locale()->insertCatalogue(QString::fromLatin1("plptools"));
 	LIBPLP::init_libplp_i18n();
+	KGlobal::locale()->insertCatalogue(QString::fromLatin1("plptools"));
+	KGlobal::locale()->insertCatalogue(QString::fromLatin1("libplpprops"));
 }
 
 plppropsFactory::~plppropsFactory() {

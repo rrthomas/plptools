@@ -1,7 +1,7 @@
 
 SUBDIRS = de
 
-APPS = kpsion
+APPS = kpsion libplpprops
 
 merge:
 	@apps='$(APPS)'; \

@@ -1,5 +1,5 @@
 LIBTOOLFILES = conf/config.guess conf/config.sub conf/ltconfig conf/ltmain.sh
-AUTOMAKEFILES = conf/install-sh conf/missing conf/mkinstalldirs
+AUTOMAKEFILES = conf/mkinstalldirs conf/missing conf/install-sh
 CONFIGHIN = include/config.h.in
 ACLOCAL = conf/aclocal.m4
 
@@ -11,33 +11,25 @@ build: devel
 	make
 
 devel: $(LIBTOOLFILES) $(AUTOMAKEFILES)
-	aclocal -I conf/m4/plptools -I conf/m4/kde
-	autoheader
-	automake
-	make -C kde2 -f Makefile.am am_edit
 	autoconf
 	touch include/stamp-h.in
 
 dist: $(LIBTOOLFILES) $(AUTOMAKEFILES)
-	aclocal -I conf/m4/plptools -I conf/m4/kde
-	aclocal -I conf/m4/plptools -I conf/m4/kde
-	autoheader
-	automake --include-deps
-	make -C kde2 -f Makefile.am am_edit
 	autoconf
 	touch include/stamp-h.in
 	./configure --enable-kde
 	$(MAKE) dist
 
 $(ACLOCAL):
-	aclocal
+	aclocal -I conf/m4/plptools -I conf/m4/kde
 
 $(CONFIGHIN): acconfig.h
 	autoheader
 
 $(LIBTOOLFILES):
-	gettextize
-	libtoolize --copy --force
+	-gettextize
+	libtoolize
 
-$(AUTOMAKEFILES): $(CONFIGHIN)
-	-automake --add-missing --copy
+$(AUTOMAKEFILES): $(ACLOCAL) $(CONFIGHIN)
+	automake --add-missing
+	make -C kde2 -f Makefile.am am_edit

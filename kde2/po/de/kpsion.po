@@ -192,8 +192,8 @@ msgid ""
 "<QT>This erases <B>ALL</B> data on the drive(s).<BR/>Do you really want to "
 "proceed?"
 msgstr ""
-"<QT>Hierdurch werden <B>ALLE</B> Daten auf dem(den) Laufwerk(en) gelöscht.<BR/>"
-"Wollen Sie wirklich fortfahren?</QT>"
+"<QT>Hierdurch werden <B>ALLE</B> Daten auf dem(den) Laufwerk(en) "
+"gelöscht.<BR/>Wollen Sie wirklich fortfahren?</QT>"
 
 #: kpsion.cpp:611
 msgid "Backup %1% complete"
@@ -275,7 +275,8 @@ msgstr "KPsion Einstellungen"
 
 #: wizards.cpp:28 wizards.cpp:411
 msgid "Click this button to continue with the next page."
-msgstr "Betätigen Sie diese Schaltfläche um mit der nächsten Seite fortzufahren."
+msgstr ""
+"Betätigen Sie diese Schaltfläche um mit der nächsten Seite fortzufahren."
 
 #: wizards.cpp:30 wizards.cpp:413
 msgid "Click this button, to go to a previous page."
@@ -415,15 +416,16 @@ msgid ""
 "to<UL><LI>specify the serial port to use.</LI><LI>specify the baud "
 "rate</LI><LI>have permission to use the specified port</LI></UL></QT>"
 msgstr ""
-"<QT>Wenn beim Programmstart keine Verbindung aufgebaut werden kann, wird <B>KPsion</B> "
-"in regelmäßigen Abständen versuchen erneut eine Verbinung aufzubauen. Bitte geben Sie den"
-"Zeitintervall an, nach dem ein erneuter Aufbau der Verbindung versucht werden soll. Wenn Sie "
-"diese automatische Funktionalität nicht wünschen, dann setzen Sie bitte den Intervall auf 0. "
-"Weiterhin kann <B>KPsion</B> versuchen, den hierzu benötigten Prozess ncpd zu starten falls "
-"dieser nicht schon läuft. Um dies zu ermöglichen, müssen Sie"
-"<UL><LI>den zu benutzenden seriellen Port angeben.</LI>"
-"<LI>die Schnittstellengeschwindigkeit angeben</LI>"
-"<LI>die Rechte zum Öffnen des angegebenen Ports besitzen</LI></UL></QT>"
+"<QT>Wenn beim Programmstart keine Verbindung aufgebaut werden kann, wird "
+"<B>KPsion</B> in regelmäßigen Abständen versuchen erneut eine Verbinung "
+"aufzubauen. Bitte geben Sie denZeitintervall an, nach dem ein erneuter "
+"Aufbau der Verbindung versucht werden soll. Wenn Sie diese automatische "
+"Funktionalität nicht wünschen, dann setzen Sie bitte den Intervall auf 0. "
+"Weiterhin kann <B>KPsion</B> versuchen, den hierzu benötigten Prozess ncpd "
+"zu starten falls dieser nicht schon läuft. Um dies zu ermöglichen, müssen "
+"Sie<UL><LI>den zu benutzenden seriellen Port angeben.</LI><LI>die "
+"Schnittstellengeschwindigkeit angeben</LI><LI>die Rechte zum Öffnen des "
+"angegebenen Ports besitzen</LI></UL></QT>"
 
 #: wizards.cpp:201
 msgid "&Connection retry interval (sec.)"
@@ -481,11 +483,12 @@ msgid ""
 "which lets you assing a Name for it. After that, i suggest performing a full "
 "Backup.<BR/>Please click <B>Finish</B> now.</QT>"
 msgstr ""
-"<QT>Das war's!<BR/>Als nächstes wird <B>KPsion</B> gestartet und wenn Ihr Psion "
-"schon angeschlossen ist und auch seine Kommunikation eingeschaltet ist (benutzen sie dazu "
-"<B>Strg-T</B> auf Systemebene), dann wird <B>KPsion</B> einen weiteren Dialog ähnlich "
-"wie Diesen zur Eingabe des Namens präsentieren. Hinterher empfehle ich, als Erstes eine "
-"Komplett-Sicherung durchzuführen.<BR/>Bitte betätigen Sie nun die Schaltfläche "
+"<QT>Das war's!<BR/>Als nächstes wird <B>KPsion</B> gestartet und wenn Ihr "
+"Psion schon angeschlossen ist und auch seine Kommunikation eingeschaltet ist "
+"(benutzen sie dazu <B>Strg-T</B> auf Systemebene), dann wird <B>KPsion</B> "
+"einen weiteren Dialog ähnlich wie Diesen zur Eingabe des Namens "
+"präsentieren. Hinterher empfehle ich, als Erstes eine Komplett-Sicherung "
+"durchzuführen.<BR/>Bitte betätigen Sie nun die Schaltfläche "
 "<B>Abschließen</B>.</QT>"
 
 #: wizards.cpp:274
@@ -508,14 +511,16 @@ msgstr ""
 "starten.<BR/>Wollen Sie das Programm wirklich verlassen?</QT>"
 
 #: wizards.cpp:347
-msgid "<QT>The folder <B>%1</B> does <B>not</B> exist.<BR/>Shall it be created?</QT>"
+msgid ""
+"<QT>The folder <B>%1</B> does <B>not</B> exist.<BR/>Shall it be created?</QT>"
 msgstr ""
 "<QT>Der Ordner <B>%1</B> existiert <B>nicht</B>.<BR/>Soll er angelegt "
 "werden?</QT>"
 
 #: wizards.cpp:352
 msgid "<QT>The specified folder<BR/><B>%1</B><BR/>could <B>not</B> be created"
-msgstr "<QT>Der angegebene Ordner<BR/><B>%1</B><BR/>konnte nicht angelegt werden"
+msgstr ""
+"<QT>Der angegebene Ordner<BR/><B>%1</B><BR/>konnte nicht angelegt werden"
 
 #: wizards.cpp:357
 msgid ""
@@ -569,9 +574,9 @@ msgid ""
 "aborted and next time you connect this Psion again, <B>KPsion</B> will run "
 "this setup again.</QT>"
 msgstr ""
-"<QT>Wenn Sie diese Schaltfläche betätigen, werden die Einstellungen für den neuen "
-"Psion nicht gespeichert. Beim nächsten Verbindungsaufbau mit diesem Psion wird "
-"<B>KPsion</B> dann erneut diesen Dialog präsentieren.</QT>"
+"<QT>Wenn Sie diese Schaltfläche betätigen, werden die Einstellungen für "
+"den neuen Psion nicht gespeichert. Beim nächsten Verbindungsaufbau mit "
+"diesem Psion wird <B>KPsion</B> dann erneut diesen Dialog präsentieren.</QT>"
 
 #: wizards.cpp:424
 msgid ""
@@ -598,8 +603,8 @@ msgid ""
 "<QT>Please select the Drive(s), you want to be backed up when running in "
 "unattended backup mode.</QT>"
 msgstr ""
-"<QT>Bitte wählen sie die Laufwerke aus, die bei einer automatischen Sicherung gesichert"
-"werden sollen.</QT>"
+"<QT>Bitte wählen sie die Laufwerke aus, die bei einer automatischen "
+"Sicherung gesichertwerden sollen.</QT>"
 
 #: wizards.cpp:466
 msgid "Available drives"
@@ -618,8 +623,8 @@ msgid ""
 "<QT>The name <B>%1</B> is already assigned to another machine.<BR/>Please "
 "choose a different name.</QT>"
 msgstr ""
-"<QT>Der Name <B>%1</B> wurde bereits einem anderen Gerät zugewiesen.<BR/>Bitte "
-"wählen Sie einen anderen Namen.</QT>"
+"<QT>Der Name <B>%1</B> wurde bereits einem anderen Gerät "
+"zugewiesen.<BR/>Bitte wählen Sie einen anderen Namen.</QT>"
 
 #: wizards.moc.cpp:43 wizards.moc.cpp:48
 msgid "FirstTimeWizard"
@@ -628,4 +633,3 @@ msgstr "FirstTimeWizard"
 #: wizards.moc.cpp:112 wizards.moc.cpp:117
 msgid "NewPsionWizard"
 msgstr "NewPsionWizard"
-
