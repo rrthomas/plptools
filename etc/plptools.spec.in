@@ -10,7 +10,7 @@ Source0: http://download.sourceforge.net/plptools/plptools-%{version}.tar.gz
 Copyright: GPL
 Group: Networking/Utilities
 Requires: chkconfig >= 0.9
-Buildrequires: libreadline
+Buildrequires: readline
 BuildRoot: /tmp/plputils-buildroot
 
 %package devel
