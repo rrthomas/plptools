@@ -5,3 +5,9 @@ man pages
 getty-style locking of the serial-line in a manner that it can be
 used with other devices/programs without stopping/starting ncpd
 all the time.
+
+Sisinstall:
+ - Use rpm-style arguments.
+ - Check requisite records.
+ - More clever residual sis file generation/truncation.
+

@@ -163,6 +163,9 @@
  soon will add these. Backup, restore and format is done by a separate
  standalone program "KPsion".
 
+ Sisinstall installs a sis file on the connected psion.  It is in very
+ early development, but it seems to work fine for simple packages.
+
 Have fun.
  -Fritz
 
