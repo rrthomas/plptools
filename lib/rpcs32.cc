@@ -117,9 +117,8 @@ getMachineInfo(machineInfo &mi)
     mi.backupBatteryStatus = (enum rpcs::batterystates)a.getDWord(108);
     mi.backupBatteryVoltage = a.getDWord(112);
     mi.backupBatteryMaxVoltage = a.getDWord(116);
-    mi.backupBatteryUsedTime.tv_low = a.getDWord(124);
-    mi.backupBatteryUsedTime.tv_high = a.getDWord(128);
-
+    mi.externalPowerUsedTime.tv_low = a.getDWord(124);
+    mi.externalPowerUsedTime.tv_high = a.getDWord(128);
     mi.externalPower = (a.getDWord(120) != 0);
 
     mtCacheS5mx |= 8;

@@ -155,8 +155,8 @@ public:
 	Enum<batterystates> backupBatteryStatus;
 	unsigned long backupBatteryVoltage;
 	unsigned long backupBatteryMaxVoltage;
-	psi_timeval backupBatteryUsedTime;
 
+	psi_timeval externalPowerUsedTime;
 	bool externalPower;
     } machineInfo;
 

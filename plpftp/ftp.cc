@@ -857,7 +857,10 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    cout << _("  Status:       ") << mi.backupBatteryStatus << endl;
 	    cout << _("  Voltage:      ") << mi.backupBatteryVoltage << " mV" << endl;
 	    cout << _("  Max. voltage: ") << mi.backupBatteryMaxVoltage << " mV" << endl;
-	    cout << _("  Used for:     ") << mi.backupBatteryUsedTime << endl;
+	    cout << _("External power:") << endl;
+	    cout << _("  Supplied:     ")
+		 << (mi.externalPower ? _("yes") : _("no")) << endl;
+	    cout << _("  Used for:     ") << mi.externalPowerUsedTime << endl;
 	    continue;
 	}
 	if (!strcmp(argv[0], "runrestore") && (argc == 2)) {

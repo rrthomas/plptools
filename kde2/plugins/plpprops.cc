@@ -713,9 +713,11 @@ public:
     QLabel *mbattMaxVoltage;
 
     QLabel *bbattStatus;
-    QLabel *bbattUsage;
     QLabel *bbattVoltage;
     QLabel *bbattMaxVoltage;
+
+    QLabel *epowerSupplied;
+    QLabel *epowerUsage;
 
     rpcs::machineInfo mi;
 };
@@ -818,19 +820,27 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     box->addWidget(gb);
     d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
 			   KDialog::spacingHint());
-    d->bbattUsage      = makeEntry(i18n("Usage time:"), gb, 1);
-    QWhatsThis::add(d->bbattUsage,
-		    i18n("This shows the accumulated time of running on backup battery power."));
-    d->bbattStatus     = makeEntry(i18n("Status:"), gb, 2);
+    d->bbattStatus     = makeEntry(i18n("Status:"), gb, 1);
     QWhatsThis::add(d->bbattStatus,
 		    i18n("This shows current status of the backup battery."));
-    d->bbattVoltage    = makeEntry(i18n("Voltage:"), gb, 3);
+    d->bbattVoltage    = makeEntry(i18n("Voltage:"), gb, 2);
     QWhatsThis::add(d->bbattVoltage,
 		    i18n("This shows the current backup battery voltage."));
-    d->bbattMaxVoltage = makeEntry(i18n("Max. voltage:"), gb, 4);
+    d->bbattMaxVoltage = makeEntry(i18n("Max. voltage:"), gb, 3);
     QWhatsThis::add(d->bbattMaxVoltage,
 		    i18n("This shows the maximum backup battery voltage."));
     d->g->addRowSpacing(0, KDialog::marginHint());
+    d->g->setColStretch(0, 1);
+    d->g->setColStretch(1, 1);
+
+    gb = new QGroupBox(i18n("External power"), d->f, "epowerInfBox");
+    box->addWidget(gb);
+    d->epowerSupplied   = makeEntry(i18n("Supplied:"), gb, 1);
+    QWhatsThis::add(d->epowerSupplied,
+		    i18n("This shows whether external power is currently supplied."));
+    d->epowerUsage      = makeEntry(i18n("Usage time:"), gb, 2);
+    QWhatsThis::add(d->epowerUsage,
+		    i18n("This shows the accumulated time of running on external power."));
     d->g->setColStretch(0, 1);
     d->g->setColStretch(1, 1);
     box->addStretch(10);
@@ -876,8 +886,6 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     d->g->setColStretch(1, 1);
     box->addStretch(10);
 
-//    KIO_ARGS << int(PLP_CMD_MACHINFO);
-//    PlpMachInfoJob *job = new PlpMachInfoJob(packedArgs);
     KURL u("psion:/0:_MachInfo");
     KIO::TransferJob *job = KIO::get(u, false, false);
 
@@ -950,13 +958,16 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 	d->mbattVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryVoltage, 0)));
 	d->mbattMaxVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryMaxVoltage, 0)));
 
-	ostrstream bbs;
-	bbs << d->mi.backupBatteryUsedTime << '\0';
-	d->bbattUsage->setText(QString(bbs.str()));
 	d->bbattStatus->setText(
 	    KGlobal::locale()->translate(d->mi.backupBatteryStatus));
 	d->bbattVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryVoltage, 0)));
 	d->bbattMaxVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryMaxVoltage, 0)));
+
+	ostrstream bbs;
+	bbs << d->mi.externalPowerUsedTime << '\0';
+	d->epowerUsage->setText(QString(bbs.str()));
+	d->epowerSupplied->setText(
+	    d->mi.externalPower ? i18n("Yes") : i18n("No"));
     }
 }
 
