@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
 	exit(0);
     }
     KUniqueApplication app;
-    app.disableSessionManagement();
 
     TopLevel *toplevel = new TopLevel();
 

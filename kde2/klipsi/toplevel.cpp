@@ -57,6 +57,8 @@ TopLevel::TopLevel()
     inSetting = false;
     mustListen = true;
     lastClipData = "";
+    state = ENABLED;
+    constate = DISCONNECTED;
 
     menu->insertTitle(kapp->miniIcon(), i18n("Klipsi - Psion Clipboard"));
     menu->insertSeparator();
@@ -66,43 +68,73 @@ TopLevel::TopLevel()
     connect(clip, SIGNAL(dataChanged()), this, SLOT(slotClipboardChanged()));
     connect(timer, SIGNAL(timeout()), this, SLOT(slotTimer()));
 
-    icon = KGlobal::iconLoader()->loadIcon("klipsi", KIcon::Toolbar);
-    resize(icon.size());
+    icons[ENABLED][DISCONNECTED] =
+	KGlobal::iconLoader()->loadIcon("klipsi", KIcon::Toolbar);
+    icons[ENABLED][CONNECTED] =
+	KGlobal::iconLoader()->loadIcon("klipsi_c", KIcon::Toolbar);
+    icons[DISABLED][DISCONNECTED] =
+	KGlobal::iconLoader()->loadIcon("klipsi_d", KIcon::Toolbar);
+    icons[DISABLED][CONNECTED] =
+	KGlobal::iconLoader()->loadIcon("klipsi_cd", KIcon::Toolbar);
+
+    icon = &icons[state][constate];
+    resize(icon->size());
+
     setBackgroundMode(X11ParentRelative);
 
     int interval = checkConnection() ? 500 : 5000;
     timer->start(interval, true);
+
+
 }
 
 TopLevel::~TopLevel()
 {
+    closeConnection();
+    delete timer;
+    delete menu;
+}
+
+void TopLevel::
+closeConnection() {
     if (rf)
 	delete(rf);
     if (rc)
 	delete(rc);
     if (rff)
 	delete rff;
-
-    delete timer;
-    delete menu;
+    rfsvSocket = 0;
+    rclipSocket = 0;
+    rf = 0;
+    rc = 0;
+    rff = 0;
+    mustListen = true;
+    constate = DISCONNECTED;
+    repaint();
 }
 
 void TopLevel::
 mousePressEvent(QMouseEvent *e)
 {
-    if ( e->button() == LeftButton || e->button() == RightButton )
+    if (e->button() == RightButton)
         showPopupMenu(menu);
+    if (e->button() == LeftButton) {
+	state = (state == ENABLED) ? DISABLED : ENABLED;
+	repaint();
+    }
 }
 
 void TopLevel::
 paintEvent(QPaintEvent *)
 {
     QPainter p(this);
-    int x = (width() - icon.width()) / 2;
-    int y = (height() - icon.height()) / 2;
+    icon = &icons[state][constate];
+
+    int x = (width() - icon->width()) / 2;
+    int y = (height() - icon->height()) / 2;
     if ( x < 0 ) x = 0;
     if ( y < 0 ) y = 0;
-    p.drawPixmap(x , y, icon);
+    p.drawPixmap(x , y, *icon);
     p.end();
 }
 
@@ -121,17 +153,24 @@ slotTimer()
 	return;
     }
 
+    if (state == DISABLED) {
+	timer->start(500, true);
+	return;
+    }
+
     if (mustListen) {
 	res = rc->sendListen();
-	if (res != rfsv::E_PSI_GEN_NONE)
-	    cerr << "sendListen: " << res << endl;
-	else
+	if (res != rfsv::E_PSI_GEN_NONE) {
+	    closeConnection();
+	    timer->start(5000, true);
+	    return;
+	} else
 	    mustListen = false;
     }
 
     if ((res = rc->checkNotify()) != rfsv::E_PSI_GEN_NONE) {
 	if (res != rfsv::E_PSI_FILE_EOF) {
-	    cerr << "checkNotify: " << res << endl;
+	    closeConnection();
 	    timer->start(5000, true);
 	    return;
 	}
@@ -145,7 +184,7 @@ slotTimer()
 void TopLevel::
 slotClipboardChanged()
 {
-    if (mustListen || inSetting)
+    if (mustListen || inSetting || (state == DISABLED))
 	return;
 
     Enum<rfsv::errs> res;
@@ -169,7 +208,7 @@ slotClipboardChanged()
     inSend = false;
 
     if (res != rfsv::E_PSI_GEN_NONE)
-	cerr << "notify: " << res << endl;
+	closeConnection();
 }
 
 void TopLevel::
@@ -257,8 +296,8 @@ putClipData(char *data) {
     if (res == rfsv::E_PSI_GEN_NONE) {
 	while ((res = rc->checkNotify()) != rfsv::E_PSI_GEN_NONE) {
 	    if (res != rfsv::E_PSI_FILE_EOF) {
-		cerr << "waitN: " << res << endl;
 		rf->fclose(fh);
+		closeConnection();
 		return;
 	    }
 	}
@@ -284,7 +323,7 @@ putClipData(char *data) {
 	rf->fclose(fh);
 	rf->fsetattr(CLIPFILE, 0x20, 0x07);
     } else
-	cerr << "replaceFile:" << res << endl;
+	closeConnection();
 }
 
 void TopLevel::
@@ -355,11 +394,11 @@ getClipData() {
 		}
 
 	    } else
-		cerr << "fopen: " << res << endl;
+		closeConnection();
 	    free(buf);
 	}
     } else
-	cerr << "fgetattr: " << res << endl;
+	closeConnection();
 
     if (!clipData.isEmpty()) {
 	inSetting = true;
@@ -385,7 +424,6 @@ checkConnection() {
     if (!rfsvSocket) {
 	rfsvSocket = new ppsocket();
 	if (!rfsvSocket->connect(NULL, sockNum)) {
-	    cerr << "rclip: could not connect to ncpd" << endl;
 	    delete rfsvSocket;
 	    rfsvSocket = 0;
 	    return false;
@@ -395,7 +433,6 @@ checkConnection() {
     if (!rclipSocket) {
 	rclipSocket = new ppsocket();
 	if (!rclipSocket->connect(NULL, sockNum)) {
-	    cerr << "rclip: could not connect to ncpd" << endl;
 	    delete rclipSocket;
 	    rclipSocket = 0;
 	    return false;
@@ -409,10 +446,16 @@ checkConnection() {
 	rf = rff->create(true);
 
     if (rf) {
-	if (!rc)
+	if (!rc) {
 	    rc = new rclip(rclipSocket);
-	if (rc->initClipbd() == rfsv::E_PSI_GEN_NONE)
-	    return true;
+	    if (rc->initClipbd() == rfsv::E_PSI_GEN_NONE) {
+		KNotifyClient::event("connected");
+		constate = CONNECTED;
+		repaint();
+		return true;
+	    } else
+		closeConnection();
+	}
     }
     return false;
 }

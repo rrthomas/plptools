@@ -121,7 +121,7 @@ sendListen() {
     if (sendCommand(RCLIP_LISTEN))
 	return rfsv::E_PSI_GEN_NONE;
     else
-	return rfsv::E_PSI_GEN_FAIL;
+	return status;
 }
 
 Enum<rfsv::errs> rclip::

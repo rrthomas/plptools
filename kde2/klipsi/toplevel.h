@@ -62,10 +62,21 @@ private slots:
     void slotMenuSelected(int);
 
 private:
+    enum {
+	ENABLED = 0,
+	DISABLED = 1,
+    } states;
+
+    enum {
+	DISCONNECTED = 0,
+	CONNECTED = 1,
+    } constates;
+
     void psiText2ascii(char *, int);
     void ascii2PsiText(char *, int);
     void putClipData(char *);
     void getClipData();
+    void closeConnection();
     bool checkConnection();
 
     QClipboard  *clip;
@@ -79,10 +90,13 @@ private:
     rfsvfactory *rff;
 
     QString     lastClipData;
-    QPixmap     icon;
+    QPixmap     *icon;
+    QPixmap     icons[2][2];
     bool        inSend;
     bool        inSetting;
     bool        mustListen;
+    int         state;
+    int         constate;
 };
 
 #endif
