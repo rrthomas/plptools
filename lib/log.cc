@@ -15,6 +15,7 @@ int logbuf::overflow(int c) {
 		*ptr = '\0';
 		syslog(level, buf);
 		ptr = buf;
+		len = 0;
 		return 0;
 	}
 	if ((len + 2) >= sizeof(buf))
