@@ -31,6 +31,9 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "ncp.h"
 #include "bufferstore.h"
@@ -208,7 +211,17 @@ main(int argc, char **argv)
 					syslog(LOG_INFO,
 					       "daemon started. Listening at 127.0.0.1:%d, using device %s\n",
 					       sockNum, serialDevice);
-					close(0); close(1); close(2);
+					setsid();
+					chdir("/");
+					int devnull =
+					    open("/dev/null", O_RDWR, 0);
+					if (devnull != -1) {
+					    dup2(devnull, STDIN_FILENO);
+					    dup2(devnull, STDOUT_FILENO);
+					    dup2(devnull, STDERR_FILENO);
+					    if (devnull > 2)
+						close(devnull);
+					}
 				}
 				ncp *a = new ncp(serialDevice, baudRate, iow);
 				int numScp = 0;
