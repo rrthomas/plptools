@@ -12,17 +12,17 @@ all:
 strictbuild: devel
 	rm -f config.cache
 	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-kde --enable-strict
-	make
+	${MAKE}
 
 build: devel
 	rm -f config.cache
 	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-kde
-	make
+	${MAKE}
 
 buildnox: devel
 	rm -f config.cache
 	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug
-	make
+	${MAKE}
 
 devel: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	autoconf
@@ -60,4 +60,4 @@ $(GETTEXT): $(GETTEXTDEP)
 
 $(AUTOMAKEFILES): $(ACLOCAL) $(CONFIGHIN)
 	automake --add-missing
-	make -C kde2 -f Makefile.am am_edit
+	${MAKE} -C kde2 -f Makefile.am am_edit
