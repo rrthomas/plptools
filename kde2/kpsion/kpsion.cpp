@@ -37,6 +37,7 @@
 #include <kiconview.h>
 #include <kmessagebox.h>
 #include <kfileitem.h>
+#include <kprocess.h>
 
 #include <qwhatsthis.h>
 #include <qtimer.h>
@@ -112,11 +113,15 @@ KPsionMainWindow::KPsionMainWindow()
 
     config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_SERIALDEV));
     ncpdDevice = config->readEntry(pcfg.getOptionName(
-	KPsionConfig::OPT_SERIALDEV));
+	KPsionConfig::OPT_SERIALDEV), "off");
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_NCPDPATH));
+    ncpdPath = config->readEntry(pcfg.getOptionName(
+	KPsionConfig::OPT_NCPDPATH), "ncpd");
 
     config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_SERIALSPEED));
-    ncpdSpeed = config->readNumEntry(
-	pcfg.getOptionName(KPsionConfig::OPT_SERIALSPEED));
+    ncpdSpeed = config->readEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_SERIALSPEED), "115200");
 
     QWhatsThis::add(view, i18n(
 			"<qt>Here, you see your Psion's drives.<br/>"
@@ -183,8 +188,6 @@ setupActions() {
 			    actionCollection());
     KStdAction::showStatusbar(this, SLOT(slotToggleStatusbar()),
 			      actionCollection());
-//    KStdAction::saveOptions(this, SLOT(slotSaveOptions()),
-//			    actionCollection());
     KStdAction::preferences(this, SLOT(slotPreferences()),
 			    actionCollection());
     new KAction(i18n("Start &Format"), 0L, 0, this,
@@ -525,6 +528,28 @@ queryClose() {
 }
 
 void KPsionMainWindow::
+startupNcpd() {
+    if (ncpdDevice == "off")
+	return;
+    KProcess proc;
+    ppsocket *testSocket;
+
+    testSocket = new ppsocket();
+    if (!testSocket->connect(NULL, 7501)) {
+	time_t start_time = time(0L) + 2;
+
+	statusBar()->changeItem(i18n("Starting ncpd daemon ..."),
+				STID_CONNECTION);
+	proc << ncpdPath;
+	proc << "-s" << ncpdDevice << "-b" << ncpdSpeed;
+	proc.start(KProcess::DontCare);
+	while ((time(0L) < start_time) && (!testSocket->connect(NULL, 7501)))
+	    kapp->processEvents();
+    }
+    delete testSocket;
+}
+
+void KPsionMainWindow::
 tryConnect() {
     if (shuttingDown || connected)
 	return;
@@ -540,6 +565,7 @@ tryConnect() {
     if (rfsvSocket)
 	delete rpcsSocket;
 
+    startupNcpd();
     rfsvSocket = new ppsocket();
     statusBar()->changeItem(i18n("Connecting ..."), STID_CONNECTION);
     if (!rfsvSocket->connect(NULL, 7501)) {
@@ -718,6 +744,7 @@ void KPsionMainWindow::
 doBackup() {
     backupRunning = true;
     switchActions();
+    QStringList processDrives;
     toBackup.clear();
 
     // Collect list of files to backup
@@ -749,6 +776,7 @@ doBackup() {
 	    progressLocalPercent = -1;
 	    progress->setValue(0);
 	    collectFiles(drv);
+	    processDrives += drv;
 	}
     }
     emit setProgressText(i18n("%1 files need backup").arg(backupSize));
@@ -765,7 +793,6 @@ doBackup() {
 	return;
     }
 
-    // statusBar()->message(i18n("Backup"));
     progressCount = 0;
     progressTotal = backupSize;
     progressPercent = -1;
@@ -783,7 +810,6 @@ doBackup() {
 	    statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
 				    STID_CONNECTION);
 	    KMessageBox::error(this, i18n("Could not create backup folder %1").arg(archiveName));
-	    // statusBar()->clear();
 	    backupRunning = false;
 	    switchActions();
 	    return;
@@ -887,13 +913,19 @@ doBackup() {
 
     backupTgz->close();
     delete backupTgz;
+    emit enableProgressText(false);
+    emit setProgress(0);
+
     if (badBackup)
 	::unlink(archiveName.latin1());
     else {
 	QString newName = archiveName;
 	newName.replace(QRegExp("\\.tmp\\.gz$"), ".tar.gz");
 	// Rename Tarfile to its final name;
-	::rename(archiveName.latin1(), newName.latin1());
+	if (::rename(archiveName.latin1(), newName.latin1()) != 0)
+	    KMessageBox::sorry(this, i18n("<QT>Could not rename backup archive from<BR/><B>%1</B> to<BR/><B>%2</B></QT>").arg(archiveName).arg(newName));
+	else
+	    removeOldBackups(processDrives);
     }
 
     backupRunning = false;
@@ -903,6 +935,120 @@ doBackup() {
     emit enableProgressText(false);
     emit setProgress(0);
     statusBar()->message(i18n("Backup done"), 2000);
+}
+
+class Barchive {
+public:
+    Barchive()
+	: n(""), d(0) {}
+    Barchive(const QString &name, time_t date)
+	: n(name), d(date) {}
+
+    QString name() const { return n; }
+    time_t date() const { return d; }
+    bool operator==(const Barchive &a) { return (a.n == n); }
+private:
+    QString n;
+    time_t d;
+};
+
+typedef QValueList<Barchive>ArchList;
+
+void KPsionMainWindow::
+removeOldBackups(QStringList &drives) {
+
+    KConfig *config = kapp->config();
+    KPsionConfig pcfg;
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_BACKUPGEN));
+    int bgen = config->readNumEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_BACKUPGEN));
+
+    if (bgen == 0)
+	return;
+
+    statusBar()->changeItem(i18n("Removing old backups ..."), STID_CONNECTION);
+    QString bdir(backupDir);
+    bdir += "/";
+    bdir += getMachineUID();
+    QDir d(bdir);
+    kapp->processEvents();
+    const QFileInfoList *fil =
+	d.entryInfoList("*.tar.gz", QDir::Files|QDir::Readable, QDir::Name);
+    QFileInfoListIterator it(*fil);
+    QFileInfo *fi;
+    ArchList alist;
+    Barchive *a;
+
+    // Build a list of full-backups sorted by date
+    while ((fi = it.current())) {
+	kapp->processEvents();
+
+	KTarGz tgz(fi->absFilePath());
+	const KTarEntry *te;
+
+	tgz.open(IO_ReadOnly);
+	te = tgz.directory()->entry("KPsionFullIndex");
+	if (te && (!te->isDirectory())) {
+	    for (QStringList::Iterator d = drives.begin(); d != drives.end();
+		 d++) {
+		const KTarEntry *de = tgz.directory()->entry(*d);
+		if (de && (de->isDirectory())) {
+		    Barchive a(tgz.fileName(), te->date());
+		    if (!alist.contains(a)) {
+			if (alist.isEmpty() || (alist.first().date()>te->date()))
+			    alist.prepend(a);
+			else
+			    alist.append(a);
+			}
+		}
+	    }
+	}
+	tgz.close();
+	++it;
+    }
+
+    // Remove entries from the beginning of the list if there are more than
+    // bgen entries. This leaves at most bgen of the youngest backups in the
+    // list.
+    while (alist.count() > bgen) {
+	Barchive r = alist.first();
+	alist.remove(r);
+    }
+
+    // Finally iterate over all backups and delete those which are older
+    // than the first entry in alist.
+
+    (void)it.toFirst();
+
+    while ((fi = it.current())) {
+	kapp->processEvents();
+
+	KTarGz tgz(fi->absFilePath());
+	const KTarEntry *te;
+	bool valid = false;
+	bool del = false;
+
+	tgz.open(IO_ReadOnly);
+	te = tgz.directory()->entry("KPsionFullIndex");
+	if (te && (!te->isDirectory()))
+	    valid = true;
+	else {
+	    te = tgz.directory()->entry("KPsionIncrementalIndex");
+	    if (te && (!te->isDirectory()))
+		valid = true;
+	}
+	if (valid) {
+	    Barchive a(tgz.fileName(), te->date());
+	    if (alist.isEmpty() ||
+		((!alist.contains(a)) && (te->date() < alist.first().date())))
+		del = true;
+	}
+	tgz.close();
+	if (del)
+	    ::remove(fi->absFilePath().data());
+	++it;
+    }
 }
 
 bool KPsionMainWindow::

@@ -36,6 +36,7 @@ KPsionConfig::KPsionConfig() {
     optionNames.insert(OPT_CONNRETRY, QString("Connection/Retry"));
     optionNames.insert(OPT_SERIALDEV, QString("Connection/Device"));
     optionNames.insert(OPT_SERIALSPEED, QString("Connection/Speed"));
+    optionNames.insert(OPT_NCPDPATH, QString("Connection/NcpdPath"));
     optionNames.insert(OPT_UIDS, QString("Psion/MachineUIDs"));
     optionNames.insert(OPT_MACHNAME, QString("Psion/Name_%1"));
     optionNames.insert(OPT_BACKUPDRIVES, QString("Psion/BackupDrives_%1"));
@@ -49,6 +50,7 @@ KPsionConfig::KPsionConfig() {
     defaults.insert(DEF_SERIALDEV, QString("0"));
     defaults.insert(DEF_SERIALSPEED, QString("4"));
     defaults.insert(DEF_BACKUPGEN, QString("3"));
+    defaults.insert(DEF_NCPDPATH, QString("ncpd"));
 }
 
 const QString KPsionConfig::

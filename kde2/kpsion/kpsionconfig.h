@@ -47,6 +47,7 @@ public:
 	OPT_DRIVES = 10,
 	OPT_LASTFULL = 11,
 	OPT_LASTINC = 12,
+	OPT_NCPDPATH = 13,
     };
 
     enum cfgDefaults {
@@ -57,6 +58,7 @@ public:
 	DEF_SERIALDEV = 4,
 	DEF_SERIALSPEED = 5,
 	DEF_BACKUPGEN = 6,
+	DEF_NCPDPATH = 13,
     };
 
     KPsionConfig();

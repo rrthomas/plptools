@@ -114,7 +114,6 @@ rfsv::~rfsv() {
 
 void rfsv::reconnect(void)
 {
-    //skt->closeSocket();
     skt->reconnect();
     serNum = 0;
     reset();

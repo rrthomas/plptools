@@ -101,6 +101,8 @@ private:
     void setDriveName(const char dchar, QString dname);
     void doFormat(QString drive);
     void updateBackupStamps();
+    void startupNcpd();
+    void removeOldBackups(QStringList &drives);
 
     rfsv *plpRfsv;
     rpcs *plpRpcs;
@@ -121,6 +123,8 @@ private:
     QString machineName;
     QString statusMsg;
     QString ncpdDevice;
+    QString ncpdSpeed;
+    QString ncpdPath;
     QString progressTotalText;
     bool S5mx;
     bool backupRunning;
@@ -136,7 +140,6 @@ private:
     bool quitImmediately;
     int reconnectTime;
     int nextTry;
-    int ncpdSpeed;
     unsigned long long machineUID;
     PlpDir toBackup;
     unsigned long backupSize;
