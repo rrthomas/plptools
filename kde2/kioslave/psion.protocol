@@ -1,0 +1,11 @@
+[Protocol]
+exec=kio_plp
+protocol=psion
+input=none
+output=filesystem
+listing=Name,Type,Size,Date,Access
+reading=true
+writing=true
+makedir=true
+deleting=true
+moving=true
