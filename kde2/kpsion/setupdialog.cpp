@@ -272,7 +272,7 @@ SetupDialog::SetupDialog(QWidget *parent, rfsv *plpRfsv, rpcs *plpRpcs)
     nameEdit = new KLineEdit(page3, "nameEdit");
     grid->addWidget(nameEdit, 1, 1);
     l->setBuddy(nameEdit);
-    QWhatsThis::add(l, i18n(
+    QWhatsThis::add(nameEdit, i18n(
 	"<QT>You can change the name of the machine here. The name "
 	"is not used internally but only provided for display purposes.</QT>"));
 

@@ -116,7 +116,12 @@ needs to be able to write to the system wide KDE directories.</para>
 <chapter id="using-kpsion">
 <title>Using &kpsion;</title>
 
-<para>Usage of &kpsion; is easy. The syntax is one of the following:</para>
+<para>
+Usage of &kpsion; is easy. Normally, you start &kpsion; using the menu entry
+in the Utilities section of the K-Menu.
+
+You also can start kpsion from the shell. The syntax is one of the following:
+</para>
 
     <cmdsynopsis>
       <command>kpsion</command>
@@ -183,6 +188,124 @@ This option starts format of the specified <replaceable>DRIVE</replaceable>.
 
 </chapter>
 
+<chapter id="commands">
+<title>Command reference</title>
+
+<sect1 id="kpsion-mainwindow">
+<title>The main &kpsion; window</title>
+<para>
+<screenshot>
+<screeninfo>&kpsion; mainwindow.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="toplevel.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>&kpsion; mainwindow</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+When a Psion PDA is connected, the main window shows its drives in the
+central icon view. By clicking on a drive-icon, you can toggle its selection.
+If any drive is selected, the entries in the File menu and the toolbar buttons
+are enabled. The most common <guimenu>actions</guimenu> are accessible via
+toolbar buttons. These are:</para>
+<para>
+<itemizedlist>
+<listitem><para>
+<guiicon>
+  <inlinemediaobject>
+    <imageobject>
+      <imagedata fileref="psion_backup.png" format="PNG">
+    </imageobject>
+  </inlinemediaobject>
+</guiicon> Full backup.
+</para></listitem>
+<listitem><para>
+<guiicon>
+  <inlinemediaobject>
+    <imageobject>
+      <imagedata fileref="psion_restore.png" format="PNG">
+    </imageobject>
+  </inlinemediaobject>
+</guiicon> Restore.
+</para></listitem>
+</itemizedlist>
+</para>
+
+<sect2><title>The File Menu</title><para><variablelist>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>b</keycap></keycombo>
+</shortcut>
+<guimenu>File</guimenu>
+<guimenuitem>Start Full Backup</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+Starts a <action>full backup</action> of selected drives.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>i</keycap></keycombo>
+</shortcut>
+<guimenu>File</guimenu>
+<guimenuitem>Start Incremental Backup</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+Starts an <action>incremental backup</action> of selected drives.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>r</keycap></keycombo>
+</shortcut>
+<guimenu>File</guimenu>
+<guimenuitem>Start Restore</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+Starts <action>restore</action> of selected drives.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>f</keycap></keycombo>
+</shortcut>
+<guimenu>File</guimenu>
+<guimenuitem>Start Format</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+Starts <action>formatting</action> of selected drives.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>q</keycap></keycombo>
+</shortcut>
+<guimenu>File</guimenu>
+<guimenuitem>Quit</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+<action>Quits</action> &kpsion;.
+</para></listitem>
+</varlistentry>
+
+</variablelist></para></sect2>
+
+</sect1>
+
+</chapter>
+
 <chapter id="Configuration">
 <title>Configuration</title>
 
@@ -216,6 +339,7 @@ directory of your choice by clicking on the Browse button. &kpsion; creates
 a that directory if it does not yet exist. Of course, you need the permission
 to do so.
 </para>
+<para></para>
 </sect2>
 
 <sect2>
@@ -245,6 +369,7 @@ A backup generation consists of a full backup plus eventually made incremental
 backups. If a backup is completed sucessfully, &kpsion; will check, if there
 are more backup generations available and delete older backup generations.
 </para>
+<para></para>
 </sect2>
 
 <sect2>
@@ -268,6 +393,124 @@ ncpd daemon running, it is also possible to start this daemon on the fly if it
 is not running. For this, you need to have permissions to use the specified
 port. 
 </para>
+<para></para>
+</sect2>
+
+</sect1>
+
+<sect1 id="newpsion">
+<title>New Psion connection</title>
+
+<para>
+When &kpsion; connects to a Psion, it retrieves the PDA's unique machine ID and
+verifies, if this PDA has been connected before. If the connected Psion has never
+been connected to &kpsion; before, a wizard dialog is shown which lets
+you assign a name for that Psion and specify a set of drives which should be
+backed up when running in unattended backup mode.
+</para>
+
+<sect2>
+<title>Psion Name</title>
+<para>
+<screenshot>
+<screeninfo>Step one. psion name.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="newpsionwizard-1.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Setting a psion name</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+The name of the new Psion is not used by &kpsion; internally but is used for
+displaying the machine's name when connected.
+</para>
+<para></para>
+</sect2>
+
+<sect2>
+<title>Specifying backup drives</title>
+<para>
+<screenshot>
+<screeninfo>Step two. specifying backup drives.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="newpsionwizard-2.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Specifying backup drives</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+Usually, you should select all drives except the ROM drive. The ROM drive
+can be backed up, but - of course - can not be restored.
+</para>
+<para></para>
+</sect2>
+</sect1>
+
+<sect1 id="settings">
+<title>Settings</title>
+
+<para>
+All settings, configured using the First time wizard and New Psion wizard
+can be changed at any time using the Settings dialog. The Settings dialog
+consists of three tabs:
+</para>
+
+<sect2>
+<title>Backup</title>
+<para>
+<screenshot>
+<screeninfo>Setup, Backup.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="settings-backup.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Settings, Backup</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+</para>
+<para></para>
+</sect2>
+
+<sect2>
+<title>Connection</title>
+<para>
+<screenshot>
+<screeninfo>Settings, Connection.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="settings-connection.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Settings, Connection</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+</para>
+<para></para>
+</sect2>
+
+<sect2>
+<title>Machines</title>
+<para>
+<screenshot>
+<screeninfo>Settings, Machines.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="settings-machines.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Settings, Machines</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+</para>
+<para></para>
 </sect2>
 
 </sect1>
@@ -282,8 +525,8 @@ port.
 
 <chapter id="faq">
 <title>Questions and Answers</title>
+
 &reporting.bugs;
-&updating.documentation;
  
 <qandaset id="faqlist">
 <qandaentry>
@@ -320,5 +563,6 @@ Local Variables:
 mode: sgml
 sgml-omittag: nil
 sgml-shorttag: t
+sgml-set-face: t
 End:
 -->
