@@ -1395,6 +1395,10 @@ sub tag_DOCFILES ()
     }
     goto nodocs if (!$files);        # Nothing to do
 
+    if ($files =~ /(^| )index\.docbook\.in($| )/) {
+    	$files =~ s/\.in//;
+    }
+
     if ($files =~ /(^| )index\.docbook($| )/) {
       
       my $lines = "";
