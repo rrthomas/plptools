@@ -275,7 +275,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	if (!once)
 	    getCommand(argc, argv);
 
-	if (!strcmp(argv[0], "help")) {
+	if ((!strcmp(argv[0], "help")) || (!strcmp(argv[0], "?"))) {
 	    usage();
 	    continue;
 	}
@@ -356,7 +356,11 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    if ((res = a.fgetmtime(f1, mtime)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else
-		cout << mtime << endl;
+		cout << mtime << "(" << hex
+		     << setw(8) << setfill('0') << mtime.getPsiTimeHi()
+		     << ":"
+		     << setw(8) << setfill('0') << mtime.getPsiTimeLo()
+		     << ")" << endl;
 	    continue;
 	}
 	if (!strcmp(argv[0], "sattr") && (argc == 3)) {
@@ -423,7 +427,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			    cout << (char) ('A' + i) << "     " <<
 				hex << setw(4) << setfill('0') << drive.getMediaType() << " " <<
 				setw(12) << setfill(' ') << setiosflags(ios::left) <<
-				drive.getName() << resetiosflags(ios::left) << dec << setw(9) <<
+				drive.getName().c_str() << resetiosflags(ios::left) << dec << setw(9) <<
 				drive.getSize() << setw(9) << drive.getSpace() << "  " << setw(8) << setfill('0') << hex <<
 				drive.getUID() << endl;
 		    }
@@ -971,14 +975,12 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 
 #if HAVE_LIBREADLINE
 #if (READLINE_VERSION >= 402)
-#define NULL_COMPLETION_RETTYPE char*
-#define NULL_COMPLETION_RETVAL ""
-#define FUNCAST(f) (CPFunction *)f
+#define FUNCAST(f) f
+#define CPFUNCAST(f) f
 #define MATCHFUNCTION rl_completion_matches
 #else
-#define NULL_COMPLETION_RETTYPE int
-#define NULL_COMPLETION_RETVAL 0
 #define FUNCAST(f) (Function *)f
+#define CPFUNCAST(f) (CPPFunction *)f
 #define MATCHFUNCTION completion_matches
 #endif
 
@@ -987,7 +989,7 @@ static char *all_commands[] = {
     "dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
     "del", "rm", "mkdir", "rmdir", "prompt", "bye", "cp", "volname",
     "ps", "kill", "killsave", "runrestore", "run", "machinfo",
-    "ownerinfo", NULL
+    "ownerinfo", "help", NULL
 };
 
 static char *localfile_commands[] = {
@@ -1003,7 +1005,7 @@ static long maskAttr;
 static char cplPath[1024];
 
 static char*
-filename_generator(char *text, int state)
+filename_generator(const char *text, int state)
 {
     static int len;
     string tmp;
@@ -1040,7 +1042,7 @@ filename_generator(char *text, int state)
 }
 
 static char *
-command_generator(char *text, int state)
+command_generator(const char *text, int state)
 {
     static int idx, len;
     char *name;
@@ -1057,20 +1059,25 @@ command_generator(char *text, int state)
     return NULL;
 }
 
-static NULL_COMPLETION_RETTYPE
-null_completion() {
-    return NULL_COMPLETION_RETVAL;
+#if (READLINE_VERSION >= 402)
+static char * null_completion(const char *, int) {
+    return "";
 }
+#else
+static int null_completion() {
+    return 0;
+}
+#endif
 
 static char **
-do_completion(char *text, int start, int end)
+do_completion(const char *text, int start, int end)
 {
     char **matches = NULL;
 
     rl_completion_entry_function = FUNCAST(null_completion);
     rl_completion_append_character = ' ';
     if (start == 0)
-	matches = MATCHFUNCTION(text, cmdgen_ptr);
+	matches = MATCHFUNCTION(text, command_generator);
     else {
 	int idx = 0;
 	char *name;
@@ -1098,7 +1105,7 @@ do_completion(char *text, int start, int end)
 		maskAttr = rfsv::PSI_A_DIR;
 	}
 
-	matches = MATCHFUNCTION(text, fnmgen_ptr);
+	matches = MATCHFUNCTION(text, filename_generator);
     }
     return matches;
 }
@@ -1110,8 +1117,10 @@ initReadline(void)
 #if HAVE_LIBREADLINE
     rl_readline_name = "plpftp";
     rl_completion_entry_function = FUNCAST(null_completion);
-    rl_attempted_completion_function = (CPPFunction *)do_completion;
+    rl_attempted_completion_function = CPFUNCAST(do_completion);
+#if (READLINE_VERSION < 402)
     rlcrap_setpointers(command_generator, filename_generator);
+#endif
 #endif
 }
 
