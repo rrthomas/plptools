@@ -248,7 +248,7 @@ perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 
 %post kde
 KONQRC=`kde-config --expandvars --install config`/konquerorrc
-if if test -f $KONQRC && grep -q '\[Notification Messages\]' $KONQRC ; then
+if test -f $KONQRC && grep -q '\[Notification Messages\]' $KONQRC ; then
 	cp $KONQRC $KONQRC.$$
 	cat $KONQRC.$$ | grep -v "askSaveinode/x-psion-drive=No" | sed \
 		-e '/\[Notification Messages\]/a\' \
