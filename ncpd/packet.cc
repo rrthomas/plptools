@@ -500,11 +500,8 @@ linkFailed()
 	}
 	serialStatus = arg;
     }
-    if (((arg & TIOCM_CTS) == 0)
-#ifndef sun
-	|| ((arg & TIOCM_DSR) == 0)
-#endif
-	) {
+    // TODO: Check for a solution on Solaris.
+    if ((arg & TIOCM_DSR) == 0) {
 	failed = true;
     }
     if ((verbose & PKT_DEBUG_LOG) && lastFatal)
