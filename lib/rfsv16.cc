@@ -272,10 +272,11 @@ fgeteattr(const char * const name, PlpDirent &e)
 	else
 	    p = realName.c_str();
 	e.name = p;
-	e.attr = a.getWord(2);
+	e.attr = attr2std((long)a.getWord(2));
 	e.size = a.getDWord(4);
 	e.time = PsiTime(a.getDWord(8));
 	e.UID  = PlpUID(0,0,0);
+	e.attrstr = string(attr2String(e.attr));
 	return res;
     }
     cerr << "fgeteattr: Unknown response (" << name << ") " << a <<endl;
