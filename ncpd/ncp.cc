@@ -54,7 +54,7 @@ ncp::ncp(const char *fname, int baud, IOWatch & iow)
     protocolVersion = PV_SERIES_5;
 
     // init channels
-    for (int i = 0; i < maxLinks(); i++)
+    for (int i = 0; i < MAX_CHANNELS_PSION; i++)
 	channelPtr[i] = NULL;
 }
 
@@ -67,13 +67,11 @@ ncp::~ncp()
 	    b2.addByte(remoteChanList[i]);
 	    controlChannel(i, NCON_MSG_CHANNEL_DISCONNECT, b2);
 	}
-	delete channelPtr[i];
 	channelPtr[i] = NULL;
     }
     controlChannel(0, NCON_MSG_NCP_END, b);
     delete l;
     delete channelPtr;
-    delete messageList;
     delete remoteChanList;
 }
 
@@ -87,7 +85,6 @@ reset() {
     for (int i = 0; i < maxLinks(); i++) {
 	if (channelPtr[i])
 	    channelPtr[i]->terminateWhenAsked();
-	delete channelPtr[i];
 	channelPtr[i] = NULL;
     }
     failed = false;
@@ -423,7 +420,6 @@ disconnect(int channel)
     channelPtr[channel]->terminateWhenAsked();
     if (verbose & NCP_DEBUG_LOG)
 	cout << "ncp: disconnect: channel=" << channel << endl;
-    delete channelPtr[channel];
     channelPtr[channel] = NULL;
     bufferStore b;
     b.addByte(remoteChanList[channel]);
