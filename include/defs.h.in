@@ -1,0 +1,33 @@
+#ifndef _defs_h_
+#define _defs_h_
+
+#define MTAB_PATH	"@MTAB@"
+#ifdef linux
+# define MTAB_TMP	"@MTAB@~"
+#else
+# define MTAB_TMP	"@MTAB@.p3nfsd"
+#endif
+
+#define DDEV		"@DDEV@"
+
+#ifdef _IBMR2
+# define DONT_UPDATE_MTAB /* The mount table is obtained from the kernel (!?) */
+#endif
+
+#define DUSER "root"
+
+#ifndef DDIR
+# define DDIR "/psion.stand/mnt"
+#endif
+
+#ifndef PSIONHOSTNAME
+# define PSIONHOSTNAME "localhost"
+#endif
+
+/* See CHANGES for comment */
+#ifdef linux
+#define NO_WRITE_SELECT
+#endif
+
+#include "config.h"
+#endif

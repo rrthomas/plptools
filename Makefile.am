@@ -1,0 +1,7 @@
+#
+# $Id$
+#
+SUBDIRS = lib nfsd
+EXTRA_DIST = COPYING README TODO INSTALL
+AUTOMAKE_OPTIONS = foreign
+

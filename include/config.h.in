@@ -1,0 +1,29 @@
+/* include/config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+#undef VERSION 
+
+#undef PACKAGE
+
+/* Define if you have the <stdlib.h> header file.  */
+#undef HAVE_STDLIB_H
+
+/* Define if you have the <sys/errno.h> header file.  */
+#undef HAVE_SYS_ERRNO_H
+
+/* Define if you have the <sys/ioctl.h> header file.  */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define if you have the <sys/ttold.h> header file.  */
+#undef HAVE_SYS_TTOLD_H
+
+/* Define if you have the bsd library (-lbsd).  */
+#undef HAVE_LIBBSD
+
+/* Define if you have the nsl library (-lnsl).  */
+#undef HAVE_LIBNSL
+
+/* Define if you have the rpcsoc library (-lrpcsoc).  */
+#undef HAVE_LIBRPCSOC
+
+/* Define if you have the socket library (-lsocket).  */
+#undef HAVE_LIBSOCKET
