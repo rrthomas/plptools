@@ -49,7 +49,7 @@ public:
     * Constructor.
     * Create an instance, presetting all thre uid values.
     */
-    PlpUID(const long u1, const long u2, const long u3);
+    PlpUID(const u_int32_t u1, const u_int32_t u2, const u_int32_t u3);
 
     /**
     * Retrieve a UID value.
@@ -57,7 +57,7 @@ public:
     * @param idx The index of the desired UID. Range must be (0..2),
     *            otherwise an assertion is triggered.
     */
-    long operator[](int idx);
+    u_int32_t operator[](int idx);
 
 private:
     long uid[3];
@@ -83,7 +83,7 @@ public:
     /**
     * Default constructor
     */
-    PlpDirent() : size(0), attr(0), name(""), time(0L), attrstr("") { };
+    PlpDirent(); 
 
     /**
     * A copy constructor.
@@ -92,6 +92,12 @@ public:
     * @param d The object to be used as initializer.
     */
     PlpDirent(const PlpDirent &d);
+
+    /**
+    * Initializing Constructor
+    */
+    PlpDirent(const u_int32_t size, const u_int32_t attr, const u_int32_t tHi,
+	      const u_int32_t tLo, const char * const name);
 
     /**
     * Default destructor.
@@ -103,14 +109,14 @@ public:
     *
     * @returns The file size in bytes.
     */
-    long getSize();
+    u_int32_t getSize();
 
     /**
     * Retrieves the file attributes of a directory entry.
     *
     * @returns The generic attributes ( @ref rfsv:file_attribs ).
     */
-    long getAttr();
+    u_int32_t getAttr();
 
     /**
     * Retrieves the UIDs of a directory entry.
@@ -120,7 +126,7 @@ public:
     *
     * @returns The selected UID or 0 if the index is out of range.
     */
-    long getUID(int uididx);
+    u_int32_t getUID(int uididx);
 
     /**
     * Retrieves the @ref PlpUID object of a directory entry.
@@ -172,8 +178,8 @@ public:
     friend ostream &operator<<(ostream &o, const PlpDirent &e);
 
 private:
-    long    size;
-    long    attr;
+    u_int32_t size;
+    u_int32_t attr;
     PlpUID  UID;
     PsiTime time;
     string  attrstr;

@@ -30,7 +30,7 @@ dist-hook:
 	$(MAKE) -C $(distdir)/kde2 -f Makefile.am am_edit
 
 kdoc:
-	kdoc -d $(TMPDEST)doc/api -n libplp $(TMPDEST)lib/*.h
+	kdoc -d $(TMPDEST)doc/api -n libplp --strip-h-path $(TMPDEST)lib/*.h
 
 specfile:
 	sed -e "s/_VERSION_/$(VERSION)/" < $(TMPDEST)etc/plptools.spec.in \

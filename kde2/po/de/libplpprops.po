@@ -31,8 +31,8 @@ msgid ""
 "If this is checked, read permission is granted. On series 5, this cannot "
 "swiched off."
 msgstr ""
-"Wird dieser Schalter aktiviert, so wird die Berechtigung zum Lesen erteilt. Auf einem Serie 5 "
-"kann dieser Schalter <B>nicht</B> abgeschaltet weden."
+"Wird dieser Schalter aktiviert, so wird die Berechtigung zum Lesen erteilt. "
+"Auf einem Serie 5 kann dieser Schalter <B>nicht</B> abgeschaltet weden."
 
 #: plpprops.cc:212
 msgid "Writeable"
@@ -40,7 +40,9 @@ msgstr "Schreiben"
 
 #: plpprops.cc:213
 msgid "If this is checked, write permission is granted."
-msgstr "Ist dieser Schalter aktiviert, so wird die Berechtigung zum Schreiben erteilt."
+msgstr ""
+"Ist dieser Schalter aktiviert, so wird die Berechtigung zum Schreiben "
+"erteilt."
 
 #: plpprops.cc:218
 msgid "Hidden"
@@ -51,8 +53,8 @@ msgid ""
 "If this is checked, the file is not shown when displaying the directory on "
 "the Psion."
 msgstr ""
-"Ist dieser Schalter aktiviert, so wird die Datei bei der Anzeige des Ordners auf dem Psion nicht "
-"angezeigt."
+"Ist dieser Schalter aktiviert, so wird die Datei bei der Anzeige des Ordners "
+"auf dem Psion nicht angezeigt."
 
 #: plpprops.cc:224
 msgid "System"
@@ -63,8 +65,11 @@ msgid "Archive"
 msgstr "Archiv"
 
 #: plpprops.cc:231
-msgid "If this is checked, the file will be included in the next incremental backup."
-msgstr "Ist dieser Schalter aktiviert, so wird die Datei in die nächste inkrementelle Sicherung einbezogen."
+msgid ""
+"If this is checked, the file will be included in the next incremental backup."
+msgstr ""
+"Ist dieser Schalter aktiviert, so wird die Datei in die nächste "
+"inkrementelle Sicherung einbezogen."
 
 #: plpprops.cc:239
 msgid "Executable"
@@ -75,8 +80,8 @@ msgid ""
 "If this is checked, the file can be executed on the Psion. This Attribute "
 "does not apply to directories."
 msgstr ""
-"Ist dieser Schalter aktiviert, so kann die Datei auf dem Psion ausgeführt werden. Dieses "
-"Attribut ist nicht auf Ordner anwendbar."
+"Ist dieser Schalter aktiviert, so kann die Datei auf dem Psion ausgeführt "
+"werden. Dieses Attribut ist nicht auf Ordner anwendbar."
 
 #: plpprops.cc:245
 msgid "Stream"
@@ -87,8 +92,8 @@ msgid ""
 "If this is checked, the file is a stream. This Attribute does not apply to "
 "directories."
 msgstr ""
-"Ist dieser Schalter aktiviert, so ist die Datei ein Stream. Dieses "
-"Attribut ist nicht auf Ordner anwendbar."
+"Ist dieser Schalter aktiviert, so ist die Datei ein Stream. Dieses Attribut "
+"ist nicht auf Ordner anwendbar."
 
 #: plpprops.cc:251
 msgid "Text"
@@ -99,8 +104,8 @@ msgid ""
 "If this is checked, the file is opened in text mode. This Attribute does not "
 "apply to directories."
 msgstr ""
-"Ist dieser Schalter aktiviert, so wird die Datei im Text-Modus geöffnet. Dieses "
-"Attribut ist nicht auf Ordner anwendbar."
+"Ist dieser Schalter aktiviert, so wird die Datei im Text-Modus geöffnet. "
+"Dieses Attribut ist nicht auf Ordner anwendbar."
 
 #: plpprops.cc:260
 msgid "Normal"
@@ -111,8 +116,8 @@ msgid ""
 "If this is checked, the file is considered regular. This Attribute does not "
 "apply to directories."
 msgstr ""
-"Ist dieser Schalter aktiviert, so wird die Datei als normal angesehen. Dieses Attribut is nicht "
-"auf Ordner anwendbar."
+"Ist dieser Schalter aktiviert, so wird die Datei als normal angesehen. "
+"Dieses Attribut is nicht auf Ordner anwendbar."
 
 #: plpprops.cc:266
 msgid "Temporary"
@@ -123,8 +128,8 @@ msgid ""
 "If this is checked, the file considered temporary. This Attribute does not "
 "apply to directories."
 msgstr ""
-"Ist dieser Schalter aktiviert, so wird die Datei als temporär angesehen. Dieses Attribut is nicht "
-"auf Ordner anwendbar."
+"Ist dieser Schalter aktiviert, so wird die Datei als temporär angesehen. "
+"Dieses Attribut is nicht auf Ordner anwendbar."
 
 #: plpprops.cc:272
 msgid "Compressed"
@@ -135,8 +140,8 @@ msgid ""
 "If this is checked, the file is stored in compressed mode. This Attribute "
 "does not apply to directories."
 msgstr ""
-"Ist dieser Schalter aktiviert, so wird die Datei komprimiert gespeichert. Dieses Attribut is nicht "
-"auf Ordner anwendbar."
+"Ist dieser Schalter aktiviert, so wird die Datei komprimiert gespeichert. "
+"Dieses Attribut is nicht auf Ordner anwendbar."
 
 #: plpprops.cc:293
 msgid "Psion &Attributes"
@@ -238,7 +243,8 @@ msgid "Format"
 msgstr "Formatieren"
 
 #: plpprops.cc:575
-msgid "Click here, to format this drive. This launches KPsion to perform that task."
+msgid ""
+"Click here, to format this drive. This launches KPsion to perform that task."
 msgstr ""
 "Klicken Sie hier, um dieses Laufwerk zu formatieren. Zu diesem Zweck wird "
 "KPsion gestartet."
@@ -295,7 +301,8 @@ msgstr "Anzeigeformat:"
 
 #: plpprops.cc:756
 msgid "Here, the display geometry of the connected device is shown."
-msgstr "Hier sehen Sie die Größe der Anzeigeeinheit des angeschlossenen Geräts."
+msgstr ""
+"Hier sehen Sie die Größe der Anzeigeeinheit des angeschlossenen Geräts."
 
 #: plpprops.cc:757
 msgid "Registry size:"
@@ -413,7 +420,8 @@ msgstr "Sicherungs-Batterie"
 
 #: plpprops.cc:816
 msgid "This shows the accumulated time of running on backup battery power."
-msgstr "Hier wird die aufsummierte Nutzungszeit der Sicherungsbatterie angezeigt."
+msgstr ""
+"Hier wird die aufsummierte Nutzungszeit der Sicherungsbatterie angezeigt."
 
 #: plpprops.cc:819
 msgid "This shows current status of the backup battery."
@@ -491,7 +499,8 @@ msgstr "RAMDisk Größe:"
 
 #: plpprops.cc:864
 msgid "This shows, how much RAM is currently used for the RAMDisc."
-msgstr "Hier wird angezeigt, wieviel Speicher gerade von der RAMDisk belegt wird."
+msgstr ""
+"Hier wird angezeigt, wieviel Speicher gerade von der RAMDisk belegt wird."
 
 #: plpprops.cc:912 plpprops.cc:925
 msgid "yes"
@@ -511,5 +520,5 @@ msgstr "Psion &Eigner"
 
 #: plpprops.cc:977
 msgid "This shows the owner's information of the connected device."
-msgstr "Hier wird die Eigentümer-Information des angeschlossenen Geräts angezeigt."
-
+msgstr ""
+"Hier wird die Eigentümer-Information des angeschlossenen Geräts angezeigt."

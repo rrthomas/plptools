@@ -3,7 +3,6 @@
  *
  * This file is part of plptools.
  *
- *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -21,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#include <plpdirent.h>
+#include "plpdirent.h"
 #include <stream.h>
 #include <iomanip>
 
@@ -29,14 +28,18 @@ PlpUID::PlpUID() {
     memset(uid, 0, sizeof(uid));
 }
 
-PlpUID::PlpUID(const long u1, const long u2, const long u3) {
+PlpUID::PlpUID(const u_int32_t u1, const u_int32_t u2, const u_int32_t u3) {
     uid[0] = u1; uid[1] = u2; uid[2] = u3;
 }
 
-long PlpUID::
+u_int32_t PlpUID::
 operator[](int idx) {
     assert ((idx > -1) && (idx < 3));
     return uid[idx];
+}
+
+PlpDirent::PlpDirent()
+    : size(0), attr(0), name(""), time(0L), attrstr("") {
 }
 
 PlpDirent::PlpDirent(const PlpDirent &e) {
@@ -48,17 +51,28 @@ PlpDirent::PlpDirent(const PlpDirent &e) {
     attrstr = e.attrstr;
 }
 
-long PlpDirent::
+PlpDirent::PlpDirent(const u_int32_t _size, const u_int32_t _attr,
+		     const u_int32_t tHi, const u_int32_t tLo,
+		     const char * const _name) {
+    size = _size;
+    attr = _attr;
+    time = PsiTime(tHi, tLo);
+    UID  = PlpUID();
+    name = _name;
+    attrstr = "";
+}
+
+u_int32_t PlpDirent::
 getSize() {
     return size;
 }
 
-long PlpDirent::
+u_int32_t PlpDirent::
 getAttr() {
     return attr;
 }
 
-long PlpDirent::
+u_int32_t PlpDirent::
 getUID(int uididx) {
     if ((uididx >= 0) && (uididx < 4))
 	return UID[uididx];

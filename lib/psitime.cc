@@ -50,7 +50,7 @@ PsiTime::PsiTime(psi_timeval *_ptv, psi_timezone *_ptz) {
     psi2unix();
 }
 
-PsiTime::PsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo) {
+PsiTime::PsiTime(const u_int32_t _ptvHi, const u_int32_t _ptvLo) {
     ptv.tv_high = _ptvHi;
     ptv.tv_low = _ptvLo;
     ptzValid = false;
@@ -106,7 +106,7 @@ void PsiTime::setPsiTime(psi_timeval *_ptv) {
     psi2unix();
 }
 
-void PsiTime::setPsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo) {
+void PsiTime::setPsiTime(const u_int32_t _ptvHi, const u_int32_t _ptvLo) {
     ptv.tv_high = _ptvHi;
     ptv.tv_low = _ptvLo;
     psi2unix();
@@ -132,11 +132,11 @@ psi_timeval &PsiTime::getPsiTimeval(void) {
     return ptv;
 }
 
-const unsigned long PsiTime::getPsiTimeLo(void) {
+const u_int32_t PsiTime::getPsiTimeLo(void) {
     return ptv.tv_low;
 }
 
-const unsigned long PsiTime::getPsiTimeHi(void) {
+const u_int32_t PsiTime::getPsiTimeHi(void) {
     return ptv.tv_high;
 }
 
@@ -168,7 +168,7 @@ ostream &operator<<(ostream &s, const PsiTime &t) {
 
 static unsigned long long
 evalOffset(psi_timezone ptz, time_t time, bool valid) {
-    unsigned long long offset = 0;
+    u_int64_t offset = 0;
 
     if (valid) {
 	offset = ptz.utc_offset;
@@ -204,7 +204,7 @@ evalOffset(psi_timezone ptz, time_t time, bool valid) {
 }
 
 void PsiTime::psi2unix(void) {
-    unsigned long long micro = ptv.tv_high;
+    u_int64_t micro = ptv.tv_high;
     micro = (micro << 32) | ptv.tv_low;
 
     /* Substract Psion's idea of UTC offset */
@@ -216,7 +216,7 @@ void PsiTime::psi2unix(void) {
 }
 
 void PsiTime::unix2psi(void) {
-    unsigned long long micro = utv.tv_sec * 1000000 + utv.tv_usec;
+    u_int64_t micro = utv.tv_sec * 1000000 + utv.tv_usec;
 
     /* Add Psion's idea of UTC offset */
     micro += evalOffset(ptz, utv.tv_sec, ptzValid);

@@ -29,6 +29,7 @@
 
 #include <sys/time.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #include <ostream.h>
 #include <intl.h>
@@ -45,7 +46,7 @@ typedef struct psi_timeval_t {
      */
     friend ostream &operator<<(ostream &o, const psi_timeval_t &ptv) {
 	ostream::fmtflags old = o.flags();
-	unsigned long long micro = ptv.tv_high;
+	u_int64_t micro = ptv.tv_high;
 	micro = (micro << 32) | ptv.tv_low;
 	micro /= 1000000;
 	int s = micro % 60;
@@ -73,11 +74,11 @@ typedef struct psi_timeval_t {
     /**
     * The lower 32 bits
     */
-    unsigned long tv_low;
+    u_int32_t tv_low;
     /**
     * The upper 32 bits
     */
-    unsigned long tv_high;
+    u_int32_t tv_high;
 } psi_timeval;
 
 /**
@@ -151,10 +152,10 @@ public:
     /**
     * Contructs a new instance.
     *
-    * @param _ptvHi The high 16 bits of a Psion time value for initialization.
-    * @param _ptvLo The low 16 bits of a Psion time value for initialization.
+    * @param _ptvHi The high 32 bits of a Psion time value for initialization.
+    * @param _ptvLo The low 32 bits of a Psion time value for initialization.
     */
-    PsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo);
+    PsiTime(const u_int32_t _ptvHi, const u_int32_t _ptvLo);
 
     /**
     * Constructs a new instance, initializing to now.
@@ -184,7 +185,7 @@ public:
     * @param _ptvHi The high 32 bits of a Psion time.
     * @param _ptvLo The low 32 bits of a Psion time.
     */
-    void setPsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo);
+    void setPsiTime(const u_int32_t _ptvHi, const u_int32_t _ptvLo);
 
     /**
     * Sets the Psion time zone of this instance.
@@ -244,7 +245,7 @@ public:
     * @returns The instance's current time as lower 32 bits of
     * a Psion struct psi_timeval_t.
     */
-    const unsigned long getPsiTimeLo(void);
+    const u_int32_t getPsiTimeLo(void);
 
     /**
     * Retrieves the instance's current value
@@ -253,7 +254,7 @@ public:
     * @returns The instance's current time as upper 32 bits of
     * a Psion struct psi_timeval_t.
     */
-    const unsigned long getPsiTimeHi(void);
+    const u_int32_t getPsiTimeHi(void);
 
     /**
     * Prints the instance's value in human readable format.

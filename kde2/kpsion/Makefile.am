@@ -12,7 +12,8 @@ lib_LTLIBRARIES = libkpsion.la
 bin_PROGRAMS	= kpsion
 
 libkpsion_la_LDFLAGS = $(LIBDEBUG) $(all_libraries) -module -version-info $(LIBVERSION)
-libkpsion_la_SOURCES = kpsion.cpp setupdialog.cpp wizards.cpp
+libkpsion_la_SOURCES = kpsion.cpp setupdialog.cpp wizards.cpp \
+	statusbarprogress.cpp
 libkpsion_la_LIBADD = -L$(top_srcdir)/lib -lplp $(LIB_KFILE)
 
 kpsion_SOURCES	= main.cpp
