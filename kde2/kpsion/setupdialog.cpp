@@ -348,6 +348,9 @@ slotMachineChanged(int idx) {
 
 void SetupDialog::
 slotDeleteMachine() {
+    KPsionConfig pcfg;
+    KConfig *config = kapp->config();
+
     QString mach = machCombo->currentText();
 
     int res = KMessageBox::questionYesNo(this, i18n(
@@ -358,6 +361,19 @@ slotDeleteMachine() {
     if (res != KMessageBox::Yes)
 	return;
     machCombo->removeItem(machCombo->currentItem());
+
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_MACHNAME));
+    config->writeEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_MACHNAME).arg(mach),
+	QString::null);
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_DRIVES));
+    config->writeEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_DRIVES).arg(mach),
+	QString::null);
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_BACKUPDRIVES));
+    config->writeEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_BACKUPDRIVES).arg(mach),
+	QString::null);
     slotMachineChanged(-1);
 }
 

@@ -33,7 +33,8 @@ rcdir = $(kde_datadir)/kpsion
 rc_DATA = kpsionui.rc
 EXTRA_DIST += kpsionui.rc
 
-noinst_HEADERS = kpsion.h setupdialog.h wizards.h
+noinst_HEADERS = kpsion.h setupdialog.h wizards.h kpsionrestoredialog.h \
+	kpsionconfig.h kpsionbackuplistview.h statusbarprogress.h
 
 messages:
 	$(XGETTEXT) -C -ki18n -kI18N_NOOP -ktranslate -kaliasLocale *.cpp *.h && mv messages.po ../po/kpsion.pot
