@@ -1112,7 +1112,7 @@ runRestore()
 static void
 runBackup()
 {
-    vector<char*>backupDrives;
+    vector<string>backupDrives;
     Enum<rfsv::errs> res;
     string dstPath;
     string archPath;
