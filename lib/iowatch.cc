@@ -30,48 +30,46 @@
 #include "iowatch.h"
 
 IOWatch::IOWatch() {
-  num = 0;
-  io = new int [MAX_IO];
+	num = 0;
+	io = new int [FD_SETSIZE];
 }
 
 IOWatch::~IOWatch() {
-  delete [] io;
+	delete [] io;
 }
 
-void IOWatch::addIO(int a) {
-  int pos;
-  for (pos = 0; pos < num && a < io[pos]; pos++);
-  for (int i = num; i > pos; i--) io[i] = io[i-1];
-  io[pos] = a;
-  num++;
+void IOWatch::addIO(const int fd) {
+	int pos;
+	for (pos = 0; pos < num && fd < io[pos]; pos++);
+	if (io[pos] == fd)
+		return;
+	for (int i = num; i > pos; i--)
+		io[i] = io[i-1];
+	io[pos] = fd;
+	num++;
 }
 
-void IOWatch::remIO(int a) {
-  int pos;
-  for (pos = 0; pos < num && a != io[pos]; pos++);
-  if (pos != num) {
-    num--;
-    for (int i = pos; i <num; i++) io[i] = io[i+1];
-  }
+void IOWatch::remIO(const int fd) {
+	int pos;
+	for (pos = 0; pos < num && fd != io[pos]; pos++);
+	if (pos != num) {
+		num--;
+		for (int i = pos; i <num; i++) io[i] = io[i+1];
+	}
 }
 
-bool IOWatch::watch(long secs, long usecs) {
-  if (num > 0) {
-    fd_set iop;
-    FD_ZERO(&iop);
-    for (int i=0; i<num; i++) {
-      FD_SET(io[i], &iop);
-    }
-    struct timeval t;
-    t.tv_usec = usecs;
-    t.tv_sec = secs;
-    return select(io[0]+1, &iop, NULL, NULL, &t);
-  }
-  else {
-    sleep(secs);
-    usleep(usecs);
-  }
-  return false;
+bool IOWatch::watch(const long secs, const long usecs) {
+	if (num > 0) {
+		fd_set iop;
+		FD_ZERO(&iop);
+		for (int i = 0; i < num; i++)
+			FD_SET(io[i], &iop);
+		struct timeval t;
+		t.tv_usec = usecs;
+		t.tv_sec = secs;
+		return (select(io[0]+1, &iop, NULL, NULL, &t) > 0);
+	}
+	sleep(secs);
+	usleep(usecs);
+	return false;
 }
-
-

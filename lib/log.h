@@ -38,7 +38,7 @@ class logbuf : public streambuf {
 		logbuf(int level);
 
 		/**
-		 * @internal Called by the associated
+		 * Called by the associated
 		 * ostream to write a character.
 		 * Stores the character in a buffer
 		 * and calls syslog(level, buffer)
@@ -56,7 +56,7 @@ class logbuf : public streambuf {
 		/**
 		 * Current length of buffer.
 		 */
-		int len;
+		unsigned int len;
 
 		/**
 		 * The log level to use with syslog.

@@ -1,6 +1,3 @@
-//#include <iostream.h>
-//#include <iomanip.h>
-
 #include "log.h"
 
 logbuf::logbuf(int _level) {

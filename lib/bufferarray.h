@@ -48,19 +48,40 @@ public:
 	bufferStore &operator [](const unsigned long index);
 
 	/**
-	 * Appends a bufferStore.
+	 * Appends a bufferStore to a bufferArray.
+	 *
+	 * @param s The bufferStore to be appended.
+	 *
+	 * @returns A new bufferArray with bufferStore appended to.
 	 */
-	bufferArray &operator +(const bufferStore &);
+	bufferArray operator +(const bufferStore &s);
 
 	/**
 	 * Concatenates two bufferArrays.
+	 *
+	 * @param a The bufferArray to be appended.
+	 *
+	 * @returns A new bufferArray consisting with a appended.
 	 */
-	bufferArray &operator +(const bufferArray &);
+	bufferArray operator +(const bufferArray &a);
 
 	/**
-	 * Appends a bufferStore.
+	 * Appends a bufferStore to current instance.
+	 *
+	 * @param s The bufferStore to append.
+	 *
+	 * @returns A reference to the current instance with s appended.
 	 */
-	bufferArray &operator +=(const bufferStore &b);
+	bufferArray &operator +=(const bufferStore &s);
+
+	/**
+	 * Appends a bufferArray to current instance.
+	 *
+	 * @param a The bufferArray to append.
+	 *
+	 * @returns A reference to the current instance with a appended.
+	 */
+	bufferArray &operator +=(const bufferArray &a);
 
 	/**
 	 * Removes the first bufferStore.

@@ -8,46 +8,39 @@ class bufferStore;
 class bufferArray;
 
 class rfsv32 : public rfsv {
-	public:
-	rfsv32(ppsocket *);
-	~rfsv32();
-	void reset();
-	void reconnect();
 
-	Enum<rfsv::errs> dir(const char *, bufferArray *);
-	Enum<rfsv::errs> dircount(const char *, long *);
+public:
+	rfsv32(ppsocket *);
+
+	Enum<rfsv::errs> dir(const char * const, bufferArray &);
+	Enum<rfsv::errs> dircount(const char * const, long &);
 	Enum<rfsv::errs> copyFromPsion(const char *, const char *, cpCallback_t);
 	Enum<rfsv::errs> copyToPsion(const char *, const char *, cpCallback_t);
 	Enum<rfsv::errs> mkdir(const char *);
 	Enum<rfsv::errs> rmdir(const char *);
 	Enum<rfsv::errs> remove(const char *);
 	Enum<rfsv::errs> rename(const char *, const char *);
-	Enum<rfsv::errs> mktemp(long *, char *);
-	Enum<rfsv::errs> fgeteattr(const char *, long *, long *, long *);
-	Enum<rfsv::errs> fgetattr(const char *, long *);
-	Enum<rfsv::errs> fsetattr(const char *, long, long);
-	Enum<rfsv::errs> fgetmtime(const char *, long *);
-	Enum<rfsv::errs> fsetmtime(const char *, long);
-	Enum<rfsv::errs> fopendir(long, const char *, long &);
-	Enum<rfsv::errs> fopen(long, const char *, long &);
-	Enum<rfsv::errs> fcreatefile(long, const char *, long &);
-	Enum<rfsv::errs> freplacefile(long, const char *, long &);
-	long fseek(long, long, long);
-	long fread(long, unsigned char *, long);
-	long fwrite(long, unsigned char *, long);
+	Enum<rfsv::errs> mktemp(long &, char * const);
+	Enum<rfsv::errs> fgeteattr(const char * const, long &, long &, PsiTime &);
+	Enum<rfsv::errs> fgetattr(const char * const, long &);
+	Enum<rfsv::errs> fsetattr(const char * const, const long, const long);
+	Enum<rfsv::errs> fgetmtime(const char * const, PsiTime &);
+	Enum<rfsv::errs> fsetmtime(const char * const, PsiTime const);
+	Enum<rfsv::errs> fopen(const long, const char * const, long &);
+	Enum<rfsv::errs> fcreatefile(const long, const char * const, long &);
+	Enum<rfsv::errs> freplacefile(const long, const char * const, long &);
+	Enum<rfsv::errs> fseek(const long, const long, const long, long &);
+	Enum<rfsv::errs> fread(const long, unsigned char * const, const long, long &);
+	Enum<rfsv::errs> fwrite(const long, const unsigned char * const, const long, long &);
 	Enum<rfsv::errs> fsetsize(long, long);
-	Enum<rfsv::errs> fclose(long);
+	Enum<rfsv::errs> fclose(const long);
 
-	Enum<rfsv::errs> devlist(long *);
-	char *devinfo(int, long *, long *, long *, long *);
-	Enum<rfsv::errs> getStatus();
-	char *opAttr(long);
-	long opMode(long);
+	Enum<rfsv::errs> devlist(long &);
+	Enum<rfsv::errs> devinfo(const int, long &, long &, long &, long &, char * const);
 
-	long attr2std(long);
-	long std2attr(long);
+	long opMode(const long);
 
-	private:
+private:
 	
 	enum file_attrib {
 		EPOC_ATTR_RONLY      = 0x0001,
@@ -58,7 +51,8 @@ class rfsv32 : public rfsv {
 		EPOC_ATTR_VOLUME     = 0x0040,
 		EPOC_ATTR_NORMAL     = 0x0080,
 		EPOC_ATTR_TEMPORARY  = 0x0100,
-		EPOC_ATTR_COMPRESSED = 0x0800
+		EPOC_ATTR_COMPRESSED = 0x0800,
+		EPOC_ATTR_MASK       = 0x09f7  /* All of the above */
 	};
 
 	enum open_mode {
@@ -154,8 +148,11 @@ class rfsv32 : public rfsv {
 		REPLACE          = 0x32
 	};
 
-	const char *getConnectName();
 	Enum<rfsv::errs> err2psierr(long);
+	Enum<rfsv::errs> fopendir(const long, const char *, long &);
+	long attr2std(const long);
+	long std2attr(const long);
+
 
 	// Communication
 	bool sendCommand(enum commands, bufferStore &);
@@ -163,13 +160,8 @@ class rfsv32 : public rfsv {
 	char *convertSlash(const char *);
 
 	// time-conversion
-	unsigned long micro2time(unsigned long, unsigned long);
-	void time2micro(unsigned long, unsigned long &, unsigned long &);
-
-	// Vars
-	ppsocket *skt;
-	int serNum;
-	Enum<rfsv::errs> status;
+	// unsigned long micro2time(unsigned long, unsigned long);
+	// void time2micro(unsigned long, unsigned long &, unsigned long &);
 };
 
 #endif

@@ -85,7 +85,7 @@ void ftp::usage() {
 	cout << "  gtime <psionfile>" << endl;
 	cout << "  test <psionfile>" << endl;
 	cout << "  gattr <psionfile>" << endl;
-	cout << "  sattr [[-|+]rhsa] <psionfile>" << endl;
+	cout << "  sattr [[-|+]rwhsa] <psionfile>" << endl;
 	cout << "  devs" << endl;
 	cout << "  dir|ls" << endl;
 	cout << "  dircnt" << endl;
@@ -105,6 +105,10 @@ void ftp::usage() {
 	cout << endl << "Known RPC commands:" << endl << endl;
 	cout << "  ps" << endl;
 	cout << "  kill <pid|'all'>" << endl;
+	cout << "  run <psionfile> [args]" << endl;
+	cout << "  killsave <unixfile>" << endl;
+	cout << "  runrestore <unixfile>" << endl;
+	cout << "  machinfo" << endl;
 }
 
 static int Wildmat(const char *s, char *p);
@@ -211,7 +215,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	}
 	if (!once) {
 		bufferArray b;
-		if (!(res = r.getOwnerInfo(b))) {
+		if ((res = r.getOwnerInfo(b)) == rfsv::E_PSI_GEN_NONE) {
 			Enum<rpcs::machs> machType;
 			r.getMachineType(machType);
 			cout << "Connected to a " << machType << ", OwnerInfo:" << endl;
@@ -228,10 +232,10 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		int i;
 
 		strcpy(defDrive, "::");
-		if (a.devlist(&devbits) == 0) {
+		if (a.devlist(devbits) == 0) {
 
 			for (i = 0; i < 26; i++) {
-				if ((devbits & 1) && a.devinfo(i, &vfree, &vtotal, &vattr, &vuniqueid)) {
+				if ((devbits & 1) && a.devinfo(i, vfree, vtotal, vattr, vuniqueid, NULL) == rfsv::E_PSI_GEN_NONE) {
 					defDrive[0] = 'A' + i;
 					break;
 				}
@@ -282,31 +286,29 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			strcat(f1, argv[1]);
 			strcpy(f2, psionDir);
 			strcat(f2, argv[2]);
-			if ((res = a.rename(f1, f2)) != 0)
+			if ((res = a.rename(f1, f2)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "touch") && (argc == 2)) {
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
-			if ((res = a.fsetmtime(f1, time(0))) != 0)
+			PsiTime pt;
+			if ((res = a.fsetmtime(f1, pt)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "test") && (argc == 2)) {
-			long attr, size, time;
+			long attr, size;
+			PsiTime time;
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
-			if ((res = a.fgeteattr(f1, &attr, &size, &time)) != 0)
+			if ((res = a.fgeteattr(f1, attr, size, time)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			else {
-				// never used to do this
-				char dateBuff[100];
-                               	strftime(dateBuff, sizeof(dateBuff), datefmt, localtime(&time));
-                               	cout << a.opAttr(attr);
+                               	cout << a.attr2String(attr);
                                	cout << " " << dec << setw(10) << setfill(' ') << size;
-                               	cout << " " << dateBuff;
-				cout << " " << argv[1] << endl;
+                               	cout << " " << time << " " << argv[1] << endl;
 			}
 			continue;
 		}
@@ -314,28 +316,25 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			long attr;
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
-			if ((res = a.fgetattr(f1, &attr)) != 0)
+			if ((res = a.fgetattr(f1, attr)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			else {
 				cout << hex << setw(4) << setfill('0') << attr;
-				cout << " (" << a.opAttr(attr) << ")" << endl;
+				cout << " (" << a.attr2String(attr) << ")" << endl;
 			}
 			continue;
 		}
 		if (!strcmp(argv[0], "gtime") && (argc == 2)) {
-			long mtime;
+			PsiTime mtime;
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
-			if ((res = a.fgetmtime(f1, &mtime)) != 0)
+			if ((res = a.fgetmtime(f1, mtime)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
-			else {
-				char dateBuff[100];
-                               	strftime(dateBuff, sizeof(dateBuff), datefmt, localtime(&mtime));
-				cout << dateBuff << endl;
-			}
+			else
+				cout << mtime << endl;
 			continue;
 		}
-		if (!strcmp(argv[0], "sattr") && (argc == 2)) {
+		if (!strcmp(argv[0], "sattr") && (argc == 3)) {
 			long attr[2];
 			int aidx = 0;
 			char *p = argv[1];
@@ -353,31 +352,35 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 						aidx = 1;
 						break;
 					case 'r':
-						attr[aidx] |= 0x01;
-						attr[1 - aidx] &= ~0x01;
+						attr[aidx] |= rfsv::PSI_A_READ;
+						attr[aidx] &= ~rfsv::PSI_A_READ;
+						break;
+					case 'w':
+						attr[1 - aidx] |= rfsv::PSI_A_RDONLY;
+						attr[aidx] &= ~rfsv::PSI_A_RDONLY;
 						break;
 					case 'h':
-						attr[aidx] |= 0x02;
-						attr[1 - aidx] &= ~0x02;
+						attr[aidx] |= rfsv::PSI_A_HIDDEN;
+						attr[1 - aidx] &= ~rfsv::PSI_A_HIDDEN;
 						break;
 					case 's':
-						attr[aidx] |= 0x04;
-						attr[1 - aidx] &= ~0x04;
+						attr[aidx] |= rfsv::PSI_A_SYSTEM;
+						attr[1 - aidx] &= ~rfsv::PSI_A_SYSTEM;
 						break;
 					case 'a':
-						attr[aidx] |= 0x20;
-						attr[1 - aidx] &= ~0x20;
+						attr[aidx] |= rfsv::PSI_A_ARCHIVE;
+						attr[1 - aidx] &= ~rfsv::PSI_A_ARCHIVE;
 						break;
 				}
 				p++;
 			}
-			if ((res = a.fsetattr(f1, attr[0], attr[1])) != 0)
+			if ((res = a.fsetattr(f1, attr[0], attr[1])) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "dircnt")) {
 			long cnt;
-			if ((res = a.dircount(psionDir, &cnt)) != 0)
+			if ((res = a.dircount(psionDir, cnt)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			else
 				cout << cnt << " Entries" << endl;
@@ -385,22 +388,20 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		}
 		if (!strcmp(argv[0], "devs")) {
 			long devbits;
-			if ((res = a.devlist(&devbits)) == 0) {
+			if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 				cout << "Drive Type Volname     Total     Free      UniqueID" << endl;
 				for (int i = 0; i < 26; i++) {
-					char *vname;
+					char vname[256];
 					long vtotal, vfree, vattr, vuniqueid;
 
 					if ((devbits & 1) != 0) {
-						vname = a.devinfo(i, &vfree, &vtotal, &vattr, &vuniqueid);
-						if (vname != NULL) {
+						if (a.devinfo(i, vfree, vtotal, vattr, vuniqueid, vname) == rfsv::E_PSI_GEN_NONE)
 							cout << (char) ('A' + i) << "     " <<
 							    hex << setw(4) << setfill('0') << vattr << " " <<
 							    setw(12) << setfill(' ') << setiosflags(ios::left) << 
 							    vname << resetiosflags(ios::left) << dec << setw(9) <<
-							    vtotal << setw(9) << vfree << setw(10) << vuniqueid << endl;
-							free(vname);
-						}
+							    vtotal << setw(9) << vfree << "  " << setw(8) << setfill('0') << hex <<
+							    vuniqueid << endl;
 					}
 					devbits >>= 1;
 				}
@@ -410,21 +411,18 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		}
 		if (!strcmp(argv[0], "ls") || !strcmp(argv[0], "dir")) {
 			bufferArray files;
-			if ((res = a.dir(psionDir, &files)) != 0)
+			if ((res = a.dir(psionDir, files)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			else
 				while (!files.empty()) {
 					bufferStore s;
 					s = files.pop();
-					long date = s.getDWord(0);
+					PsiTime *date = (PsiTime *)s.getDWord(0);
 					long size = s.getDWord(4);
 					long attr = s.getDWord(8);
-					char dateBuff[100];
-                                	strftime(dateBuff, sizeof(dateBuff), datefmt, localtime(&date));
-                                	cout << a.opAttr(attr);
+                                	cout << a.attr2String(attr);
                                 	cout << " " << dec << setw(10) << setfill(' ') << size;
-                                	cout << " " << dateBuff;
-					cout << " " << s.getString(12) << endl;
+                                	cout << " " << *date << " " << s.getString(12) << endl;
 				}
 			continue;
 		}
@@ -470,7 +468,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				}
 				if ((f1[strlen(f1) -1] != '/') && (f1[strlen(f1) -1] != '\\'))
 					strcat(f1,"\\");
-				if ((res = a.dircount(f1, &tmp)) == 0) {
+				if ((res = a.dircount(f1, tmp)) == rfsv::E_PSI_GEN_NONE) {
 					for (char *p = f1; *p; p++)
 						if (*p == '/')
 							*p = '\\';
@@ -496,7 +494,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			else
 				strcat(f2, argv[2]);
 			gettimeofday(&stime, 0L);
-			if ((res = a.copyFromPsion(f1, f2, cab)) != 0) {
+			if ((res = a.copyFromPsion(f1, f2, cab)) != rfsv::E_PSI_GEN_NONE) {
 				if (hash)
 					cout << endl;
 				continueRunning = 1;
@@ -525,7 +523,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		} else if ((!strcmp(argv[0], "mget")) && (argc == 2)) {
 			char *pattern = argv[1];
 			bufferArray files;
-			if ((res = a.dir(psionDir, &files)) != 0) {
+			if ((res = a.dir(psionDir, files)) != rfsv::E_PSI_GEN_NONE) {
 				cerr << "Error: " << res << endl;
 				continue;
 			}
@@ -560,7 +558,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 						for (char *p = f2; *p; p++)
 							*p = tolower(*p);
 					}
-					if ((res = a.copyFromPsion(f1, f2, cab)) != 0) {
+					if ((res = a.copyFromPsion(f1, f2, cab)) != rfsv::E_PSI_GEN_NONE) {
 						if (hash)
 							cout << endl;
 						continueRunning = 1;
@@ -588,7 +586,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			else
 				strcat(f2, argv[2]);
 			gettimeofday(&stime, 0L);
-			if ((res = a.copyToPsion(f1, f2, cab)) != 0) {
+			if ((res = a.copyToPsion(f1, f2, cab)) != rfsv::E_PSI_GEN_NONE) {
 				if (hash)
 					cout << endl;
 				continueRunning = 1;
@@ -649,7 +647,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 						if (temp[0] == 'y') {
 							strcpy(f2, psionDir);
 							strcat(f2, de->d_name);
-							if ((res = a.copyToPsion(f1, f2, cab)) != 0) {
+							if ((res = a.copyToPsion(f1, f2, cab)) != rfsv::E_PSI_GEN_NONE) {
 								if (hash)
 									cout << endl;
 								continueRunning = 1;
@@ -672,21 +670,21 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		    !strcmp(argv[0], "rm")) && (argc == 2)) {
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
-			if ((res = a.remove(f1)) != 0)
+			if ((res = a.remove(f1)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "mkdir") && (argc == 2)) {
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
-			if ((res = a.mkdir(f1)) != 0)
+			if ((res = a.mkdir(f1)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "rmdir") && (argc == 2)) {
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
-			if ((res = a.rmdir(f1)) != 0)
+			if ((res = a.rmdir(f1)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			continue;
 		}
@@ -710,6 +708,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			continue;
 		}
 		// RPCS commands
+#ifdef EXPERIMENTAL
 		if (!strcmp(argv[0], "x")) {
 			r.configOpen();
 			continue;
@@ -718,6 +717,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			r.configRead();
 			continue;
 		}
+#endif
 		if (!strcmp(argv[0], "run") && (argc >= 2)) {
 			char argbuf[1024];
 			char cmdbuf[1024];
@@ -740,7 +740,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		}
 		if (!strcmp(argv[0], "machinfo")) {
 			rpcs::machineInfo mi;
-			if ((res = r.getMachineInfo(mi))) {
+			if ((res = r.getMachineInfo(mi)) != rfsv::E_PSI_GEN_NONE) {
 				cerr << "Error: " << res << endl;
 				continue;
 			}
@@ -790,15 +790,22 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		}
 		if (!strcmp(argv[0], "runrestore") && (argc == 2)) {
 			ifstream ip(argv[1]);
+			char cmd[512];
+			char arg[512];
 			if (!ip) {
 				cerr << "Could not read processlist " << argv[1] << endl;
 				continue;
 			}
+			ip >> cmd;
+			if (strcmp(cmd, "#plpftp processlist")) {
+				ip.close();
+				cerr << "Error: " << argv[1] <<
+					" is not a process list saved with killsave" << endl;
+				continue;
+			}
 			while (!ip.eof()) {
-				char cmd[256];
-				char arg[256];
 				ip >> cmd >> arg;
-				if ((res = r.execProgram(cmd, arg))) {
+				if ((res = r.execProgram(cmd, arg)) != rfsv::E_PSI_GEN_NONE) {
 					cerr << "Could not start " << cmd << " " << arg << endl;
 					cerr << "Error: " << res << endl;
 				}
@@ -814,6 +821,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				continue;
 			}
 			r.queryDrive('C', tmp);
+			op << "#plpftp processlist" << endl;
 			while (!tmp.empty()) {
 				char pbuf[128];
 				bufferStore cmdargs;
@@ -908,12 +916,12 @@ filename_generator(char *text, int state)
 
 
 	if (!state) {
-		long res;
+		Enum<rfsv::errs> res;
 		len = strlen(text);
 		if (comp_files)
 			delete comp_files;
 		comp_files = new bufferArray();
-		if ((res = comp_a->dir(psionDir, comp_files)) != 0) {
+		if ((res = comp_a->dir(psionDir, *comp_files)) != rfsv::E_PSI_GEN_NONE) {
 			cerr << "Error: " << res << endl;
 			return NULL;
 		}

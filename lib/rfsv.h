@@ -2,6 +2,7 @@
 #define _rfsv_h_
 
 #include "Enum.h"
+#include "psitime.h"
 
 class ppsocket;
 class bufferStore;
@@ -15,8 +16,6 @@ const long RFSV_SENDLEN = 2000;
  */
 typedef int (*cpCallback_t)(long);
 
-// Abstract base class of RFSV ; 16-bit and 32-bit variants implement this
-// interface
 /**
  * Access remote file services of a Psion.
  *
@@ -148,66 +147,308 @@ class rfsv {
 		 * The known file attributes
 		 */
 		enum file_attribs {
-			/**
-			 * Attributes, valid on both EPOC and SIBO.
-			 */
-			PSI_A_RDONLY = 0x0001,
-			PSI_A_HIDDEN = 0x0002,
-			PSI_A_SYSTEM = 0x0004,
-			PSI_A_DIR = 0x0008,
-			PSI_A_ARCHIVE = 0x0010,
-			PSI_A_VOLUME = 0x0020,
+			/** Attributes, valid on both <em>EPOC</em> and <em>SIBO</em>. */
+			PSI_A_RDONLY     = 0x0001,
+			PSI_A_HIDDEN     = 0x0002,
+			PSI_A_SYSTEM     = 0x0004,
+			PSI_A_DIR        = 0x0008,
+			PSI_A_ARCHIVE    = 0x0010,
+			PSI_A_VOLUME     = 0x0020,
 
-			/**
-			 * Attributes, valid on EPOC only.
-			 */
-			PSI_A_NORMAL = 0x0040,
-			PSI_A_TEMP = 0x0080,
+			/** Attributes, valid on EPOC <em>only</em>. */
+			PSI_A_NORMAL     = 0x0040,
+			PSI_A_TEMP       = 0x0080,
 			PSI_A_COMPRESSED = 0x0100,
 
-			/**
-			 * Attributes, valid on SIBO only.
-			 */
-			PSI_A_READ = 0x0200,
-			PSI_A_EXEC = 0x0400,
-			PSI_A_STREAM = 0x0800,
-			PSI_A_TEXT = 0x1000
+			/** Attributes, valid on SIBO <em>only</em>. */
+			PSI_A_READ       = 0x0200,
+			PSI_A_EXEC       = 0x0400,
+			PSI_A_STREAM     = 0x0800,
+			PSI_A_TEXT       = 0x1000,
 		};
-		virtual ~rfsv() {}
-		virtual void reset() = 0;
-		virtual void reconnect() = 0;
-		virtual Enum<errs> getStatus() = 0;
-		virtual const char *getConnectName() = 0;
-		virtual Enum<errs> fopen(long, const char *, long &) = 0;
-		virtual Enum<errs> mktemp(long *, char *) = 0;
-		virtual Enum<errs> fcreatefile(long, const char *, long &) = 0;
-		virtual Enum<errs> freplacefile(long, const char *, long &) = 0;
-		virtual Enum<errs> fopendir(long, const char *, long &) = 0;
-		virtual Enum<errs> fclose(long) = 0;
-		virtual Enum<errs> dir(const char *, bufferArray *) = 0;
-		virtual Enum<errs> fgetmtime(const char *, long *) = 0;
-		virtual Enum<errs> fsetmtime(const char *, long) = 0;
-		virtual Enum<errs> fgetattr(const char *, long *) = 0;
-		virtual Enum<errs> fgeteattr(const char *, long *, long *, long *) =0; 
-		virtual Enum<errs> fsetattr(const char *, long, long) = 0;
-		virtual Enum<errs> dircount(const char *, long *) = 0;
-		virtual Enum<errs> devlist(long *) = 0;
-		virtual char *devinfo(int, long *, long *, long *, long *) = 0;
-		virtual char *opAttr(long) = 0;
-		virtual long opMode(long) = 0;
-		virtual long fread(long, unsigned char *, long) = 0;
-		virtual long fwrite(long, unsigned char *, long) = 0;
-		virtual Enum<errs> copyFromPsion(const char *, const char *, cpCallback_t) = 0;
-		virtual Enum<errs> copyToPsion(const char *, const char *, cpCallback_t) = 0;
-		virtual Enum<errs> fsetsize(long, long) = 0;
-		virtual long fseek(long, long, long) = 0;
-		virtual Enum<errs> mkdir(const char *) = 0;
-		virtual Enum<errs> rmdir(const char *) = 0;
-		virtual Enum<errs> rename(const char *, const char *) = 0;
-		virtual Enum<errs> remove(const char *) = 0;
 
-		virtual long attr2std(long) = 0;
-		virtual long std2attr(long) = 0;
+		virtual ~rfsv();
+		void reset();
+		void reconnect();
+
+		/**
+		 * Retrieves the current connection status.
+		 *
+		 * @returns The status of the connection.
+		 */
+		Enum<errs> getStatus();
+
+		/**
+		 * Opens a file.
+		 *
+		 */
+		virtual Enum<errs> fopen(const long attr, const char * const name, long &handle) = 0;
+
+		/**
+		 * Creates a unique temporary file.
+		 * The file is opened for reading and writing.
+		 *
+		 * @param handle The handle for usage with @ref fread, @ref frwrite, @ref fseek @ref fclose is returned here.
+		 * @param name The name of the temporary file is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> mktemp(long &handle, char * const name) = 0;
+
+		/**
+		 * Creates a named file.
+		 */
+		virtual Enum<errs> fcreatefile(const long attr, const char * const name, long &handle) = 0;
+
+		/**
+		 * Creates an named file, overwriting an existing file.
+		 */
+		virtual Enum<errs> freplacefile(const long attr, const char * const name, long &handle) = 0;
+
+		/**
+		 * Close a file on the Psion whih was previously opened/created by using
+		 * @ref fopen, @ref fcreatefile, @ref freplacefile or @ref mktemp.
+		 *
+		 * @param handle A valid file handle.
+		 */
+		virtual Enum<errs> fclose(const long handle) = 0;
+
+		/**
+		 * Reads a directory on the Psion.
+		 * The returned array of @ref bufferArray contains one @ref bufferStore element
+		 * for each directory entry.
+		 * The layout of information data is as follows:
+		 * <pre>
+		 * 	offset		size	value
+		 * 	0		4	Pointer to a PsiTime object, representing the file's modification.
+		 * 	4		4	Size in bytes.
+		 * 	8		4	Attributes.
+		 * 	12		?	Zero terminated file name.
+		 * </pre>
+		 *
+		 * @param name The name of the directory
+		 * @param ret Array of @ref bufferStore containing information for directory entries.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> dir(const char * const name, bufferArray &ret) = 0;
+
+		/**
+		 * Retrieves the modification time of a file on the Psion.
+		 *
+		 * @param name Name of the file.
+		 * @param mtime Modification time is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> fgetmtime(const char * const name, PsiTime &mtime) = 0;
+
+		/**
+		 * Sets the modification time of a file on the Psion.
+		 *
+		 * @param name Name of the file whose modification time should be set.
+		 * @param mtime The desired modification time.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> fsetmtime(const char * const name, const PsiTime mtime) = 0;
+
+		/**
+		 * Retrieves attributes of a file on the Psion.
+		 *
+		 * @param name Name of the file whose attributes ar to be retrieved.
+		 * @param attr The file's attributes are returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> fgetattr(const char * const name, long &attr) = 0;
+
+		/**
+		 * Retrieves attributes, size and modification time of a file on the Psion.
+		 *
+		 * @param name The name of the file.
+		 * @param attr The file's attributes are returned here.
+		 * @param size The file's size in bytes is returned here.
+		 * @param time The file's modification time is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> fgeteattr(const char * const name, long &attr, long &size, PsiTime &time) =0; 
+
+		/**
+		 * @param name
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> fsetattr(const char * const name, const long seta, const long unseta) = 0;
+
+		/**
+		 * Counts number of entries in a directory.
+		 *
+		 * @param name The directory whose entries are to be counted.
+		 * @param count The number of entries is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> dircount(const char * const name, long &count) = 0;
+		virtual Enum<errs> devlist(long &devbits) = 0;
+		virtual Enum<errs> devinfo(const int dev, long &free, long &total, long &attr, long &uniqueid, char * const name) = 0;
+
+
+		/**
+		 * Reads from a file on the Psion.
+		 *
+		 * @param handle Handle of the file to read from.
+		 * @param buffer The area where to store the data read.
+		 * @param len The number of bytes to read.
+		 * @param count The number of bytes actually read is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> fread(const long handle, unsigned char * const buffer, const long len, long &count) = 0;
+
+		/**
+		 * Write to a file on the Psion.
+		 *
+		 * @param handle Handle of the file to read from.
+		 * @param buffer The area to be written.
+		 * @param len The number of bytes to write.
+		 * @param count The number of bytes actually written is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> fwrite(const long handle, const unsigned char * const buffer, const long len, long &count) = 0;
+
+		/**
+		 * Copies a file from the Psion to the local machine.
+		 *
+		 * @param from Name of the file on the Psion to be copied.
+		 * @param to Name of the destination file on the local machine.
+		 * @param func Pointer to a function which gets called on every read.
+		 * 	This function can be used to show some progress etc. May be set
+		 * 	to NULL, where no callback is performed.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> copyFromPsion(const char *from, const char *to, cpCallback_t func) = 0;
+
+		/**
+		 * Copies a file from local machine to the Psion.
+		 *
+		 * @param from Name of the file on the local machine to be copied.
+		 * @param to Name of the destination file on the Psion.
+		 * @param func Pointer to a function which gets called on every read.
+		 * 	This function can be used to show some progress etc. May be set
+		 * 	to NULL, where no callback is performed.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> copyToPsion(const char * const from, const char * const to, cpCallback_t func) = 0;
+
+		/**
+		 * Resizes an open file on the Psion.
+		 * If the new size is greater than the file's
+		 * current size, the contents of the added
+		 * data is undefined. If The new size is smaller,
+		 * the file is truncated.
+		 *
+		 * @param handle Handle of the file to be resized.
+		 * @param size New size for that file.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> fsetsize(const long handle, const long size) = 0;
+
+		/**
+		 * Sets the current file position of a file on the Psion.
+		 *
+		 * @param handle The file handle.
+		 * @param offset Position to be seeked to.
+		 * @param mode The mode for seeking.
+		 * @param resultpos The final file position after seeking is returned here.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> fseek(const long handle, const long offset, const long mode, long &resultpos) = 0;
+
+		/**
+		 * Creates a directory on the Psion.
+		 *
+		 * @param name Name of the directory to be created.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> mkdir(const char * const name) = 0;
+
+		/**
+		 * Removes a directory on the Psion.
+		 *
+		 * @param name Name of the directory to be removed.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> rmdir(const char * const name) = 0;
+
+		/**
+		 * Renames a file on the Psion.
+		 *
+		 * @param oldname Name of the file to be renamed.
+		 * @param newname New Name for that file.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> rename(const char * const oldname, const char * const newname) = 0;
+
+		/**
+		 * Removes a file on the Psion.
+		 *
+		 * @param name Name of the file to be removed.
+		 *
+		 * @returns A Psion error code (One of enum @ref #errs ).
+		 */
+		virtual Enum<errs> remove(const char * const name) = 0;
+
+		/**
+		 * Converts a file attribute @ref rfsv::file_attribs to
+		 * human readable format, usable for showing them in directory
+		 * listings. The first 7 characters are common to all
+		 * machine types:
+		 * <pre>
+		 * 	Char Nr.	Value
+		 * 	0		'd' if a directory,			'-' otherwise.
+		 * 	1		'r' if file is readable,		'-' otherwise.
+		 * 	2		'w' if file is writeable,		'-' otherwise.
+		 * 	3		'h' if file is hidden,			'-' otherwise.
+		 * 	4		's' if file is a system file,		'-' otherwise.
+		 * 	5		'a' if file is modified (archive flag),	'-' otherwise.
+		 * 	6		'v' if file is a volume name,		'-' otherwise.
+		 * </pre>
+		 * The rest (3 characters) are machine specific:
+		 * <pre>
+		 * 	Char Nr.	EPOC Value		SIBO Value
+		 * 	7		'n' if normal,		'x' if executable,	'-' otherwise.
+		 * 	8		't' if temporary,	'b' if a stream,	'-' otherwise.
+		 * 	8		'c' if compressed,	't' if a textfile,	'-' otherwise.
+		 * </pre>
+		 *
+		 * @param attr the generic file attribute.
+		 *
+		 * @returns Pointer to static textual representation of file attributes.
+		 *
+		 */
+		const char * const attr2String(const long attr);
+		virtual long opMode(const long mode) = 0;
+protected:
+		/**
+		 * Retrieves the PLP protocol name. Mainly internal use.
+		 *
+		 * @returns The connection name always "SYS$RFSV"
+		 */
+		const char *getConnectName();
+
+		ppsocket *skt;
+		Enum<errs> status;
+		int serNum;
 };
 
 #endif

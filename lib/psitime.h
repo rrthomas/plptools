@@ -89,25 +89,48 @@ typedef struct psi_timezone_t {
  * <em>not</em> set, a fallback using the environment
  * variable <em>PSI_TZ</em> is provided. Users should
  * set this variable to the offset of their time zone
- * in seconds.
+ * in seconds. If <em>PSI_TZ</em> is net set, a second
+ * fallback uses the local machine's setup, which assumes
+ * that both Psion and local machine have the same
+ * time zone and daylight settings.
  */
 class PsiTime {
 public:
 	/**
 	 * Contructs a new instance.
 	 * 
-	 * @param _ptv A Psion time value for initialization.
-	 * @param _ptz A Psion timezone for initialization.
-	 */
-	PsiTime(psi_timeval *_ptv = 0L, psi_timezone *_ptz = 0L);
-
-	/**
-	 * Constructs a new instance.
-	 *
 	 * @param _utv A Unix time value for initialization.
 	 * @param _utz A Unix timezone for initialization.
 	 */
-	PsiTime(struct timeval *_utv = 0L, struct timezone *_utz = 0L);
+	PsiTime(struct timeval *_utv, struct timezone *_utz = 0L);
+
+	/**
+	 * Contructs a new instance.
+	 * 
+	 * @param time A Unix time value for initialization.
+	 */
+	PsiTime(time_t time);
+
+	/**
+	 * Contructs a new instance.
+	 * 
+	 * @param _ptv A Psion time value for initialization.
+	 * @param _ptz A Psion timezone for initialization.
+	 */
+	PsiTime(psi_timeval *_ptv, psi_timezone *_ptz = 0L);
+
+	/**
+	 * Contructs a new instance.
+	 * 
+	 * @param _ptvHi The high 16 bits of a Psion time value for initialization.
+	 * @param _ptvLo The low 16 bits of a Psion time value for initialization.
+	 */
+	PsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo);
+
+	/**
+	 * Constructs a new instance, initializing to now.
+	 */
+	PsiTime(void);
 
 	/**
 	 * Destroys the instance.
@@ -122,6 +145,14 @@ public:
 	void setPsiTime(psi_timeval *_ptv);
 
 	/**
+	 * Modifies the value of this instance.
+	 *
+	 * @param _ptvHi The high 32 bits of a Psion time.
+	 * @param _ptvLo The low 32 bits of a Psion time.
+	 */
+	void setPsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo);
+
+	/**
 	 * Sets the Psion time zone of this instance.
 	 *
 	 * @param _ptz The new Psion time zone.
@@ -134,6 +165,13 @@ public:
 	 * @param _utv The new Unix time representation.
 	 */
 	void setUnixTime(struct timeval *_utv);
+
+	/**
+	 * Sets the value of this instance.
+	 *
+	 * @param _utv The new Unix time representation.
+	 */
+	void setUnixTime(time_t time);
 
 	/**
 	 * Sets the value of this instance to the
@@ -164,6 +202,22 @@ public:
 	 * @returns The instance's current time a Psion struct psi_timeval_t.
 	 */
 	psi_timeval &getPsiTimeval(void);
+
+	/**
+	 * Retrieves the instance's current value
+	 * in Psion time format, high 32 bits.
+	 *
+	 * @returns The instance's current time as lower 32 bits of a Psion struct psi_timeval_t.
+	 */
+	const unsigned long getPsiTimeLo(void);
+
+	/**
+	 * Retrieves the instance's current value
+	 * in Psion time format, low 32 bits.
+	 *
+	 * @returns The instance's current time as upper 32 bits of a Psion struct psi_timeval_t.
+	 */
+	const unsigned long getPsiTimeHi(void);
 
 	/**
 	 * Prints the instance's value in human readable format.

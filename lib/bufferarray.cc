@@ -125,15 +125,24 @@ operator [](const unsigned long index)
 	return buff[index];
 }
 
-bufferArray &bufferArray::
-operator +(const bufferStore &a)
+bufferArray bufferArray::
+operator +(const bufferStore &s)
 {
-	append(a);
-	return *this;
+	bufferArray res = *this;
+	res += s;
+	return res;
+}
+
+bufferArray bufferArray::
+operator +(const bufferArray &a)
+{
+	bufferArray res = *this;
+	res += a;
+	return res;
 }
 
 bufferArray &bufferArray::
-operator +(const bufferArray &a)
+operator +=(const bufferArray &a)
 {
 	lenAllocd += a.lenAllocd;
 	bufferStore *nb = new bufferStore[lenAllocd];
@@ -148,8 +157,8 @@ operator +(const bufferArray &a)
 }
 
 bufferArray &bufferArray::
-operator +=(const bufferStore &a)
+operator +=(const bufferStore &s)
 {
-	append(a);
+	append(s);
 	return *this;
 }

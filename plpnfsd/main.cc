@@ -46,7 +46,7 @@ long rfsv_dir(const char *file, dentry **e) {
 
 	if (!a)
 		return -1;
-	ret = a->dir(&(*file), &entries);
+	ret = a->dir(file, entries);
 	while (!entries.empty()) {
 		bufferStore s;
 		s = entries.pop();
@@ -54,9 +54,9 @@ long rfsv_dir(const char *file, dentry **e) {
 		*e = (dentry *)malloc(sizeof(dentry));
 		if (!*e)
 			return -1;
-		(*e)->time = s.getDWord(0);
+		(*e)->time = ((PsiTime *)s.getDWord(0))->getTime();
 		(*e)->size = s.getDWord(4);
-		(*e)->attr = a->attr2std(s.getDWord(8));
+		(*e)->attr = s.getDWord(8);
 		(*e)->name = strdup(s.getString(12));
 		(*e)->next = tmp;
 	}
@@ -66,7 +66,7 @@ long rfsv_dir(const char *file, dentry **e) {
 long rfsv_dircount(const char *file, long *count) {
 	if (!a)
 		return -1;
-	return a->dircount(&(*file), &(*count));
+	return a->dircount(file, *count);
 }
 
 long rfsv_rmdir(const char *name) {
@@ -142,6 +142,7 @@ static long rfsv_opencached(const char *name, long mode) {
 
 long rfsv_read(char *buf, long offset, long len, char *name) {
 	long ret = 0;
+	long r_offset;
 
 	if (!a)
 		return -1;
@@ -150,20 +151,22 @@ long rfsv_read(char *buf, long offset, long len, char *name) {
 		if((ret = rfsv_opencached(name, rfsv::PSI_O_RDONLY)))
 			return ret;
 	}
-	if (a_offset != offset)
-		ret = a->fseek(a_handle, offset, rfsv::PSI_SEEK_SET);
-	if (ret >= 0) {
-		a_offset = offset;
-		ret = a->fread(a_handle, (unsigned char *)buf, len);
-		if (ret <= 0)
-			return ret;
-		a_offset += ret;
+	if (a_offset != offset) {
+		if (a->fseek(a_handle, offset, rfsv::PSI_SEEK_SET, r_offset) != rfsv::E_PSI_GEN_NONE)
+			return -1;
+		if (offset != r_offset)
+			return -1;
 	}
+	a_offset = offset;
+	if (a->fread(a_handle, (unsigned char *)buf, len, ret) != rfsv::E_PSI_GEN_NONE)
+		return -1;
+	a_offset += ret;
 	return ret;
 }
 
 long rfsv_write(char *buf, long offset, long len, char *name) {
 	long ret = 0;
+	long r_offset;
 
 	if (!a)
 		return -1;
@@ -174,15 +177,16 @@ long rfsv_write(char *buf, long offset, long len, char *name) {
 		if ((ret = rfsv_opencached(name, rfsv::PSI_O_RDWR)))
 			return ret;
 	}
-	if (a_offset != offset)
-		ret = a->fseek(a_handle, offset, rfsv::PSI_SEEK_SET);
-	if (ret >= 0) {
-		a_offset = offset;
-		ret = a->fwrite(a_handle, (unsigned char *)buf, len);
-		if (ret <= 0)
-			return ret;
-		a_offset += ret;
+	if (a_offset != offset) {
+		if (a->fseek(a_handle, offset, rfsv::PSI_SEEK_SET, r_offset) != rfsv::E_PSI_GEN_NONE)
+			return -1;
+		if (offset != r_offset)
+			return -1;
 	}
+	a_offset = offset;
+	if (a->fwrite(a_handle, (unsigned char *)buf, len, ret) != rfsv::E_PSI_GEN_NONE)
+		return -1;
+	a_offset += ret;
 	return ret;
 }
 
@@ -191,7 +195,7 @@ long rfsv_setmtime(const char *name, long time) {
 		return -1;
 	if (a_filename && !strcmp(a_filename, name))
 		rfsv_closecached();
-	return a->fsetmtime(name, time);
+	return a->fsetmtime(name, PsiTime(time));
 }
 
 long rfsv_setsize(const char *name, long size) {
@@ -215,30 +219,27 @@ long rfsv_setattr(const char *name, long sattr, long dattr) {
 		return -1;
 	if (a_filename && !strcmp(name, a_filename))
 		rfsv_closecached();
-	dattr = a->std2attr(dattr);
-	sattr = a->std2attr(sattr);
 	return a->fsetattr(name, dattr, sattr);
 }
 
 long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
-	long res, psiattr;
+	long res;
+	PsiTime pt;
 	
 	if (!a)
 		return -1;
-	res = a->fgeteattr(&(*name), &psiattr, &(*size), &(*time));
-	*attr = a->attr2std(psiattr);
+	res = a->fgeteattr(name, *attr, *size, pt);
+	*time = pt.getTime();
 	return res;
 }
 
 long rfsv_statdev(char letter) {
 	long vfree, vtotal, vattr, vuniqueid;
 	int devnum = letter - 'A';
-	char *name;
 
 	if (!a)
 		return -1;
-	name = a->devinfo(devnum, &vfree, &vtotal, &vattr, &vuniqueid);
-	return (name == NULL);
+	return (a->devinfo(devnum, vfree, vtotal, vattr, vuniqueid, NULL) != rfsv::E_PSI_GEN_NONE);
 }
 
 long rfsv_rename(const char *oldname, const char *newname) {
@@ -255,18 +256,18 @@ long rfsv_drivelist(int *cnt, device **dlist) {
 
 	if (!a)
 		return -1;
-	ret = a->devlist(&devbits);
+	ret = a->devlist(devbits);
 	if (ret == 0)
 		for (i = 0; i<26; i++) {
-			char *name;
+			char name[256];
 			long vtotal, vfree, vattr, vuniqueid;
 
 			if ((devbits & 1) &&
-			    ((name = a->devinfo(i, &vfree, &vtotal, &vattr, &vuniqueid)))) {
+			    ((a->devinfo(i, vfree, vtotal, vattr, vuniqueid, name) == rfsv::E_PSI_GEN_NONE))) {
 				device *next = *dlist;
 				*dlist = (device *)malloc(sizeof(device));
 				(*dlist)->next = next;
-				(*dlist)->name = name;
+				(*dlist)->name = strdup(name);
 				(*dlist)->total = vtotal;
 				(*dlist)->free = vfree;
 				(*dlist)->letter = 'A' + i;
