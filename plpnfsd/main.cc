@@ -23,18 +23,17 @@ extern "C" {
 
 static rfsv *a;
 static rfsvfactory *rf;
-static char *a_filename;
+static char *a_filename = 0;
 static long  a_handle;
 static long  a_offset;
 static long  a_openmode;
 
 long rfsv_isalive() {
 	if (!a) {
-		a = rf->create(true);
-		if (a != NULL)
-			return (a->getStatus() == 0);
+		if (!(a = rf->create(true)))
+			return 0;
 	}
-	return 0;
+	return (a->getStatus() == 0);
 }
 
 long rfsv_dir(const char *file, dentry **e) {
@@ -79,27 +78,33 @@ long rfsv_mkdir(const char *file) {
 	return a->mkdir(file);
 }
 
+static long rfsv_closecached() {
+	if (!a)
+		return -1;
+	if (!a_filename)
+		return 0;
+	a->fclose(a_handle);
+	free(a_filename);
+	a_filename = 0;
+	return 0;
+}
+
 long rfsv_remove(const char *file) {
 	if (!a)
 		return -1;
+	if (a_filename && !strcmp(a_filename, file))
+		rfsv_closecached();
 	return a->remove(file);
 }
 
 long rfsv_fclose(long handle) {
 	if (!a)
 		return -1;
+	if (a_filename && (handle == a_handle)) {
+		free(a_filename);
+		a_filename = 0;
+	}
 	return a->fclose(handle);
-}
-
-long rfsv_fopen(long attr, const char *file, long *handle) {
-	long ph;
-	long ret;
-
-	if (!a)
-		return -1;
-	ret = a->fopen(a->opMode(attr), file, ph);
-	*handle = ph;
-	return ret;
 }
 
 long rfsv_fcreate(long attr, const char *file, long *handle) {
@@ -108,6 +113,8 @@ long rfsv_fcreate(long attr, const char *file, long *handle) {
 
 	if (!a)
 		return -1;
+	if (a_filename && !strcmp(a_filename, file))
+		rfsv_closecached();
 	ret = a->fcreatefile(attr, file, ph);
 	*handle = ph;
 	return ret;
@@ -128,17 +135,6 @@ static long rfsv_opencached(const char *name, long mode) {
 	a_openmode = mode;
 	a_filename = strdup(name);
 	return ret;
-}
-
-static long rfsv_closecached() {
-	if (!a)
-		return -1;
-	if (!a_filename)
-		return 0;
-	a->fclose(a_handle);
-	free(a_filename);
-	a_filename = 0;
-	return 0;
 }
 
 long rfsv_read(char *buf, long offset, long len, char *name) {
@@ -192,6 +188,8 @@ long rfsv_write(char *buf, long offset, long len, char *name) {
 long rfsv_setmtime(const char *name, long time) {
 	if (!a)
 		return -1;
+	if (a_filename && !strcmp(a_filename, name))
+		rfsv_closecached();
 	return a->fsetmtime(name, time);
 }
 
@@ -202,6 +200,8 @@ long rfsv_setsize(const char *name, long size) {
 
 	if (!a)
 		return -1;
+	if (a_filename && !strcmp(name, a_filename))
+		return a->fsetsize(a_handle, size);
 	ret = a->fopen(a->opMode(rfsv::PSI_O_RDWR), name, ph);
 	if (!ret) {
 		ret = a->fsetsize(ph, size);
@@ -213,7 +213,10 @@ long rfsv_setsize(const char *name, long size) {
 long rfsv_setattr(const char *name, long sattr, long dattr) {
 	if (!a)
 		return -1;
-	return a->fsetattr(name, dattr, sattr);
+	if (a_filename && !strcmp(name, a_filename))
+		rfsv_closecached();
+	long ret = a->fsetattr(name, dattr, sattr);
+	return ret;
 }
 
 long rfsv_getattr(const char *name, long *attr, long *size, long *time) {

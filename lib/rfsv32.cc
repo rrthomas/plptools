@@ -300,7 +300,8 @@ opMode(long mode)
 	long ret = 0;
 
 	ret |= (((mode & 03) == PSI_O_RDONLY) ? 0 : EPOC_OMODE_READ_WRITE);
-	ret |= (mode & PSI_O_EXCL) ? 0 : EPOC_OMODE_SHARE_READERS;
+	if (!ret)
+		ret |= (mode & PSI_O_EXCL) ? 0 : EPOC_OMODE_SHARE_READERS;
 	return ret;
 }
 

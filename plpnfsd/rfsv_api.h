@@ -16,7 +16,6 @@ extern long rfsv_rmdir(const char *name);
 extern long rfsv_remove(const char *name);
 extern long rfsv_rename(const char *oldname, const char *newname);
 extern long rfsv_fclose(long handle);
-extern long rfsv_fopen(long attr, const char *name, long *handle);
 extern long rfsv_fcreate(long attr, const char *name, long *handle);
 extern long rfsv_read(char *buf, long offset, long len, char *name);
 extern long rfsv_write(char *buf, long offset, long len, char *name);

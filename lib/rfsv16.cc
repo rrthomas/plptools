@@ -279,7 +279,8 @@ opMode(long mode)
 	ret |= (mode & PSI_O_TRUNC) ? P_FREPLACE : 0;
 	ret |= (mode & PSI_O_CREAT) ? P_FCREATE : 0;
 	ret |= (mode & PSI_O_APPEND) ? P_FAPPEND : 0;
-	ret |= (mode & PSI_O_EXCL) ? 0 : P_FSHARE;
+	if (mode & 03) == PSI_O_RDONLY)
+		ret |= (mode & PSI_O_EXCL) ? 0 : P_FSHARE;
 	return ret;
 }
 
