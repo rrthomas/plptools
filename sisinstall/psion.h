@@ -20,6 +20,9 @@ public:
 
 	virtual bool connect();
 
+	virtual Enum<rfsv::errs> copyFromPsion(const char * const from, int fd,
+										   cpCallback_t func);
+
     virtual Enum<rfsv::errs> copyToPsion(const char * const from,
 										 const char * const to,
 										 void *, cpCallback_t func);

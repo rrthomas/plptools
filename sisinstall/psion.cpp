@@ -63,6 +63,13 @@ Psion::connect()
 }
 
 Enum<rfsv::errs>
+Psion::copyFromPsion(const char * const from, int fd,
+					 cpCallback_t func)
+{
+	return m_rfsv->copyFromPsion(from, fd, func);
+}
+
+Enum<rfsv::errs>
 Psion::copyToPsion(const char * const from, const char * const to,
 				   void *, cpCallback_t func)
 {

@@ -28,6 +28,12 @@
 #include <stdio.h>
 
 SisRC
+SISFile::compareApp(SISFile* other)
+{
+	return m_header.compareApp(&other->m_header);
+}
+
+SisRC
 SISFile::fillFrom(uint8_t* buf, off_t len)
 {
 	int ix = 0;

@@ -38,6 +38,14 @@ class SISReqRecord;
 class SISFile
 {
 public:
+
+	/**
+	 * Compare uid and version number of this file, with another.
+	 *
+	 * @see SISFileHeader::compareApp()
+	 */
+	SisRC compareApp(SISFile* other);
+
 	/**
 	 * Populate the fields.
 	 *
@@ -61,6 +69,11 @@ public:
 	 * Get the name of this component, in the selected language.
 	 */
 	uint8_t* getName();
+
+	/**
+	 * Is this the same application?
+	 */
+	bool sameApp(SISFile* other);
 
 	/**
 	 * Set the installed drive.

@@ -63,6 +63,8 @@ private:
 
 	int installFile(SISFileRecord* fileRecord);
 
+	void uninstall(SISFile* sisFile);
+
 };
 
 #endif

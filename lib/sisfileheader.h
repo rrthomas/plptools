@@ -36,6 +36,11 @@ class SISFileHeader
 public:
 
 	/**
+	 * Compare uid and version number of this file, with another.
+	 */
+	SisRC compareApp(SISFileHeader* other);
+
+	/**
 	 * Populate the fields.
 	 *
 	 * @param buf The buffer to read from.

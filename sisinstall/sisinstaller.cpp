@@ -136,7 +136,7 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 				case 2:
 					printf("(Continue installation?) [Y]es/No\n");
 					fgets(readbuf, 2, stdin);
-					if (!strchr("Nn", readbuf[0]))
+					if (strchr("Nn", readbuf[0]))
 						{
 						// Watch out if we have copied any files
 						// already.
@@ -234,6 +234,13 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	uint8_t* compName = m_file->getName();
 	printf("Installing component: `%s'\n", compName);
 
+	// In order to check requisites and previous versions, we need to
+	// load all sis files from the c:/system/install directory.
+	// This is the only way to find out if a specific application or
+	// library has been loaded, since the sis file names could be just
+	// about anything.
+	//
+
 	// Check Requisites.
 	//
 	n = m_file->m_header.m_nreqs;
@@ -255,6 +262,76 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 		   m_file->m_header.m_uid1,
 		   m_file->m_header.m_major,
 		   m_file->m_header.m_minor);
+	char* resname = new char[256];
+	int namelen = 0;
+	while (compName[namelen] != 0)
+		{
+		if (compName[namelen] == ' ')
+			break;
+		namelen++;
+		}
+	sprintf(resname, "C:\\System\\Install\\%.*s.sis", namelen, compName);
+
+#if 0
+	char srcName[32];
+	strcpy(srcName, "/tmp/plptools-sis-XXXXXX");
+	int fd = mkstemp(srcName);
+	if (-1 == fd)
+		{
+		printf("Couldn't create temp file: %s\n", strerror(errno));
+		return SIS_FAILED;
+		}
+	Enum<rfsv::errs> res;
+	continueRunning = 1;
+	printf("Copying from %s to temp file %s\n", resname, srcName);
+	res = m_psion->copyFromPsion(resname, fd, checkAbortHash);
+	if (res == rfsv::E_PSI_GEN_NONE)
+		{
+		off_t fileLen = lseek(fd, SEEK_END, 0);
+		if (logLevel >= 2)
+			printf("Read %d bytes from the Psion file %s\n",
+				   fileLen, resname);
+		lseek(fd, SEEK_SET, 0);
+		uint8_t* sisbuf = new uint8_t[fileLen];
+		int rc = read(fd, sisbuf, fileLen);
+		if (rc == fileLen)
+			{
+			bool uninstallFirst = false;
+			SISFile sisFile;
+			SisRC rc2 = sisFile.fillFrom(sisbuf, fileLen);
+			if (rc2 == SIS_OK)
+				{
+				switch (sisFile.compareApp(m_file))
+					{
+					case SIS_DIFFERENT_APP:
+						// NOW WHAT?
+						return SIS_DIFFERENT_APP;
+
+					case SIS_VER_EARLIER:
+						uninstallFirst = true;
+						break;
+
+					case SIS_SAME_OR_LATER:
+						// Ask for confirmation.
+						uninstallFirst = true;
+						break;
+
+					case SIS_OTHER_VARIANT:
+						// Ask for confirmation.
+						uninstallFirst = true;
+						break;
+
+					}
+				if (uninstallFirst)
+					{
+					// Not yet...
+				//	uninstall(&sisFile);
+					}
+				}
+			}
+		}
+	close(fd);
+#endif
 
 	// Install file components.
 	//
@@ -265,7 +342,8 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	int nCopiedFiles = 0;
 	int firstFile = -1;
 	bool skipnext = false;
-	while (n-- > 0)
+	bool aborted = false;
+	while (!aborted && (n-- > 0))
 		{
 		SISFileRecord* fileRecord = &m_file->m_fileRecords[n];
 		m_fileNo = (fileRecord->m_flags & 1) ? lang : 0;
@@ -297,11 +375,12 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 					skipnext = true;
 					break;
 				case FILE_ABORT:
+					aborted = true;
 					break;
 				}
 			}
-
-		nCopiedFiles++;
+		if (!aborted)
+			nCopiedFiles++;
 		}
 	m_file->setFiles(nCopiedFiles);
 	if (logLevel >= 1)
@@ -309,21 +388,21 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 			   m_file->m_header.m_installationFiles,
 			   m_file->m_header.m_nfiles,
 			   firstFile);
+	if (nCopiedFiles == 0)
+		{
+		// There is no need to copy any uninstall information to the
+		// psion, unless we've actually copied anything there.
+		//
+		return SIS_ABORTED;
+		}
 
 	// Copy the updated sis file to the epoc machine.
 	//
-	char* resname = new char[256];
-	int namelen = 0;
-	while (compName[namelen] != 0)
-		{
-		if (compName[namelen] == ' ')
-			break;
-		namelen++;
-		}
-	sprintf(resname, "C:\\System\\Install\\%.*s.sis", namelen, compName);
 	printf("Creating residual sis file %s\n", resname);
 	copyBuf(buf, firstFile, resname);
 	delete[] resname;
+	if (aborted)
+		return SIS_ABORTED;
 	return SIS_OK;
 }
 
