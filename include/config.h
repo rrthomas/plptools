@@ -3,7 +3,7 @@
 
 #define VERSION "0.3" 
 
-#define PACKAGE "plpnfsd"
+#define PACKAGE "plptools"
 
 /* Define if you have the <stdlib.h> header file.  */
 #define HAVE_STDLIB_H 1
