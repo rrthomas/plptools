@@ -201,6 +201,7 @@ packet::
 {
     if (fd != -1) {
 	pthread_cancel(datapump);
+	pthread_join(datapump, NULL);
 	ser_exit(fd);
     }
     fd = -1;
@@ -212,8 +213,10 @@ packet::
 void packet::
 reset()
 {
-    if (fd != -1)
+    if (fd != -1) {
 	pthread_cancel(datapump);
+	pthread_join(datapump, NULL);
+    }
     outRead = outWrite = 0;
     internalReset();
     if (fd != -1)
@@ -229,7 +232,7 @@ internalReset()
 	ser_exit(fd);
 	fd = -1;
     }
-    usleep(1000000);
+    usleep(100000);
     inRead = inWrite = 0;
     esc = false;
     lastFatal = false;
@@ -499,13 +502,12 @@ linkFailed()
 #endif
 	) {
 	failed = true;
-	justStarted = true;
     }
     if ((verbose & PKT_DEBUG_LOG) && lastFatal)
 	cout << "packet: linkFATAL\n";
     if ((verbose & PKT_DEBUG_LOG) && failed)
 	cout << "packet: linkFAILED\n";
-    return lastFatal || failed;
+    return (lastFatal || failed);
 }
 
 /*

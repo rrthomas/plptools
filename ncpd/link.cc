@@ -98,7 +98,6 @@ retransTimeout()
 
 void Link::
 reset() {
-    p->reset();
     txSequence = 1;
     rxSequence = -1;
     failed = false;
@@ -108,7 +107,7 @@ reset() {
     purgeAllQueues();
     for (int i = 0; i < 256; i++)
 	xoff[i] = false;
-
+    p->reset();
     // submit a link request
     sendReqReq();
 }
@@ -335,6 +334,7 @@ receive(bufferStore buff)
 		    rxSequence = 0;
 		    txSequence = 1;
 		    purgeAllQueues();
+		    p->setEpoc(false);
 		    if (verbose & LNK_DEBUG_LOG)
 			cout << "Link: 1-linkType set to " << linkType << endl;
 		}
@@ -444,6 +444,7 @@ receive(bufferStore buff)
 		    rxSequence = 0;
 		    txSequence = 1; // Our ReqReq was seq 0
 		    purgeAllQueues();
+		    p->setEpoc(false);
 		    sendAck(rxSequence);
 		}
 	    }

@@ -257,6 +257,16 @@ decodeControlMessage(bufferStore & buff)
 			cout << "ncp: REJECT client connect" << endl;
 		}
 		controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
+
+		// Create linkchan if it does not yet exist
+		if (!lChan) {
+		    if (verbose & NCP_DEBUG_LOG)
+			cout << "ncp: new active linkChan" << endl;
+		    channelPtr[localChan] =
+			lChan = new linkChan(this, -1);
+		    lChan->setVerbose(verbose);
+		}
+
 	    }
 	    break;
 
