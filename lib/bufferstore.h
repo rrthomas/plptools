@@ -187,7 +187,10 @@ public:
 	 * Appends data to the content of this instance.
 	 *
 	 * @param b The bufferStore whose content to append.
-	 * @param maxLen Length of content.
+	 * @param maxLen Length of content to append. If
+	 *               @p maxLen is less than 0 or greater than
+	 *               the current length of @p b , then the
+	 *               whole content of @p b is appended.
 	 */
 	void addBuff(const bufferStore &b, long maxLen = -1);
   

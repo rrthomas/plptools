@@ -83,7 +83,7 @@ typedef struct psi_timezone_t {
  * NOTE: For proper conversion, the current timezone of
  * the Psion has to be set. For EPOC devices, the
  * timezone can be evaluated using
- * @ref rpcs::getMachineInfo. For SIBO devices,
+ * @ref rpcs::getMachineInfo . For SIBO devices,
  * unfortunately there is no known method of retrieving
  * this information. Therefore, if the timezone is
  * <em>not</em> set, a fallback using the environment
