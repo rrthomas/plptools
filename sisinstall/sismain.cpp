@@ -2,6 +2,7 @@
 #include "sisfile.h"
 #include "sisinstaller.h"
 #include "psion.h"
+#include "fakepsion.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -14,18 +15,33 @@
 
 static void error(int line)
 {
-	fprintf(stderr, "Got errno = %d (%s) on line %d\n",
-			errno, strerror(errno), line);
+	fprintf(stderr, "Got errno = %d on line %d\n", errno, line);
 	exit(1);
 }
 
 void main(int argc, char* argv[])
 {
 	char* filename = 0;
-	if (argc > 1)
-		filename = argv[1];
-	else
-		return 0;
+	char option;
+	bool dryrun = false;
+	while ((option = getopt(argc, argv, "nl:")) != -1)
+		{
+		switch (option)
+			{
+			case 'l':
+				logLevel = atoi(optarg);
+				break;
+			case 'n':
+				dryrun = true;
+				break;
+			}
+		}
+	if (optind < argc)
+		{
+		filename = argv[optind];
+		printf("Installing sis file %s%s\n", filename,
+			   dryrun ? ", not really" : "");
+		}
 	struct stat st;
 	if (-1 == stat(filename, &st))
 		error(__LINE__);
@@ -39,23 +55,26 @@ void main(int argc, char* argv[])
 	if (-1 == read(fd, buf, len))
 		error(__LINE__);
 	close(fd);
-	Psion psion;
-#if 0
-	if (!psion.connect())
+	Psion* psion;
+	if (dryrun)
+		psion = new FakePsion();
+	else
+		psion = new Psion();
+	if (!psion->connect())
 		{
 		printf("Couldn't connect with the Psion\n");
 		exit(1);
 		}
-#endif
 	createCRCTable();
 	SISFile sisFile;
 	sisFile.fillFrom(buf);
-	SISInstaller installer;
-	installer.setPsion(&psion);
-	installer.run(&sisFile, buf);
-#if 0
-	psion.disconnect();
-#endif
+	if (!dryrun)
+		{
+		SISInstaller installer;
+		installer.setPsion(psion);
+		installer.run(&sisFile, buf);
+		}
+	psion->disconnect();
 
 	exit(0);
 }

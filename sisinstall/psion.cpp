@@ -1,3 +1,4 @@
+
 #include "psion.h"
 
 #include <plpintl.h>
@@ -13,6 +14,11 @@
 #include <netdb.h>
 
 #include <stdio.h>
+
+Psion::~Psion()
+{
+	disconnect();
+}
 
 bool
 Psion::connect()
@@ -41,11 +47,11 @@ Psion::connect()
 
 	m_skt = new ppsocket();
 	if (!m_skt->connect(NULL, sockNum)) {
-		return 1;
+		return false;
 	}
 	m_skt2 = new ppsocket();
 	if (!m_skt2->connect(NULL, sockNum)) {
-		return 1;
+		return false;
 	}
 	m_rfsvFactory = new rfsvfactory(m_skt);
 	m_rpcsFactory = new rpcsfactory(m_skt2);
@@ -53,22 +59,41 @@ Psion::connect()
 	m_rpcs = m_rpcsFactory->create(true);
 	if ((m_rfsv != NULL) && (m_rpcs != NULL))
 		return true;
+	return false;
 }
 
-Psion::~Psion()
+Enum<rfsv::errs>
+Psion::copyToPsion(const char * const from, const char * const to,
+				   void *, cpCallback_t func)
 {
-	disconnect();
+	return m_rfsv->copyToPsion(from, to, NULL, func);
+}
+
+Enum<rfsv::errs>
+Psion::devinfo(const char drive, PlpDrive& plpDrive)
+{
+	return m_rfsv->devinfo(drive, plpDrive);
 }
 
 Enum<rfsv::errs>
 Psion::devlist(u_int32_t& devbits)
 {
-	printf("Running devlist\n");
-	u_int32_t devb;
 	Enum<rfsv::errs> res;
-	res = m_rfsv->devlist(devb);
-	devbits = devb;
+	res = m_rfsv->devlist(devbits);
 	return res;
+}
+
+bool
+Psion::dirExists(const char* name)
+{
+	rfsvDirhandle handle;
+	Enum<rfsv::errs> res;
+	bool exists = false;
+	res = m_rfsv->opendir(rfsv::PSI_A_ARCHIVE, name, handle);
+	if (res == rfsv::E_PSI_GEN_NONE)
+		exists = true;
+	res = m_rfsv->closedir(handle);
+	return exists;
 }
 
 void
@@ -80,5 +105,11 @@ Psion::disconnect()
 	delete m_skt2;
 	delete m_rfsvFactory;
 	delete m_rpcsFactory;
+}
+
+Enum<rfsv::errs>
+Psion::mkdir(const char* dir)
+{
+	return m_rfsv->mkdir(dir);
 }
 

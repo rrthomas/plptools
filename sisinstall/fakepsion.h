@@ -1,22 +1,16 @@
-#ifndef _PSION_H
-#define _PSION_H
+#ifndef _FAKEPSION_H
+#define _FAKEPSION_H
 
-#include <Enum.h>
-#include "rfsv.h"
-
-class ppsocket;
-class rfsvfactory;
-class rpcsfactory;
-class rpcs;
+#include "psion.h"
 
 /**
- * Semi smart proxy for communicating with a Psion.
+ * A dummy version of the Psion proxy, mainly for testing the installer.
  */
-class Psion
+class FakePsion : public Psion
 {
 public:
 
-	virtual ~Psion();
+	virtual ~FakePsion();
 
 	virtual bool connect();
 
@@ -33,15 +27,6 @@ public:
 	virtual void disconnect();
 
 	virtual Enum<rfsv::errs> mkdir(const char* dir);
-
-private:
-
-	ppsocket* m_skt;
-	ppsocket* m_skt2;
-	rfsvfactory* m_rfsvFactory;
-	rpcsfactory* m_rpcsFactory;
-	rpcs* m_rpcs;
-	rfsv* m_rfsv;
 
 };
 
