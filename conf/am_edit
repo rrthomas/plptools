@@ -1237,9 +1237,10 @@ sub tag_POFILES ()
     else
     {
         $tmp =~ s/\034/ /g;
+	$tmp =~ s/\@POFILES\@//g;
         $pofiles = $tmp;
     }
-    return 1    if (!$pofiles);        # Nothing to do
+    return 1    if ($pofiles =~ /^[ \t]*$/);        # Nothing to do
 
     handle_POFILES($pofiles, $kdelang);
 
@@ -1701,7 +1702,7 @@ sub updateMakefile ()
     open (FILEOUT, "> $makefile")
                         || die "Could not create $makefile: $!\n";
 
-    print FILEOUT "\# $progId - " . '$Revision: 1.208 $ '  . "\n";
+    print FILEOUT "\# $progId - " . '$Revision: 1.1 $ '  . "\n";
     $MakefileData =~ s/\034/\\\n/g;    # Restore continuation lines
     print FILEOUT $MakefileData;
     close FILEOUT;
