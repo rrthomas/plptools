@@ -573,7 +573,7 @@ sendCommand(enum commands cc, bufferStore & data)
 	if (status == E_PSI_FILE_DISC) {
 		reconnect();
 		if (status == E_PSI_FILE_DISC)
-			return FALSE;
+			return false;
 	}
 	
 	bool result;

@@ -504,7 +504,7 @@ bool ppsocket::
 bindSocket(char *Host, int Port)
 {
 
-	// If we are already bound return FALSE but with no last error
+	// If we are already bound return false but with no last error
 
 	m_LastError = 0;
 
@@ -542,7 +542,7 @@ bindInRange(char *Host, int Low, int High, int Retries)
 {
 	int port, i;
 
-	// If we are already bound return FALSE but with no last error
+	// If we are already bound return false but with no last error
 	m_LastError = 0;
 	if (m_Bound) {
 		return (false);
@@ -627,7 +627,7 @@ createSocket(void)
 		return (false);
 	}
 	// By default set no lingering
-	linger(FALSE, 0);
+	linger(false, 0);
 	// Return indicating success
 	return (true);
 }

@@ -1,19 +1,11 @@
-#if !defined(AFX_ppsocket_H__5611BC0C_3E39_11D1_8E4B_00805F2AB205__INCLUDED_)
-#define AFX_ppsocket_H__5611BC0C_3E39_11D1_8E4B_00805F2AB205__INCLUDED_
-
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
+#ifndef _PPSOCKET_H_
+#define _PPSOCKET_H_
 
 #include <unistd.h>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#ifndef TRUE
-#define  TRUE		-1
-#define  FALSE		0
-#endif
 #define  DWORD		unsigned int
 #define  SOCKET		int
 
@@ -89,9 +81,6 @@ private:
   struct sockaddr m_HostAddr, m_PeerAddr;
   int m_Port;
   bool   m_Bound;
-#ifdef WIN32
-  OVERLAPPED m_ReadOverlapped, m_WriteOverlapped;
-#endif
   DWORD m_Timeout;
   DWORD m_LastError;
 };

@@ -84,11 +84,19 @@
        this file on some operating systems is vital for functionality
        of mount/umount, this update can be disabled with the above option.
 
+  --enable-kde
+
+       Enable build of KDE related stuff. This needs installed
+       KDE 2.0.1 headers/development-libraries as well as QT
+       headers/development-libraries.
+
  You will get 3 programs and a shared and static library.
  By default, the install-prefix is /usr/local, so you probably
  should add /usr/local/lib to your /etc/ld.so.conf and then run
  ldconfig after installation. Another option is to run configure
  with the option --prefix=/usr
+ When enabling KDE stuff, you will get an additional library
+ kio_plp.so, which installs into KDE's library dir.
 
  Please read the man pages ncpd(8) plpftp(1) and plpnfsd(8)! The
  information there is more up-to-date.
@@ -122,6 +130,14 @@
  disconnected. After that, the mount-point will appear empty.
  As soon as the psion is connected again, the subdirectories
  will reappear. (possibly with a few secs delay)
+
+ The KDE2 KIOslave library adds support for a new protocol named
+ "psion:". So in konqueror, just open psion:/ to see your Psion's
+ drives. You now can copy, move, rename, open ... all those
+ operations you are used to. Any KDE application which supports
+ URLs should be able to deal with the files on the Psion.
+ Currently there are no mime-types for Psion-Files but i soon will
+ add these.
 
 Have fun.
  -Fritz
