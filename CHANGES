@@ -1,4 +1,11 @@
-Changes from Version 0.6 to now (not yet released)
+Changes from Version 0.7 to 0.8
+
+ - Fixed lot of bugs, especially in nfs code
+ - Series 3 _should_ work again.
+ - Added support for KDE (KDE >= 2.1)
+ - Added KDE Application "kpsion"
+
+Changes from Version 0.6 to 0.7
 
  - Changed timezone-stuff again. With S5, now the machine-info is
    evaluated. This info holds the Psion's time-offset so that we
@@ -35,7 +42,7 @@ Changes from Version 0.6 to now (not yet released)
    restart-information to the specified file. runrestore reads a file
    created by killsave and starts all processes saved in this file.
    -> Functionality similar to the behavior of PsiWin before/after backup.
-   
+
 Changes from Version 0.5 to 0.6:
 
  - Maintenance release: bugfixes in plpnfsd and libs which make
