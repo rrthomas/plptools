@@ -45,6 +45,8 @@ public:
 	OPT_MACHNAME = 8,
 	OPT_BACKUPDRIVES = 9,
 	OPT_DRIVES = 10,
+	OPT_LASTFULL = 11,
+	OPT_LASTINC = 12,
     };
 
     enum cfgDefaults {

@@ -76,6 +76,8 @@ KPsionMainWindow::KPsionMainWindow()
     backupRunning = false;
     restoreRunning = false;
     formatRunning = false;
+    doScheduledBackup = false;
+    quitImmediately = true;
 
     view = new KIconView(this, "iconview");
     view->setSelectionMode(KIconView::Multi);
@@ -270,6 +272,11 @@ insertDrive(char letter, const char * const name) {
     it->setRenameEnabled(false);
 }
 
+bool KPsionMainWindow::
+shouldQuit() {
+    return quitImmediately;
+}
+
 void KPsionMainWindow::
 queryPsion() {
     u_int32_t devbits;
@@ -333,6 +340,7 @@ queryPsion() {
 		delete rfsvSocket;
 	    if (rfsvSocket)
 		delete rpcsSocket;
+	    quitImmediately = true;
 	    return;
 	}
 	NewPsionWizard *wiz = new NewPsionWizard(this, "newpsionwiz");
@@ -341,7 +349,63 @@ queryPsion() {
     statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
 			    STID_CONNECTION);
 
-    if (args->isSet("autobackup") || args->isSet("backup") ||
+    if (args->isSet("autobackup")) {
+	// Check, if scheduled backups to perform
+
+	doScheduledBackup = false;
+	KPsionConfig pcfg;
+	QIconViewItem *i;
+	QStringList::Iterator it;
+	QDateTime d;
+	KConfig *config = kapp->config();
+	QString uid = getMachineUID();
+	QString key;
+	int fi = pcfg.getIntervalDays(config, KPsionConfig::OPT_FULLINTERVAL);
+	int ii = pcfg.getIntervalDays(config, KPsionConfig::OPT_INCINTERVAL);
+
+	// Check for Full Backup
+	config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_LASTFULL));
+	for (it = backupDrives.begin(); it != backupDrives.end(); ++it) {
+	    key =
+		pcfg.getOptionName(KPsionConfig::OPT_LASTFULL).arg(uid).arg(*it);
+	    d.setTime_t(config->readNumEntry(key));
+
+	    if (fi && d.daysTo(QDateTime::currentDateTime()) >= fi) {
+		fullBackup = true;
+		for (i = view->firstItem(); i; i = i->nextItem()) {
+		    if (i->key() == *it) {
+			i->setSelected(true);
+			doScheduledBackup = true;
+		    }
+		}
+	    }
+	}
+	if (!doScheduledBackup) {
+	    // Check for Incremental Backup
+	    fullBackup = false;
+	    view->clearSelection();
+	    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_LASTINC));
+	    for (it = backupDrives.begin(); it != backupDrives.end(); ++it) {
+		key =
+		    pcfg.getOptionName(KPsionConfig::OPT_LASTINC).arg(uid).arg(*it);
+		d.setTime_t(config->readNumEntry(key));
+		if (ii && d.daysTo(QDateTime::currentDateTime()) >= ii) {
+		    for (i = view->firstItem(); i; i = i->nextItem()) {
+			if (i->key() == *it) {
+			    i->setSelected(true);
+			    doScheduledBackup = true;
+			}
+		    }
+		}
+	    }
+	}
+	if (!doScheduledBackup) {
+	    quitImmediately = true;
+	    return;
+	}
+	
+    }
+    if (doScheduledBackup || args->isSet("backup") ||
 	args->isSet("restore") || args->isSet("format")) {
 	view->setEnabled(false);
 	actionCollection()->action("restore")->setEnabled(false);
@@ -354,61 +418,11 @@ queryPsion() {
 
 void KPsionMainWindow::
 slotAutoAction() {
-    QString uid = getMachineUID();
-    KConfig *config = kapp->config();
-    KPsionConfig pcfg;
+    QIconViewItem *i;
 
-    if (args->isSet("autobackup")) {
-	bool any = false;
-	QStringList::Iterator it;
-	QDateTime d;
-	int fi = pcfg.getIntervalDays(config, KPsionConfig::OPT_FULLINTERVAL);
-	int ii = pcfg.getIntervalDays(config, KPsionConfig::OPT_INCINTERVAL);
-
-	KPsionBackupListView *bl = new KPsionBackupListView(0, "backups");
-	bl->readBackups(uid);
-
-	// Full Backups
-	for (it = backupDrives.begin(); it != backupDrives.end(); ++it) {
-	    d = bl->getLastBackup(KPsionBackupListView::FULL, *it);
-	    if (fi && d.daysTo(QDateTime::currentDateTime()) >= fi) {
-		fullBackup = true;
-		for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
-		    if (i->key() == *it) {
-			i->setSelected(true);
-			any = true;
-		    }
-		}
-	    }
-	}
-	if (any) {
-	    delete bl;
-	    doBackup();
-	    // If just made a backup, re-read backups
-	    bl = new KPsionBackupListView(0, "backups");
-	    bl->readBackups(uid);
-	}
-
-	// Incremental Backups
-	any = false;
-	fullBackup = false;
-	view->clearSelection();
-	for (it = backupDrives.begin(); it != backupDrives.end(); ++it) {
-	    d = bl->getLastBackup(KPsionBackupListView::INCREMENTAL, *it);
-	    if (ii && d.daysTo(QDateTime::currentDateTime()) >= ii) {
-		for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
-		    if (i->key() == *it) {
-			i->setSelected(true);
-			any = true;
-		    }
-		}
-	    }
-	}
-	delete bl;
-
-	if (any)
-	    doBackup();
-
+    if (doScheduledBackup) {
+	doBackup();
+	QTimer::singleShot(1000, this, SLOT(close()));
 	return;
     }
 
@@ -421,7 +435,7 @@ slotAutoAction() {
 	for (it = argl.begin(); it != argl.end(); ++it) {
 	    QString drv((*it).upper());
 
-	    for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+	    for (i = view->firstItem(); i; i = i->nextItem()) {
 		if (i->key() == drv) {
 		    i->setSelected(true);
 		    any = true;
@@ -432,6 +446,7 @@ slotAutoAction() {
 	    fullBackup = true;
 	    doBackup();
 	}
+	QTimer::singleShot(1000, this, SLOT(close()));
 	return;
     }
 
@@ -449,7 +464,7 @@ slotAutoAction() {
 		    "a <B>ROM</B> drive and therefore cannot be restored.</QT>"));
 		continue;
 	    }
-	    for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+	    for (i = view->firstItem(); i; i = i->nextItem()) {
 		if (i->key() == drv) {
 		    i->setSelected(true);
 		    any = true;
@@ -458,6 +473,7 @@ slotAutoAction() {
 	}
 	if (any)
 	    slotStartRestore();
+	QTimer::singleShot(1000, this, SLOT(close()));
 	return;
     }
 
@@ -468,7 +484,7 @@ slotAutoAction() {
 
 	for (it = argl.begin(); it != argl.end(); ++it) {
 	    QString drv((*it).upper());
-	    for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+	    for (i = view->firstItem(); i; i = i->nextItem()) {
 		if (i->key() == drv) {
 		    i->setSelected(true);
 		    any = true;
@@ -477,8 +493,10 @@ slotAutoAction() {
 	}
 	if (any)
 	    slotStartFormat();
+	QTimer::singleShot(1000, this, SLOT(close()));
 	return;
     }
+    QTimer::singleShot(1000, this, SLOT(close()));
 }
 
 QString KPsionMainWindow::
@@ -665,6 +683,22 @@ findTarEntry(const KTarEntry *te, QString path, QString rpath) {
 }
 
 void KPsionMainWindow::
+updateBackupStamps() {
+    KConfig *config = kapp->config();
+    KPsionConfig pcfg;
+    QString uid = getMachineUID();
+    int cfgBtype = (fullBackup)
+	? KPsionConfig::OPT_LASTFULL : KPsionConfig::OPT_LASTINC;
+    
+    config->setGroup(pcfg.getSectionName(cfgBtype));
+    for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+	QString key = pcfg.getOptionName(cfgBtype).arg(uid).arg(i->key());
+	if (i->isSelected())
+	    config->writeEntry(key, time(0));
+    }
+}
+
+void KPsionMainWindow::
 doBackup() {
     backupRunning = true;
     switchActions();
@@ -707,7 +741,9 @@ doBackup() {
 	emit setProgress(0);
 	statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
 				STID_CONNECTION);
-	KMessageBox::information(this, i18n("No files need backup"));
+	updateBackupStamps();
+	if (!args->isSet("autobackup"))
+	    KMessageBox::information(this, i18n("No files need backup"));
 	backupRunning = false;
 	switchActions();
 	return;
@@ -740,7 +776,7 @@ doBackup() {
     archiveName += (fullBackup) ? "/F-" : "/I-";
     time_t now = time(0);
     char tstr[30];
-    strftime(tstr, sizeof(tstr), "%Y-%m-%d-%H-%M-%S.tar.gz",
+    strftime(tstr, sizeof(tstr), "%Y-%m-%d-%H-%M-%S.tmp.gz",
 	     localtime(&now));
     archiveName += tstr;
     backupTgz = new KTarGz(archiveName);
@@ -827,6 +863,7 @@ doBackup() {
 	    }
 	    updateProgress(e.getSize());
 	}
+	updateBackupStamps();
     }
     // Restart previously running applications on the Psion
     // from saved state info.
@@ -835,7 +872,14 @@ doBackup() {
     backupTgz->close();
     delete backupTgz;
     if (badBackup)
-	unlink(archiveName.data());
+	::unlink(archiveName.latin1());
+    else {
+	// Rename Tarfile to its final name;
+	::rename(archiveName.latin1(),
+		 archiveName.replace(QRegExp("\\.tmp\\.gz$"), ".tar.gz"));
+
+    }
+
     backupRunning = false;
     switchActions();
     statusBar()->changeItem(i18n("Connected to %1").arg(machineName),

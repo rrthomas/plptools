@@ -54,7 +54,7 @@ public:
     bool isConnected() { return connected; }
     const KTarEntry *findTarEntry(const KTarEntry *te, QString path,
 				  QString rpath = "");
-
+    bool shouldQuit();
     static QString unix2psion(const char * const);
     static QString psion2unix(const char * const);
 
@@ -100,6 +100,7 @@ private:
     bool askOverwrite(PlpDirent e);
     void setDriveName(const char dchar, QString dname);
     void doFormat(QString drive);
+    void updateBackupStamps();
 
     rfsv *plpRfsv;
     rpcs *plpRpcs;
@@ -130,7 +131,9 @@ private:
     bool firstTry;
     bool shuttingDown;
     bool fullBackup;
+    bool doScheduledBackup;
     bool overWriteAll;
+    bool quitImmediately;
     int reconnectTime;
     int nextTry;
     int ncpdSpeed;

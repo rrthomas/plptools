@@ -322,6 +322,23 @@ uid2mime(PlpDirent &e) {
 }
 
 void PLPProtocol::
+appendUIDmime(PlpDirent &e, UDSEntry &entry) {
+    QString tmp;
+
+    if ((e.getAttr() & rfsv::PSI_A_DIR) == 0) {
+	PlpUID u = e.getUID();
+	UidMap::Iterator it = puids.find(u);
+	if (it != puids.end()) {
+	    UDSAtom atom;
+
+	    atom.m_uds = KIO::UDS_MIME_TYPE;
+	    atom.m_str = it.data();
+	    entry.append(atom);
+	}
+    }
+}
+
+void PLPProtocol::
 listDir(const KURL& _url) {
     KURL url(_url);
     QString path(QFile::encodeName(url.path(-1)));
@@ -371,18 +388,13 @@ listDir(const KURL& _url) {
 	UDSAtom atom;
 
 	PlpDirent e = files[i];
-	long attr = e.getAttr();
 
 	entry.clear();
 	atom.m_uds = KIO::UDS_NAME;
 	atom.m_str = e.getName();
 	entry.append(atom);
 
-	if ((attr & rfsv::PSI_A_DIR) == 0) {
-	    atom.m_uds = KIO::UDS_MIME_TYPE;
-	    atom.m_str = uid2mime(e);
-	    entry.append(atom);
-	}
+	appendUIDmime(e, entry);
 
 	completeUDSEntry(entry, e, rom);
 	listEntry(entry, false);
@@ -431,17 +443,14 @@ createVirtualDirEntry(UDSEntry & entry, bool rdonly, int type) {
 	    atom.m_long = S_IFDIR;
 	    entry.append(atom);
 	    atom.m_uds = KIO::UDS_GUESSED_MIME_TYPE;
-	    atom.m_uds = KIO::UDS_MIME_TYPE;
 	    atom.m_str = QString("inode/x-psion-drive");
 	    entry.append(atom);
 	    break;
 	case PLP_FTYPE_DRIVE:
 	    atom.m_uds = KIO::UDS_FILE_TYPE;
-	    atom.m_long = S_IFDIR;
+	    atom.m_long = S_IFREG;
 	    entry.append(atom);
 	    atom.m_uds = KIO::UDS_GUESSED_MIME_TYPE;
-	    atom.m_str = QString("inode/x-psion-drive");
-	    atom.m_uds = KIO::UDS_MIME_TYPE;
 	    atom.m_str = QString("inode/x-psion-drive");
 	    entry.append(atom);
 	    break;

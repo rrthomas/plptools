@@ -109,8 +109,9 @@ int main(int argc, char **argv) {
 
     KPsionMainWindow *w = new KPsionMainWindow();
 
-    if (args->isSet("autobackup") && (!w->isConnected()))
+    if (w->shouldQuit())
 	return 0;
+
     w->resize(300, 170);
     a.setMainWidget(w);
     w->show();

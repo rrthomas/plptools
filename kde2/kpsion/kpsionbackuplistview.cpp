@@ -391,31 +391,6 @@ getFormatDrives() {
     return l;
 }
 
-QDateTime KPsionBackupListView::
-getLastBackup(int backupType, QString drive) {
-    time_t stamp = 0;
-
-    drive += ":";
-    // Find latest backup for given drive
-    KPsionCheckListItem *i = firstChild();
-    while (i != 0L) {
-	if ((backupType >= i->backupType()) && (i->when() > stamp)) {
-	    KPsionCheckListItem *c = i->firstChild();
-	    while (c != 0L) {
-		if (c->text() == drive) {
-		    stamp = i->when();
-		    break;
-		}
-		c = c->nextSibling();
-	    }
-	}
-	i = i->nextSibling();
-    }
-    QDateTime d;
-    d.setTime_t(stamp);
-    return d;
-}
-
 bool KPsionBackupListView::
 autoSelect(QString drive) {
     KPsionCheckListItem *latest = NULL;

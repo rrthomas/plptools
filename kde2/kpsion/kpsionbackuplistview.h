@@ -103,7 +103,6 @@ public:
     QStringList getSelectedTars();
     QStringList getFormatDrives();
     bool autoSelect(QString drive);
-    QDateTime getLastBackup(int backupType, QString drive);
 
 signals:
     void itemsEnabled(bool);

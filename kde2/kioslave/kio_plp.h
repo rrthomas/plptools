@@ -38,7 +38,7 @@ class PLPProtocol : public KIO::SlaveBase {
 public:
     PLPProtocol (const QCString &pool, const QCString &app);
     virtual ~PLPProtocol();
-	
+
     virtual void openConnection();
     virtual void closeConnection();
 
@@ -74,6 +74,7 @@ private:
     QString uid2mime(PlpDirent &e);
     int checkSpecial(const QString& path);
     void setOwner(KIO::UDSEntry & entry);
+    void appendUIDmime(PlpDirent &e, KIO::UDSEntry &entry);
 
     rfsv *plpRfsv;
     rpcs *plpRpcs;
@@ -81,7 +82,7 @@ private:
     ppsocket *plpRpcsSocket;
     QStringList drives;
     QMap<QString,char> drivechars;
-    UidMap puids; 
+    UidMap puids;
     QString currentHost;
     int    currentPort;
     time_t t_last;
