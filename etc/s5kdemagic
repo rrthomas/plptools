@@ -1,0 +1,41 @@
+0	long		0x10000037	application/x-psion
+>4	long		0x10000039	application/x-psion-font
+>4	long		0x1000003A	application/x-psion-pdriver
+>4	long		0x1000003B	application/x-psion-clipcoard
+>4	long		0x10000042	application/x-psion-mbm
+>4	long		0x1000006A	application/x-psion-aif
+>4	long		0x1000006D
+>>8	long		0x1000007D	application/x-psion-scetch
+>>8	long		0x1000007E	application/x-psion-voice
+>>8	long		0x1000007F	application/x-psion-word
+>>8	long		0x10000085	application/x-psion-opl
+>>8	long		0x10000088	application/x-psion-sheet
+>>8	long		0x100001C4	application/x-psion-eini
+>4	long		0x10000073	application/x-psion-opo
+>4	long		0x10000074	application/x-psion-opapp
+>4	long		0x1000008A	application/x-psion-xmbm
+
+0	long		0x10000041	application/x-psion-mbm
+
+0	long		0x10000050	application/x-psion
+>4	long		0x1000006D	application/x-psion-db
+>4	long		0x100000E4	application/x-psion-ini
+
+0	long		0x10000079	application/x-psion-bin
+>4	long		0x00000000	application/x-psion-dll
+>4	long		0x10000049	application/x-psion-chlib
+>4	long		0x1000004A	application/x-psion-cplib
+>4	long		0x1000005D	application/x-psion-opx
+>4	long		0x1000006C	application/x-psion-app
+>4	long		0x1000008D	application/x-psion-dll
+>4	long		0x100000AC	application/x-psion-ldd
+>4	long		0x100000AD	application/x-psion-pdd
+>4	long		0x100000E5	application/x-psion-ftp
+>4	long		0x100000E5	application/x-psion-ftp
+>4	long		0x10000140	application/x-psion-ppd
+>4	long		0x10000141	application/x-psion-ppd
+
+0	long		0x1000007A	application/x-psion-exe
+
+
+

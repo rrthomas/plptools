@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# psion        Starts ncpd/plpnfsd.
+#
+#
+# chkconfig: 2345 30 70
+# description: This facility enables connectivity to a Psion series 5.
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+[ -f @prefix@/sbin/ncpd ] || exit 0
+[ -f @prefix@/sbin/plpnfsd ] || exit 0
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting Psion support: "
+	daemon @prefix@/sbin/ncpd
+	daemon @prefix@/sbin/plpnfsd
+	echo
+	touch /var/lock/subsys/psion
+	;;
+  stop)
+	echo -n "Shutting down Psion support: "
+	killproc plpnfsd
+	killproc ncpd
+	echo
+	rm -f /var/lock/subsys/psion
+	;;
+  status)
+	status plpnfsd
+	status ncpd
+	;;
+  restart)
+	$0 stop
+	$0 start
+	;;
+  *)
+	echo "Usage: psion {start|stop|status|restart}"
+	exit 1
+esac
+
+exit 0
+
