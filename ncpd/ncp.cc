@@ -29,21 +29,20 @@
 #include <string>
 #include <time.h>
 
-#include "ncp.h"
-#include "linkchan.h"
-#include "link.h"
 #include <bufferstore.h>
 #include <bufferarray.h>
 #include <rfsv.h>
+
+#include "ncp.h"
+#include "linkchan.h"
+#include "link.h"
+#include "main.h"
 
 #define MAX_CHANNELS_PSION 256
 #define MAX_CHANNELS_SIBO  8
 #define NCP_SENDLEN 250
 
 using namespace std;
-
-extern ostream lout;
-extern ostream lerr;
 
 ncp::ncp(const char *fname, int baud, unsigned short _verbose)
 {
@@ -230,6 +229,9 @@ decodeControlMessage(bufferStore & buff)
 		controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
 		if (verbose & NCP_DEBUG_LOG)
 		    lout << "ncp: Link UP" << endl;
+		linf << "Connected with a S"
+		     << ((protocolVersion == PV_SERIES_5) ? 5 : 3) << " at "
+		     << getSpeed() << "baud" << endl;
 		// Create linkchan if it does not yet exist
 		if (!lChan) {
 		    if (verbose & NCP_DEBUG_LOG)

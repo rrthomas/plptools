@@ -37,6 +37,7 @@
 #include "ncp.h"
 #include "bufferstore.h"
 #include "bufferarray.h"
+#include "main.h"
 
 extern "C" {
     static void *expire_check(void *arg)
@@ -51,9 +52,6 @@ extern "C" {
 };
 
 using namespace std;
-
-extern ostream lout;
-extern ostream lerr;
 
 ENUM_DEFINITION(Link::link_type, Link::LINK_TYPE_UNKNOWN) {
     stringRep.add(Link::LINK_TYPE_UNKNOWN, N_("Unknown"));

@@ -66,15 +66,17 @@ static int numScp = 0;
 static socketChan *scp[257]; // MAX_CHANNELS_PSION + 1
 
 
+logbuf ilog(LOG_INFO, STDOUT_FILENO);
 logbuf dlog(LOG_DEBUG, STDOUT_FILENO);
 logbuf elog(LOG_ERR, STDERR_FILENO);
+ostream linf(&ilog);
 ostream lout(&dlog);
 ostream lerr(&elog);
 
 static RETSIGTYPE
 term_handler(int)
 {
-    lout << "Got SIGTERM" << endl;
+    linf << "Got SIGTERM" << endl;
     signal(SIGTERM, term_handler);
     active = false;
 };
@@ -82,7 +84,7 @@ term_handler(int)
 static RETSIGTYPE
 int_handler(int)
 {
-    lout << "Got SIGINT" << endl;
+    linf << "Got SIGINT" << endl;
     signal(SIGINT, int_handler);
     active = false;
 };
@@ -352,9 +354,10 @@ main(int argc, char **argv)
 		    openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
 		    dlog.setOn(true);
 		    elog.setOn(true);
-		    syslog(LOG_INFO,
-			   "daemon started. Listening at %s:%d, "
-			   "using device %s\n", host, sockNum, serialDevice);
+		    ilog.setOn(true);
+		    linf << "daemon started. Listening at " << host << ":"
+			 << sockNum << " using device " << serialDevice
+			 << endl;
 		    setsid();
 		    chdir("/");
 		    int devnull =
@@ -385,6 +388,7 @@ main(int argc, char **argv)
 		}
 		while (active)
 		    checkForNewSocketConnection();
+		linf << "terminating" << endl;
 		void *ret;
 		pthread_join(thr_a, &ret);
 		pthread_join(thr_b, &ret);

@@ -43,6 +43,7 @@ extern "C" {
 }
 #include "packet.h"
 #include "link.h"
+#include "main.h"
 
 #define BUFLEN 4096 // Must be a power of 2
 #define BUFMASK (BUFLEN-1)
@@ -150,9 +151,6 @@ static const int baud_table[] = {
 #define BAUD_TABLE_SIZE (sizeof(baud_table) / sizeof(int))
 
 using namespace std;
-
-extern ostream lout;
-extern ostream lerr;
 
 packet::
 packet(const char *fname, int _baud, Link *_link, unsigned short _verbose)

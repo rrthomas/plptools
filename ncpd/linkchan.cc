@@ -29,11 +29,9 @@
 #include "ncp.h"
 #include "bufferstore.h"
 #include "bufferarray.h"
+#include "main.h"
 
 using namespace std;
-
-extern ostream lout;
-extern ostream lerr;
 
 linkChan::linkChan(ncp * _ncpController, int _ncpChannel):channel(_ncpController)
 {
