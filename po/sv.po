@@ -1162,7 +1162,7 @@ msgstr "  Använt:       "
 
 #: plpftp/ftp.cc:854 plpftp/ftp.cc:858
 msgid "  Voltage:      "
-msgstr ""
+msgstr "  Spänning:     "
 
 #: plpftp/ftp.cc:855 plpftp/ftp.cc:859
 msgid "  Max. voltage: "
@@ -1174,7 +1174,7 @@ msgstr "Backupbatteri: "
 
 #: plpftp/ftp.cc:860
 msgid "External power:"
-msgstr ""
+msgstr "Extern ström:  "
 
 #: plpftp/ftp.cc:861
 #, fuzzy

@@ -28,6 +28,18 @@
 
 #include <stdio.h>
 
+SISFile::SISFile()
+{
+	m_buf = 0;
+	m_ownBuffer = false;
+}
+
+SISFile::~SISFile()
+{
+	if (m_ownBuffer)
+		delete[] m_buf;
+}
+
 SisRC
 SISFile::compareApp(SISFile* other)
 {
@@ -38,6 +50,7 @@ SisRC
 SISFile::fillFrom(uint8_t* buf, off_t len)
 {
 	int ix = 0;
+	m_buf = buf;
 	SisRC rc = m_header.fillFrom(buf, &ix, len);
 	if (rc != SIS_OK)
 		{

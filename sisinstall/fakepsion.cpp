@@ -57,3 +57,8 @@ FakePsion::mkdir(const char* dir)
 	return rfsv::E_PSI_GEN_NONE;
 }
 
+void
+FakePsion::remove(const char* name)
+{
+}
+

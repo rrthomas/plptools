@@ -39,6 +39,10 @@ class SISFile
 {
 public:
 
+	SISFile();
+
+	virtual ~SISFile();
+
 	/**
 	 * Compare uid and version number of this file, with another.
 	 *
@@ -70,6 +74,11 @@ public:
 	 */
 	uint8_t* getName();
 
+	void ownBuffer()
+		{
+		m_ownBuffer = true;
+		}
+
 	/**
 	 * Is this the same application?
 	 */
@@ -98,6 +107,10 @@ public:
 private:
 
 	SISComponentNameRecord m_componentRecord;
+
+	bool m_ownBuffer;
+
+	uint8_t* m_buf;
 
 };
 

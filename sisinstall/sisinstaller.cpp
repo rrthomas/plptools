@@ -27,6 +27,22 @@ checkAbortHash(void *, u_int32_t)
 SISInstaller::SISInstaller()
 {
 	m_installed = 0;
+	m_ownInstalled = false;
+}
+
+SISInstaller::~SISInstaller()
+{
+	if (m_ownInstalled)
+		{
+		SISFileLink* curr = m_installed;
+		while (curr)
+			{
+			delete curr->m_file;
+			SISFileLink* next = curr->m_next;
+			delete curr;
+			curr = next;
+			}
+		}
 }
 
 void
@@ -66,20 +82,23 @@ SISInstaller::copyFile(SISFileRecord* fileRecord)
 		m_file->setDrive(m_drive);
 		}
 	int len = fileRecord->m_destLength;
-	char* dest = new char[len + 1];
+	char dest[256];
 	memcpy(dest, m_buf + fileRecord->m_destPtr, len);
 	dest[len] = 0;
 	if (dest[0] == '!')
 		{
 		dest[0] = m_drive;
-		m_buf[fileRecord->m_destPtr] = m_drive;
+		fileRecord->setMainDrive(m_drive);
+		if (logLevel >= 2)
+			printf("Setting drive at index %d to %c\n",
+				   fileRecord->m_destPtr, m_drive);
+//		m_buf[fileRecord->m_destPtr] = m_drive;
 		}
 	printf("Copying %d bytes to %s\n",
 		   fileRecord->m_fileLengths[m_fileNo], dest);
 	copyBuf(m_buf + fileRecord->m_filePtrs[m_fileNo],
 			fileRecord->m_fileLengths[m_fileNo],
 			dest);
-	delete[] dest;
 }
 
 void
@@ -115,7 +134,7 @@ SISInstaller::copyBuf(const uint8_t* buf, int len, char* name)
 int
 SISInstaller::installFile(SISFileRecord* fileRecord)
 {
-	char readbuf[2];
+	char readbuf[8];
 	switch (fileRecord->m_fileType)
 		{
 		case 0:
@@ -129,11 +148,11 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 				{
 				case 0:
 					printf("Continue\n");
-					fgets(readbuf, 2, stdin);
+					fgets(readbuf, sizeof(readbuf), stdin);
 					break;
 				case 1:
 					printf("(Install next file?) [Y]es/No\n");
-					fgets(readbuf, 2, stdin);
+					fgets(readbuf, sizeof(readbuf), stdin);
 					if (strchr("Nn", readbuf[0]))
 						{
 						return FILE_SKIP;
@@ -141,7 +160,7 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 					break;
 				case 2:
 					printf("(Continue installation?) [Y]es/No\n");
-					fgets(readbuf, 2, stdin);
+					fgets(readbuf, sizeof(readbuf), stdin);
 					if (strchr("Nn", readbuf[0]))
 						{
 						// Watch out if we have copied any files
@@ -157,8 +176,11 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 			if (logLevel >= 1)
 				printf("Recursive sis file...\n");
 			SISFile sisFile;
-			uint8_t* buf2 = m_buf + fileRecord->m_filePtrs[m_fileNo];
+			int fileptr = fileRecord->m_filePtrs[m_fileNo];
+			uint8_t* buf2 = m_buf + fileptr;
 			off_t len = fileRecord->m_fileLengths[m_fileNo];
+			if (m_lastSisFile < fileptr + len)
+				m_lastSisFile = fileptr + len;
 			SisRC rc = sisFile.fillFrom(buf2, len);
 			if (rc != SIS_OK)
 				{
@@ -254,11 +276,31 @@ SISInstaller::loadPsionSis(const char* name)
 					printf(" Ok.\n");
 				SISFileLink* link = new SISFileLink(sisFile);
 				link->m_next = m_installed;
+				m_ownInstalled = true;
 				m_installed = link;
+				sisFile->ownBuffer();
+				}
+			else
+				{
+				delete sisFile;
+				delete[] sisbuf;
 				}
 			}
 		}
 	close(fd);
+	unlink(srcName);
+}
+
+void
+SISInstaller::removeFile(SISFileRecord* fileRecord)
+{
+	int len = fileRecord->m_destLength;
+	char dest[256];
+	memcpy(dest, fileRecord->getDestPtr(), len);
+	dest[len] = 0;
+	if (logLevel >= 1)
+		printf("Removing file component %s.\n", dest);
+	m_psion->remove(dest);
 }
 
 SisRC
@@ -334,8 +376,9 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 		   m_file->m_header.m_major,
 		   m_file->m_header.m_minor);
 
-	bool uninstallFirst;
+	bool uninstallFirst = false;
 	SISFileLink* curr = m_installed;
+	SISFile* oldFile = 0;
 	while (curr)
 		{
 		SISFile* sisFile = curr->m_file;
@@ -343,16 +386,19 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 			{
 			case SIS_VER_EARLIER:
 				uninstallFirst = true;
+				oldFile = sisFile;
 				break;
 
 			case SIS_SAME_OR_LATER:
 				// Ask for confirmation.
 				uninstallFirst = true;
+				oldFile = sisFile;
 				break;
 
 			case SIS_OTHER_VARIANT:
 				// Ask for confirmation.
 				uninstallFirst = true;
+				oldFile = sisFile;
 				break;
 			}
 		curr = curr->m_next;
@@ -360,10 +406,15 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 
 	if (uninstallFirst)
 		{
-		printf("You should uninstall the previous version first.\n");
-		return SIS_ABORTED;
-		// Not yet...
-	//	uninstall(&sisFile);
+//		printf("You should uninstall the previous version first.\n");
+//		if (!m_forced)
+//			return SIS_ABORTED;
+//		printf("Forced mode... Installing anyway!\n");
+		printf("Uninstalling the previous version first.\n");
+		if (oldFile == 0)
+			printf("Already installed, but 0?\n");
+		else
+			uninstall(oldFile);
 		}
 
 	// Install file components.
@@ -374,6 +425,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	m_drive = (parent == 0) ? 0 : parent->m_header.m_installationDrive;
 	int nCopiedFiles = 0;
 	int firstFile = -1;
+	m_lastSisFile = 0;
 	bool skipnext = false;
 	bool aborted = false;
 	while (!aborted && (n-- > 0))
@@ -417,10 +469,12 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 		}
 	m_file->setFiles(nCopiedFiles);
 	if (logLevel >= 1)
-		printf("Installed %d files of %d, cutting at offset %d\n",
+		printf("Installed %d files of %d, cutting at offset max(%d,%d)\n",
 			   m_file->m_header.m_installationFiles,
 			   m_file->m_header.m_nfiles,
-			   firstFile);
+			   firstFile, m_lastSisFile);
+	if (firstFile < m_lastSisFile)
+		firstFile = m_lastSisFile;
 	if (nCopiedFiles == 0)
 		{
 		// There is no need to copy any uninstall information to the
@@ -431,7 +485,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 
 	// Copy the updated sis file to the epoc machine.
 	//
-	char* resname = new char[256];
+	char resname[256];
 	int namelen = 0;
 	while (compName[namelen] != 0)
 		{
@@ -442,7 +496,6 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	sprintf(resname, "C:\\System\\Install\\%.*s.sis", namelen, compName);
 	printf("Creating residual sis file %s\n", resname);
 	copyBuf(buf, firstFile, resname);
-	delete[] resname;
 	if (aborted)
 		return SIS_ABORTED;
 	return SIS_OK;
@@ -513,5 +566,74 @@ void
 SISInstaller::setPsion(Psion* psion)
 {
 	m_psion = psion;
+}
+
+void
+SISInstaller::uninstall(SISFile* file)
+{
+	int n = file->m_header.m_nfiles;
+	int fileix = n - file->m_header.m_installationFiles;
+	if (logLevel >= 1)
+		printf("Uninstalling %d files, from a total of %d.\n",
+			   file->m_header.m_installationFiles,
+			   file->m_header.m_nfiles);
+	int lang = file->getLanguage();
+	while (fileix < n)
+		{
+		SISFileRecord* fileRecord = &file->m_fileRecords[fileix];
+		m_fileNo = (fileRecord->m_flags & 1) ? lang : 0;
+		char drive = file->m_header.m_installationDrive;
+		fileRecord->setMainDrive(drive);
+		uninstallFile(fileRecord);
+		++fileix;
+		}
+}
+
+void
+SISInstaller::uninstallFile(SISFileRecord* fileRecord)
+{
+	switch (fileRecord->m_fileType)
+		{
+		case 0:
+		case 4:
+			removeFile(fileRecord);
+			break;
+		case 2:
+			{
+#if 0
+			// This is messy... We can't remove the sis component unless
+			// we've stored the entire component in the residual sis
+			// file no the target machine.
+			//
+			if (logLevel >= 1)
+				printf("Recursive sis file...\n");
+			SISFile sisFile;
+			int fileptr = fileRecord->m_filePtrs[m_fileNo];
+			uint8_t* buf2 = m_buf + fileptr;
+			off_t len = fileRecord->m_fileLengths[m_fileNo];
+			if (m_lastSisFile < fileptr + len)
+				m_lastSisFile = fileptr + len;
+			SisRC rc = sisFile.fillFrom(buf2, len);
+			if (rc != SIS_OK)
+				{
+				printf("Could not read contained sis file, rc = %d\n", rc);
+				break;
+				}
+			SISInstaller installer;
+			installer.setPsion(m_psion);
+			installer.setInstalled(m_installed);
+			rc = installer.run(&sisFile, buf2, len, m_file);
+			if (0 == m_drive)
+				{
+				m_drive = sisFile.m_header.m_installationDrive;
+				m_file->setDrive(m_drive);
+				if (logLevel >= 1)
+					printf("Updated drive to %c from recursive sis file\n",
+						   m_drive);
+				}
+#endif
+			break;
+			}
+		}
 }
 

@@ -32,6 +32,7 @@ SISFileRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 	if (*base + 28 + 4 * 2 > len)
 		return SIS_TRUNCATED;
 
+	m_buf = buf;
 	uint8_t* p = buf + *base;
 	int size = 0;
 	m_flags = read32(p);
@@ -122,5 +123,12 @@ SISFileRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 		}
 	*base += size;
 	return SIS_OK;
+}
+
+void
+SISFileRecord::setMainDrive(char drive)
+{
+	if (m_buf[m_destPtr] == '!')
+		m_buf[m_destPtr] = drive;
 }
 

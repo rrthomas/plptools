@@ -48,6 +48,13 @@ public:
 	 */
 	SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile);
 
+	uint8_t* getDestPtr()
+		{
+		return &m_buf[m_destPtr];
+		}
+
+	void setMainDrive(char drive);
+
 	/**
 	 * 1 if multiple language versions, otherwise 0.
 	 */
@@ -86,6 +93,15 @@ public:
 	uint32_t m_destPtr;
 	uint32_t* m_fileLengths;
 	uint32_t* m_filePtrs;
+
+private:
+
+	/**
+	 * The buffer we belong to.
+	 * Used for updating the destination file name.
+	 */
+	uint8_t* m_buf;
+
 };
 
 #endif

@@ -73,7 +73,10 @@ Enum<rfsv::errs>
 Psion::copyToPsion(const char * const from, const char * const to,
 				   void *, cpCallback_t func)
 {
-	return m_rfsv->copyToPsion(from, to, NULL, func);
+	Enum<rfsv::errs> res;
+	res = m_rfsv->copyToPsion(from, to, NULL, func);
+//	printf("Returned to Psion\n");
+	return res;
 }
 
 Enum<rfsv::errs>
@@ -124,5 +127,11 @@ Enum<rfsv::errs>
 Psion::mkdir(const char* dir)
 {
 	return m_rfsv->mkdir(dir);
+}
+
+void
+Psion::remove(const char* name)
+{
+	m_rfsv->remove(name);
 }
 

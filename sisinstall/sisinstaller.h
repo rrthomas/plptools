@@ -20,6 +20,8 @@ public:
 
 	SISInstaller();
 
+	virtual ~SISInstaller();
+
 	SisRC run(SISFile* file, uint8_t* buf, off_t len);
 
 	SisRC run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent);
@@ -29,6 +31,20 @@ public:
 	 */
 	void selectDrive();
 
+	/**
+	 * Set forced mode, which means that it ignores any earlier versions
+	 * of the same application.
+	 */
+	void setForced(bool f)
+		{
+		m_forced = f;
+		}
+
+	/**
+	 * Set the base pointer to the list of already installed
+	 * applications, so we don't have to scan it for every sis
+	 * component.
+	 */
 	void setInstalled(SISFileLink* installed)
 		{
 		m_installed = installed;
@@ -52,6 +68,14 @@ private:
 	SISFile* m_file;
 
 	SISFileLink* m_installed;
+
+	int m_lastSisFile;
+
+	bool m_forced;
+
+	bool m_ownBuffer;
+
+	bool m_ownInstalled;
 
 	enum {
 		FILE_OK,
@@ -77,7 +101,11 @@ private:
 
 	void loadPsionSis(const char* name);
 
+	void removeFile(SISFileRecord* fileRecord);
+
 	void uninstall(SISFile* sisFile);
+
+	void uninstallFile(SISFileRecord* fileRecord);
 
 };
 

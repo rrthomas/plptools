@@ -30,6 +30,8 @@ public:
 
 	virtual Enum<rfsv::errs> mkdir(const char* dir);
 
+	virtual void remove(const char* name);
+
 };
 
 #endif
