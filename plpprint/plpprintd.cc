@@ -186,13 +186,14 @@ ps_escape(string &text)
 }
 
 static void
-ps_bitmap(FILE *f, int llx, int lly, int urx, int ury, const char *buf)
+ps_bitmap(FILE *f, unsigned long llx, unsigned long lly, unsigned long urx,
+	  unsigned long ury, const char *buf)
 {
     bufferStore out;
     int width, height;
     if (decodeBitmap((const unsigned char *)buf, width, height, out)) {
-	fprintf(f, "%d %d %d %d I\n");
-	const char *p = out.getString(0);
+	fprintf(f, "%d %d %d %d %d %d I\n", llx, lly, urx, ury, width, height);
+	const unsigned char *p = (const unsigned char *)out.getString(0);
 	for (int y = 0; y < height; y++) {
 	    for (int x = 0; x < width; x++)
 		fprintf(f, "%02x", *p++);
@@ -485,9 +486,13 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    case 0x25: {
 		// Draw bitmap
 		// skip for now
+		unsigned long llx  = buf.getDWord(i+1);
+		unsigned long lly  = buf.getDWord(i+13);
+		unsigned long urx  = buf.getDWord(i+9);
+		unsigned long ury  = buf.getDWord(i+5);
 		unsigned long blen = buf.getDWord(i+17);
-		fprintf(f, "%% @%d: U25\n", i);
-		debuglog("@%d: U25 len=%d ofs=%d", i, blen, buf.getDWord(i+21));
+		fprintf(f, "%% @%d: Bitmap\n", i);
+		ps_bitmap(f, llx, lly, urx, ury, buf.getString(i+17));
 		i += (17 + blen);
 	    }
 		break;
@@ -497,15 +502,13 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 		unsigned long lly  = buf.getDWord(i+13);
 		unsigned long urx  = buf.getDWord(i+9);
 		unsigned long ury  = buf.getDWord(i+5);
-		unsigned long bw   = buf.getDWord(i+25);
-		unsigned long bh   = buf.getDWord(i+29);
 		unsigned long blen = buf.getDWord(i+17);
-		unsigned long bofs = buf.getDWord(i+21);
-		unsigned long bits = buf.getDWord(i+41);
-		bool rle = (buf.getDWord(i+53) == 1);
-		fprintf(f, "%% @%d: Bitmap\n", i);
-		ps_bitmap(f, llx, lly, urx, ury, buf.getString(17));
-		debuglog("Bitmap len=%d ofs=%d", blen, bofs);
+		unsigned long u1   = buf.getDWord(i+17+blen);
+		unsigned long u2   = buf.getDWord(i+17+blen+4);
+		unsigned long u3   = buf.getDWord(i+17+blen+8);
+		unsigned long u4   = buf.getDWord(i+17+blen+12);
+		fprintf(f, "%% @%d: Bitmap %d %d %d %d\n", i, u1, u2, u3, u4);
+		ps_bitmap(f, llx, lly, urx, ury, buf.getString(i+17));
 		i += (17 + blen + 16);
 	    }
 		break;

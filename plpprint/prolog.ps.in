@@ -156,4 +156,21 @@ putinterval def
     grestore
   end
 }bind def
+/I{
+  7 dict begin
+    /rows exch def
+    /cols exch def
+    twips /ury exch def
+    twips /urx exch def
+    twips /lly exch def
+    twips /llx exch def
+    /ibuf cols string def
+    gsave
+      llx top lly sub translate
+      urx llx sub lly ury sub scale
+      cols rows 8 [cols 0 0 rows neg 0 rows]
+      {currentfile ibuf readhexstring pop} image
+    grestore
+  end
+}bind def
 %%EndResource
