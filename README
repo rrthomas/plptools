@@ -87,7 +87,7 @@
   --enable-kde
 
        Enable build of KDE related stuff. This needs installed
-       KDE 2.1 headers/development-libraries as well as QT 2.2.4
+       KDE (>= 2) headers/development-libraries as well as QT (>= 2.2.4)
        headers/development-libraries.
 
   --with-kdedir=/path/to/your/kde
@@ -107,6 +107,12 @@
 
       Same as above. Use these, when automatic detection fails.
 
+  --with-kdeversion=X
+
+       Override the KDE version detection manually. Only needed in
+       special cases where more than one KDE version is installed and
+       autodetection fails. X can be either 2 or 3.
+
  You will get 6 programs and a shared and static library (in
  case you enabled KDE: 8 Programs 4 shared libraries).
  By default, the install-prefix is /usr/local, so you probably
@@ -114,7 +120,15 @@
  ldconfig after installation. Another option is to run configure
  with the option --prefix=/usr
 
- IMPORTANT NOTE:
+ NOTE:
+ Although the subdirectory for KDE stuff is named "kde2", this is only
+ for historical reason. The package builds on KDE2 as well as KDE3.
+ It tries to figure out the version of KDE automatically. People who have
+ both versions installed should carefully watch the output of configure.
+ The KDEDIR as well as KDE's version can be overridden via commandline
+ (see above).
+
+ IMPORTANT NOTE about the following descriptions:
  Please read the man pages ncpd(8) plpftp(1), plpnfsd(8) plpprintd(8),
  sisinstall(1) and plpbackup(1)! The information there is more up-to-date.
 
@@ -169,7 +183,7 @@
 
  KDE STUFF
 
- The KDE2 KIOslave library adds support for a new protocol named
+ The KDE KIOslave library adds support for a new protocol named
  "psion:". So in konqueror, just open psion:/ to see your Psion's
  drives. You now can copy, move, rename, open ... all those
  operations you are used to. Any KDE application which supports

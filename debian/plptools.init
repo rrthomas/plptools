@@ -2,30 +2,63 @@
 #
 # start or stop the plptools daemon
 #
-# This file was automatically customized by dh-make on Wed, 13 Dec 2000 11:35:52 +0000
 
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/sbin/ncpd
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON1=/usr/sbin/ncpd
+DAEMON2=/usr/sbin/plpnfsd
+DAEMON3=/usr/sbin/plpprintd
 NAME=plptools
 DESC=plptools
-SERIAL=/dev/ttyS0
+CONFIG=/etc/plptools.conf
 
-test -f $DAEMON || exit 0
+test -x $DAEMON1 || exit 0
+test -x $DAEMON2 || exit 0
+test -x $DAEMON3 || exit 0
+test -f $CONFIG && . $CONFIG || exit 0
 
 set -e
 
 case "$1" in
   start)
-	echo -n "Starting $DESC: "
+	echo -n "Starting $DESC ($DAEMON1): "
 	start-stop-daemon --start --quiet \
-		--exec $DAEMON -- -s $SERIAL
-	echo "$NAME."
+		--exec $DAEMON1 -- $NCPD_ARGS && \
+			echo -n "done" || echo -n "already running"
+	echo "."
+	if test "$START_PLPNFSD" = "yes" ; then
+		echo -n "Starting $DESC ($DAEMON2): "
+		start-stop-daemon --start --quiet \
+			--exec $DAEMON2 -- $PLPNFSD_ARGS && \
+			echo -n "done" || echo -n "already running"
+		echo "."
+	fi
+	if test "$START_PLPPRINTD" = "yes" ; then
+		echo -n "Starting $DESC ($DAEMON3): "
+		start-stop-daemon --start --quiet \
+			--exec $DAEMON3 -- $PLPPRINTD_ARGS && \
+			echo -n "done" || echo -n "already running"
+		echo "."
+	fi
 	;;
   stop)
-	echo -n "Stopping $DESC: "
-	start-stop-daemon --stop --quiet \
-		--exec $DAEMON
-	echo "$NAME."
+	if test "$START_PLPNFSD" = "yes" ; then
+		echo -n "Stopping $DESC ($DAEMON2): "
+		start-stop-daemon --stop --schedule HUP/5/TERM/1 --quiet \
+				--exec $DAEMON2 && \
+			echo -n "done" || echo -n "already stopped"
+		echo "."
+	fi
+	if test "$START_PLPPRINTD" = "yes" ; then
+		echo -n "Stopping $DESC ($DAEMON3): "
+		start-stop-daemon --stop --quiet --exec $DAEMON3 && \
+			echo -n "done" || echo -n "already stopped"
+		echo "."
+	fi
+	echo -n "Stopping $DESC ($DAEMON1): "
+	start-stop-daemon --stop --quiet --exec $DAEMON1 && \
+		echo -n "done" || echo -n "already stopped"
+	echo "."
+
 	;;
   #reload)
 	#
@@ -45,13 +78,9 @@ case "$1" in
 	#	option to the "reload" entry above. If not, "force-reload" is
 	#	just the same as "restart".
 	#
-	echo -n "Restarting $DESC: "
-	start-stop-daemon --stop --quiet --pidfile \
-		/var/run/$NAME.pid --exec $DAEMON
+	$0 stop
 	sleep 1
-	start-stop-daemon --start --quiet --pidfile \
-		/var/run/$NAME.pid --exec $DAEMON
-	echo "$NAME."
+	$0 start
 	;;
   *)
 	N=/etc/init.d/$NAME

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-15 00:16+0200\n"
+"POT-Creation-Date: 2002-07-16 06:23+0200\n"
 "PO-Revision-Date: 2002-07-08 00:06CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -552,7 +552,7 @@ msgstr "Keine Antwort vom ncpd"
 msgid "Not present"
 msgstr "Nicht vorhanden"
 
-#: lib/plpdirent.cc:176 ncpd/link.cc:59
+#: lib/plpdirent.cc:176 ncpd/link.cc:57
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -1710,7 +1710,7 @@ msgstr "Konnte SIS-Datei nicht parsen.\n"
 msgid "Installation complete. Press any key to exit."
 msgstr "Installation beendet. Beenden mit beliebiger Taste."
 
-#: ncpd/main.cc:145
+#: ncpd/main.cc:147
 msgid ""
 "Usage: ncpd [OPTIONS]...\n"
 "\n"
@@ -1756,17 +1756,17 @@ msgstr ""
 " -s, --serial=DEV        Benutze serielle Schnittstelle DEV.\n"
 " -b, --baudrate=RATE     Setze Schnittstellengeschwindigkeit auf BAUD.\n"
 
-#: ncpd/main.cc:170
+#: ncpd/main.cc:172
 msgid "                         Default: "
 msgstr "                         Vorgabe: "
 
-#: ncpd/main.cc:172
+#: ncpd/main.cc:174
 msgid ""
 "                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n"
 msgstr ""
 "                         Vorgabe: Automatisch 115.2k, 57.6k 38.4k, 19.2k\n"
 
-#: ncpd/main.cc:175
+#: ncpd/main.cc:177
 msgid ""
 " -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
 "                         Default for HOST: 127.0.0.1\n"
@@ -1776,19 +1776,19 @@ msgstr ""
 "                         Vorgabe für HOST: 127.0.0.1\n"
 "                         Vorgabe für PORT: "
 
-#: ncpd/main.cc:183
+#: ncpd/main.cc:185
 msgid "Try `ncpd --help' for more information"
 msgstr "Versuchen Sie `ncpd --help' für weitere Informationen."
 
-#: ncpd/main.cc:275
+#: ncpd/main.cc:277
 msgid "ncpd Version "
 msgstr "ncpd Version "
 
-#: ncpd/link.cc:60
+#: ncpd/link.cc:58
 msgid "SIBO"
 msgstr "SIBO"
 
-#: ncpd/link.cc:61
+#: ncpd/link.cc:59
 msgid "EPOC"
 msgstr "EPOC"
 

@@ -310,6 +310,8 @@ if test "x$ac_enable_kde" = "xyes" ; then
 	AC_CHECK_KDEMAXPATHLEN
 	KDE_CHECK_FINAL
 	AM_KDE_WITH_NLS
+	KDE_PLUGIN="-avoid-version -module -no-undefined \$(KDE_RPATH)"
+	AC_SUBST(KDE_PLUGIN)
 	AM_CONDITIONAL(BUILD_KDE, true)
 fi
 

@@ -39,7 +39,7 @@ $(CONFIGHIN): acconfig.h configure.in
 	autoheader
 
 $(LIBTOOLFILES):
-	libtoolize
+	libtoolize --force
 
 $(GETTEXT): $(ACLOCAL)
 	echo n | gettextize -f

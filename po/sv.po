@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-15 00:16+0200\n"
+"POT-Creation-Date: 2002-07-16 06:23+0200\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -552,7 +552,7 @@ msgstr "inget svar från ncpd"
 msgid "Not present"
 msgstr "Inte tillgänglig"
 
-#: lib/plpdirent.cc:176 ncpd/link.cc:59
+#: lib/plpdirent.cc:176 ncpd/link.cc:57
 msgid "Unknown"
 msgstr "Okänd"
 
@@ -1719,7 +1719,7 @@ msgstr "Kunde inte parsa sisfilen.\n"
 msgid "Installation complete. Press any key to exit."
 msgstr ""
 
-#: ncpd/main.cc:145
+#: ncpd/main.cc:147
 msgid ""
 "Usage: ncpd [OPTIONS]...\n"
 "\n"
@@ -1744,36 +1744,36 @@ msgid ""
 " -b, --baudrate=RATE     Set serial speed to BAUD.\n"
 msgstr ""
 
-#: ncpd/main.cc:170
+#: ncpd/main.cc:172
 msgid "                         Default: "
 msgstr ""
 
-#: ncpd/main.cc:172
+#: ncpd/main.cc:174
 msgid ""
 "                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n"
 msgstr ""
 
-#: ncpd/main.cc:175
+#: ncpd/main.cc:177
 msgid ""
 " -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
 "                         Default for HOST: 127.0.0.1\n"
 "                         Default for PORT: "
 msgstr ""
 
-#: ncpd/main.cc:183
+#: ncpd/main.cc:185
 #, fuzzy
 msgid "Try `ncpd --help' for more information"
 msgstr "Prova 'plpftp --help' för mer information"
 
-#: ncpd/main.cc:275
+#: ncpd/main.cc:277
 msgid "ncpd Version "
 msgstr ""
 
-#: ncpd/link.cc:60
+#: ncpd/link.cc:58
 msgid "SIBO"
 msgstr ""
 
-#: ncpd/link.cc:61
+#: ncpd/link.cc:59
 msgid "EPOC"
 msgstr ""
 

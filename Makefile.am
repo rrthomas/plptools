@@ -9,14 +9,16 @@ endif
 
 SUBDIRS = intl po lib ncpd plpnfsd plpftp plpbackup plpprint sisinstall \
 	$(KDESUB) doc .
+
 EXTRA_DIST = CHANGES COPYING README TODO INSTALL ABOUT-NLS include/*.h* \
-	etc/*magic etc/*.in etc/*.c etc/psidump* patches conf/m4/kde/*.m4 \
+	etc/*magic etc/*.in etc/*.c etc/psidump* conf/m4/kde/*.m4 \
 	conf/m4/plptools/*.m4 conf/[a-l]* conf/missing conf/mkinstalldirs \
-	debian
+	debian/* patches/*
 DISTCLEANFILES = etc/psion etc/psion.SuSE etc/psion.SuSE8
 AUTOMAKE_OPTIONS = foreign
 
 TMPDEST=
+
 #
 # remove all intermediate files that can be recreated using
 # Makefile.cvs
@@ -40,10 +42,12 @@ dist-hook:
 	test -f CVS/Root && conf/cvs2cl -W 1800 -S --no-wrap --prune \
 		--gmt -f $(distdir)/ChangeLog || \
 		cp -f ChangeLog $(distdir)/ChangeLog
+	# remove CVS from debian/ and patches/ subdirs
+	rm -rf $(distdir)/debian/CVS $(distdir)/patches/CVS
 
 kdoc:
 	kdoc -d $(TMPDEST)doc/api -n libplp --strip-h-path $(TMPDEST)lib/*.h
 
 specfile:
-	sed -e "s/_VERSION_/$(VERSION)/" < $(TMPDEST)etc/plptools.spec.in \
+	sed -e "s/\@VERSION\@/$(VERSION)/" < $(TMPDEST)etc/plptools.spec.in \
 		> $(TMPDEST)etc/plptools.spec

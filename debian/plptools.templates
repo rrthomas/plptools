@@ -1,14 +1,20 @@
-Template: plptools/setup
+Template: plptools/customize
 Type: note
-Description: In addition to plptools' main daemon "ncpd", plptools provides
- two optional daemons:
+Description: Customize /etc/plptools.conf
+ In addition to plptools' main daemon "ncpd", plptools provides two optional
+ daemons:
+ .
   plpnfsd (for nfs-like mounting a Psion's drives)
   plpprintd (for printing via PC from a Psion Series 5)
+ .
  Both daemons are disabled by default. You can enable them by editing
  /etc/plptools.conf.
-Description-de: Zusätzlich zum Haupt-Daemon "ncpd", stellt das Packet plptools
- zwei optionale Daemonen zur Verfügung:
+Description-de: Anpassung von /etc/plptools.conf
+ Zusätzlich zum Haupt-Daemon "ncpd", stellt das Packet plptools zwei
+ optionale Daemonen zur Verfügung:
+ .
   plpnfsd (zum Einhängen von Psion-Laufwerken - ähnlich wie NFS)
   plpprintd (zum Drucken via PC von einem Psion Serie 5)
+ .
  Beide Daemonen sind standardmäßig abgeschaltet. Sie können aktiviert weden,
  indem die Datei /etc/plptools.conf editiert wird.

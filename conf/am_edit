@@ -345,19 +345,39 @@ sub processMakefile ($)
     appendLines($cvs_lines);
     $target_adds{"clean"} .= "kde-rpo-clean ";
 
-    foreach $add (keys %target_adds) {
-      my $lookup = "$add:\s*(.*)";
+    # some strange people like to do a install-exec, and expect that also
+    # all modules are installed.  automake doesn't know this, so we need to move
+    # this here from install-data to install-exec.
+    if ($MakefileData =~ m/\nkdemodule_LTLIBRARIES\s*=/) {
+      $target_adds{"install-exec-am"} .= "install-kdemoduleLTLIBRARIES";
+      my $lookup = 'install-data-am:\s*(.*)';
       if ($MakefileData =~ /\n$lookup\n/) {
-	substituteLine($lookup, "$add: " . $target_adds{$add} . $1);
+        my $newdeps = $1;
+	$newdeps =~ s/\s*install-kdemoduleLTLIBRARIES\s*/ /g;
+	substituteLine($lookup, "install-data-am: " . $newdeps);
       }
+    }
+    
+    my $lines = "";
+
+    foreach $add (keys %target_adds) {
+	my $lookup = quotemeta($add) . ':([^\n]*)';
+        if ($MakefileData =~ /\n$lookup\n/) {
+            substituteLine($lookup, "$add: " . $target_adds{$add} . $1);
+        } else {
+            $lines .= "$add: " . $target_adds{$add} . "\n";
+        }
+    }
+    if ($lines) {
+        appendLines($lines);
     }
 
     my $found = 1;
 
     while ($found) {
       if ($MakefileData =~ m/\n(.*)\$\(CXXFLAGS\)(.*)\n/) {
-	my $vor = $1;
-	my $nach = $2;
+	my $vor = $1;   # "vor" means before in German
+	my $nach = $2; # "nach" means after in German
 	my $lookup = quotemeta("$1\$(CXXFLAGS)$2");
 	my $replacement = "$1\$(KCXXFLAGS)$2";
 	$MakefileData =~ s/$lookup/$replacement/;
@@ -369,7 +389,23 @@ sub processMakefile ($)
       }
     }
 
+#    $lookup = '(\n[^#].*\$\(LIBTOOL\) --mode=link) (\$\(CXXLD\).*\$\(KCXXFLAGS\))';
+#    
+#    if ($MakefileData =~ m/$lookup/ ) {
+#        $MakefileData =~ s/$lookup/$1 --tag=CXX $2/;
+#    }
+#
+#    $lookup = '(\n[^#].*\$\(LIBTOOL\) --mode=compile) (\$\(CXX\).*\$\(KCXXFLAGS\))';
+#    if ($MakefileData =~ m/$lookup/ ) {
+#        $MakefileData =~ s/$lookup/$1 --tag=CXX $2/;
+#    }
+
     $MakefileData =~ s/\$\(KCXXFLAGS\)/\$\(CXXFLAGS\)/g;
+
+    $lookup = '(.*)cp -pr \$\$/\$\$file \$\(distdir\)/\$\$file(.*)';
+    if ($MakefileData =~ m/\n$lookup\n/) {
+        substituteLine($lookup, "$1cp -pr \$\$d/\$\$file \$(distdir)/\$\$file$2");
+    }
 
     # Always update the Makefile.in
     updateMakefile ();
@@ -1078,6 +1114,7 @@ sub tag_ICON()
 	 'hi22' => 'hicolor/22x22',
 	 'hi32' => 'hicolor/32x32',
 	 'hi48' => 'hicolor/48x48',
+	 'hi64' => 'hicolor/64x64',
 	 'hisc' => 'hicolor/scalable'
 	);
 

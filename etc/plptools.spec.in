@@ -228,6 +228,8 @@ cp /etc/rc.config /etc/rc.config.old && mv /etc/rc.config.$$ /etc/rc.config
 /sbin/insserv -d psion
 %endif
 %endif
+
+%post kde
 %{_initrddir}/psion condrestart
 KONQRC=`kde-config --expandvars --install config`/konquerorrc
 if grep -q '\[Notification Messages\]' $KONQRC ; then
@@ -243,7 +245,7 @@ askSaveinode/x-psion-drive=No
 EOF
 fi
 
-%preun
+%preun kde
 if [ "$1" = 0 ]
 then
 	%{_initrddir}/psion stop >/dev/null 2>&1
@@ -269,7 +271,7 @@ fi
 %{_bindir}/sisinstall
 %{_sbindir}/*
 %{_mandir}/*/*
-%{_libdir}/libplp.so*
+%{_libdir}/libplp.so.*
 %{_libdir}/libplp.la
 %{_datadir}/locale/*/LC_MESSAGES/plptools.mo
 %{_datadir}/%{name}/*
@@ -286,23 +288,26 @@ fi
 %files devel
 %doc doc/api etc/*.spec
 %{_libdir}/libplp.a
+%{_libdir}/libplp.so
 %{_includedir}/%{name}/*
 
 %files kde
-%{_libdir}/kio_plp.so*
-%{_libdir}/kio_plp.la
-%{_libdir}/libplpprops.so*
-%{_libdir}/libplpprops.la
+%{_libdir}/kde*/kio_plp.so*
+%{_libdir}/kde*/kio_plp.la
+%{_libdir}/kde*/libplpprops.so*
+%{_libdir}/kde*/libplpprops.la
 %{_datadir}/services/*
 %{_datadir}/icons/*/*/mimetypes/*
 %{_datadir}/icons/*/*/devices/*
 %{_datadir}/icons/*/*/apps/psion*
 %{_datadir}/locale/*/LC_MESSAGES/libplpprops.mo
 %{_datadir}/mimelnk/*/*
+%{_datadir}/doc/HTML/*/kioslave/*
 
 %files -n kpsion
 %{_bindir}/kpsion
-%{_libdir}/libkpsion.*
+%{_libdir}/libkpsion.so
+%{_libdir}/libkpsion.la
 %{_datadir}/applnk/*/kpsion*
 %{_datadir}/apps/kpsion/*
 %{_datadir}/apps/konqueror/*
@@ -313,7 +318,8 @@ fi
 
 %files -n klipsi
 %{_bindir}/klipsi
-%{_libdir}/klipsi.*
+%{_libdir}/klipsi.so
+%{_libdir}/klipsi.la
 %{_datadir}/applnk/*/klipsi*
 %{_datadir}/apps/klipsi/*
 %{_datadir}/icons/*/*/apps/klipsi*

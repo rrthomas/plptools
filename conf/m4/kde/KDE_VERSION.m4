@@ -12,4 +12,6 @@ AC_DEFUN(KDE_VERSION,
 			;;
 	esac
 	AC_MSG_RESULT($ac_kde_version.x)
+	kdeversion=$ac_kde_version
+	AC_SUBST(kdeversion)
 ])

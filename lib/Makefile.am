@@ -1,6 +1,6 @@
 # $Id$
 #
-INCLUDES += -I$(top_srcdir)/intl
+INCLUDES = -I$(top_srcdir)/intl
 CFLAGS = $(THREADED_CFLAGS)
 CXXFLAGS = $(THREADED_CXXFLAGS)
 

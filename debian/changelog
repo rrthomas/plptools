@@ -1,4 +1,4 @@
-plptools (0.11-1) unstable; urgency=low
+plptools (0.11-0) unstable; urgency=low
 
   * New upstream version
   * Made separate binaries for KDE dependant programs
@@ -25,7 +25,3 @@ plptools (0.7-1) unstable; urgency=low
   * Initial Release.
 
  -- John Lines <john@paladin.demon.co.uk>  Wed, 13 Dec 2000 11:35:52 +0000
-
-Local variables:
-mode: debian-changelog
-End:

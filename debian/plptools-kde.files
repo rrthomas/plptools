@@ -1,11 +1,11 @@
-usr/lib/kio_plp.so
-usr/lib/kio_plp.la
-usr/lib/libplpprops.so.*
-usr/lib/libplpprops.la
+usr/lib/kde*/kio_plp.so
+usr/lib/kde*/kio_plp.la
+usr/lib/kde*/libplpprops.so
+usr/lib/kde*/libplpprops.la
 usr/share/services/*
 usr/share/icons/*/*/mimetypes/*
 usr/share/icons/*/*/devices/*
 usr/share/icons/*/*/apps/psion*
 usr/share/locale/*/LC_MESSAGES/libplpprops.mo
 usr/share/mimelnk/*/*
-usr/share/lintian/overrides/plptools-kde
+usr/share/doc/kde/HTML/*/kioslave/*

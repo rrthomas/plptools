@@ -1,16 +1,16 @@
 Source: plptools
-Build-Depends: debhelper (>= 4.0.2), automake (>= 1:1.4-p4-1.1), autoconf, libtool, gettext, libncurses5-dev, libreadline4-dev, libnewt-dev, kdoc, libqt-dev, kdebase-dev
+Build-Depends: debhelper (>= 4.0.2), automake (>= 1:1.4-p4-1.1) | automake1.6, autoconf, libtool, gettext, libncurses5-dev, libreadline4-dev, libnewt-dev, kdoc, libqt-dev|libqt3-dev, kdebase-dev
 Section: otherosfs
 Priority: optional
 Maintainer: John Lines <john@paladin.demon.co.uk>
-Standards-Version: 3.5.6
+Standards-Version: 3.5.6.1
 
 Package: plptools
 Architecture: any
 Depends: ${shlibs:Depends}, debconf
 Description: Access a Psion PDA over a serial link 
  This package lets you access Psion drives over a serial link. You
- can mount them, pseudo NFS style, access them ftp-like, use a local
+ can mount them, pseudo NFS style, access them FTP-like, use a local
  printer from the Psion (Psion S5 only) and perform backup/restore.
  .
  The software is partially based on p3nfs, which is also packed for
@@ -22,29 +22,32 @@ Architecture: any
 Section: devel
 Depends: plptools (= ${Source-Version})
 Description: plptools (development files)
- You need these files if you want to build programs which use libplp.
+ This package provides a static library, headers and API documentation
+ for plptools development. You need these files if you want to build
+ programs which use libplp.
 
 Package: plptools-kde
 Architecture: any
-Depends: ${shlibs:Depends}, kdebase-libs, konqueror
+Depends: ${shlibs:Depends}
+Suggests: konqueror
 Enhances: kdebase
 Description: KDE integration of plptools
  This package provides integrated access to a Psion PDA into KDE
  Using a kioslave, any KDE compliant application can access files on
- a Psion using a new URL protocol type "psion:/". Furthermore, a plugin
+ a Psion using a new URI protocol type "psion:/". Furthermore, a plug-in
  for KDE's advanced file manager konqueror adds Psion-related entries
  to it's property dialog.
 
 Package: kpsion
 Architecture: any
-Depends: ${shlibs:Depends}, kdebase-libs
+Depends: ${shlibs:Depends}
 Description: Backup and Restore of a Psion PDA
- This package provides a KDE frontend for backup/restore of a Psion PDA
+ This package provides a KDE front-end for backup/restore of a Psion PDA
 
 Package: klipsi
 Architecture: any
-Depends: ${shlibs:Depends}, kdebase-libs
+Depends: ${shlibs:Depends}
 Description: Remote Cut&Paste for Psion PDA
- This package provides a KDE systray application which allows to share
+ This package provides a KDE sys-tray application which allows to share
  KDE's clipboard remotely with a Psion PDA.
 

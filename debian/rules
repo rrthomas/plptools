@@ -10,6 +10,7 @@ export DH_COMPAT=3
 
 tmp = $(shell pwd)/debian/tmp
 ltmp = $(tmp)/usr/share/lintian/overrides
+hdir = $(shell kde-config --expandvars -install html)
 
 %.1: %.1.in
 	MANDATE=`grep CHECKIN $< | awk '{print $$4}'` ; \
@@ -56,7 +57,7 @@ install: build debian/kpsion.1 debian/klipsi.1
 	dh_clean -k
 	dh_installdirs
 	# install into debian/tmp.
-	$(MAKE) DESTDIR=$(tmp) install
+	$(MAKE) DESTDIR=$(tmp) kde_htmldir=$(hdir) install
 	install -d $(tmp)/etc
 	install -d $(ltmp)
 	install -m 644 debian/plptools.conf $(tmp)/etc
@@ -100,7 +101,7 @@ binary-arch: build install
 	dh_installchangelogs 
 	dh_link
 	dh_strip
-	dh_compress
+	dh_compress -a -X.docbook -X.css -X-license -X.dcl -X.bz2
 	dh_fixperms
 	# You may want to make some executables suid here.
 #	dh_suidregister

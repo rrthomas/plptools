@@ -1,5 +1,6 @@
 usr/bin/klipsi
-usr/lib/klipsi.*
+usr/lib/klipsi.la
+usr/lib/klipsi.so
 usr/share/applnk/*/klipsi*
 usr/share/apps/klipsi/*
 usr/share/icons/*/*/apps/klipsi*
