@@ -24,8 +24,12 @@
 0	lelong		0x10000041	application/x-psion-mbm
 
 0	lelong		0x10000050
->4	lelong		0x1000006D	application/x-psion-db
 >4	lelong		0x100000E4	application/x-psion-ini
+>4	lelong		0x10000075
+>>8	lelong		0x1000034d	application/x-psion-backlite
+>4	lelong		0x1000006D
+>>8	lelong		0x10000084	application/x-psion-agenda
+>>8	lelong		0x10000086	application/x-psion-addressbook
 
 0	lelong		0x10000079
 >4	lelong		0x00000000	application/x-psion-dll
@@ -42,4 +46,7 @@
 >4	lelong		0x10000141	application/x-psion-ppd
 
 0	lelong		0x1000007A	application/x-psion-exe
+
+4	lelong		0x1000006d
+>8	lelong		0x10000419	application/x-psion-sis
 
