@@ -1,0 +1,72 @@
+
+ This package is heavily based on two other packages:
+
+   - p3nfsd-5.4 by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
+     an nfs daemon for Psion series 3 and 5
+   - plp_1_7 by Philip Proudman
+	(former email, current address unknown proudman@btinternet.com)
+
+ I want to thank both authors for their nice packages and for making
+ these available under GPL which makes it possible for me to
+ create this package (which of course is also distributed under GPL)
+
+ What i did:
+
+ I modified and improved Philip's code to support more (nearly all?)
+ rfsv32 commands and to gain speed (approx 4 times) and stability
+ (properly reconnects on lost serial link).
+ Rudolf's code originally used a homegrown protocol which needs a
+ separate program running on the Psion. I changed his code to use
+ the socket-based client-code from Philip's rfsv program thus
+ eliminating the need for any software beeing run on the Psion. 
+ The rfsv code and some other stuff went into a lib (both shared
+ and static available). I also removed all Psion-3 related stuff,
+ because a) i can't test it and b) Sibo support is dropped by
+ Psion.
+
+ How to install:
+
+ ./configure
+ make
+ make install
+
+ In addition to the ususal options (see INSTALL), configure
+ understands the following stuff for customization to your
+ environment:
+
+  --enable-debug
+
+       Adds -g to CFLAGS, so you will get debugging-versions of
+       the programs and libplp
+
+  --with-serial=/dev/sometty
+
+       overrides the default serial device for ncpd. Without this
+       option, configure tries to automagically find a serial device.
+
+  --with-speed=baudrate
+
+       overrides the default serial speed of 115200 baud.
+
+  --with-port=portnum
+
+       overrides the default port number, where ncpd listens
+       and plpftp resp. plpnfsd connects to.
+
+ You will get 3 programs and a shared and static library.
+ By default, the install-prefix is /usr/local, so you probably
+ should add /usr/local/lib to your /etc/ld.so.conf and then run
+ ldconfig after installation.
+
+ The programs:
+
+ ncpd is the daemon which handles the serial link to your Psion.
+ It listens at port 7501 for local connections and provides
+ basic PLP/NCP services for the other two programs.
+
+ plpftp is a FTP-like program for manipulating files on the Psion.
+
+ plpnfsd is a daemon, which provides NFS-like access to your Psion.
+
+Have fun.
+
