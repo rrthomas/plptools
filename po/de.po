@@ -685,7 +685,7 @@ msgid "OwnerInfo returned error "
 msgstr "OwnerInfo lieferte Fehler "
 
 #: plpftp/ftp.cc:260
-msgid "FATAL: Couln't find default Drive"
+msgid "FATAL: Couldn't find default Drive"
 msgstr "FATAL: Konnte Standard-Laufwerk nicht ermitteln"
 
 #: plpftp/ftp.cc:269

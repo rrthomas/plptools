@@ -257,7 +257,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    }
 	}
 	if (!strcmp(defDrive, "::")) {
-	    cerr << _("FATAL: Couln't find default Drive") << endl;
+	    cerr << _("FATAL: Couldn't find default Drive") << endl;
 	    return -1;
 	}
     } else
