@@ -1,7 +1,7 @@
 [Desktop Entry]
 Comment=Psion Recorder
 Hidden=false
-Icon=x-psion-recorder
+Icon=x_psion_recorder
 MimeType=application/x-psion-record
 Patterns=
 Type=MimeType
