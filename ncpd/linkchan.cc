@@ -31,7 +31,13 @@ linkChan::linkChan(ncp * _ncpController):channel(_ncpController)
 void linkChan::
 ncpDataCallback(bufferStore & a)
 {
-	cout << "linkchan: got message " << a << endl;
+	if (verbose & LINKCHAN_DEBUG_LOG) {
+		cout << "linkchan: << msg ";
+		if (verbose & LINKCHAN_DEBUG_DUMP)
+			cout << a << endl;
+		else
+			cout << a.getLen() << endl;
+	}
 }
 
 const char *linkChan::
@@ -43,12 +49,14 @@ getNcpConnectName()
 void linkChan::
 ncpConnectAck()
 {
-	cout << "linkchan: got connect ack\n";
+	if (verbose & LINKCHAN_DEBUG_LOG)
+		cout << "linkchan: << cack" << endl;
 }
 
 void linkChan::
 ncpConnectTerminate()
 {
-	cout << "linkchan: got connect terminate\n";
+	if (verbose & LINKCHAN_DEBUG_LOG)
+		cout << "linkchan: << ctrm" << endl;
 	terminateWhenAsked();
 }

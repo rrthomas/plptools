@@ -7,6 +7,9 @@ class link;
 class channel;
 class IOWatch;
 
+#define NCP_DEBUG_LOG  1
+#define NCP_DEBUG_DUMP 2
+
 class ncp {
 	public:
 		ncp(const char *fname, int baud, IOWatch &iow);
@@ -16,9 +19,16 @@ class ncp {
 		void disconnect(int channel);
 		void send(int channel, bufferStore &a);
 		void poll();
+		void reset();
 		bool stuffToSend();
 		bool hasFailed();
 		bool gotLinkChannel();
+		void setVerbose(short int);
+		short int getVerbose();
+		void setLinkVerbose(short int);
+		short int getLinkVerbose();
+		void setPktVerbose(short int);
+		short int getPktVerbose();
   
 	private:
 		enum c { MAX_LEN = 200, LAST_MESS = 1, NOT_LAST_MESS = 2 };
@@ -39,6 +49,7 @@ class ncp {
 		char * ctrlMsgName(unsigned char);
   
 		link *l;
+		unsigned short verbose;
 		channel *channelPtr[8];
 		bufferStore messageList[8];
 		int remoteChanList[8];

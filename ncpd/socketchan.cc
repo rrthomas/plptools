@@ -30,76 +30,85 @@
 #include "ppsocket.h"
 #include "iowatch.h"
 
-socketChan::socketChan(ppsocket *_skt, ncp *_ncpController, IOWatch &_iow) :
-  channel(_ncpController),
-  iow(_iow)
+socketChan:: socketChan(ppsocket * _skt, ncp * _ncpController, IOWatch & _iow):
+channel(_ncpController),
+iow(_iow)
 {
-  skt = _skt;
-  connectName = 0;
-  iow.addIO(skt->socket());
-  connected = false;
+	skt = _skt;
+	connectName = 0;
+	iow.addIO(skt->socket());
+	connected = false;
 }
 
-socketChan::~socketChan() {
-  iow.remIO(skt->socket());
-  skt->closeSocket();
-  delete skt;
-  if (connectName) free(connectName);
+socketChan::~socketChan()
+{
+	iow.remIO(skt->socket());
+	skt->closeSocket();
+	delete skt;
+	if (connectName)
+		free(connectName);
 }
 
-void socketChan::ncpDataCallback(bufferStore &a) {
-  if (connectName != 0) {
-    skt->sendBufferStore(a);
-  }
-  else {
-    cerr << "This should not happen\n";
-  }
+void socketChan::
+ncpDataCallback(bufferStore & a)
+{
+	if (connectName != 0) {
+		skt->sendBufferStore(a);
+	} else
+		cerr << "socketchan: Connect without name!!!\n";
 }
 
-const char *socketChan::getNcpConnectName() {
-  return connectName;
+const char *socketChan::
+getNcpConnectName()
+{
+	return connectName;
 }
 
-void socketChan::ncpConnectAck() {
-  bufferStore a;
-  a.addStringT("Ok");
-  skt->sendBufferStore(a);
-  connected = true;
+void socketChan::
+ncpConnectAck()
+{
+	bufferStore a;
+	a.addStringT("Ok");
+	skt->sendBufferStore(a);
+	connected = true;
 }
 
-void socketChan::ncpConnectTerminate() {
-  bufferStore a;
-  a.addStringT("Close");
-  skt->sendBufferStore(a);
-  terminateWhenAsked();
+void socketChan::
+ncpConnectTerminate()
+{
+	bufferStore a;
+	a.addStringT("Close");
+	skt->sendBufferStore(a);
+	terminateWhenAsked();
 }
 
-void socketChan::socketPoll() {
-  if (connectName == 0) {
-    bufferStore a;
-    if (skt->getBufferStore(a, false) == 1) {
-      connectName = strdup(a.getString());
-      ncpConnect();
-    }
-  }
-  else if (connected) {
-    bufferStore a;
-    int res = skt->getBufferStore(a, false);
-    if ( res == -1 ) {
-      ncpDisconnect();
-    }
-    else if (res == 1) {
-      if (a.getLen() > 5 &&
-	  !strncmp(a.getString(), "Close", 5)) {
-	ncpDisconnect();
-      }
-      else {
-	ncpSend(a);
-      }
-    }
-  }
+void socketChan::
+socketPoll()
+{
+	if (connectName == 0) {
+		bufferStore a;
+		if (skt->getBufferStore(a, false) == 1) {
+			connectName = strdup(a.getString());
+			ncpConnect();
+		}
+	} else if (connected) {
+		bufferStore a;
+		int res = skt->getBufferStore(a, false);
+		if (res == -1) {
+			ncpDisconnect();
+		} else if (res == 1) {
+			if (a.getLen() > 5 &&
+			    !strncmp(a.getString(), "Close", 5)) {
+				ncpDisconnect();
+			} else {
+				ncpSend(a);
+			}
+		}
+	}
 }
 
-bool socketChan::isConnected() const {
-  return connected;
+bool socketChan::
+isConnected()
+const {
+	return connected;
 }

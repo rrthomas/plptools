@@ -26,35 +26,63 @@
 #include "channel.h"
 #include "ncp.h"
 
-channel::channel(ncp *_ncpController) {
-  ncpController = _ncpController;
-  _terminate = false;
+channel::channel(ncp * _ncpController)
+{
+	verbose = 0;
+	ncpController = _ncpController;
+	_terminate = false;
 }
 
-void channel::ncpSend(bufferStore &a) {
-  ncpController->send(ncpChannel, a);
+void channel::
+ncpSend(bufferStore & a)
+{
+	ncpController->send(ncpChannel, a);
 }
 
-bool channel::terminate() {
-  return _terminate;
+bool channel::
+terminate()
+{
+	return _terminate;
 }
 
-void channel::terminateWhenAsked() {
-  _terminate = true;
+void channel::
+terminateWhenAsked()
+{
+	_terminate = true;
 }
 
-void channel::ncpConnect() {
-  ncpController->connect(this);
+void channel::
+ncpConnect()
+{
+	ncpController->connect(this);
 }
 
-void channel::ncpDisconnect() {
-  ncpController->disconnect(ncpChannel);
+void channel::
+ncpDisconnect()
+{
+	ncpController->disconnect(ncpChannel);
 }
 
-void channel::setNcpChannel(int chan) {
-  ncpChannel = chan;
+void channel::
+setNcpChannel(int chan)
+{
+	ncpChannel = chan;
 }
 
-void channel::newNcpController(ncp *_ncpController) {
-  ncpController = _ncpController;
+void channel::
+newNcpController(ncp * _ncpController)
+{
+	ncpController = _ncpController;
+}
+
+void channel::
+setVerbose(short int _verbose)
+{
+	verbose = _verbose;
+}
+
+short int channel::
+getVerbose()
+{
+	return verbose;
 }

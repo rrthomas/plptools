@@ -40,7 +40,7 @@ extern "C" {
 
 #define BUFFERLEN 2000
 
-packet::packet(const char *fname, int _baud, IOWatch & _iow, bool _verbose):
+packet::packet(const char *fname, int _baud, IOWatch & _iow, short int _verbose = 0):
 iow(_iow)
 {
 	verbose = _verbose;
@@ -56,12 +56,23 @@ iow(_iow)
 	iow.addIO(fd);
 }
 
+short int packet::
+getVerbose()
+{
+	return verbose;
+}
+
+void packet::
+setVerbose(short int _verbose)
+{
+	verbose = _verbose;
+}
+
 packet::~packet()
 {
 	iow.remIO(fd);
 	ser_exit(fd);
 	usleep(100000);
-
 	delete[]inBuffer;
 	delete[]outBuffer;
 	free(devname);
@@ -70,8 +81,13 @@ packet::~packet()
 void packet::
 send(unsigned char type, const bufferStore & b)
 {
-	if (verbose)
-		cout << "packet: send ";
+	if (verbose & PKT_DEBUG_LOG) {
+		cout << "packet: >> ";
+		if (verbose & PKT_DEBUG_DUMP)
+			cout << b << endl;
+		else
+			cout << "len=" << b.getLen() << endl;
+	}
 	opByte(0x16);
 	opByte(0x10);
 	opByte(0x02);
@@ -94,8 +110,6 @@ send(unsigned char type, const bufferStore & b)
 
 	opByte(crcOut >> 8);
 	opByte(crcOut & 0xff);
-	if (verbose)
-		cout << endl;
 	realWrite();
 }
 
@@ -117,8 +131,6 @@ opByte(unsigned char a)
 {
 	*outPtr++ = a;
 	outLen++;
-	if (verbose)
-		cout << hex << setw(2) << setfill('0') << (int) a << " ";
 	if (outLen >= BUFFERLEN)
 		realWrite();
 }
@@ -129,8 +141,8 @@ realWrite()
 	outPtr = outBuffer;
 	while (outLen > 0) {
 		int r = write(fd, outPtr, outLen);
-		if (verbose)
-			cout << "realW:" << dec << r << endl;
+		if (verbose & PKT_DEBUG_LOG)
+			cout << "packet: WR=" << dec << r << endl;
 		if (r > 0) {
 			outLen -= r;
 			outPtr += r;
@@ -145,7 +157,7 @@ get(unsigned char &type, bufferStore & ret)
 	while (!terminated()) {
 		int res = read(fd, inPtr, BUFFERLEN - inLen);
 		if (res > 0) {
-			if (verbose)
+			if (verbose & PKT_DEBUG_LOG)
 				cout << "packet: rcv " << dec << res << endl;
 			inPtr += res;
 			inLen += res;
@@ -153,16 +165,19 @@ get(unsigned char &type, bufferStore & ret)
 		if (res < 0)
 			return false;
 		if (inLen >= BUFFERLEN) {
-			cerr << "input Overflow!!!!" << endl;
+			cerr << "packet: input buffer overflow!!!!" << endl;
 			inLen = 0;
 			inPtr = inBuffer;
 			return false;
 		}
 	}
-	if (verbose) {
+	if (verbose & PKT_DEBUG_LOG) {
 		cout << "packet: get ";
-		for (int i = 0; i < termLen; i++)
-			cout << hex << setw(2) << setfill('0') << (int) inBuffer[i] << " ";
+		if (verbose & PKT_DEBUG_DUMP) {
+			for (int i = 0; i < termLen; i++)
+				cout << hex << setw(2) << setfill('0') << (int) inBuffer[i] << " ";
+		} else
+			cout << "len=" << dec << termLen;
 		cout << endl;
 	}
 	inLen -= termLen;
@@ -176,8 +191,10 @@ get(unsigned char &type, bufferStore & ret)
 		ret = rcv;
 		ret.discardFirstBytes(1);
 		return true;
-	} else
-		cout << "packet::Warning - bad crc packet " << endl;
+	} else {
+		if (verbose & PKT_DEBUG_LOG)
+			cout << "packet: BAD CRC" << endl;
+	}
 	return false;
 }
 

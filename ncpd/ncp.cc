@@ -35,9 +35,9 @@
 
 ncp::ncp(const char *fname, int baud, IOWatch & iow)
 {
-	l = new link(fname, baud, iow, LINK_LAYER_DIAGNOSTICS);
-	gotLinkChan = false;
+	l = new link(fname, baud, iow);
 	failed = false;
+	verbose = 0;
 
 	// init channels
 	for (int i = 0; i < 8; i++)
@@ -47,6 +47,51 @@ ncp::ncp(const char *fname, int baud, IOWatch & iow)
 ncp::~ncp()
 {
 	delete l;
+}
+
+void ncp::
+reset() {
+	for (int i = 0; i < 8; i++)
+		channelPtr[i] = NULL;
+	failed = false;
+	gotLinkChan = false;
+	l->reset();
+}
+
+short int ncp::
+getVerbose()
+{
+	return verbose;
+}
+
+void ncp::
+setVerbose(short int _verbose)
+{
+	verbose = _verbose;
+}
+
+short int ncp::
+getLinkVerbose()
+{
+	return l->getVerbose();
+}
+
+void ncp::
+setLinkVerbose(short int _verbose)
+{
+	l->setVerbose(_verbose);
+}
+
+short int ncp::
+getPktVerbose()
+{
+	return l->getPktVerbose();
+}
+
+void ncp::
+setPktVerbose(short int _verbose)
+{
+	l->setPktVerbose(_verbose);
 }
 
 void ncp::
@@ -66,7 +111,7 @@ poll()
 					int allData = s.getByte(1);
 					s.discardFirstBytes(2);
 					if (channelPtr[channel] == NULL) {
-						cerr << "Got message for unknown channel\n";
+						cerr << "ncp: Got message for unknown channel\n";
 					} else {
 						messageList[channel].addBuff(s);
 						if (allData == LAST_MESS) {
@@ -93,7 +138,8 @@ controlChannel(int chan, enum interControllerMessageType t, bufferStore & comman
 	open.addByte(chan);
 	open.addByte(t);
 	open.addBuff(command);
-	cout << "put " << ctrlMsgName(t) << endl;
+	if (verbose & NCP_DEBUG_LOG)
+		cout << "ncp: >> " << ctrlMsgName(t) << " " << chan << endl;
 	l->send(open);
 }
 
@@ -103,16 +149,16 @@ decodeControlMessage(bufferStore & buff)
 	int remoteChan = buff.getByte(0);
 	interControllerMessageType imt = (interControllerMessageType) buff.getByte(1);
 	buff.discardFirstBytes(2);
-	cout << "got " << ctrlMsgName(imt) << " " << remoteChan << " ";
+	if (verbose & NCP_DEBUG_LOG)
+		cout << "ncp: << " << ctrlMsgName(imt) << " " << remoteChan;
 	switch (imt) {
-		case NCON_MSG_DATA_XOFF:
-			cout << remoteChan << "  " << buff << endl;
-			break;
-		case NCON_MSG_DATA_XON:
-			cout << buff << endl;
-			break;
-		case NCON_MSG_CONNECT_TO_SERVER:{
-				cout << buff << endl;
+		case NCON_MSG_CONNECT_TO_SERVER:
+			{
+				if (verbose & NCP_DEBUG_LOG) {
+					if (verbose & NCP_DEBUG_DUMP)
+						cout << "  " << buff;
+					cout << endl;
+				}
 				int localChan;
 				bufferStore b;
 
@@ -125,61 +171,72 @@ decodeControlMessage(bufferStore & buff)
 				if (!strcmp(buff.getString(0), "LINK.*")) {
 					if (gotLinkChan)
 						failed = true;
-					cout << "Accepted link channel" << endl;
+					if (verbose & NCP_DEBUG_LOG)
+						cout << "ncp: Link UP" << endl;
 					channelPtr[localChan] = new linkChan(this);
 					channelPtr[localChan]->setNcpChannel(localChan);
 					channelPtr[localChan]->ncpConnectAck();
 					gotLinkChan = true;
 				} else {
-					cout << "Disconnecting channel" << endl;
+					if (verbose & NCP_DEBUG_LOG)
+						cout << "ncp: Link DOWN" << endl;
 					bufferStore b;
 					b.addByte(remoteChan);
 					controlChannel(localChan, NCON_MSG_CHANNEL_DISCONNECT, b);
 				}
 			}
 			break;
-		case NCON_MSG_CONNECT_RESPONSE:{
+		case NCON_MSG_CONNECT_RESPONSE:
+			{
 				int forChan = buff.getByte(0);
-				cout << "for channel " << forChan << " status ";
+				if (verbose & NCP_DEBUG_LOG)
+					cout << "ch=" << forChan << " stat=";
 				if (buff.getByte(1) == 0) {
-					cout << "OK" << endl;
+					if (verbose & NCP_DEBUG_LOG)
+						cout << "OK" << endl;
 					if (channelPtr[forChan]) {
 						remoteChanList[forChan] = remoteChan;
 						channelPtr[forChan]->ncpConnectAck();
 					} else {
-						cerr << "Got message for unknown channel\n";
+						if (verbose & NCP_DEBUG_LOG)
+							cout << "ncp: message for unknown channel\n";
 					}
 				} else {
-					cout << "Unknown status " << (int) buff.getByte(1) << endl;
+					if (verbose & NCP_DEBUG_LOG)
+						cout << "Unknown " << (int) buff.getByte(1) << endl;
 					channelPtr[forChan]->ncpConnectTerminate();
 				}
 			}
 			break;
-		case NCON_MSG_CHANNEL_CLOSED:
-			cout << buff << endl;
-			break;
 		case NCON_MSG_NCP_INFO:
 			if (buff.getByte(0) == 6) {
-				cout << buff << endl;
-				{
-					// Send time info
-					bufferStore b;
-					b.addByte(6);
-					b.addDWord(0);
-					controlChannel(0, NCON_MSG_NCP_INFO, b);
+				bufferStore b;
+				if (verbose & NCP_DEBUG_LOG) {
+					if (verbose & NCP_DEBUG_DUMP)
+						cout << " " << buff;
+					cout << endl;
 				}
+				b.addByte(6);
+				b.addDWord(0);
+				controlChannel(0, NCON_MSG_NCP_INFO, b);
 			} else
 				cout << "ALERT!!!! Protocol-Version is NOT 6!! (No Series 5?)!" << endl;
 			break;
 		case NCON_MSG_CHANNEL_DISCONNECT:
-			cout << "channel " << (int) buff.getByte(0) << endl;
+			if (verbose & NCP_DEBUG_LOG)
+				cout << " ch=" << (int) buff.getByte(0) << endl;
 			disconnect(buff.getByte(0));
 			break;
+		case NCON_MSG_DATA_XOFF:
+		case NCON_MSG_DATA_XON:
+		case NCON_MSG_CHANNEL_CLOSED:
 		case NCON_MSG_NCP_END:
-			cout << buff << endl;
-			break;
 		default:
-			cout << endl;
+			if (verbose & NCP_DEBUG_LOG) {
+				if (verbose & NCP_DEBUG_DUMP)
+					cout << " " << buff;
+				cout << endl;
+			}
 	}
 }
 

@@ -8,12 +8,17 @@ class psiEmul;
 class bufferStore;
 class IOWatch;
 
+#define PKT_DEBUG_LOG  1
+#define PKT_DEBUG_DUMP 2
+
 class packet {
 	public:
-		packet(const char *fname, int baud, IOWatch &iow, bool verbose = false);
+		packet(const char *fname, int baud, IOWatch &iow, short int verbose = 0);
 		~packet();
 		void send(unsigned char type, const bufferStore &b);
 		bool get(unsigned char &type, bufferStore &b);
+		void setVerbose(short int);
+		short int getVerbose();
   
 	private:
 		bool terminated();

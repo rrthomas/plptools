@@ -30,10 +30,9 @@
 #include "bufferstore.h"
 #include "bufferarray.h"
 
-link::link(const char *fname, int baud, IOWatch & iow, bool _s5, bool _verbose):
-s5(_s5)
+link::link(const char *fname, int baud, IOWatch & iow, unsigned short _verbose)
 {
-	p = new packet(fname, baud, iow, PACKET_LAYER_DIAGNOSTICS);
+	p = new packet(fname, baud, iow);
 	verbose = _verbose;
 	idSent = 0;
 	idLastGot = -1;
@@ -46,6 +45,40 @@ s5(_s5)
 link::~link()
 {
 	delete p;
+}
+
+void link::
+reset() {
+	idSent = 0;
+	idLastGot = -1;
+	newLink = true;
+	somethingToSend = false;
+	timesSent = 0;
+	failed = false;
+}
+
+short int link::
+getVerbose()
+{
+	return verbose;
+}
+
+void link::
+setVerbose(short int _verbose)
+{
+	verbose = _verbose;
+}
+
+short int link::
+getPktVerbose()
+{
+	return p->getVerbose();
+}
+
+void link::
+setPktVerbose(short int _verbose)
+{
+	p->setVerbose(_verbose);
 }
 
 void link::
@@ -65,49 +98,65 @@ poll()
 	unsigned char type;
 
 	while (p->get(type, buff)) {
-		if ((type & 0xf0) == 0x30) {
-			// Data
-			int ser = type & 0x0f;
-			if (verbose)
-				cout << "link: Got data ser " << ser << " : " << buff << endl;
-			// Send ack
-			if (idLastGot != ser) {
-				idLastGot = ser;
-				ret.pushBuffer(buff);
-			} else {
-				if (verbose)
-					cout << "link: Duplicated data - not passing back, repeating ack\n";
-			}
-			if (verbose)
-				cout << "link: Send ack ser " << ser << endl;
-			bufferStore blank;
-			p->send(ser, blank);
-			break;
-		} else if ((type & 0xf0) == 0x00) {
-			// Ack
-			int ser = type & 0x0f;
-			if (ser == idSent) {
-				if (verbose)
-					cout << "link: Got ack " << ser << " : " << buff << endl;
+		int seq = type & 0x0f;
+		bufferStore blank;
+		type &= 0xf0;
+		switch (type) {
+			case 0x30:
+				if (verbose & LNK_DEBUG_LOG) {
+					cout << "link: << dat seq=" << seq ;
+					if (verbose & LNK_DEBUG_DUMP)
+						cout << " " << buff << endl;
+					else
+						cout << " len=" << buff.getLen() << endl;
+				}
+				// Send ack
+				if (idLastGot != seq) {
+					idLastGot = seq;
+					ret.pushBuffer(buff);
+				} else {
+					if (verbose & LNK_DEBUG_LOG)
+						cout << "link: DUP\n";
+				}
+				if (verbose & LNK_DEBUG_LOG)
+					cout << "link: >> ack seq=" << seq << endl;
+				blank.init();
+				p->send(seq, blank);
+				break;
+			case 0x00:
+				// Ack
+				if (seq == idSent) {
+					if (verbose & LNK_DEBUG_LOG) {
+						cout << "link: << ack seq=" << seq ;
+						if (verbose & LNK_DEBUG_DUMP)
+							cout << " " << buff;
+						cout << endl;
+					}
+					somethingToSend = false;
+					timesSent = 0;
+				}
+				break;
+			case 0x20:
+				// New link
+				if (verbose & LNK_DEBUG_LOG) {
+					cout << "link: << lrq seq=" << seq;
+					if (verbose & LNK_DEBUG_DUMP)
+						cout << " " << buff;
+					cout << endl;
+				}
+				idLastGot = 0;
+				if (verbose & LNK_DEBUG_LOG)
+					cout << "link: >> lack seq=" << seq << endl;
 				somethingToSend = false;
-				timesSent = 0;
-			}
-		} else if ((type & 0xf0) == 0x20) {
-			// New link
-			int ser = type & 0x0f;
-			if (verbose)
-				cout << "link: got New link request " << ser << " : " << buff << endl;
-			idLastGot = 0;
-			bufferStore blank;
-			if (verbose)
-				cout << "link: Sending ack of new link\n";
-			somethingToSend = false;
-			p->send(idLastGot, blank);
-		} else if ((type & 0xf0) == 0x10) {
-			// Disconnect
-			cerr << "Disconnect?\n";
-			failed = true;
-			return ret;
+				blank.init();
+				p->send(idLastGot, blank);
+				break;
+			case 0x10:
+				// Disconnect
+				if (verbose & LNK_DEBUG_LOG)
+					cout << "link: << DISC" << endl;
+				failed = true;
+				return ret;
 		}
 	}
 
@@ -136,19 +185,22 @@ poll()
 			} else {
 				if (toSend.empty()) {
 					// Request for new link
-					if (verbose)
-						cout << "link: Send req new session ser " << idSent << endl;
+					if (verbose & LNK_DEBUG_LOG)
+						cout << "link: >> lrq seq=" << idSent << endl;
 					p->send(0x20 + idSent, toSend);
 				} else {
-					if (verbose)
-						cout << "link: Send data packet ser " << idSent << " : " << toSend << endl;
+					if (verbose & LNK_DEBUG_LOG) {
+						cout << "link: >> data seq=" << idSent;
+						if (verbose & LNK_DEBUG_DUMP)
+							cout << " " << toSend;
+						cout << endl;
+					}
 					p->send(0x30 + idSent, toSend);
 				}
 				countToResend = 5;
 			}
-		} else {
+		} else
 			countToResend--;
-		}
 	}
 	return ret;
 }

@@ -31,6 +31,8 @@
 #include "socketchan.h"
 #include "iowatch.h"
 #include "linkchan.h"
+#include "link.h"
+#include "packet.h"
 
 void
 checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp * a, IOWatch & iow)
@@ -44,6 +46,8 @@ checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp 
 			bufferStore a;
 			a.addStringT("No psion ncp channel free");
 			next->sendBufferStore(a);
+			sleep(1);
+			next->closeSocket();
 		} else
 			scp[numScp++] = new socketChan(next, a, iow);
 	}
@@ -90,8 +94,8 @@ resetSocketConnections(int &numScp, socketChan ** scp, ncp * a)
 void
 usage()
 {
-	cout << "Version : " << VERSION << endl;
-	cout << "Usage : 	ncp [-s <socket number>] [-d <device>] [-b <baud rate>]\n";
+	cerr << "Usage : ncpd [-s <socket number>] [-d <device>] [-b <baud rate>]\n";
+	exit(1);
 }
 
 int
@@ -105,23 +109,40 @@ main(int argc, char **argv)
 	int sockNum = DPORT;
 	int baudRate = DSPEED;
 	const char *serialDevice = DDEV;
+	short int nverbose = 0;
+	short int pverbose = 0;
+	short int lverbose = 0;
 
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-s") && i + 1 < argc) {
 			sockNum = atoi(argv[++i]);
 		} else if (!strcmp(argv[i], "-d") && i + 1 < argc) {
 			serialDevice = argv[++i];
+		} else if (!strcmp(argv[i], "-v") && i + 1 < argc) {
+			i++;
+			if (!strcmp(argv[i], "nl"))
+				nverbose |= NCP_DEBUG_LOG;
+			if (!strcmp(argv[i], "nd"))
+				nverbose |= NCP_DEBUG_DUMP;
+			if (!strcmp(argv[i], "ll"))
+				lverbose |= LNK_DEBUG_LOG;
+			if (!strcmp(argv[i], "ld"))
+				lverbose |= LNK_DEBUG_DUMP;
+			if (!strcmp(argv[i], "pl"))
+				pverbose |= PKT_DEBUG_LOG;
+			if (!strcmp(argv[i], "pd"))
+				pverbose |= PKT_DEBUG_DUMP;
 		} else if (!strcmp(argv[i], "-b") && i + 1 < argc) {
 			baudRate = atoi(argv[++i]);
-		} else {
+		} else if (!strcmp(argv[i], "-V")) {
+			cout << "plpnfsd version " << VERSION << endl;
+			exit(0);
+		} else
 			usage();
-			exit(1);
-		}
 	}
 
 	if (!skt.listen("127.0.0.1", sockNum)) {
 		cerr << "Could not initiate listen on socket " << sockNum << endl;
-		cerr << "NCP is now started by rfsv - you don't have to do it explicitly yourself" << endl;
 	} else {
 		ncp *a = NULL;
 		int numScp;
@@ -130,12 +151,15 @@ main(int argc, char **argv)
 		while (true) {
 			if (a == NULL) {
 				a = new ncp(serialDevice, baudRate, iow);
+				a->setVerbose(nverbose);
+				a->setLinkVerbose(lverbose);
+				a->setPktVerbose(pverbose);
 				numScp = 0;
 				iow.addIO(skt.socket());
 			}
 			// sockets
-			checkForNewSocketConnection(skt, numScp, scp, a, iow);
 			pollSocketConnections(numScp, scp);
+			checkForNewSocketConnection(skt, numScp, scp, a, iow);
 
 			// psion
 			a->poll();
@@ -144,11 +168,13 @@ main(int argc, char **argv)
 				iow.watch(0, 100000);
 			else
 				iow.watch(100000, 0);
+
 			if (a->hasFailed()) {
 				cout << "ncp: restarting\n";
-				resetSocketConnections(numScp, scp, a);
-				delete a;
-				a = NULL;
+				// resetSocketConnections(numScp, scp, a);
+				// delete a;
+				// a = NULL;
+				a->reset();
 			}
 		}
 		delete a;
