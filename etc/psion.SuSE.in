@@ -1,0 +1,98 @@
+#! /bin/sh
+#
+# /sbin/init.d/psion
+#
+
+. /etc/rc.config
+
+# Determine the base and follow a runlevel link name.
+base=${0##*/}
+link=${base#*[SK][0-9][0-9]}
+
+# Force execution if not called by a runlevel directory.
+test $link = $base && START_PSION=yes
+test "$START_PSION" = yes || exit 0
+
+test -f @prefix@/sbin/ncpd || exit 0
+test -f @prefix@/sbin/plpnfsd || exit 0
+
+# The echo return value for success (defined in /etc/rc.config).
+return=$rc_done
+
+MGETTY_HASPLP=false
+
+if grep -qs ^/PLP/ /etc/mgetty+sendfax/login.config ; then
+	mrun=`pidofproc mgetty`
+	test -n "$mrun" && MGETTY_HASPLP=true
+fi
+
+start() {
+	if $MGETTY_HASPLP ; then
+		echo "NOT Starting ncpd because mgetty configured for PLP"
+		exit 0
+	fi
+	echo -n "Starting Psion support (ncpd): "
+	/sbin/startproc @prefix@/sbin/ncpd
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+		echo -e "$return"
+		echo -n "Starting Psion support (plpnfsd): "
+		/sbin/startproc @prefix@/sbin/plpnfsd
+		RETVAL=$?
+	fi
+	test $RETVAL -eq 0 || return=$rc_failed
+	echo -e "$return"
+	return $RETVAL
+}
+
+stop() {
+	echo -n "Stopping Psion support: "
+	/bin/killproc -HUP plpnfsd
+	while true ; do
+		test -z "`pidof plpnfsd`" && break;
+		sleep 1 # allow plpnfsd flushing it's cache
+	done
+	/sbin/killproc -TERM ncpd
+	RETVAL=$?
+	test $RETVAL -eq 0 || return=$rc_failed
+	echo -e "$return"
+	return $RETVAL
+}
+
+case "$1" in
+    start)
+    	start
+	;;
+
+    stop)
+    	stop
+	;;
+
+    reload|restart)
+	## If first returns OK call the second, if first or
+	## second command fails, set echo return value.
+	$0 stop  &&  $0 start  ||  return=$rc_failed
+	;;
+
+    status)
+	echo -n "Checking for Psion support: "
+	## Check status with checkproc(8), if process is running
+	## checkproc will return with exit status 0.
+	checkproc @prefix@/sbin/ncpd && \
+		echo -n "ncpd running " ||  \
+		echo -n "No running ncpd "
+	checkproc @prefix@/sbin/plpnfsd && \
+		echo -n "plpnfsd running " ||  \
+		echo -n "No running plpnfsd "
+	;;
+
+    *)
+	echo "Usage: $0 {start|stop|status|restart}"
+	exit 1
+	;;
+esac
+
+# Inform the caller not only verbosely and set an exit status.
+test "$return" = "$rc_done" || exit 1
+exit 0
+

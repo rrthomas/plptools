@@ -26,6 +26,28 @@ maintainer-clean-local:
 	find . -name "\.\#*" -exec rm -f {} \;
 	sh conf/intlclean
 
+# Suse doesn't have chkconfig, so we need to create the symlinks here.
+install-data-local:
+	if [ -f /etc/SuSE-release ] ; then \
+		install -m 755 etc/psion.SuSE $(DESTDIR)/etc/rc.d/init.d/psion ;\
+		ln -s ../psion /etc/rc.d/rc2.d/S45psion ;\
+		ln -s ../psion /etc/rc.d/rc3.d/S45psion ;\
+		ln -s ../psion /etc/rc.d/rc4.d/S45psion ;\
+		ln -s ../psion /etc/rc.d/rc5.d/S45psion ;\
+		ln -s ../psion /etc/rc.d/rc1.d/K70psion ;\
+		ln -s ../psion /etc/rc.d/rc0.d/K70psion ;\
+		ln -s ../psion /etc/rc.d/rc6.d/K70psion ;\
+		grep -v START_PSION /etc/rc.config > /etc/rc.config.psion ;\
+		( \
+		echo '# Set START_PSION to yes to start Psion support' ;\
+		echo 'START_PSION=yes' ;\
+		) >> /etc/rc.config.psion ;\
+		cp /etc/rc.config /etc/rc.config.old ;\
+		mv /etc/rc.config.psion /etc/rc.config ;\
+	else \
+		install -m 755 etc/psion $(DESTDIR)/etc/rc.d/init.d/psion ;\
+	fi
+
 dist-hook:
 	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile
 	$(MAKE) -C $(distdir)/kde2 -f Makefile.am am_edit
