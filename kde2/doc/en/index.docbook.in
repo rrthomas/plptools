@@ -186,13 +186,117 @@ This option starts format of the specified <replaceable>DRIVE</replaceable>.
 <chapter id="Configuration">
 <title>Configuration</title>
 
-<para>TBD</para>
+<sect1 id="firsttime">
+<title>First time startup</title>
+
+<para>
+When you start &kpsion; the first time, a wizard dialog is shown which lets
+you easily configure the application for your personal use. The initial setup
+is divided into three steps:
+</para>
+
+<sect2>
+<title>Select a backup directory</title>
+<para>
+<screenshot>
+<screeninfo>Step one. Select a backup directory.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="firstwizard-1.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Selecting the backup directory</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+The backup directory will be used by &kpsion; for storing backup archives.
+You simply can accept the default proposed by this dialog if you don't have
+to care about disk space used in your home directory. Otherwise, select a
+directory of your choice by clicking on the Browse button. &kpsion; creates
+a that directory if it does not yet exist. Of course, you need the permission
+to do so.
+</para>
+</sect2>
+
+<sect2>
+<title>Adjust the backup strategy</title>
+<para>
+<screenshot>
+<screeninfo>Step two. backup strategy.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="firstwizard-2.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Setting the backup strategy</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+In the second step, you can adjust the backup strategy. For both, incremental
+and full backups, you can select an interval. If any of these intervals is
+enabled, &kpsion; will create a <filename>.desktop</filename> Entry in your
+KDE Autostart folder. Every time KDE is started, this will start &kpsion;
+in autobackup mode. If the interval is expired and your Psion is currently
+connected, an unattended backup will be performed.
+</para>
+<para>
+The third adjustment to be made is the number of backup generations to keep.
+A backup generation consists of a full backup plus eventually made incremental
+backups. If a backup is completed sucessfully, &kpsion; will check, if there
+are more backup generations available and delete older backup generations.
+</para>
+</sect2>
+
+<sect2>
+<title>Connection parameters</title>
+<para>
+<screenshot>
+<screeninfo>Step three. connection parameters.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="firstwizard-3.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Setting connection parameters</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+In the third step, you can adjust the behavior of &kpsion; during initial
+connect. If you set the connection retry interval to a non-zero value, &kpsion;
+will retry a connection attempt if it had failed. Since &kpsion; needs the
+ncpd daemon running, it is also possible to start this daemon on the fly if it
+is not running. For this, you need to have permissions to use the specified
+port. 
+</para>
+</sect2>
+
+</sect1>
+
 </chapter>
 
 <chapter id="Internals">
 <title>Internals</title>
 
 <para>TBD</para>
+</chapter>
+
+<chapter id="faq">
+<title>Questions and Answers</title>
+&reporting.bugs;
+&updating.documentation;
+ 
+<qandaset id="faqlist">
+<qandaentry>
+<question>
+<para>I have a Psion Series 3 and &kpsion; doesn't work.</para>
+</question>
+<answer>
+<para>This is currently a known problem with the plptools lib. You have to
+wait until tis is fixed. Sorry.
+</para>
+</answer>
+</qandaentry>
+</qandaset>
 </chapter>
 
 <chapter id="Author">
