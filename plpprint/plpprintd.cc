@@ -91,7 +91,7 @@ debuglog(char *fmt, ...)
     if (debug)
 	cout << buf << endl;
     else
-	syslog(LOG_DEBUG, buf);
+	syslog(LOG_DEBUG, "%s", buf);
     free(buf);
     return 0;
 }
@@ -104,7 +104,7 @@ errorlog(char *fmt, ...)
     if (debug)
 	cerr << buf << endl;
     else
-	syslog(LOG_ERR, buf);
+	syslog(LOG_ERR, "%s", buf);
     free(buf);
     return 0;
 }
@@ -117,7 +117,7 @@ infolog(char *fmt, ...)
     if (debug)
 	cout << buf << endl;
     else
-	syslog(LOG_INFO, buf);
+	syslog(LOG_INFO, "%s", buf);
     free(buf);
     return 0;
 }

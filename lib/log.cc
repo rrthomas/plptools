@@ -37,7 +37,7 @@ int logbuf::overflow(int c) {
 	*ptr++ = '\n';
 	*ptr = '\0';
 	if (_on)
-	    syslog(_level, buf);
+	    syslog(_level, "%s", buf);
 	else if (_fd != -1)
 	    write(_fd, buf, len + 1);
 	ptr = buf;
