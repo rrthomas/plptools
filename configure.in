@@ -1,8 +1,7 @@
 AC_REVISION($Revision$)dnl revision of this configure.in script
 
-AC_CONFIG_AUX_DIR(conf)
 AC_INIT(Makefile.am)
-AC_PROG_CC
+AC_CONFIG_AUX_DIR(conf)
 AC_AIX
 AC_CANONICAL_SYSTEM
 AM_CONFIG_HEADER(include/config.h)
@@ -15,7 +14,6 @@ AM_MAINTAINER_MODE
 
 dnl checks for programs
 AC_PROG_MAKE_SET
-AC_PROG_CXX
 PLP_CHECK_COMPILERS
 AC_PROG_AWK
 AC_PATH_PROG(SED,sed)
@@ -215,6 +213,7 @@ AC_ARG_WITH(mountdir,
 )
 AC_DEFINE_UNQUOTED(DMOUNTPOINT,"$DMOUNTPOINT")
 AC_SUBST(DMOUNTPOINT)
+test "x$prefix" = xNONE && prefix="$ac_default_prefix"
 eval PKGDATA="${datadir}/${PACKAGE}"
 AC_DEFINE_UNQUOTED(PKGDATA,"$PKGDATA",[This defines the dir for support files])
 
@@ -231,15 +230,21 @@ AC_ARG_ENABLE(kde,
 )
 PLP_HELP_MSG([Options, only needed when building KDE2 stuff:])
 if test "x$ac_enable_kde" = "xyes" ; then
-	if test "${prefix}" != "NONE" ; then
-		kde_prefix=${prefix}
+	AC_PATH_KDE
+	if test -n "${kde_cv_path_kde_config}" ; then
+			kde_prefix=`${kde_cv_path_kde_config} --prefix`
+			kde_exec_prefix=`${kde_cv_path_kde_config} --prefix`
 	else
-		kde_prefix=$ac_default_prefix
-	fi
-	if test "${exec_prefix}" != "NONE" ; then
-		kde_exec_prefix=${exec_prefix}
-	else
-		kde_exec_prefix=${kde_prefix}
+		if test "${prefix}" != "NONE" ; then
+			kde_prefix=${prefix}
+		else
+			kde_prefix=$ac_default_prefix
+		fi
+		if test "${exec_prefix}" != "NONE" ; then
+			kde_exec_prefix=${exec_prefix}
+		else
+			kde_exec_prefix=${kde_prefix}
+		fi
 	fi
 	AC_ARG_WITH(kdedir,
 	[  --with-kdedir=DIR       specify KDE directory [${prefix:-${ac_default_prefix}}]],
@@ -251,7 +256,6 @@ if test "x$ac_enable_kde" = "xyes" ; then
 	AC_MSG_RESULT(KDE stuff will be installed below $kde_prefix)
 	AC_SUBST(kde_prefix)
 	AC_SUBST(kde_exec_prefix)
-	AC_PATH_KDE
 	AC_CHECK_KDEMAXPATHLEN
 	KDE_CHECK_FINAL
 	AM_KDE_WITH_NLS
@@ -285,7 +289,6 @@ AC_OUTPUT(
 	sisinstall/Makefile
 	doc/Makefile
 	doc/api/Makefile
-	include/config.h
 	etc/psion
 	etc/plptools.spec
 	doc/ncpd.man

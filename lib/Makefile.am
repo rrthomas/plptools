@@ -1,8 +1,8 @@
 # $Id$
 #
 INCLUDES += -I$(top_srcdir)/intl
-CFLAGS += -D_REENTRANT
-CXXFLAGS += -D_REENTRANT
+CFLAGS = $(THREADED_CFLAGS)
+CXXFLAGS = $(THREADED_CXXFLAGS)
 
 lib_LTLIBRARIES = libplp.la
 

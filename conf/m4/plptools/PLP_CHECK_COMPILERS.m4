@@ -1,192 +1,165 @@
-dnl
-dnl Check for various compiler options
-dnl
 AC_DEFUN(PLP_CHECK_COMPILERS,
 [
-  dnl this is somehow a fat lie, but prevents other macros from double checking
-  AC_PROVIDE([AC_PROG_CC])
-  AC_PROVIDE([AC_PROG_CPP])
-  AC_REQUIRE([PLP_HELP_MSG])
-  PLP_HELP_MSG([Generic build options:])
-  AC_ARG_ENABLE(debug,[  --enable-debug          creates debugging code [default=no]],
-  [ 
-   if test $enableval = "no"; dnl 
-     then ac_use_debug_code="no"
-     else ac_use_debug_code="yes"
+  AC_ARG_ENABLE(debug,[  --enable-debug          enables debug symbols [default=no]],
+  [
+   if test $enableval = "no"; dnl
+     then
+       plp_use_debug_code="no"
+       plp_use_debug_define=yes
+     else
+       plp_use_debug_code="yes"
+       plp_use_debug_define=no
    fi
-  ], [ac_use_debug_code="no"])
+  ], 
+    [plp_use_debug_code="no"
+      plp_use_debug_define=no
+  ])
+
+  dnl Just for configure --help
+  AC_ARG_ENABLE(dummyoption,[  --disable-debug         disables debug output and debug symbols [default=no]],[],[])
 
   AC_ARG_ENABLE(strict,[  --enable-strict         compiles with strict compiler options (may not work!)],
-   [ 
-    if test $enableval = "no"; then 
-         ac_use_strict_options="no"
-       else 
-         ac_use_strict_options="yes"
+   [
+    if test $enableval = "no"; then
+         plp_use_strict_options="no"
+       else
+         plp_use_strict_options="yes"
     fi
-   ], [ac_use_strict_options="no"])
+   ], [plp_use_strict_options="no"])
 
-dnl this was AC_PROG_CC. I had to include it manualy, since I had to patch it
-  AC_MSG_CHECKING(for a C-Compiler)
-  dnl if there is one, print out. if not, don't matter
-  AC_MSG_RESULT($CC) 
- 
-  if test -z "$CC"; then AC_CHECK_PROG(CC, gcc, gcc) fi
-  if test -z "$CC"; then AC_CHECK_PROG(CC, cc, cc, , , /usr/ucb/cc) fi
-  if test -z "$CC"; then AC_CHECK_PROG(CC, xlc, xlc) fi
-  test -z "$CC" && AC_MSG_ERROR([no acceptable cc found in \$PATH])
+  AC_ARG_ENABLE(profile,[  --enable-profile        creates profiling infos [default=no]],
+    [plp_use_profiling=$enableval],
+    [plp_use_profiling="no"]
+  )
 
-  AC_PROG_CC_WORKS
-  AC_PROG_CC_GNU
+  dnl this prevents stupid AC_PROG_CC to add "-g" to the default CFLAGS
+  CFLAGS=" $CFLAGS"
 
-  if test $ac_cv_prog_gcc = yes; then
-    GCC=yes
-  else
-    GCC=
-  fi
+  AC_PROG_CC 
 
-  if test -z "$CFLAGS"; then
-    if test "$ac_use_debug_code" = "yes"; then
-      AC_PROG_CC_G
-      if test $ac_cv_prog_cc_g = yes; then
-        CFLAGS="-g"
-      fi
+  if test "$GCC" = "yes"; then
+    if test "$plp_use_debug_code" = "yes"; then
+      CFLAGS="-g -O2 $CFLAGS"
+      case $host in
+        *-*-linux-gnu)	
+          CFLAGS="-Wpointer-arith $CFLAGS"
+        ;;
+      esac
     else
-      if test "$GCC" = "yes"; then
-        CFLAGS="-O2"
-      else
-        CFLAGS=""
-      fi
+      CFLAGS="-O2 $CFLAGS"
     fi
-
-    if test "$GCC" = "yes"; then
-     CFLAGS="$CFLAGS -Wall"
-
-     if test "$ac_use_strict_options" = "yes"; then
-	CFLAGS="$CFLAGS -W -ansi -pedantic"     
-     fi
+    if test "$plp_use_strict_options" = "yes"; then
+      CFLAGS="-ansi -Wall -W -pedantic -Wshadow -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE $CFLAGS"
     fi
-  else
-    AC_MSG_RESULT(Using predefined CFLAGS $CFLAGS)
   fi
 
-  case "$host" in 
-  *-*-sysv4.2uw*) CFLAGS="$CFLAGS -D_UNIXWARE";;
+  if test "$plp_use_debug_define" = "yes"; then
+    CFLAGS="-DNDEBUG $CFLAGS"
+  fi
+
+  case "$host" in
+  *-*-sysv4.2uw*) CFLAGS="-D_UNIXWARE $CFLAGS";;
+  *-*-sysv5uw7*) CFLAGS="-D_UNIXWARE7 $CFLAGS";;
   esac
 
-  #
-  # If debugging is off, strip all programs
-  #
-  if test "$ac_use_debug_code" = "no"; then
-  	if test -z "$LDFLAGS" && test "$GCC" = "yes"; then
-		LDFLAGS="-s"
-		LIBDEBUG=""
-	fi
-  else
-  	AC_DEFINE_UNQUOTED(DEBUG)
-	LIBDEBUG="--debug"
-  fi
-  AC_SUBST(LIB_DEBUG)
-
-dnl this is AC_PROG_CPP. I had to include it here, since autoconf checks
-dnl dependecies between AC_PROG_CPP and AC_PROG_CC (or is it automake?)
-
-  AC_MSG_CHECKING(how to run the C preprocessor)
-  # On Suns, sometimes $CPP names a directory.
-  if test -n "$CPP" && test -d "$CPP"; then
-    CPP=
-  fi
-  if test -z "$CPP"; then
-  AC_CACHE_VAL(ac_cv_prog_CPP,
-  [  # This must be in double quotes, not single quotes, because CPP may get
-    # substituted into the Makefile and "${CC-cc}" will confuse make.
-    CPP="${CC-cc} -E"
-    # On the NeXT, cc -E runs the code through the compiler's parser,
-    # not just through cpp.
-    dnl Use a header file that comes with gcc, so configuring glibc    
-    dnl with a fresh cross-compiler works.
-    AC_TRY_CPP([#include <assert.h>
-    Syntax Error], ,
-    CPP="${CC-cc} -E -traditional-cpp"
-    AC_TRY_CPP([#include <assert.h>
-    Syntax Error], , CPP=/lib/cpp))
-    ac_cv_prog_CPP="$CPP"])dnl
-    CPP="$ac_cv_prog_CPP"
-  else
-    ac_cv_prog_CPP="$CPP"
-  fi
-  AC_MSG_RESULT($CPP)
-  AC_SUBST(CPP)dnl
-
-
-  AC_MSG_CHECKING(for a C++-Compiler)
-  dnl if there is one, print out. if not, don't matter
-  AC_MSG_RESULT($CXX) 
- 
-  if test -z "$CXX"; then AC_CHECK_PROG(CXX, g++, g++) fi
-  if test -z "$CXX"; then AC_CHECK_PROG(CXX, CC, CC) fi
-  if test -z "$CXX"; then AC_CHECK_PROG(CXX, xlC, xlC) fi
-  if test -z "$CXX"; then AC_CHECK_PROG(CXX, DCC, DCC) fi
-  test -z "$CXX" && AC_MSG_ERROR([no acceptable C++-compiler found in \$PATH])
-
-  AC_PROG_CXX_WORKS
-  AC_PROG_CXX_GNU
-
-  if test $ac_cv_prog_gxx = yes; then
-    GXX=yes
-  else
-    AC_MSG_CHECKING(whether we are using SPARC CC)
-    GXX=
-    cat > conftest.C << EOF
-#ifdef __SUNPRO_CC
-   yes;
-#endif
-EOF
-
-    ac_try="$CXX -E conftest.C"
-    if { (eval echo configure:__online__: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; } | egrep yes >/dev/null 2>&1; then
-      ac_cv_prog_CC=yes
-    else
-      ac_cv_prog_CC=no
+  if test "$plp_use_debug_code" = "no"; then
+    if test -z "$LDFLAGS" && test "$GCC" = "yes"; then
+      LDFLAGS="-s"
     fi
-    AC_MSG_RESULT($ac_cv_prog_CC)
+    AC_DEFINE_UNQUOTED(NDEBUG,1,[Define this to disable assert macro])
+    LIBDEBUG=""
+  else
+    AC_DEFINE_UNQUOTED(DEBUG,1,[Define this to enable debugging code])
+    LIBDEBUG="--debug"
   fi
+  AC_SUBST(LIBDEBUG)
 
-  if test -z "$CXXFLAGS"; then 
-    if test "$ac_use_debug_code" = "yes"; then
-      AC_PROG_CXX_G
-      if test $ac_cv_prog_cxx_g = yes; then
-        CXXFLAGS="-g"
-      fi
-      if test "$ac_cv_prog_CC" = "yes"; then
-        CXXFLAGS="$CXXFLAGS -pto"
+  CXXFLAGS=" $CXXFLAGS"
+
+  AC_PROG_CXX
+
+  if test "$GXX" = "yes"; then
+    if test "$plp_use_debug_code" = "yes"; then
+      CXXFLAGS="-g -O2 -Wpointer-arith -Wmissing-prototypes $CXXFLAGS"
+
+      PLP_CHECK_COMPILER_FLAG(Wno-long-long,[CXXFLAGS="-Wno-long-long $CXXFLAGS"])
+      PLP_CHECK_COMPILER_FLAG(Wnon-virtual-dtor,[CXXFLAGS="-Wnon-virtual-dtor $CXXFLAGS"])
+      PLP_CHECK_COMPILER_FLAG(fno-builtin,[CXXFLAGS="-fno-builtin $CXXFLAGS"])
+
+      case $host in  dnl
+      *-*-linux-gnu)
+        CXXFLAGS="-D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wbad-function-cast -Wcast-align -Wundef $CXXFLAGS"
+        ;;
+      esac
+
+      if test "$plp_use_strict_options" = "yes"; then
+        CXXFLAGS="-ansi -pedantic -W -Wconversion -Wcast-qual -Wwrite-strings -Wbad-function-cast -Wshadow -Wcast-align $CXXFLAGS"
       fi
     else
-      if test "$GXX" = "yes"; then
-         CXXFLAGS="-O2"
-      else
-         if test "$ac_cv_prog_CC" = "yes"; then
-            CXXFLAGS="-pto -O2"
-         else
-            CXXFLAGS=""
-         fi
-      fi
+      CXXFLAGS="-O2 $CXXFLAGS"
     fi
+  fi
 
-    if test "$GXX" = "yes"; then
-       CXXFLAGS="$CXXFLAGS -Wall"
- 
-       if test "$ac_use_strict_options" = "yes"; then
-	CXXFLAGS="$CXXFLAGS -W -ansi -Wtraditional  -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Woverloaded-virtual -Wbad-function-cast  -Wsynth"
-       fi
-
-       if test "$ac_very_strict" = "yes"; then
-         CXXFLAGS="$CXXFLAGS -Wold-style-cast -Wshadow -Wredundant-decls -Wconversion"
-       fi
-    fi
+  if test "$plp_use_debug_define" = "yes"; then
+    CXXFLAGS="-DNDEBUG $CXXFLAGS"
   fi  
 
-    case "$host" in
-      *-*-sysv4.2uw*) CXXFLAGS="$CXXFLAGS -D_UNIXWARE";;
-    esac    
+  if test "$plp_use_profiling" = "yes"; then
+    PLP_CHECK_COMPILER_FLAG(pg,
+    [
+      CFLAGS="-pg $CFLAGS"
+      CXXFLAGS="-pg $CXXFLAGS"
+    ])
+  fi
+    
+  PLP_CHECK_COMPILER_FLAG(fno-exceptions,[CXXFLAGS="$CXXFLAGS -fno-exceptions"])
+  PLP_CHECK_COMPILER_FLAG(fno-check-new, [CXXFLAGS="$CXXFLAGS -fno-check-new"])
+  PLP_CHECK_COMPILER_FLAG(fexceptions, [USE_EXCEPTIONS="-fexceptions"], USE_EXCEPTIONS=	)
+  AC_SUBST(USE_EXCEPTIONS)
+  dnl obsolete macro - provided to keep things going
+  USE_RTTI=
+  AC_SUBST(USE_RTTI)
 
+  case "$host" in
+      *-*-irix*)  test "$GXX" = yes && CXXFLAGS="-D_LANGUAGE_C_PLUS_PLUS -D__LANGUAGE_C_PLUS_PLUS $CXXFLAGS" ;;
+      *-*-sysv4.2uw*) CXXFLAGS="-D_UNIXWARE $CXXFLAGS";;
+      *-*-sysv5uw7*) CXXFLAGS="-D_UNIXWARE7 $CXXFLAGS";;
+      *-*-solaris*) 
+        if test "$GXX" = yes; then
+          libstdcpp=`$CXX -print-file-name=libstdc++.so`
+          if test ! -f $libstdcpp; then
+             AC_MSG_ERROR([You've compiled gcc without --enable-shared. This doesn't work with plptools. Please recompile gcc with --enable-shared to receive a libstdc++.so])
+          fi
+        fi
+        ;;
+  esac
+
+  AC_VALIDIFY_CXXFLAGS
+
+  AC_PROG_CXXCPP
+
+  # the following is to allow programs, that are known to
+  # have problems when compiled with -O2
+  if test -n "$CXXFLAGS"; then
+      plp_safe_IFS=$IFS
+      IFS=" "
+      NOOPT_CXXFLAGS=""
+      for i in $CXXFLAGS; do
+        case $i in
+          -O*)
+                ;;
+          *)
+                NOOPT_CXXFLAGS="$NOOPT_CXXFLAGS $i"
+                ;;
+        esac
+      done
+      IFS=$plp_safe_IFS
+  fi
+
+  AC_SUBST(NOOPT_CXXFLAGS)
+  THREADED_CFLAGS="-D_REENTRANT $CFLAGS"
+  THREADED_CXXFLAGS="-D_REENTRANT $CFLAGS"
+  AC_SUBST(THREADED_CFLAGS)
+  AC_SUBST(THREADED_CXXFLAGS)
 ])
+

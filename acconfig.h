@@ -96,11 +96,6 @@
 # define DONT_UPDATE_MTAB /* The mount table is obtained from the kernel (!?) */
 #endif
 
-/* Disable assert macro if DEBUG is not defined */
-#ifndef DEBUG
-# define NDEBUG
-#endif
-
 #ifndef HAVE_BOOL
 # ifndef bool
 #  define bool int
