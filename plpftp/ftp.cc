@@ -55,6 +55,7 @@ extern "C"  {
 #if HAVE_LIBHISTORY
 #include <readline/history.h>
 #endif
+#include "rlcrap.h"
 }
 #endif
 
@@ -1008,7 +1009,7 @@ do_completion(char *text, int start, int end)
 
 	rl_completion_entry_function = (Function *)null_completion;
 	if (start == 0)
-		matches = completion_matches(text, (CPFunction *)command_generator);
+		matches = completion_matches(text, cmdgen_ptr);
 	else {
 		int idx = 0;
 		char *name;
@@ -1029,7 +1030,7 @@ do_completion(char *text, int start, int end)
 				maskAttr = rfsv::PSI_A_DIR;
 		}
 		
-		matches = completion_matches(text, (CPFunction *)filename_generator);
+		matches = completion_matches(text, fnmgen_ptr);
 	}
 	return matches;
 }
@@ -1042,6 +1043,7 @@ initReadline(void)
 	rl_readline_name = "plpftp";
 	rl_completion_entry_function = (Function *)null_completion;
 	rl_attempted_completion_function = (CPPFunction *)do_completion;
+	rlcrap_setpointers(command_generator, filename_generator);
 #endif
 }
 

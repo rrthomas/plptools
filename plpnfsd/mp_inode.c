@@ -20,7 +20,7 @@
 #include <objc/hashtable.h>
 #define strdup NXCopyStringBuffer
 #endif
-#define HASHSIZE 99
+#define HASHSIZE 999
 
 static int nextinode = 6;
 static p_inode *numtab[HASHSIZE];

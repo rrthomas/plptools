@@ -681,7 +681,8 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 	if ((cp = search_cache(attrcache, inode->inode))) {
 		debuglog("getattr: cache hit\n");
 		*fp = cp->attr;	/* gotcha */
-		return &res;
+		if (fp->nlink > 0)
+			return &res;
 	}
 	l = strlen(inode->name);
 
