@@ -34,7 +34,7 @@
 #include "bufferstore.h"
 #include "bufferarray.h"
 
-link::link(const char *fname, int baud, IOWatch & iow, unsigned short _verbose)
+link::link(const char *fname, int baud, IOWatch *iow, unsigned short _verbose)
 {
     p = new packet(fname, baud, iow);
     verbose = _verbose;
@@ -44,7 +44,7 @@ link::link(const char *fname, int baud, IOWatch & iow, unsigned short _verbose)
     somethingToSend = false;
     timesSent = 0;
     failed = false;
-    for (int i; i < 256; i++)
+    for (int i = 0; i < 256; i++)
 	xoff[i] = false;
 }
 
@@ -62,7 +62,7 @@ reset() {
     somethingToSend = false;
     timesSent = 0;
     failed = false;
-    for (int i; i < 256; i++)
+    for (int i = 0; i < 256; i++)
 	xoff[i] = false;
 }
 

@@ -38,7 +38,7 @@ class IOWatch;
 
 class ncp {
 public:
-    ncp(const char *fname, int baud, IOWatch &iow);
+    ncp(const char *fname, int baud, IOWatch *iow);
     ~ncp();
 
     int connect(channel *c); // returns channel, or -1 if failure

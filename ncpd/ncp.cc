@@ -39,7 +39,7 @@
 #define MAX_CHANNELS_SIBO  8
 #define NCP_SENDLEN 250
 
-ncp::ncp(const char *fname, int baud, IOWatch & iow)
+ncp::ncp(const char *fname, int baud, IOWatch *iow)
 {
     channelPtr = new channel*[MAX_CHANNELS_PSION + 1];
     messageList = new bufferStore[MAX_CHANNELS_PSION + 1];
@@ -71,8 +71,9 @@ ncp::~ncp()
     }
     controlChannel(0, NCON_MSG_NCP_END, b);
     delete l;
-    delete channelPtr;
-    delete remoteChanList;
+    delete [] channelPtr;
+    delete [] remoteChanList;
+    delete [] messageList;
 }
 
 int ncp::
@@ -251,7 +252,8 @@ decodeControlMessage(bufferStore & buff)
 	    } else {
 		if (verbose & NCP_DEBUG_LOG)
 		    cout << "Unknown " << (int) buff.getByte(1) << endl;
-		channelPtr[forChan]->ncpConnectNak();
+		if (channelPtr[forChan])
+		    channelPtr[forChan]->ncpConnectNak();
 	    }
 	    break;
 

@@ -46,6 +46,7 @@ socketChan::~socketChan()
 {
     skt->closeSocket();
     delete skt;
+    skt = 0;
     if (registerName)
 	free(registerName);
 }

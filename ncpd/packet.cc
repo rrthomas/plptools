@@ -46,7 +46,7 @@ extern "C" {
 
 #define BUFFERLEN 2000
 
-packet::packet(const char *fname, int _baud, IOWatch & _iow, short int _verbose = 0):
+packet::packet(const char *fname, int _baud, IOWatch *_iow, short int _verbose = 0):
 iow(_iow)
 {
 	verbose = _verbose;
@@ -58,14 +58,19 @@ iow(_iow)
 	foundSync = 0;
 	esc = false;
 	lastFatal = false;
+	iowLocal = false;
 	serialStatus = -1;
 	crcIn = crcOut = 0;
 
 	fd = init_serial(devname, baud, 0);
+	if (!_iow) {
+		iow = new IOWatch();
+		iowLocal = true;
+	}
 	if (fd == -1)
 		lastFatal = true;
-	else
-		iow.addIO(fd);
+	else 
+		iow->addIO(fd);
 }
 
 void packet::reset()
@@ -73,7 +78,7 @@ void packet::reset()
 	if (verbose & PKT_DEBUG_LOG)
 		cout << "resetting serial connection" << endl;
 	if (fd != -1) {
-		iow.remIO(fd);
+		iow->remIO(fd);
 		ser_exit(fd);
 	}
 	usleep(100000);
@@ -87,7 +92,7 @@ void packet::reset()
 	crcIn = crcOut = 0;
 	fd = init_serial(devname, baud, 0);
 	if (fd != -1) {
-		iow.addIO(fd);
+		iow->addIO(fd);
 		lastFatal = false;
 	}
 	if (verbose & PKT_DEBUG_LOG)
@@ -110,13 +115,15 @@ setVerbose(short int _verbose)
 packet::~packet()
 {
 	if (fd != -1) {
-		iow.remIO(fd);
+		iow->remIO(fd);
 		ser_exit(fd);
 	}
 	usleep(100000);
 	delete[]inBuffer;
 	delete[]outBuffer;
 	free(devname);
+	if (iowLocal)
+		delete iow;
 }
 
 void packet::

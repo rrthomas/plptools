@@ -38,7 +38,7 @@ class IOWatch;
 
 class packet {
 	public:
-		packet(const char *fname, int baud, IOWatch &iow, short int verbose = 0);
+		packet(const char *fname, int baud, IOWatch *iow, short int verbose = 0);
 		~packet();
 		void send(unsigned char type, const bufferStore &b);
 		bool get(unsigned char &type, bufferStore &b);
@@ -70,9 +70,10 @@ class packet {
 		short int verbose;
 		bool esc;
 		bool lastFatal;
+		bool iowLocal;
 		char *devname;
 		int baud;
-		IOWatch &iow;
+		IOWatch *iow;
 };
 
 #endif

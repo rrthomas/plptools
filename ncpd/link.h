@@ -38,7 +38,7 @@ class IOWatch;
 
 class link {
 	public:
-  		link(const char *fname, int baud, IOWatch &iow, unsigned short _verbose = 0);
+  		link(const char *fname, int baud, IOWatch *iow, unsigned short _verbose = 0);
   		~link();
   		void send(const bufferStore &buff);
   		bufferArray poll();
