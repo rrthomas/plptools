@@ -252,11 +252,37 @@ public:
 private:
 	void psi2unix(void);
 	void unix2psi(void);
+	void tryPsiZone();
 
 	psi_timeval ptv;
 	psi_timezone ptz;
 	struct timeval utv;
 	struct timezone utz;
 	bool ptzValid;
+};
+
+class PsiZone {
+	friend class rpcs32;
+
+public:
+	static PsiZone &getInstance();
+
+	bool getZone(psi_timezone &ptz);
+
+private:
+	/**
+	 * This objects instance (singleton)
+	 */
+	static PsiZone *_instance;
+
+	/**
+	 * Private constructor.
+	 */
+	PsiZone();
+
+	void setZone(psi_timezone &ptz);
+
+	bool _ptzValid;
+	psi_timezone _ptz;
 };
 #endif

@@ -146,6 +146,8 @@ getMachineInfo(machineInfo &mi)
 	mi.tz.dst_zones = a.getDWord(64);
 	mi.tz.home_zone = a.getDWord(68);
 
+	PsiZone::getInstance().setZone(mi.tz);
+
 	mi.mainBatteryInsertionTime.tv_low = a.getDWord(72);
 	mi.mainBatteryInsertionTime.tv_high = a.getDWord(76);
 	mi.mainBatteryStatus = (enum rpcs::batterystates)a.getDWord(80);

@@ -37,6 +37,7 @@
 #include <kconfig.h>
 
 #include <rfsvfactory.h>
+#include <rpcsfactory.h>
 #include <bufferarray.h>
 
 #include <string>
@@ -226,6 +227,26 @@ openConnection() {
 		error(ERR_COULD_NOT_CONNECT, i18n("Could not read version info"));
 		return;
 	}
+
+	/* If we have a S5, get the Psion's Owner- and Mach- info.
+	 * This implicitely sets the Timezone info of the Psion also.
+	 */
+
+	ppsocket rpcsSocket;
+	if (rpcsSocket.connect((char *)(currentHost.data()), currentPort)) {
+		rpcsfactory factory(&rpcsSocket);
+		rpcs *Rpcs = factory.create(false);
+		if (Rpcs != 0L) {
+			bufferArray b;
+			Enum <rfsv::errs> res;
+			if ((res = Rpcs->getOwnerInfo(b)) == rfsv::E_PSI_GEN_NONE) {
+				Rpcs->getMachineType(machType);
+				if (machType == rpcs::PSI_MACH_S5)
+					Rpcs->getMachineInfo(mi);
+			}
+		}
+	}
+
 	long devbits;
 	Enum<rfsv::errs> res;
 

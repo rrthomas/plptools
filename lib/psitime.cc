@@ -4,6 +4,7 @@
 
 PsiTime::PsiTime(void) {
 	ptzValid = false;
+	tryPsiZone();
 	setUnixNow();
 }
 
@@ -19,8 +20,10 @@ PsiTime::PsiTime(psi_timeval *_ptv, psi_timezone *_ptz) {
 	if (_ptz != 0L) {
 		ptz = *_ptz;
 		ptzValid = true;
-	} else
+	} else {
 		ptzValid = false;
+		tryPsiZone();
+	}
 	/* get our own timezone */
 	gettimeofday(NULL, &utz);
 	psi2unix();
@@ -30,6 +33,7 @@ PsiTime::PsiTime(const unsigned long _ptvHi, const unsigned long _ptvLo) {
 	ptv.tv_high = _ptvHi;
 	ptv.tv_low = _ptvLo;
 	ptzValid = false;
+	tryPsiZone();
 	/* get our own timezone */
 	gettimeofday(NULL, &utz);
 	psi2unix();
@@ -40,6 +44,7 @@ PsiTime::PsiTime(struct timeval *_utv = 0L, struct timezone *_utz = 0L) {
 		utv = *_utv;
 	if (_utz != 0L)
 		utz = *_utz;
+	tryPsiZone();
 	unix2psi();
 }
 
@@ -49,9 +54,11 @@ PsiTime::PsiTime(const PsiTime &t) {
 	ptv = t.ptv;
 	ptz = t.ptz;
 	ptzValid = t.ptzValid;
+	tryPsiZone();
 }
 
 PsiTime::~PsiTime() {
+	tryPsiZone();
 }
 
 void PsiTime::setUnixTime(struct timeval *_utv) {
@@ -118,6 +125,7 @@ PsiTime &PsiTime::operator=(const PsiTime &t) {
 	ptv = t.ptv;
 	ptz = t.ptz;
 	ptzValid = t.ptzValid;
+	tryPsiZone();
 	return *this;
 }
 
@@ -143,7 +151,7 @@ evalOffset(psi_timezone ptz, time_t time, bool valid) {
 
 	if (valid) {
 		offset = ptz.utc_offset;
-		if ((ptz.dst_zones & 0x40000000) || (ptz.dst_zones & ptz.home_zone))
+		if (!(ptz.dst_zones & 0x40000000) || (ptz.dst_zones & ptz.home_zone))
 			offset += 3600;
 	} else {
 		/**
@@ -195,4 +203,37 @@ void PsiTime::unix2psi(void) {
 
 	ptv.tv_low = micro & 0x0ffffffff;
 	ptv.tv_high = (micro >> 32) & 0x0ffffffff;
+}
+
+void PsiTime::tryPsiZone() {
+	if (ptzValid)
+		return;
+	if (PsiZone::getInstance().getZone(ptz))
+		ptzValid = true;
+}
+
+PsiZone *PsiZone::_instance = 0L;
+
+PsiZone &PsiZone::
+getInstance() {
+	if (_instance == 0L)
+		_instance = new PsiZone();
+	return *_instance;
+}
+
+PsiZone::PsiZone() {
+	_ptzValid = false;
+}
+
+void PsiZone::
+setZone(psi_timezone &ptz) {
+	_ptz = ptz;
+	_ptzValid = true;
+}
+
+bool PsiZone::
+getZone(psi_timezone &ptz) {
+	if (_ptzValid)
+		ptz = _ptz;
+	return _ptzValid;
 }

@@ -26,6 +26,7 @@
 #include <qstringlist.h>
 #include <qmap.h>
 #include <rfsv.h>
+#include <rpcs.h>
 #include <ppsocket.h>
 
 typedef QMap<PlpUID,QString> UidMap;
@@ -77,6 +78,8 @@ private:
 	int    currentPort;
 	time_t t_last;
 	time_t t_start;
+	Enum<rpcs::machs> machType;
+	rpcs::machineInfo mi;
 };
 
 #endif
