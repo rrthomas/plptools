@@ -57,7 +57,7 @@ void main(int argc, char* argv[])
 
 	while (1)
 		{
-		option = getopt_long(argc, argv, "hnl:", opts, NULL);
+		option = getopt_long(argc, argv, "hnl:V", opts, NULL);
 		if (option == -1)
 			break;
 		switch (option)
@@ -72,6 +72,9 @@ void main(int argc, char* argv[])
 			case 'n':
 				dryrun = true;
 				break;
+			case 'V':
+				printf(_("sisinstall version 0.1\n"));
+				exit(0);
 			}
 		}
 	if (optind < argc)
