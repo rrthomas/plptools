@@ -15,7 +15,8 @@ set -e
 
 case "$1" in
 	remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
-		KONQRC=`kde-config --expandvars --install config`/konquerorrc
+		KDEBUGRC=`dpkg -S kdebugrc | awk '{print $2}'`
+		KONQRC=`dirname $KDEBUGRC`/konquerorrc
 		if test -f $KONQRC ; then
 			cp $KONQRC $KONQRC.$$
 			grep -v 'askSaveinode/x-psion-drive=' $KONQRC.$$ > $KONQRC && rm -f $KONQRC.$$

@@ -11,7 +11,8 @@ set -e
 #
 case "$1" in
 	configure)
-		KONQRC=`kde-config --expandvars --install config`/konquerorrc
+		KDEBUGRC=`dpkg -S kdebugrc | awk '{print $2}'`
+		KONQRC=`dirname $KDEBUGRC`/konquerorrc
 		if test -f $KONQRC && grep -q '\[Notification Messages\]' $KONQRC ; then
 			cp $KONQRC $KONQRC.$$
 			cat $KONQRC.$$ | grep -v "askSaveinode/x-psion-drive=No" | sed \

@@ -1,3 +1,9 @@
+plptools (0.12-0) unstable; urgency=low
+
+  * Security fix for several formatstring exploits
+
+ -- Fritz Elfert <felfert@users.sf.net>  Mon,  3 Feb 2003 06:01:22 +0100
+
 plptools (0.11-0) unstable; urgency=low
 
   * New upstream version
