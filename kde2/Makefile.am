@@ -12,4 +12,4 @@ maintainer-clean-local:
 	rm -f Makefile.in
 
 am_edit:
-	perl ../conf/am_edit --topdir=kde2
+	perl ../conf/am_edit --topdir=kde2 $(AM_EDIT_ARGS)

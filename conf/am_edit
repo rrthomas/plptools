@@ -98,6 +98,7 @@ $use_final  = 1;        # create code for --enable-final
 $cleantarget = "clean";
 $dryrun     = 0;
 $pathoption = 0;
+$iskde3     = 0;
 
 while (defined ($ARGV[0]))
 {
@@ -132,6 +133,10 @@ while (defined ($ARGV[0]))
     {
         $KDEtopdir = $1 if($1);
         $KDEtopdir = $2 if($2);
+    }
+    elsif (/^--kde3$/)
+    {
+	$iskde3 = 1;
     }
     elsif (/^--help$|^-h$/)
     {
@@ -1402,34 +1407,73 @@ sub tag_DOCFILES ()
     if ($files =~ /(^| )index\.docbook($| )/) {
       
       my $lines = "";
-      my $lookup = 'KDB2HTML\s*=';
+      if ($iskde3) {
+        my $lookup = 'MEINPROC\s*=';
+        if ($MakefileData !~ /\n($lookup)/) {
+	  $lines = "MEINPROC=/\$(kde_bindir)/meinproc\n";
+        }
+        $lookup = 'KDE_XSL_STYLESHEET\s*=';
+        if ($MakefileData !~ /\n($lookup)/) {
+          $lines .= "KDE_XSL_STYLESHEET=/\$(kde_datadir)/ksgmltools2/customization/kde-chunk.xsl\n";
+        }
+        $lookup = '\nindex.cache.bz2:';
+        if ($MakefileData !~ /\n($lookup)/) {
+           $lines .= "index.cache.bz2: \$(srcdir)/index.docbook \$(KDE_XSL_STYLESHEET) $files\n";
+           $lines .= "\t-\@if test -n \"\$(MEINPROC)\"; then echo \$(MEINPROC) --check --cache index.cache.bz2 \$(srcdir)/index.docbook; \$(MEINPROC) --check --cache index.cache.bz2 \$(srcdir)/index.docbook; fi\n";
+           $lines .= "\n";
+        }
+ 
+        $lines .= "docs-am: index.cache.bz2\n";  
+        $lines .= "\n";
+        $lines .= "install-docs: docs-am install-nls\n";
+        $lines .= "\t\$(mkinstalldirs) \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname\n";
+        $lines .= "\t\@if test -f index.cache.bz2; then \\\n";
+        $lines .= "\techo \$(INSTALL_DATA) index.cache.bz2 \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/; \\\n";
+        $lines .= "\t\$(INSTALL_DATA) index.cache.bz2 \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/; \\\n";
+        $lines .= "\tfi\n";
+        $lines .= "\t-rm -f \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/common\n";
+        $lines .= "\t\$(LN_S) \$(kde_libs_htmldir)/$kdelang/common \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/common\n";
+
+        $lines .= "\n";
+        $lines .= "uninstall-docs:\n";
+        $lines .= "\t-rm -rf \$(kde_htmldir)/$kdelang/$appname\n";
+        $lines .= "\n";
+        $lines .= "clean-docs:\n";
+        $lines .= "\t-rm -f index.cache.bz2\n";
+        $lines .= "\n";
+        $target_adds{"install-data-am"} .= "install-docs ";
+        $target_adds{"uninstall"} .= "uninstall-docs ";
+        $target_adds{"clean-am"} .= "clean-docs ";
+      } else {
+        my $lookup = 'KDB2HTML\s*=';
       #if ($MakefileData !~ /\n($lookup)/) {
 #	$lines = "KDB2HTML = \$(SHELL) /\$(kde_bindir)/kdb2html\n";
 #      }
-      $lines .= "docs-am: HTML HTML/index.html\n";
-      $lines .= "\n";
-      $lines .= "HTML:\n";
-      $lines .= "\ttest -d HTML || mkdir HTML\n";
-      $lines .= "\n";
-      $lines .= "HTML/index.html: HTML index.docbook\n";
-      $lines .= "\t\@test -d HTML && rm -r HTML\n";
-      $lines .= "\t\$(KDB2HTML) \$(srcdir)/index.docbook\n";
-      $lines .= "\n";
-      $lines .= "install-docs:\n";
-      $lines .= "\t\$(mkinstalldirs) \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname\n";
-      $lines .= "\t-\@if test -d HTML; then \\\n";
-      $lines .= "\tfilelist=`(cd HTML && ls -1 * .anchors 2> /dev/null)`; for file in \$\$filelist; do if test -f HTML/\$\$file; then \\\n";
-      $lines .= "\techo \$(INSTALL_DATA) HTML/\$\$file \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/\$\$file ;\\\n";
-      $lines .= "\t\$(INSTALL_DATA) HTML/\$\$file \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/\$\$file; \\\n";
-      $lines .= "\tfi; done; fi\n";
-      $lines .= "\t-rm -f \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/common\n";
-      $lines .= "\t\$(LN_S) /\$(kde_htmldir)/$kdelang/common \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/common\n";
-      $lines .= "\n";
-      $lines .= "uninstall-docs:\n";
-      $lines .= "\t-rm -rf \$(kde_htmldir)/$kdelang/$appname\n";
-      $lines .= "\n";
-      $target_adds{"install-data-am"} .= "install-docs ";
-      $target_adds{"uninstall"} .= "uninstall-docs ";
+        $lines .= "docs-am: HTML HTML/index.html\n";
+        $lines .= "\n";
+        $lines .= "HTML:\n";
+        $lines .= "\ttest -d HTML || mkdir HTML\n";
+        $lines .= "\n";
+        $lines .= "HTML/index.html: HTML index.docbook\n";
+        $lines .= "\t\@test -d HTML && rm -r HTML\n";
+        $lines .= "\t\$(KDB2HTML) \$(srcdir)/index.docbook\n";
+        $lines .= "\n";
+        $lines .= "install-docs:\n";
+        $lines .= "\t\$(mkinstalldirs) \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname\n";
+        $lines .= "\t-\@if test -d HTML; then \\\n";
+        $lines .= "\tfilelist=`(cd HTML && ls -1 * .anchors 2> /dev/null)`; for file in \$\$filelist; do if test -f HTML/\$\$file; then \\\n";
+        $lines .= "\techo \$(INSTALL_DATA) HTML/\$\$file \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/\$\$file ;\\\n";
+        $lines .= "\t\$(INSTALL_DATA) HTML/\$\$file \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/\$\$file; \\\n";
+        $lines .= "\tfi; done; fi\n";
+        $lines .= "\t-rm -f \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/common\n";
+        $lines .= "\t\$(LN_S) /\$(kde_htmldir)/$kdelang/common \$(DESTDIR)\$(kde_htmldir)/$kdelang/$appname/common\n";
+        $lines .= "\n";
+        $lines .= "uninstall-docs:\n";
+        $lines .= "\t-rm -rf \$(kde_htmldir)/$kdelang/$appname\n";
+        $lines .= "\n";
+        $target_adds{"install-data-am"} .= "install-docs ";
+        $target_adds{"uninstall"} .= "uninstall-docs ";
+      }
       appendLines ($lines);
       $docsadded = 1;
 
