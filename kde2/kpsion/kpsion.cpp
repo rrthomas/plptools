@@ -190,7 +190,7 @@ setupActions() {
 			      actionCollection());
     KStdAction::preferences(this, SLOT(slotPreferences()),
 			    actionCollection());
-    new KAction(i18n("Start &Format"), 0L, 0, this,
+    new KAction(i18n("Start &Format"), "psion_format", 0, this,
 		SLOT(slotStartFormat()), actionCollection(), "format");
     new KAction(i18n("Start Full &Backup"), "psion_backup", 0, this,
 		SLOT(slotStartFullBackup()), actionCollection(),
@@ -267,7 +267,8 @@ insertDrive(char letter, const char * const name) {
     drives.insert(letter,tmp);
     QIconViewItem *it =
 	new QIconViewItem(view, tmp,
-			  KFileItem(KURL(), "inode/x-psion-drive", 0).pixmap(0));
+			  KGlobal::iconLoader()->loadIcon("psion_drive",
+							  KIcon::Desktop));
     tmp = QString::fromLatin1("%1").arg(letter);
     it->setKey(tmp);
     it->setDropEnabled(false);
