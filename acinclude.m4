@@ -82,7 +82,8 @@ dnl this was AC_PROG_CC. I had to include it manualy, since I had to patch it
 	CFLAGS="$CFLAGS -W -ansi -pedantic"     
      fi
     fi
-
+  else
+    AC_MSG_RESULT(Using predefined CFLAGS $CFLAGS)
   fi
 
   case "$host" in 
