@@ -2,17 +2,10 @@ Makefile.in
 Makefile
 aclocal.m4
 configure
-missing
-mkinstalldirs
 libtool
-ltconfig
-ltmain.sh
-install-sh
 config.status
 config.cache
 config.log
-config.guess
-config.sub
 plptools-*.tar.gz
 .vimsession
 .emacs.desktop
