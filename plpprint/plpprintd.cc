@@ -827,6 +827,7 @@ main(int argc, char **argv)
 			debuglog("plpprintd: could not connect: %s",
 				 ret.toString().c_str());
 		    delete wPrt;
+		    sleep(1);
 		} else {
 		    errorlog("plpprintd: Could not create wprt object");
 		    exit(1);

@@ -350,22 +350,72 @@ public:
     * machines, returns always an error code E_PSI_NOT_SIBO.
     *
     * @param machineInfo The struct holding all information on return.
-    * @return Psion error code. 0 = Ok.
+    *
+    * @returns Psion error code. 0 = Ok.
     */
     virtual Enum<rfsv::errs> getMachineInfo(machineInfo &) { return rfsv::E_PSI_NOT_SIBO;}
 
-    virtual Enum<rfsv::errs> closeHandle(int) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regOpenIter(u_int32_t, char *, u_int16_t &) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regReadIter(u_int16_t) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regWrite(void) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regRead(void) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regDelete(void) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> setTime(void) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> configOpen(void) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> configRead(void) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> configWrite(void) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> queryOpen(void) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> queryRead(void) { return rfsv::E_PSI_NOT_SIBO;}
+    /**
+     * Release an rpcs handle.
+     *
+     * This function works with EPOC only. Using it with SIBO
+     * machines, returns always an error code E_PSI_NOT_SIBO.
+     * It releases a handle, obtained by a previous call to
+     * @ref rpcs::configOpen .
+     *
+     * @param handle The handle to close.
+     *
+     * @returns A psion error code. 0 = Ok.
+     */
+    virtual Enum<rfsv::errs> closeHandle(u_int32_t handle)
+	{ return rfsv::E_PSI_NOT_SIBO; }
+
+    virtual Enum<rfsv::errs> regOpenIter(u_int32_t, char *, u_int16_t &)
+	{ return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<rfsv::errs> regReadIter(u_int16_t)
+	{ return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<rfsv::errs> regWrite(void)
+	{ return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<rfsv::errs> regRead(void)
+	{ return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<rfsv::errs> regDelete(void)
+	{ return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<rfsv::errs> setTime(void)
+	{ return rfsv::E_PSI_NOT_SIBO;}
+
+    /**
+     * Read from Series 5 scratch RAM
+     *
+     * This function works with EPOC only. Using it with SIBO
+     * machines, returns always an error code E_PSI_NOT_SIBO.
+     * It reads raw data from the scatch RAM of the Series 5.
+     *
+     * @param size   The amount of data to me read.
+     * @param data   The content of the scratch RAM is returned here.
+     *
+     * @returns A psion error code. 0 = Ok.
+     */
+    virtual Enum<rfsv::errs> configRead(u_int32_t size, bufferStore &data)
+	{ return rfsv::E_PSI_NOT_SIBO; }
+
+    /**
+     * Write to Series 5 scratch RAM
+     *
+     * This function works with EPOC only. Using it with SIBO
+     * machines, returns always an error code E_PSI_NOT_SIBO.
+     * It writes raw data to the scatch RAM of the Series 5.
+     *
+     * @param data   The data to be written to the scratch RAM.
+     *
+     * @returns A psion error code. 0 = Ok.
+     */
+    virtual Enum<rfsv::errs> configWrite(bufferStore data)
+	{ return rfsv::E_PSI_NOT_SIBO;}
+
+    virtual Enum<rfsv::errs> queryOpen(void)
+	{ return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<rfsv::errs> queryRead(void)
+	{ return rfsv::E_PSI_NOT_SIBO;}
 
 protected:
     /**
@@ -396,6 +446,7 @@ protected:
 	GET_CMDLINE      = 0x0a,
 	FUSER            = 0x0b,
 	GET_MACHINE_INFO = 0x64,
+	CLOSE_HANDLE     = 0x65,
 	REG_OPEN_ITER    = 0x66,
 	REG_READ_ITER    = 0x67,
 	REG_WRITE        = 0x68,
@@ -415,6 +466,27 @@ protected:
      * machine is an S5mx.
      */
     int mtCacheS5mx;
+
+    /**
+     * Prepare scratch RAM in Series 5 for read/write
+     *
+     * This function works with EPOC only. Using it with SIBO
+     * machines, returns always an error code E_PSI_NOT_SIBO.
+     * It prepares a scratch area on the EPOC machine for a following
+     * use from within @ref rpcs::configRead or @ref rpcs::configWrite .
+     * These functions call @ref rpcs::closeHandle on exit. The contents
+     * of the scratch area is stored in RAM of the Series 5, therefore it
+     * gets lost when the Series 5 is switched off.
+     *
+     * @param handle The handle to be used in @ref rpcs::configRead ,
+     *               @ref rpcs::configWrite and @ref rpcs::closeHandle is
+     *               returned here.
+     * @param size   The number of bytes you want to use.
+     *
+     * @returns A psion error code. 0 = Ok.
+     */
+    virtual Enum<rfsv::errs> configOpen(u_int16_t &handle, u_int32_t size)
+	{ return rfsv::E_PSI_NOT_SIBO; }
 
    /**
     * Sends a command to the remote side.

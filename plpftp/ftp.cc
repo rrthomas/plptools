@@ -775,8 +775,47 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    }
 	    continue;
 	}
-	if (!strcmp(argv[0], "y")) {
-	    r.configRead();
+	if (!strcmp(argv[0], "y") && (argc == 2)) {
+	    u_int32_t size;
+	    Enum<rfsv::errs> res;
+	    bufferStore db;
+	    bufferStore db2;
+
+	    sscanf(argv[1], "%lu", &size);
+//	    while (1) {
+		res = r.configRead(size, db);
+		if (res != rfsv::E_PSI_GEN_NONE) {
+		    cerr << "err: " << res << endl;
+		    break;
+		}
+		if (db.getLen() != db2.getLen())
+		    cout << "New length: " << db.getLen() << endl;
+		if (db.getLen() == 1268) {
+		    char *p = (char *)db.getString(0);
+//		    p[0x164] = 2;
+		    cout << "wr: " << r.configWrite(db) << endl;
+		}
+		res = r.configRead(size, db2);
+		if (res != rfsv::E_PSI_GEN_NONE) {
+		    cerr << "err: " << res << endl;
+		    break;
+		}
+//		else {
+		    for (int i = 0; i < db.getLen(); i++) {
+			unsigned char c = db.getByte(i);
+			unsigned char c2 = db2.getByte(i);
+			if ((c != c2) && ((i < 0x350) || (i > 0x353)))
+			    cout << hex << setw(4) << setfill('0') << i
+				 << " " << setw(2) << setfill('0') << (int)c2
+				 << " " << setw(2) << setfill('0') << (int)c
+				 << dec << endl;
+		    }
+#if 0
+		}
+		db2 = db;
+		sleep(1);
+#endif
+//	    }
 	    continue;
 	}
 #endif

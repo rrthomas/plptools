@@ -204,6 +204,13 @@ accept(string *Peer, IOWatch *iow)
 #ifdef sun
     int len;
 #else
+# ifdef __FreeBSD__
+#  if __FreeBSD_version >= 400000
+    socklen_t len;
+#  else
+    unsigned len;
+#  endif
+# endif
     socklen_t len;
 #endif
     ppsocket *accepted;

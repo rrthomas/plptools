@@ -3,7 +3,7 @@
  *
  * This file is part of plptools.
  *
- *  Copyright (C) 2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2001-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,11 +39,22 @@
 #include <qcheckbox.h>
 #include <qwhatsthis.h>
 
-#include <rfsv.h>
-#include <rpcs.h>
-
 #include <strstream>
 #include <iomanip>
+
+#ifdef ENABLE_NLS
+#define _PLPINTL_H_ // Override NLS stuff in headers from libplp
+static inline QString X_(const char *t) {
+    return KGlobal::locale()->translate(t);
+}
+static inline QString _(const char *t) {
+    return KGlobal::locale()->translate(t);
+}
+static inline const char *N_(const char *t) { return t; }
+#endif
+
+#include <rfsv.h>
+#include <rpcs.h>
 
 #define PLP_CMD_DRIVEINFO 1
 #define PLP_CMD_OWNERINFO 2
@@ -742,7 +753,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     box = new QVBoxLayout(d->f, KDialog::spacingHint());
     gb = new QGroupBox(i18n("General"), d->f, "genInfBox");
     box->addWidget(gb);
-    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+    d->g = new QGridLayout(gb, 8, 2, KDialog::marginHint(),
 			   KDialog::spacingHint());
 
     d->machType = makeEntry(i18n("Machine type:"), gb, 1);
@@ -769,7 +780,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
 
     gb = new QGroupBox(i18n("Time"), d->f, "timeInfBox");
     box->addWidget(gb);
-    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+    d->g = new QGridLayout(gb, 5, 2, KDialog::marginHint(),
 			   KDialog::spacingHint());
     d->machTime = makeEntry(i18n("Date/Time:"), gb, 1);
     QWhatsThis::add(d->machTime,
@@ -789,7 +800,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     box = new QVBoxLayout(d->f, KDialog::spacingHint());
     gb = new QGroupBox(i18n("Main battery"), d->f, "mbatInfBox");
     box->addWidget(gb);
-    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+    d->g = new QGridLayout(gb, 9, 2, KDialog::marginHint(),
 			   KDialog::spacingHint());
     d->mbattChanged    = makeEntry(i18n("Changed at:"), gb, 1);
     QWhatsThis::add(d->mbattChanged,
@@ -818,7 +829,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
 
     gb = new QGroupBox(i18n("Backup battery"), d->f, "bbatInfBox");
     box->addWidget(gb);
-    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+    d->g = new QGridLayout(gb, 5, 2, KDialog::marginHint(),
 			   KDialog::spacingHint());
     d->bbattStatus     = makeEntry(i18n("Status:"), gb, 1);
     QWhatsThis::add(d->bbattStatus,
@@ -835,12 +846,15 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
 
     gb = new QGroupBox(i18n("External power"), d->f, "epowerInfBox");
     box->addWidget(gb);
+    d->g = new QGridLayout(gb, 4, 2, KDialog::marginHint(),
+			   KDialog::spacingHint());
     d->epowerSupplied   = makeEntry(i18n("Supplied:"), gb, 1);
     QWhatsThis::add(d->epowerSupplied,
 		    i18n("This shows whether external power is currently supplied."));
     d->epowerUsage      = makeEntry(i18n("Usage time:"), gb, 2);
     QWhatsThis::add(d->epowerUsage,
 		    i18n("This shows the accumulated time of running on external power."));
+    d->g->addRowSpacing(0, KDialog::marginHint());
     d->g->setColStretch(0, 1);
     d->g->setColStretch(1, 1);
     box->addStretch(10);
@@ -850,7 +864,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     box = new QVBoxLayout(d->f, KDialog::spacingHint());
     gb = new QGroupBox(i18n("ROM"), d->f, "romInfBox");
     box->addWidget(gb);
-    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+    d->g = new QGridLayout(gb, 5, 2, KDialog::marginHint(),
 			   KDialog::spacingHint());
     d->romVersion = makeEntry(i18n("Version:"), gb, 1);
     QWhatsThis::add(d->romVersion,
@@ -867,7 +881,7 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
 
     gb = new QGroupBox(i18n("RAM"), d->f, "ramInfBox");
     box->addWidget(gb);
-    d->g = new QGridLayout(gb, 1, 1, KDialog::marginHint(),
+    d->g = new QGridLayout(gb, 6, 2, KDialog::marginHint(),
 			   KDialog::spacingHint());
     d->ramSize    = makeEntry(i18n("Size:"), gb, 1);
     QWhatsThis::add(d->ramSize,
@@ -910,10 +924,8 @@ bool PlpMachinePage::supports(KFileItemList _items) {
 }
 
 void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
-    cout << "Mjdata" << endl;
     if (data.size() == sizeof(d->mi)) {
 	memcpy((char *)&d->mi, data, sizeof(d->mi));
-	cout << "got machInfo" << endl;
 
 	d->machType->setText(KGlobal::locale()->translate(d->mi.machineType));
 	d->machName->setText(QString(d->mi.machineName));
@@ -922,20 +934,35 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 	s << hex << setw(16) << d->mi.machineUID << '\0';
 	d->machUID->setText(QString(s.str()));
 	d->machLang->setText(KGlobal::locale()->translate(d->mi.uiLanguage));
-	d->dispGeo->setText(QString("%1x%2").arg(d->mi.displayWidth).arg(d->mi.displayHeight));
-	d->regSize->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.registrySize)).arg(KGlobal::locale()->formatNumber(d->mi.registrySize, 0)));
+	d->dispGeo->setText(QString("%1x%2").arg(
+				d->mi.displayWidth).arg(d->mi.displayHeight));
+	d->regSize->setText(
+	    QString("%1 (%2)").arg(
+		KIO::convertSize(d->mi.registrySize)).arg(
+		    KGlobal::locale()->formatNumber(d->mi.registrySize, 0)));
 
 	QString rev;
 	rev.sprintf("%d.%02d(%d)", d->mi.romMajor, d->mi.romMinor,
 		    d->mi.romBuild);
 	d->romVersion->setText(rev);
-	d->romSize->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.romSize)).arg(KGlobal::locale()->formatNumber(d->mi.romSize, 0)));
+	d->romSize->setText(
+	    QString("%1 (%2)").arg(KIO::convertSize(d->mi.romSize)).arg(
+		KGlobal::locale()->formatNumber(d->mi.romSize, 0)));
 	d->romProg->setText(d->mi.romProgrammable ? i18n("yes") : i18n("no"));
 
-	d->ramSize->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramSize)).arg(KGlobal::locale()->formatNumber(d->mi.ramSize, 0)));
-	d->ramFree->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramFree)).arg(KGlobal::locale()->formatNumber(d->mi.ramFree, 0)));
-	d->ramMaxFree->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramMaxFree)).arg(KGlobal::locale()->formatNumber(d->mi.ramMaxFree, 0)));
-	d->ramDiskSz->setText(QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramDiskSize)).arg(KGlobal::locale()->formatNumber(d->mi.ramDiskSize, 0)));
+	d->ramSize->setText(
+	    QString("%1 (%2)").arg(
+		KIO::convertSize(d->mi.ramSize)).arg(
+		    KGlobal::locale()->formatNumber(d->mi.ramSize, 0)));
+	d->ramFree->setText(
+	    QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramFree)).arg(
+		KGlobal::locale()->formatNumber(d->mi.ramFree, 0)));
+	d->ramMaxFree->setText(
+	    QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramMaxFree)).arg(
+		KGlobal::locale()->formatNumber(d->mi.ramMaxFree, 0)));
+	d->ramDiskSz->setText(
+	    QString("%1 (%2)").arg(KIO::convertSize(d->mi.ramDiskSize)).arg(
+		KGlobal::locale()->formatNumber(d->mi.ramDiskSize, 0)));
 
 
 	PsiTime pt(&d->mi.time, &d->mi.tz);
@@ -943,7 +970,8 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 	dt.setTime_t(pt.getTime());
 	d->machTime->setText(KGlobal::locale()->formatDateTime(dt, false));
 	d->machUTCo->setText(i18n("%1 seconds").arg(d->mi.tz.utc_offset));
-	d->machDST->setText((d->mi.tz.dst_zones & PsiTime::PSI_TZ_HOME) ? i18n("yes") : i18n("no"));
+	d->machDST->setText((d->mi.tz.dst_zones & PsiTime::PSI_TZ_HOME)
+			    ? i18n("yes") : i18n("no"));
 
 	ostrstream mbs;
 	mbs << d->mi.mainBatteryUsedTime << '\0';
@@ -953,15 +981,27 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 	d->mbattChanged->setText(KGlobal::locale()->formatDateTime(dt, false));
 	d->mbattStatus->setText(
 	    KGlobal::locale()->translate(d->mi.mainBatteryStatus));
-	d->mbattPower->setText(QString("%1 mAs").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryUsedPower, 0)));
-	d->mbattCurrent->setText(QString("%1 mA").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryCurrent, 0)));
-	d->mbattVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryVoltage, 0)));
-	d->mbattMaxVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.mainBatteryMaxVoltage, 0)));
+	d->mbattPower->setText(
+	    QString("%1 mAs").arg(
+		KGlobal::locale()->formatNumber(d->mi.mainBatteryUsedPower, 0)));
+	d->mbattCurrent->setText(
+	    QString("%1 mA").arg(
+		KGlobal::locale()->formatNumber(d->mi.mainBatteryCurrent, 0)));
+	d->mbattVoltage->setText(
+	    QString("%1 mV").arg(
+		KGlobal::locale()->formatNumber(d->mi.mainBatteryVoltage, 0)));
+	d->mbattMaxVoltage->setText(
+	    QString("%1 mV").arg(KGlobal::locale()->formatNumber(
+				     d->mi.mainBatteryMaxVoltage, 0)));
 
 	d->bbattStatus->setText(
 	    KGlobal::locale()->translate(d->mi.backupBatteryStatus));
-	d->bbattVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryVoltage, 0)));
-	d->bbattMaxVoltage->setText(QString("%1 mV").arg(KGlobal::locale()->formatNumber(d->mi.backupBatteryMaxVoltage, 0)));
+	d->bbattVoltage->setText(
+	    QString("%1 mV").arg(
+		KGlobal::locale()->formatNumber(d->mi.backupBatteryVoltage, 0)));
+	d->bbattMaxVoltage->setText(
+	    QString("%1 mV").arg(KGlobal::locale()->formatNumber(
+				     d->mi.backupBatteryMaxVoltage, 0)));
 
 	ostrstream bbs;
 	bbs << d->mi.externalPowerUsedTime << '\0';
@@ -976,7 +1016,6 @@ void PlpMachinePage::slotJobFinished(KIO::Job *job) {
 
     if (mJob->error())
 	job->showErrorDialog(d->props->dialog());
-    cout << "MachInfo job has finished" << endl;
 }
 
 class PlpOwnerPage::PlpOwnerPagePrivate

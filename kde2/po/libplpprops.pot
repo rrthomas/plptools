@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-02-11 13:09+0100\n"
+"POT-Creation-Date: 2002-03-20 02:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,466 +14,486 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: plpprops.cc:142
+#: plpprops.cc:153
 msgid "&Permissions"
 msgstr ""
 
-#: plpprops.cc:144 plpprops.cc:660
+#: plpprops.cc:155 plpprops.cc:671
 msgid "&General"
 msgstr ""
 
-#: plpprops.cc:206
+#: plpprops.cc:217
 msgid "Readable"
 msgstr ""
 
-#: plpprops.cc:207
+#: plpprops.cc:218
 msgid ""
 "If this is checked, read permission is granted. On series 5, this cannot "
 "swiched off."
 msgstr ""
 
-#: plpprops.cc:212
+#: plpprops.cc:223
 msgid "Writeable"
 msgstr ""
 
-#: plpprops.cc:213
+#: plpprops.cc:224
 msgid "If this is checked, write permission is granted."
 msgstr ""
 
-#: plpprops.cc:218
+#: plpprops.cc:229
 msgid "Hidden"
 msgstr ""
 
-#: plpprops.cc:219 plpprops.cc:225
+#: plpprops.cc:230 plpprops.cc:236
 msgid ""
 "If this is checked, the file is not shown when displaying the directory on "
 "the Psion."
 msgstr ""
 
-#: plpprops.cc:224
+#: plpprops.cc:235
 msgid "System"
 msgstr ""
 
-#: plpprops.cc:230
+#: plpprops.cc:241
 msgid "Archive"
 msgstr ""
 
-#: plpprops.cc:231
+#: plpprops.cc:242
 msgid ""
 "If this is checked, the file will be included in the next incremental backup."
 msgstr ""
 
-#: plpprops.cc:239
+#: plpprops.cc:250
 msgid "Executable"
 msgstr ""
 
-#: plpprops.cc:240
+#: plpprops.cc:251
 msgid ""
 "If this is checked, the file can be executed on the Psion. This Attribute "
 "does not apply to directories."
 msgstr ""
 
-#: plpprops.cc:245
+#: plpprops.cc:256
 msgid "Stream"
 msgstr ""
 
-#: plpprops.cc:246
+#: plpprops.cc:257
 msgid ""
 "If this is checked, the file is a stream. This Attribute does not apply to "
 "directories."
 msgstr ""
 
-#: plpprops.cc:251
+#: plpprops.cc:262
 msgid "Text"
 msgstr ""
 
-#: plpprops.cc:252
+#: plpprops.cc:263
 msgid ""
 "If this is checked, the file is opened in text mode. This Attribute does not "
 "apply to directories."
 msgstr ""
 
-#: plpprops.cc:260
+#: plpprops.cc:271
 msgid "Normal"
 msgstr ""
 
-#: plpprops.cc:261
+#: plpprops.cc:272
 msgid ""
 "If this is checked, the file is considered regular. This Attribute does not "
 "apply to directories."
 msgstr ""
 
-#: plpprops.cc:266
+#: plpprops.cc:277
 msgid "Temporary"
 msgstr ""
 
-#: plpprops.cc:267
+#: plpprops.cc:278
 msgid ""
 "If this is checked, the file considered temporary. This Attribute does not "
 "apply to directories."
 msgstr ""
 
-#: plpprops.cc:272
+#: plpprops.cc:283
 msgid "Compressed"
 msgstr ""
 
-#: plpprops.cc:273
+#: plpprops.cc:284
 msgid ""
 "If this is checked, the file is stored in compressed mode. This Attribute "
 "does not apply to directories."
 msgstr ""
 
-#: plpprops.cc:293
+#: plpprops.cc:304
 msgid "Psion &Attributes"
 msgstr ""
 
-#: plpprops.cc:298
+#: plpprops.cc:309
 msgid "Path on Psion:"
 msgstr ""
 
-#: plpprops.cc:305
+#: plpprops.cc:316
 msgid "Generic attributes"
 msgstr ""
 
-#: plpprops.cc:319
+#: plpprops.cc:330
 msgid "Machine specific attributes"
 msgstr ""
 
-#: plpprops.cc:503
+#: plpprops.cc:514
 msgid "Psion &Drive"
 msgstr ""
 
-#: plpprops.cc:513
+#: plpprops.cc:524
 msgid "Information"
 msgstr ""
 
-#: plpprops.cc:519
+#: plpprops.cc:530
 msgid "Type"
 msgstr ""
 
-#: plpprops.cc:525
+#: plpprops.cc:536
 msgid "The type of the drive is shown here."
 msgstr ""
 
-#: plpprops.cc:527
+#: plpprops.cc:538
 msgid "Total capacity"
 msgstr ""
 
-#: plpprops.cc:530 plpprops.cc:538 plpprops.cc:546
+#: plpprops.cc:541 plpprops.cc:549 plpprops.cc:557
 msgid " "
 msgstr ""
 
-#: plpprops.cc:533
+#: plpprops.cc:544
 msgid "This shows the total capacity of the drive."
 msgstr ""
 
-#: plpprops.cc:535
+#: plpprops.cc:546
 msgid "Free space"
 msgstr ""
 
-#: plpprops.cc:541
+#: plpprops.cc:552
 msgid "This shows the available space of the drive."
 msgstr ""
 
-#: plpprops.cc:543
+#: plpprops.cc:554
 msgid "Unique ID"
 msgstr ""
 
-#: plpprops.cc:549
+#: plpprops.cc:560
 msgid "This shows unique ID of the drive. For ROM drives, this is always 0."
 msgstr ""
 
-#: plpprops.cc:553
+#: plpprops.cc:564
 msgid ""
 "Here, the usage of the drive is shown in a pie diagram. The purple area "
 "shows used space, the blue area shows free space."
 msgstr ""
 
-#: plpprops.cc:561
+#: plpprops.cc:572
 msgid "Backup"
 msgstr ""
 
-#: plpprops.cc:565
+#: plpprops.cc:576
 msgid ""
 "Click here, to do a backup of this drive. This launches KPsion to perform "
 "that task."
 msgstr ""
 
-#: plpprops.cc:567
+#: plpprops.cc:578
 msgid "Restore"
 msgstr ""
 
-#: plpprops.cc:572
+#: plpprops.cc:583
 msgid ""
 "Click here, to do a restore of this drive. This launches KPsion to perform "
 "that task."
 msgstr ""
 
-#: plpprops.cc:574
+#: plpprops.cc:585
 msgid "Format"
 msgstr ""
 
-#: plpprops.cc:579
+#: plpprops.cc:590
 msgid ""
 "Click here, to format this drive. This launches KPsion to perform that task."
 msgstr ""
 
-#: plpprops.cc:665
+#: plpprops.cc:676
 msgid "Information for Psion drive %1: (%2)"
 msgstr ""
 
-#: plpprops.cc:738
+#: plpprops.cc:751
 msgid "Psion &Machine"
 msgstr ""
 
-#: plpprops.cc:741
+#: plpprops.cc:754
 msgid "General"
 msgstr ""
 
-#: plpprops.cc:746
+#: plpprops.cc:759
 msgid "Machine type:"
 msgstr ""
 
-#: plpprops.cc:748
+#: plpprops.cc:761
 msgid "Here, the type of the connected device is shown."
 msgstr ""
 
-#: plpprops.cc:749
+#: plpprops.cc:762
 msgid "Model name:"
 msgstr ""
 
-#: plpprops.cc:751
+#: plpprops.cc:764
 msgid "Here, the model name of the connected device is shown."
 msgstr ""
 
-#: plpprops.cc:752
+#: plpprops.cc:765
 msgid "Machine UID:"
 msgstr ""
 
-#: plpprops.cc:754
+#: plpprops.cc:767
 msgid "Here, the unique ID of the connected device is shown."
 msgstr ""
 
-#: plpprops.cc:755
+#: plpprops.cc:768
 msgid "UI language:"
 msgstr ""
 
-#: plpprops.cc:757
+#: plpprops.cc:770
 msgid "Here, the user interface language of the connected device is shown."
 msgstr ""
 
-#: plpprops.cc:758
+#: plpprops.cc:771
 msgid "Display geometry:"
 msgstr ""
 
-#: plpprops.cc:760
+#: plpprops.cc:773
 msgid "Here, the display geometry of the connected device is shown."
 msgstr ""
 
-#: plpprops.cc:761
+#: plpprops.cc:774
 msgid "Registry size:"
 msgstr ""
 
-#: plpprops.cc:763
+#: plpprops.cc:776
 msgid "Here, the size of the registry data is shown."
 msgstr ""
 
-#: plpprops.cc:768
+#: plpprops.cc:781
 msgid "Time"
 msgstr ""
 
-#: plpprops.cc:772
+#: plpprops.cc:785
 msgid "Date/Time:"
 msgstr ""
 
-#: plpprops.cc:774
+#: plpprops.cc:787
 msgid "Here, the current time setting of the connected device is shown."
 msgstr ""
 
-#: plpprops.cc:775
+#: plpprops.cc:788
 msgid "UTC offset"
 msgstr ""
 
-#: plpprops.cc:777
+#: plpprops.cc:790
 msgid ""
 "Here, the offset of the connected device's time zone relative to GMT is "
 "shown."
 msgstr ""
 
-#: plpprops.cc:778
+#: plpprops.cc:791
 msgid "Daylight saving"
 msgstr ""
 
-#: plpprops.cc:780
+#: plpprops.cc:793
 msgid ""
 "Here, you can see, if daylight saving time is currently active on the "
 "connected device."
 msgstr ""
 
-#: plpprops.cc:786
+#: plpprops.cc:799
 msgid "Psion &Battery"
 msgstr ""
 
-#: plpprops.cc:788
+#: plpprops.cc:801
 msgid "Main battery"
 msgstr ""
 
-#: plpprops.cc:792
+#: plpprops.cc:805
 msgid "Changed at:"
 msgstr ""
 
-#: plpprops.cc:794
+#: plpprops.cc:807
 msgid "This shows the time of last battery change."
 msgstr ""
 
-#: plpprops.cc:795 plpprops.cc:821
+#: plpprops.cc:808 plpprops.cc:854
 msgid "Usage time:"
 msgstr ""
 
-#: plpprops.cc:797
+#: plpprops.cc:810
 msgid "This shows the accumulated time of running on battery power."
 msgstr ""
 
-#: plpprops.cc:798 plpprops.cc:824
+#: plpprops.cc:811 plpprops.cc:834
 msgid "Status:"
 msgstr ""
 
-#: plpprops.cc:800
+#: plpprops.cc:813
 msgid "This shows current status of the battery."
 msgstr ""
 
-#: plpprops.cc:801
+#: plpprops.cc:814
 msgid "Total consumed power:"
 msgstr ""
 
-#: plpprops.cc:803
+#: plpprops.cc:816
 msgid "This shows accumulated power consumtion of the device."
 msgstr ""
 
-#: plpprops.cc:804
+#: plpprops.cc:817
 msgid "Current:"
 msgstr ""
 
-#: plpprops.cc:806
+#: plpprops.cc:819
 msgid "This shows the current, drawn from power supply (battery or mains)."
 msgstr ""
 
-#: plpprops.cc:807 plpprops.cc:827
+#: plpprops.cc:820 plpprops.cc:837
 msgid "Voltage:"
 msgstr ""
 
-#: plpprops.cc:809
+#: plpprops.cc:822
 msgid "This shows the current battery voltage."
 msgstr ""
 
-#: plpprops.cc:810 plpprops.cc:830
+#: plpprops.cc:823 plpprops.cc:840
 msgid "Max. voltage:"
 msgstr ""
 
-#: plpprops.cc:812
+#: plpprops.cc:825
 msgid "This shows the maximum battery voltage."
 msgstr ""
 
-#: plpprops.cc:817
+#: plpprops.cc:830
 msgid "Backup battery"
 msgstr ""
 
-#: plpprops.cc:823
-msgid "This shows the accumulated time of running on backup battery power."
-msgstr ""
-
-#: plpprops.cc:826
+#: plpprops.cc:836
 msgid "This shows current status of the backup battery."
 msgstr ""
 
-#: plpprops.cc:829
+#: plpprops.cc:839
 msgid "This shows the current backup battery voltage."
 msgstr ""
 
-#: plpprops.cc:832
+#: plpprops.cc:842
 msgid "This shows the maximum backup battery voltage."
 msgstr ""
 
-#: plpprops.cc:838
-msgid "Psion M&emory"
-msgstr ""
-
-#: plpprops.cc:841
-msgid "ROM"
-msgstr ""
-
-#: plpprops.cc:845
-msgid "Version:"
-msgstr ""
-
 #: plpprops.cc:847
-msgid "This shows the firmware version."
-msgstr ""
-
-#: plpprops.cc:848 plpprops.cc:862
-msgid "Size:"
-msgstr ""
-
-#: plpprops.cc:850
-msgid "This shows the size of the ROM."
+msgid "External power"
 msgstr ""
 
 #: plpprops.cc:851
-msgid "Programmable:"
+msgid "Supplied:"
 msgstr ""
 
 #: plpprops.cc:853
-msgid "This shows, whether the ROM is flashable or not."
+msgid "This shows whether external power is currently supplied."
 msgstr ""
 
-#: plpprops.cc:858
-msgid "RAM"
+#: plpprops.cc:856
+msgid "This shows the accumulated time of running on external power."
 msgstr ""
 
-#: plpprops.cc:864
-msgid "This shows the total capacity of the RAM."
+#: plpprops.cc:862
+msgid "Psion M&emory"
 msgstr ""
 
 #: plpprops.cc:865
-msgid "Free:"
+msgid "ROM"
 msgstr ""
 
-#: plpprops.cc:867
-msgid "This shows the free capacity of the RAM."
-msgstr ""
-
-#: plpprops.cc:868
-msgid "Max. free:"
-msgstr ""
-
-#: plpprops.cc:870
-msgid "This shows the size of the largest free block of the RAM."
+#: plpprops.cc:869
+msgid "Version:"
 msgstr ""
 
 #: plpprops.cc:871
+msgid "This shows the firmware version."
+msgstr ""
+
+#: plpprops.cc:872 plpprops.cc:886
+msgid "Size:"
+msgstr ""
+
+#: plpprops.cc:874
+msgid "This shows the size of the ROM."
+msgstr ""
+
+#: plpprops.cc:875
+msgid "Programmable:"
+msgstr ""
+
+#: plpprops.cc:877
+msgid "This shows, whether the ROM is flashable or not."
+msgstr ""
+
+#: plpprops.cc:882
+msgid "RAM"
+msgstr ""
+
+#: plpprops.cc:888
+msgid "This shows the total capacity of the RAM."
+msgstr ""
+
+#: plpprops.cc:889
+msgid "Free:"
+msgstr ""
+
+#: plpprops.cc:891
+msgid "This shows the free capacity of the RAM."
+msgstr ""
+
+#: plpprops.cc:892
+msgid "Max. free:"
+msgstr ""
+
+#: plpprops.cc:894
+msgid "This shows the size of the largest free block of the RAM."
+msgstr ""
+
+#: plpprops.cc:895
 msgid "RAMDisk size:"
 msgstr ""
 
-#: plpprops.cc:873
+#: plpprops.cc:897
 msgid "This shows, how much RAM is currently used for the RAMDisc."
 msgstr ""
 
-#: plpprops.cc:925 plpprops.cc:938
+#: plpprops.cc:951 plpprops.cc:974
 msgid "yes"
 msgstr ""
 
-#: plpprops.cc:925 plpprops.cc:938
+#: plpprops.cc:951 plpprops.cc:974
 msgid "no"
 msgstr ""
 
-#: plpprops.cc:937
+#: plpprops.cc:972
 msgid "%1 seconds"
 msgstr ""
 
-#: plpprops.cc:985
+#: plpprops.cc:1010
+msgid "Yes"
+msgstr ""
+
+#: plpprops.cc:1010
+msgid "No"
+msgstr ""
+
+#: plpprops.cc:1035
 msgid "Psion &Owner"
 msgstr ""
 
-#: plpprops.cc:991
+#: plpprops.cc:1041
 msgid "This shows the owner's information of the connected device."
 msgstr ""

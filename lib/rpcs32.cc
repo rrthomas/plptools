@@ -169,43 +169,81 @@ regReadIter(u_int16_t handle)
 }
 
 Enum<rfsv::errs> rpcs32::
-configOpen(void)
+configOpen(u_int16_t &handle, u_int32_t size)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
 
+    a.addDWord(size);
     if (!sendCommand(rpcs::CONFIG_OPEN, a))
 	return rfsv::E_PSI_FILE_DISC;
     res = getResponse(a, true);
-    cout << "co: r=" << res << " a=" << a << endl;
-    if (a.getLen() > 0)
-	hhh = a.getDWord(0);
+    if (res == rfsv::E_PSI_GEN_NONE && (a.getLen() >= 2))
+	handle = a.getWord(0);
+    return res;
+}
+
+Enum<rfsv::errs> rpcs32::
+configRead(u_int32_t size, bufferStore &ret)
+{
+    bufferStore a;
+    u_int16_t handle;
+    Enum<rfsv::errs> res;
+
+    ret.init();
+    if ((res = configOpen(handle, size)) != rfsv::E_PSI_GEN_NONE)
+	return res;
+    do {
+	a.init();
+	a.addWord(handle);
+	a.addDWord(2047);
+	if (!sendCommand(rpcs::CONFIG_READ, a))
+	    return rfsv::E_PSI_FILE_DISC;
+	if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
+	    closeHandle(handle);
+	    return res;
+	}
+	if (a.getLen() > 0)
+	    ret.addBuff(a);
+    } while (a.getLen() > 0);
     return rfsv::E_PSI_GEN_NONE;
 }
 
 Enum<rfsv::errs> rpcs32::
-configRead(void)
+configWrite(bufferStore data)
 {
     bufferStore a;
+    u_int16_t handle;
     Enum<rfsv::errs> res;
-    int l;
-    FILE *f;
 
-    f = fopen("blah", "w");
+    return rfsv::E_PSI_GEN_NONE;
+    if ((res = configOpen(handle, data.getLen())) != rfsv::E_PSI_GEN_NONE)
+	return res;
     do {
 	a.init();
-	a.addDWord(hhh);
-	if (!sendCommand(rpcs::CONFIG_READ, a))
+	long l = (data.getLen() > 2047) ? 2047 : data.getLen();
+	a.addWord(handle);
+	a.addBuff(data, l);
+	data.discardFirstBytes(l);
+	if (!sendCommand(rpcs::CONFIG_WRITE, a))
 	    return rfsv::E_PSI_FILE_DISC;
-	if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
+	if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
+	    closeHandle(handle);
 	    return res;
-	l = a.getLen();
-	cout << "cr: " << l << endl;
-	fwrite(a.getString(0), 1, l, f);
-    } while (l > 0);
-    fclose(f);
-//cout << "cr: r=" << res << " a=" << a << endl;
+	}
+    } while (data.getLen() > 0);
     return rfsv::E_PSI_GEN_NONE;
+}
+
+Enum<rfsv::errs> rpcs32::
+closeHandle(u_int16_t handle)
+{
+    bufferStore a;
+
+    a.addWord(handle);
+    if (!sendCommand(rpcs::CLOSE_HANDLE, a))
+	return rfsv::E_PSI_FILE_DISC;
+    return getResponse(a, true);
 }
 
 /*

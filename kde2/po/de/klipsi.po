@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-02-11 12:56+0100\n"
-"PO-Revision-Date: 2002-02-13 07:26CET\n"
+"POT-Creation-Date: 2002-03-20 02:52+0100\n"
+"PO-Revision-Date: 2002-03-20 03:00CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -26,15 +26,29 @@ msgstr "Psion Zwischenablage"
 msgid "Original Developer/Maintainer"
 msgstr "Original Entwickler/Betreuer"
 
-#: toplevel.cpp:70
+#: toplevel.cpp:71
 msgid "Klipsi - Psion Clipboard"
 msgstr "Klipsi - Psion Zwischenablage"
 
-#: toplevel.cpp:72
+#: toplevel.cpp:73
 msgid "&Quit"
 msgstr "B&eenden"
 
-#: toplevel.cpp:732
+#: toplevel.cpp:562
+msgid ""
+"<QT>Your Psion is reported to be a <B>Series 3</B> machine. This type of "
+"machine does <B>not support</B> the remote clipboard protocol; Sorry.<BR/"
+"><B>Klipsi</B> will now terminate.</QT>"
+msgstr ""
+"<QT>Ihr Psion wurde als <B>Serie 3</B> Gerät erkannt. Dieser Gerätetyp "
+"unterstützt leider <B>nicht</B> das nötige Protokoll; Sorry.<BR/> "
+"<B>Klipsi</B> wird sich nun beenden.</QT>"
+
+#: toplevel.cpp:566 toplevel.cpp:591
+msgid "Protocol not supported"
+msgstr "Protokoll nicht unterstützt"
+
+#: toplevel.cpp:582
 msgid ""
 "<QT>Your Psion does not support the remote clipboard protocol.<BR/>The "
 "reason for that is usually a missing server library on your Psion.<BR/>Make "
@@ -51,10 +65,6 @@ msgstr ""
 "normalerweise auf Ihren Psion kopiert, wenn Sie CopyAnywhere in PsiWin "
 "aktivieren. Sie können sie auch manuell aus dem PsiWin-Installationsordner "
 "auf Ihren Psion kopieren.<BR/> <B>Klipsi</B> wird sich nun beenden.</QT>"
-
-#: toplevel.cpp:741
-msgid "Protocol not supported"
-msgstr "Protokoll nicht unterstützt"
 
 #: toplevel.moc.cpp:42 toplevel.moc.cpp:47
 msgid "TopLevel"

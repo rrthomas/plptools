@@ -25,17 +25,21 @@ Requires: %{name} = %{version} kdelibs >= 2.1 qt >= 2.2.4
 
 %description
 This package contains the programs (client and server), necessary to
-communicate with a psion series 5. The psion's file-system will
+communicate with a Psion palmtop. The psion's file-system will
 be automatically mounted under /mnt/psion at the time it is
 connected to your computer. If the psion is shut down or
 disconnected, the contents of /mnt/psion will automatically
-disappear. A second program (plpftp) allows you to transfer
-files in a ftp-like manner, view and modifiy processes on your
-psion and some other useful stuff.
+disappear. Other programs included are:
+ - plpftp, a program which allows you to transfer files in a ftp-like
+   manner, view and modifiy processes on your psion.
+ - plpbackup, a backup/restore utility.
+ - plpprintd, a daemon for enabling printing from a Psion Series 5 via any
+   accessible printer.
+ - sisinstall, an installer for Psion's SIS software package format.
 
 %description devel
 This package contains the static library and include files for building
-programs which can communicate with a psion series 5.
+programs which can communicate with a Psion palmtop.
 
 %description kde
 This package provides support for a new protocol prefix "psion:/" for
@@ -45,17 +49,22 @@ dialog provides access to Psions proprietary file attributes and information
 about the Psion's drives as well as generic machine information.
 
 %description -l de
-Dieses Packet enthält Programme zur Kommunikation mit einem Psion 5.
+Dieses Packet enthält Programme zur Kommunikation mit einem Psion Palmtop.
 Das Dateisystem des Psion wird beim Anschließen automatisch unter
 /mnt/psion eingehängt. Wird der Psion ausgeschaltet oder das Kabel
 gezogen, so verschwindet der Inhalt dieses Verzeichnisses automatisch
-und erscheint erneuten Anschließen wieder. Ein weiteres Programm ist
-plpftp, welches eine FTP-ähnliche Oberfläche für Dateitransfer
-bietet.
+und erscheint erneuten Anschließen wieder. Weiterhin sind enthalten:
+ - plpftp, ein Programm welches eine FTP-ähnliche Oberfläche für Dateitransfer
+   bietet und Prozesse auf dem Psion stoppen und starten kann.
+ - plpbackup, ein Backup/Restore Utility für die Kommandozeile.
+ - plpprintd, ein Daemon welcher Ausdrucken von einem Psion Serie 5 über
+   beliebige vefügbare Drucker ermöglicht
+ - sisinstall, ein Installationsprogramm für das Psion-eigene SIS
+   packetformat.
 
 %description -l de devel
 Dieses Packet enthält die statische Bibliothek und include-Dateien
-zur Programm-Entwicklung von Kommunikations-software für den Psion 5.
+zur Programm-Entwicklung von Kommunikations-software für den Psion.
 
 %description -l de kde
 Dieses Packet stellt Unterstützung für eine neues Protokoll-Präfix "psion:/"
@@ -75,7 +84,7 @@ This package contains a KDE utility program for backup, restore and formatting
 Psion drives.
 
 %description -l de -n kpsion
-Dieses Packet enthält ein KDE werkzeug zum Backup, Restore und Formatieren
+Dieses Packet enthält ein KDE Werkzeug zum Backup, Restore und Formatieren
 von Psion Laufwerken.
 
 %package -n klipsi
@@ -133,6 +142,21 @@ ldconfig
 test ! -d /mnt/psion && mkdir -p /mnt/psion
 /sbin/chkconfig --add psion
 /etc/rc.d/init.d/psion condrestart
+KONQRC=`kde-config --expandvars --install config`/konquerorrc
+if grep -q '\[Notification Messages\]' $KONQRC ; then
+(
+	sed -n -e '1,/\[Notification Messages\]/p'
+	echo askSaveinode/x-psion-drive=No
+	sed -n -e '/\[Notification Messages\]/,$p' | tail +1
+) > /tmp/$$
+mv /tmp/$$ $KONQRC
+else
+cat>>$KONQRC<<EOF
+
+[Notification Messages]
+askSaveinode/x-psion-drive=No
+EOF
+fi
 
 %preun
 if [ "$1" = 0 ]
