@@ -733,6 +733,10 @@ checkConnection() {
 			"protocol.<BR/>The reason for that is usually a missing "
 			"server library on your Psion.<BR/>Make shure, that "
 			"<B>C:\\System\\Libs\\clipsvr.rsy</B> exists.<BR/>"
+			"This file is part of PsiWin and usually gets copied "
+			"to your Psion when you enable CopyAnywhere in PsiWin. "
+			"You also get it from a PsiWin installation directory "
+			"and copy it to your Psion manually.<BR/>"
 			"<B>Klipsi</B> will now terminate.</QT>"),
 				       i18n("Protocol not supported"));
 		    delete timer;

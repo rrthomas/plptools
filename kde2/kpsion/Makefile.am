@@ -23,7 +23,7 @@ libkpsion_la_SOURCES = kpsion.cpp setupdialog.cpp wizards.cpp \
 	statusbarprogress.cpp kpsionconfig.cpp kpsionbackuplistview.cpp \
 	kpsionrestoredialog.cpp
 
-libkpsion_la_LIBADD = -L$(top_srcdir)/lib/.libs -lplp $(LIB_KFILE)
+libkpsion_la_LIBADD = -L$(top_srcdir)/lib -lplp $(LIB_KFILE)
 
 kpsion_SOURCES	= main.cpp
 kpsion_LDFLAGS  = $(KDE_RPATH)

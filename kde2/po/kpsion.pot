@@ -6,13 +6,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-04-09 02:19+0200\n"
+"POT-Creation-Date: 2002-02-11 13:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
-"Content-Transfer-Encoding: ENCODING\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: kpsionbackuplistview.cpp:226
 msgid "Available backups"
@@ -44,51 +44,51 @@ msgstr ""
 msgid "KPsionBackupListView"
 msgstr ""
 
-#: kpsionconfig.cpp:93
+#: kpsionconfig.cpp:103
 msgid "off"
 msgstr ""
 
-#: kpsionconfig.cpp:123
+#: kpsionconfig.cpp:133
 msgid "none"
 msgstr ""
 
-#: kpsionconfig.cpp:124
+#: kpsionconfig.cpp:134
 msgid "daily"
 msgstr ""
 
-#: kpsionconfig.cpp:125
+#: kpsionconfig.cpp:135
 msgid "every 2 days"
 msgstr ""
 
-#: kpsionconfig.cpp:126
+#: kpsionconfig.cpp:136
 msgid "every 3 days"
 msgstr ""
 
-#: kpsionconfig.cpp:127
+#: kpsionconfig.cpp:137
 msgid "every 4 days"
 msgstr ""
 
-#: kpsionconfig.cpp:128
+#: kpsionconfig.cpp:138
 msgid "every 5 days"
 msgstr ""
 
-#: kpsionconfig.cpp:129
+#: kpsionconfig.cpp:139
 msgid "every 6 days"
 msgstr ""
 
-#: kpsionconfig.cpp:130
+#: kpsionconfig.cpp:140
 msgid "weekly"
 msgstr ""
 
-#: kpsionconfig.cpp:131
+#: kpsionconfig.cpp:141
 msgid "every 2 weeks"
 msgstr ""
 
-#: kpsionconfig.cpp:132
+#: kpsionconfig.cpp:142
 msgid "every 3 weeks"
 msgstr ""
 
-#: kpsionconfig.cpp:133
+#: kpsionconfig.cpp:143
 msgid "monthly"
 msgstr ""
 
@@ -100,8 +100,8 @@ msgstr ""
 msgid ""
 "<qt>Here, you see your Psion's drives.<br/>Every drive is represented by an "
 "Icon. If you click on it, it gets selected for the next operation. E.g.: "
-"backup, restore or format.<br/>To unselect it, simply click on it "
-"again.<br/>Select as many drives a you want, then choose an operation.</qt>"
+"backup, restore or format.<br/>To unselect it, simply click on it again.<br/"
+">Select as many drives a you want, then choose an operation.</qt>"
 msgstr ""
 
 #: kpsion.cpp:193
@@ -136,248 +136,250 @@ msgstr ""
 msgid "Format selected drive(s)"
 msgstr ""
 
-#: kpsion.cpp:289
+#: kpsion.cpp:293
 msgid "Retrieving machine info ..."
 msgstr ""
 
-#: kpsion.cpp:293
+#: kpsion.cpp:297
 msgid "Could not get Psion machine info"
 msgstr ""
 
-#: kpsion.cpp:308
+#: kpsion.cpp:312
 msgid "an unknown machine"
 msgstr ""
 
-#: kpsion.cpp:319
+#: kpsion.cpp:323
 msgid "Retrieving drive list ..."
 msgstr ""
 
-#: kpsion.cpp:322
+#: kpsion.cpp:326
 msgid "Could not get list of drives"
 msgstr ""
 
-#: kpsion.cpp:353 kpsion.cpp:764 kpsion.cpp:787 kpsion.cpp:811 kpsion.cpp:934
-#: kpsion.cpp:1182 kpsion.cpp:1343 kpsion.cpp:1352 kpsion.cpp:1383
-#: kpsion.cpp:1401 kpsion.cpp:1412
+#: kpsion.cpp:357 kpsion.cpp:778 kpsion.cpp:801 kpsion.cpp:825 kpsion.cpp:950
+#: kpsion.cpp:1201 kpsion.cpp:1362 kpsion.cpp:1371 kpsion.cpp:1402
+#: kpsion.cpp:1420 kpsion.cpp:1431
 #, c-format
 msgid "Connected to %1"
 msgstr ""
 
-#: kpsion.cpp:467
+#: kpsion.cpp:473
 msgid ""
 "<QT>The selected drive <B>Z:</B> is a <B>ROM</B> drive and therefore cannot "
 "be restored.</QT>"
 msgstr ""
 
-#: kpsion.cpp:519
+#: kpsion.cpp:525
 msgid ""
 "A backup is running.\n"
 "Do you really want to quit?"
 msgstr ""
 
-#: kpsion.cpp:521
+#: kpsion.cpp:527
 msgid ""
 "A restore is running.\n"
 "Do you really want to quit?"
 msgstr ""
 
-#: kpsion.cpp:523
+#: kpsion.cpp:529
 msgid ""
 "A format is running.\n"
 "Do you really want to quit?"
 msgstr ""
 
-#: kpsion.cpp:542
+#: kpsion.cpp:549
 msgid "Starting ncpd daemon ..."
 msgstr ""
 
-#: kpsion.cpp:571
+#: kpsion.cpp:585
 msgid "Connecting ..."
 msgstr ""
 
-#: kpsion.cpp:577
+#: kpsion.cpp:591
 msgid "RFSV could not connect to ncpd at %1:%2. "
 msgstr ""
 
-#: kpsion.cpp:580 kpsion.cpp:606 kpsion.cpp:633 kpsion.cpp:662
+#: kpsion.cpp:594 kpsion.cpp:620 kpsion.cpp:647 kpsion.cpp:676
 msgid " (Retry in %1 seconds.)"
 msgstr ""
 
-#: kpsion.cpp:601
+#: kpsion.cpp:615
 #, c-format
 msgid "RFSV could not establish link: %1."
 msgstr ""
 
-#: kpsion.cpp:626
+#: kpsion.cpp:640
 msgid "RPCS could not connect to ncpd at %1:%2."
 msgstr ""
 
-#: kpsion.cpp:653
+#: kpsion.cpp:667
 #, c-format
 msgid "RPCS could not establish link: %1."
 msgstr ""
 
-#: kpsion.cpp:768
+#: kpsion.cpp:782
 #, c-format
 msgid "Could not retrieve drive details for drive %1"
 msgstr ""
 
-#: kpsion.cpp:773
+#: kpsion.cpp:787
 #, c-format
 msgid "Scanning drive %1"
 msgstr ""
 
-#: kpsion.cpp:783
+#: kpsion.cpp:797
 msgid "%1 files need backup"
 msgstr ""
 
-#: kpsion.cpp:791
+#: kpsion.cpp:805
 msgid "No files need backup"
 msgstr ""
 
-#: kpsion.cpp:813
+#: kpsion.cpp:827
 #, c-format
 msgid "Could not create backup folder %1"
 msgstr ""
 
-#: kpsion.cpp:836
+#: kpsion.cpp:850
+#, c-format
 msgid "Backup %1% done"
 msgstr ""
 
-#: kpsion.cpp:856
+#: kpsion.cpp:870
 msgid "<QT>Could not open<BR/><B>%1</B></QT>"
 msgstr ""
 
-#: kpsion.cpp:876
+#: kpsion.cpp:890
 msgid "<QT>Could not read<BR/><B>%1</B></QT>"
 msgstr ""
 
-#: kpsion.cpp:889
+#: kpsion.cpp:903
 msgid "Resetting archive attributes"
 msgstr ""
 
-#: kpsion.cpp:902
+#: kpsion.cpp:918
 msgid "<QT>Could not set attributes of<BR/><B>%1</B></QT>"
 msgstr ""
 
-#: kpsion.cpp:927
+#: kpsion.cpp:943
 msgid ""
 "<QT>Could not rename backup archive from<BR/><B>%1</B> to<BR/><B>%2</B></QT>"
 msgstr ""
 
-#: kpsion.cpp:938
+#: kpsion.cpp:954
 msgid "Backup done"
 msgstr ""
 
-#: kpsion.cpp:971
+#: kpsion.cpp:990
 msgid "Removing old backups ..."
 msgstr ""
 
-#: kpsion.cpp:1066 kpsion.cpp:1296
+#: kpsion.cpp:1085 kpsion.cpp:1315
 msgid "<QT>Could not get attributes of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1095
+#: kpsion.cpp:1114
 msgid "Overwrite"
 msgstr ""
 
-#: kpsion.cpp:1098
+#: kpsion.cpp:1117
 msgid "Overwrite &All"
 msgstr ""
 
-#: kpsion.cpp:1111
+#: kpsion.cpp:1130
 msgid ""
-"<QT>The file <B>%1</B> exists already on the Psion with different size "
-"and/or attributes.<P><B>On the Psion:</B><BR/>  Size: %2<BR/>  Date: %3<BR/> "
-" Attributes: %4</P><P><B>In backup:</B><BR/>  Size: %5<BR/>  Date: %6<BR/>  "
+"<QT>The file <B>%1</B> exists already on the Psion with different size and/"
+"or attributes.<P><B>On the Psion:</B><BR/>  Size: %2<BR/>  Date: %3<BR/>  "
+"Attributes: %4</P><P><B>In backup:</B><BR/>  Size: %5<BR/>  Date: %6<BR/>  "
 "Attributes: %7</P>Do you want to overwrite it?</QT>"
 msgstr ""
 
-#: kpsion.cpp:1149
+#: kpsion.cpp:1168
 msgid "Reading backups ..."
 msgstr ""
 
-#: kpsion.cpp:1154
+#: kpsion.cpp:1173
 msgid "Selecting backups ..."
 msgstr ""
 
-#: kpsion.cpp:1187 kpsion.cpp:1235
+#: kpsion.cpp:1206 kpsion.cpp:1254
+#, c-format
 msgid "Restore %1% done"
 msgstr ""
 
-#: kpsion.cpp:1251
+#: kpsion.cpp:1270
 msgid "<QT>Could not create directory<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1266
+#: kpsion.cpp:1285
 msgid "<QT>Could not create<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1288
+#: kpsion.cpp:1307
 msgid "<QT>Could not write to<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1314
+#: kpsion.cpp:1333
 msgid "<QT>Could not set attributes of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1327
+#: kpsion.cpp:1346
 msgid ""
 "<QT>Could not set modification time of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1354
+#: kpsion.cpp:1373
 msgid "Restore done"
 msgstr ""
 
-#: kpsion.cpp:1368
+#: kpsion.cpp:1387
 msgid "Formatting drive %1:"
 msgstr ""
 
-#: kpsion.cpp:1379
+#: kpsion.cpp:1398
 msgid "<QT>Could not format drive %1:<BR/>%2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1396
+#: kpsion.cpp:1415
 msgid "<QT>Error during format of drive %1:<BR/>%2</QT>"
 msgstr ""
 
-#: kpsion.cpp:1414
+#: kpsion.cpp:1433
 msgid "Format done"
 msgstr ""
 
-#: kpsion.cpp:1420
+#: kpsion.cpp:1439
 msgid ""
 "<QT>This erases <B>ALL</B> data on the drive(s).<BR/>Do you really want to "
 "proceed?"
 msgstr ""
 
-#: kpsion.cpp:1441
+#: kpsion.cpp:1460
 msgid "Assign drive name"
 msgstr ""
 
-#: kpsion.cpp:1450
+#: kpsion.cpp:1469
 msgid ""
-"<QT>Formatting of drive %1: finished. Please assign a name for that "
-"drive.</QT>"
+"<QT>Formatting of drive %1: finished. Please assign a name for that drive.</"
+"QT>"
 msgstr ""
 
-#: kpsion.cpp:1454
+#: kpsion.cpp:1473
 msgid "New name of drive %1:"
 msgstr ""
 
-#: kpsion.cpp:1600
+#: kpsion.cpp:1619
 #, c-format
 msgid "Stopping %1"
 msgstr ""
 
-#: kpsion.cpp:1618
+#: kpsion.cpp:1637
 msgid ""
 "<QT>Could not stop all processes.<BR/>Please stop running programs manually "
 "on the Psion, then klick <B>Ok</B>."
 msgstr ""
 
-#: kpsion.cpp:1641
+#: kpsion.cpp:1660
 #, c-format
 msgid "Starting %1"
 msgstr ""
@@ -408,57 +410,57 @@ msgstr ""
 msgid "KPsionRestoreDialog"
 msgstr ""
 
-#: main.cpp:51
+#: main.cpp:49
 msgid "perform scheduled backup"
 msgstr ""
 
-#: main.cpp:53
+#: main.cpp:51
 msgid "perform backup"
 msgstr ""
 
-#: main.cpp:55
+#: main.cpp:53
 msgid "perform restore"
 msgstr ""
 
-#: main.cpp:57
+#: main.cpp:55
 msgid "format drive"
 msgstr ""
 
-#: main.cpp:62
+#: main.cpp:60
 msgid "KPsion"
 msgstr ""
 
-#: main.cpp:64
+#: main.cpp:62
 msgid "Psion connectivity utility"
 msgstr ""
 
-#: main.cpp:69
+#: main.cpp:67
 msgid "Original Developer/Maintainer"
 msgstr ""
 
-#: main.cpp:107
+#: main.cpp:105
 msgid ""
 "The options are mutually exclusive. I.e. You cannot specify more than one "
 "action at once."
 msgstr ""
 
-#: setupdialog.cpp:46
+#: setupdialog.cpp:47
 msgid "Settings"
 msgstr ""
 
-#: setupdialog.cpp:59
+#: setupdialog.cpp:60
 msgid "&Backup"
 msgstr ""
 
-#: setupdialog.cpp:62 setupdialog.cpp:380 wizards.cpp:279
+#: setupdialog.cpp:63 setupdialog.cpp:435 wizards.cpp:279
 msgid "Backup folder"
 msgstr ""
 
-#: setupdialog.cpp:73 wizards.cpp:107
+#: setupdialog.cpp:74 wizards.cpp:107
 msgid "Browse"
 msgstr ""
 
-#: setupdialog.cpp:76
+#: setupdialog.cpp:77
 msgid ""
 "<QT>This is the name of the backup folder. Click on <B>Browse</B>, for "
 "opening a dialog which lets you easily select the backup folder. If the "
@@ -466,44 +468,44 @@ msgid ""
 "the new location.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:82
+#: setupdialog.cpp:83
 msgid ""
 "<QT>Click here, for opening a dialog which lets you easily select the backup "
 "folder. If the backup folder is changed and it already contains backups, "
 "these are moved to the new location.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:93
+#: setupdialog.cpp:94
 msgid "Backup strategy"
 msgstr ""
 
-#: setupdialog.cpp:97 wizards.cpp:145
+#: setupdialog.cpp:98 wizards.cpp:145
 msgid "&Incremental backup interval"
 msgstr ""
 
-#: setupdialog.cpp:101 setupdialog.cpp:114
+#: setupdialog.cpp:102 setupdialog.cpp:115
 msgid ""
 "<QT>If you select an interval here, <B>KPsion</B> creates an entry in your "
 "Autostart directory which performs an incremental backup of selected drives. "
 "If your Psion is not connected at that time, nothing will happen.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:119 wizards.cpp:153
+#: setupdialog.cpp:120 wizards.cpp:153
 msgid "&Full backup interval"
 msgstr ""
 
-#: setupdialog.cpp:122 setupdialog.cpp:135
+#: setupdialog.cpp:123 setupdialog.cpp:136
 msgid ""
 "<QT>If you select an interval here, <B>KPsion</B> creates an entry in your "
 "Autostart directory which performs a full backup of selected drives. If your "
 "Psion is not connected at that time, nothing will happen.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:140 wizards.cpp:161
+#: setupdialog.cpp:141 wizards.cpp:161
 msgid "Backup &generations"
 msgstr ""
 
-#: setupdialog.cpp:143 setupdialog.cpp:156
+#: setupdialog.cpp:144 setupdialog.cpp:157
 msgid ""
 "<QT>Specify the number of backup generations you want to keep on your "
 "machine. One backup generation means a full backup of a drive plus "
@@ -513,50 +515,50 @@ msgid ""
 "deleted.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:167
+#: setupdialog.cpp:168
 msgid "&Connection"
 msgstr ""
 
-#: setupdialog.cpp:170 wizards.cpp:205
+#: setupdialog.cpp:171 wizards.cpp:205
 msgid "&Connection retry interval (sec.)"
 msgstr ""
 
-#: setupdialog.cpp:174 setupdialog.cpp:183
+#: setupdialog.cpp:175 setupdialog.cpp:184
 msgid ""
 "<QT>If this is not 0, <B>KPsion</B> attempts to retry connection setup.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:186 wizards.cpp:213
+#: setupdialog.cpp:187 wizards.cpp:213
 msgid "Serial &device"
 msgstr ""
 
-#: setupdialog.cpp:189 setupdialog.cpp:209
+#: setupdialog.cpp:190 setupdialog.cpp:210
 msgid ""
 "<QT>If a device is selected here and the connection can not established at "
 "startup, <B>KPsion</B> will attempt to start the ncpd daemon with "
 "appropriate parameters.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:213 wizards.cpp:222
+#: setupdialog.cpp:214 wizards.cpp:222
 msgid "Serial &speed"
 msgstr ""
 
-#: setupdialog.cpp:216 setupdialog.cpp:233
+#: setupdialog.cpp:217 setupdialog.cpp:234
 msgid ""
 "<QT>If a device is selected at <B>Serial device</B> and the connection can "
 "not established at startup, <B>KPsion</B> will attempt to start the ncpd "
 "daemon with appropriate parameters.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:241
+#: setupdialog.cpp:242
 msgid "&Machines"
 msgstr ""
 
-#: setupdialog.cpp:245
+#: setupdialog.cpp:246
 msgid "Machine &UID"
 msgstr ""
 
-#: setupdialog.cpp:248 setupdialog.cpp:260
+#: setupdialog.cpp:249 setupdialog.cpp:261
 msgid ""
 "<QT>This shows the known machines. Select an entry here and you will be able "
 "to change its name and specify the drives that should be selected for "
@@ -564,87 +566,92 @@ msgid ""
 "backups for it.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:266
+#: setupdialog.cpp:267
 msgid "Machine &Name"
 msgstr ""
 
-#: setupdialog.cpp:269 setupdialog.cpp:276
+#: setupdialog.cpp:270 setupdialog.cpp:277
 msgid ""
 "<QT>You can change the name of the machine here. The name is not used "
 "internally but only provided for display purposes.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:279
+#: setupdialog.cpp:280
 msgid "Delete"
 msgstr ""
 
-#: setupdialog.cpp:283
+#: setupdialog.cpp:284
 msgid ""
 "<QT>Click here to delete the selected machine from the list of known "
 "machines. This includes deleting all backups of that machine.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:288
+#: setupdialog.cpp:289
 msgid "Automatic backup drives"
 msgstr ""
 
-#: setupdialog.cpp:298
+#: setupdialog.cpp:299
 msgid ""
 "<QT>Here, you can select the drives which shall be included in atomatic "
 "backups.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:354
+#: setupdialog.cpp:358
 msgid ""
 "<QT>Removing a machine also removes all backups of this machine.<BR/><B>This "
-"can not be reverted!</B><BR/>Do you really want to remove the machine %1 "
-"(%2)?</QT>"
+"can not be reverted!</B><BR/>Do you really want to remove the machine %1 (%"
+"2)?</QT>"
 msgstr ""
 
-#: setupdialog.cpp:471 wizards.cpp:365
+#: setupdialog.cpp:374
+#, c-format
+msgid "Could not remove backup file %1."
+msgstr ""
+
+#: setupdialog.cpp:526 wizards.cpp:365
 msgid ""
 "<QT>The folder <B>%1</B> does <B>not</B> exist.<BR/>Shall it be created?</QT>"
 msgstr ""
 
-#: setupdialog.cpp:476 wizards.cpp:370
+#: setupdialog.cpp:531 wizards.cpp:370
 msgid "<QT>The specified folder<BR/><B>%1</B><BR/>could <B>not</B> be created"
 msgstr ""
 
-#: setupdialog.cpp:481 wizards.cpp:375
+#: setupdialog.cpp:536 wizards.cpp:375
 msgid ""
 ", because you either don't have sufficient rights to do that, or the "
 "filesystem is readonly."
 msgstr ""
 
-#: setupdialog.cpp:485 wizards.cpp:379
+#: setupdialog.cpp:540 wizards.cpp:379
 msgid ", because the filesystem has not enough space."
 msgstr ""
 
-#: setupdialog.cpp:491 wizards.cpp:385
+#: setupdialog.cpp:546 wizards.cpp:385
 msgid ", because there already exists another object with the same name."
 msgstr ""
 
-#: setupdialog.cpp:501 wizards.cpp:395
+#: setupdialog.cpp:556 wizards.cpp:395
 msgid ""
 ", because you specified a path which probably contains a dangling symbolic "
 "link."
 msgstr ""
 
-#: setupdialog.cpp:504 wizards.cpp:398
+#: setupdialog.cpp:559 wizards.cpp:398
 msgid ""
 ", because you specified a path which contains an element which is not a "
 "folder."
 msgstr ""
 
-#: setupdialog.cpp:508 wizards.cpp:402
+#: setupdialog.cpp:563 wizards.cpp:402
 msgid ", because you specified a path which contains too many symbolic links."
 msgstr ""
 
-#: setupdialog.cpp:515 wizards.cpp:409
+#: setupdialog.cpp:570 wizards.cpp:409
 msgid "<BR/>Please select another folder.</QT>"
 msgstr ""
 
-#: setupdialog.cpp:539
+#: setupdialog.cpp:594
 msgid "Could not move existing backup for machine %1 to %2."
 msgstr ""
 
@@ -716,10 +723,10 @@ msgstr ""
 
 #: wizards.cpp:134
 msgid ""
-"<QT>Next, please specify some information regarding backup "
-"policy:<UL><LI>How many generations of backups do you want to "
-"keep?</LI><LI>Shall i perform automatic backups?</LI><LI>If yes, in what "
-"intervals do you want to happen backups?</LI></UL></QT>"
+"<QT>Next, please specify some information regarding backup policy:"
+"<UL><LI>How many generations of backups do you want to keep?</LI><LI>Shall i "
+"perform automatic backups?</LI><LI>If yes, in what intervals do you want to "
+"happen backups?</LI></UL></QT>"
 msgstr ""
 
 #: wizards.cpp:181
@@ -733,8 +740,8 @@ msgid ""
 "which a connection attempt should happen. If you don't want automatic retry, "
 "set the interval to zero. Furthermore, <B>KPsion</B> can try to start ncpd "
 "if it is not already running. For that to work correctly, you need "
-"to<UL><LI>specify the serial port to use.</LI><LI>specify the baud "
-"rate</LI><LI>have permission to use the specified port</LI></UL></QT>"
+"to<UL><LI>specify the serial port to use.</LI><LI>specify the baud rate</"
+"LI><LI>have permission to use the specified port</LI></UL></QT>"
 msgstr ""
 
 #: wizards.cpp:244

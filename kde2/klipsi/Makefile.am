@@ -18,7 +18,7 @@ lib_LTLIBRARIES = klipsi.la
 
 CLEANFILES = dummy.cpp
 
-klipsi_la_LIBADD = -L$(top_srcdir)/lib/.libs -lplp $(LIB_KDEUI)
+klipsi_la_LIBADD = -L$(top_srcdir)/lib -lplp $(LIB_KDEUI)
 klipsi_la_SOURCES = main.cpp toplevel.cpp
 klipsi_la_LDFLAGS = $(all_libraries) -module -avoid-version
 

@@ -13,7 +13,7 @@ kio_plp_la_LDFLAGS = -module -avoid-version
 lib_LTLIBRARIES = kio_plp.la
 
 kio_plp_la_SOURCES = kio_plp.cpp
-kio_plp_la_LIBADD = -L$(top_srcdir)/lib/.libs -lplp $(LIB_KIO)
+kio_plp_la_LIBADD = -L$(top_srcdir)/lib -lplp $(LIB_KIO)
 
 noinst_HEADERS = kio_plp.h
 

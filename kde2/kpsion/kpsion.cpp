@@ -540,20 +540,28 @@ startupNcpd() {
 	return;
     KProcess proc;
     ppsocket *testSocket;
+    time_t start_time = time(0L) + 2;
+    bool connectOk = false;
 
     testSocket = new ppsocket();
     if (!testSocket->connect(NULL, 7501)) {
-	time_t start_time = time(0L) + 2;
 
 	statusBar()->changeItem(i18n("Starting ncpd daemon ..."),
 				STID_CONNECTION);
 	proc << ncpdPath;
 	proc << "-s" << ncpdDevice << "-b" << ncpdSpeed;
 	proc.start(KProcess::DontCare);
-	while ((time(0L) < start_time) && (!testSocket->connect(NULL, 7501)))
+	while ((time(0L) < start_time) &&
+	       (!(connectOk = testSocket->connect(NULL, 7501))))
 	    kapp->processEvents();
     }
     delete testSocket;
+    if (connectOk) {
+	// 2 more seconds for ncpd to negotiate with the Psion.
+	start_time = time(0L) + 2;
+	while (time(0L) < start_time)
+	    kapp->processEvents();
+    }
 }
 
 void KPsionMainWindow::

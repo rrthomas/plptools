@@ -4,15 +4,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: plptools 0.10\n"
-"POT-Creation-Date: 2001-05-24 02:01+0200\n"
-"PO-Revision-Date: 2001-05-24 02:11CET\n"
+"Project-Id-Version: plptools 0.11\n"
+"POT-Creation-Date: 2002-02-11 12:56+0100\n"
+"PO-Revision-Date: 2002-02-13 07:26CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 0.8\n"
+"X-Generator: KBabel 0.9.5\n"
 
 #: main.cpp:36
 msgid "Klipsi"
@@ -26,11 +26,37 @@ msgstr "Psion Zwischenablage"
 msgid "Original Developer/Maintainer"
 msgstr "Original Entwickler/Betreuer"
 
-#: toplevel.cpp:58
+#: toplevel.cpp:70
 msgid "Klipsi - Psion Clipboard"
 msgstr "Klipsi - Psion Zwischenablage"
 
-#: toplevel.cpp:60
+#: toplevel.cpp:72
 msgid "&Quit"
 msgstr "B&eenden"
+
+#: toplevel.cpp:732
+msgid ""
+"<QT>Your Psion does not support the remote clipboard protocol.<BR/>The "
+"reason for that is usually a missing server library on your Psion.<BR/>Make "
+"shure, that <B>C:\\System\\Libs\\clipsvr.rsy</B> exists.<BR/>This file is "
+"part of PsiWin and usually gets copied to your Psion when you enable "
+"CopyAnywhere in PsiWin. You also get it from a PsiWin installation directory "
+"and copy it to your Psion manually.<BR/><B>Klipsi</B> will now terminate.</"
+"QT>"
+msgstr ""
+"<QT>Ihr Psion unterstützt nicht das Zwischenablage-Protokoll.<BR/>Der Grund "
+"hierfür ist üblicherweise eine fehlende Server-Bibliothek auf dem Psion.<BR/"
+">Stellen Sie bitte sicher, daß die Datei <B>C:\\System\\Libs\\clipsvr.rsy</"
+"B> existiert.<BR/>Diese Datei ist Bestandteil von PsiWin und wird "
+"normalerweise auf Ihren Psion kopiert, wenn Sie CopyAnywhere in PsiWin "
+"aktivieren. Sie können sie auch manuell aus dem PsiWin-Installationsordner "
+"auf Ihren Psion kopieren.<BR/> <B>Klipsi</B> wird sich nun beenden.</QT>"
+
+#: toplevel.cpp:741
+msgid "Protocol not supported"
+msgstr "Protokoll nicht unterstützt"
+
+#: toplevel.moc.cpp:42 toplevel.moc.cpp:47
+msgid "TopLevel"
+msgstr "TopLevel"
 
