@@ -271,10 +271,10 @@ PLPPRINTD_ARGS=
 EOF
 %endif
 %if "%{isMDK}" > "0"
-# Mandrake has a different menu structure
-mkdir -p $RPM_BUILD_ROOT%{_kdedatadir}/applnk-mdk/Office/PDA
-mv $RPM_BUILD_ROOT%{_kdedatadir}/applnk/Utilities/*.desktop \
-	$RPM_BUILD_ROOT%{_kdedatadir}/applnk-mdk/Office/PDA
+# Mandrake has a menu configurator
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/menu
+echo '?package(kpsion): needs="kde" kde_filename="kpsion" section="Office/PDA" title="KPsion" icon="psion_desktop.png" command="kpsion" kde_opt="\\nEncoding=UTF-8\\nGenericName=My Psion PDA\\nDocPath=kpsion/index.html\\nTerminal=0\\nX-KDE-StartupNotify=true"' > $RPM_BUILD_ROOT%{_libdir}/menu/kpsion
+echo '?package(klipsi): needs="kde" kde_filename="klipsi" section="Office/PDA" title="Klipsi" icon="klipsi.png" command="klipsi" kde_opt="\\nEncoding=UTF-8\\nGenericName=Psion Clipboard Utility\\nDocPath=klipsi/index.html\\nTerminal=0\\nX-KDE-StartupNotify=true"' > $RPM_BUILD_ROOT%{_libdir}/menu/klipsi
 %endif
 
 %clean
@@ -337,6 +337,14 @@ perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 export PATH=%{_kdebindir}:$PATH
 perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 %endif
+%endif
+
+%if "%{isMDK}" > "0"
+%post -n kpsion
+update-menus
+
+%post -n klipsi
+update-menus
 %endif
 
 %post kde
@@ -435,10 +443,9 @@ fi
 %{_kdelibdir}/libkpsion.so*
 %{_kdelibdir}/libkpsion.la
 %if "%{isMDK}" > "0"
-%{_kdedatadir}/applnk-mdk/Office/PDA/kpsion*
-%else
-%{_kdedatadir}/applnk/*/kpsion*
+%{_libdir}/menu/kpsion
 %endif
+%{_kdedatadir}/applnk/*/kpsion*
 %{_kdedatadir}/apps/kpsion/*
 %{_kdedatadir}/apps/konqueror/*
 %{_kdedatadir}/icons/*/*/apps/kpsion*
@@ -451,10 +458,9 @@ fi
 %{_kdelibdir}/klipsi.so*
 %{_kdelibdir}/klipsi.la
 %if "%{isMDK}" > "0"
-%{_kdedatadir}/applnk-mdk/Office/PDA/klipsi*
-%else
-%{_kdedatadir}/applnk/*/klipsi*
+%{_libdir}/menu/klipsi
 %endif
+%{_kdedatadir}/applnk/*/klipsi*
 %{_kdedatadir}/apps/klipsi/*
 %{_kdedatadir}/icons/*/*/apps/klipsi*
 %{_kdedatadir}/icons/*/*/actions/klipsi*
