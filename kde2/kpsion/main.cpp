@@ -44,15 +44,14 @@ extern "C" {
 
 
 static KCmdLineOptions options[] = {
-    {"a", 0, 0},
+//    {"a", 0, 0},
     {"autobackup", I18N_NOOP("perform scheduled backup"), 0},
-    {"b <drive>", 0, 0},
-    {"backup <drive>", I18N_NOOP("perform backup"), 0},
-    {"r <drive>", 0, 0},
-    {"restore <drive>", I18N_NOOP("perform restore"), 0},
-    {"f <drive>", 0, 0},
-    {"format <drive>", I18N_NOOP("format drive"), 0},
-    {"+drive", I18N_NOOP("The drive letter to backup/restore or format."), 0},
+//    {"b <drv>", 0, 0},
+    {"backup <drv>", I18N_NOOP("perform backup"), 0},
+//    {"r <drv>", 0, 0},
+    {"restore <drv>", I18N_NOOP("perform restore"), 0},
+//    {"f <drv>", 0, 0},
+    {"format <drv>", I18N_NOOP("format drive"), 0},
     { 0, 0, 0},
 };
 
@@ -84,9 +83,25 @@ int main(int argc, char **argv) {
 	wiz->exec();
     }
 
+    KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
+
+    int acnt = 0;
+    if (args->isSet("backup"))
+	acnt++;
+    if (args->isSet("restore"))
+	acnt++;
+    if (args->isSet("format"))
+	acnt++;
+    if (args->isSet("autobackup"))
+	acnt++;
+
+    if (acnt > 1)
+	KCmdLineArgs::usage(i18n(
+	    "The options are mutually exclusive. "
+	    "I.e. You cannot specify more than one action at once."));
+
     KPsionMainWindow *w = new KPsionMainWindow();
 
-    KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     if (args->isSet("autobackup") && (!w->isConnected()))
 	return 0;
     w->resize(300, 170);

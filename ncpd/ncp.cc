@@ -247,7 +247,7 @@ decodeControlMessage(bufferStore & buff)
 			// sent, which is rather crude, but works for Series 3
 			// and probably 5. If Symbian have changed EPOC Connect
 			// for the Series 5mx/7, this may need to change.
-			// 
+			//
 			if (ver == PV_SERIES_5 || ver == PV_SERIES_3) {
 				bufferStore b;
 				protocolVersion = ver;

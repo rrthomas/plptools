@@ -388,7 +388,7 @@ bool KPsionBackupListView::
 autoSelect(QString drive) {
     KPsionCheckListItem *latest = NULL;
     time_t stamp = 0;
-    
+
     drive += ":";
     // Find latest full backup for given drive
     KPsionCheckListItem *i = firstChild();
@@ -485,6 +485,8 @@ KPsionMainWindow::KPsionMainWindow()
 	    SLOT(iconClicked(QIconViewItem *)));
     connect(view, SIGNAL(onItem(QIconViewItem *)),
 	    SLOT(iconOver(QIconViewItem *)));
+    connect(this, SIGNAL(rearrangeIcons(bool)), view,
+	    SLOT(arrangeItemsInGrid(bool)));
     KConfig *config = kapp->config();
     config->setGroup("Psion");
     QStringList uids = config->readListEntry("MachineUIDs");
@@ -714,7 +716,7 @@ queryPsion() {
     for (int i = 0; i < 26; i++) {
 	if ((devbits & 1) != 0) {
 	    PlpDrive drive;
-	    if (plpRfsv->devinfo(i, drive) == rfsv::E_PSI_GEN_NONE)
+	    if (plpRfsv->devinfo('A' + i, drive) == rfsv::E_PSI_GEN_NONE)
 		insertDrive('A' + i, drive.getName().c_str());
 	}
 	devbits >>= 1;
@@ -738,6 +740,70 @@ queryPsion() {
     }
     statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
 			    STID_CONNECTION);
+    if (args->isSet("backup")) {
+	bool any = false;
+
+	QCStringList argl = args->getOptionList("backup");
+	QCStringList::Iterator it;
+
+	for (it = argl.begin(); it != argl.end(); ++it) {
+	    QString drv((*it).upper());
+
+	    for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+		if (i->key() == drv) {
+		    i->setSelected(true);
+		    any = true;
+		}
+	    }
+	}
+	if (any) {
+	    fullBackup = true;
+	    doBackup();
+	}
+	return;
+    }
+    if (args->isSet("restore")) {
+	bool any = false;
+
+	QCStringList argl = args->getOptionList("restore");
+	QCStringList::Iterator it;
+
+	for (it = argl.begin(); it != argl.end(); ++it) {
+	    QString drv((*it).upper());
+	    if (drv == "Z") {
+		KMessageBox::sorry(this, i18n(
+		    "<QT>The selected drive <B>Z:</B> is "
+		    "a <B>ROM</B> drive and therefore cannot be restored.</QT>"));
+		continue;
+	    }
+	    for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+		if (i->key() == drv) {
+		    i->setSelected(true);
+		    any = true;
+		}
+	    }
+	}
+	if (any)
+	    slotStartRestore();
+	return;
+    }
+    if (args->isSet("format")) {
+	bool any = false;
+	QCStringList argl = args->getOptionList("format");
+	QCStringList::Iterator it;
+
+	for (it = argl.begin(); it != argl.end(); ++it) {
+	    QString drv((*it).upper());
+	    for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+		if (i->key() == drv) {
+		    i->setSelected(true);
+		    any = true;
+		}
+	    }
+	}
+	KMessageBox::sorry(this, "Formatting is not yet implemented");
+	return;
+    }
 }
 
 QString KPsionMainWindow::
@@ -941,9 +1007,9 @@ doBackup() {
 	if (i->isSelected()) {
 	    QString drv = i->key();
 	    drv += ":";
-	    int drvNum = *(drv.data()) - 'A';
+	    int drvChar = drv[0].latin1();
 	    PlpDrive drive;
-	    if (plpRfsv->devinfo(drvNum, drive) != rfsv::E_PSI_GEN_NONE) {
+	    if (plpRfsv->devinfo(drvChar, drive) != rfsv::E_PSI_GEN_NONE) {
 		statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
 					STID_CONNECTION);
 		emit enableProgressText(false);
@@ -1194,12 +1260,12 @@ askOverwrite(PlpDirent e) {
 		       KDialogBase::Cancel, KDialogBase::No,
 		       KDialogBase::Cancel, this, "overwriteDialog", true, true,
 		       QString::null, QString::null, i18n("Overwrite &All"));
-    
+
     QWidget *contents = new QWidget(&dialog);
     QHBoxLayout * lay = new QHBoxLayout(contents);
     lay->setSpacing(KDialog::spacingHint()*2);
     lay->setMargin(KDialog::marginHint()*2);
-    
+
     lay->addStretch(1);
     QLabel *label1 = new QLabel(contents);
     label1->setPixmap(QMessageBox::standardIcon(QMessageBox::Warning,
@@ -1218,10 +1284,10 @@ askOverwrite(PlpDirent e) {
 	"  Attributes: %7</P>"
 	"Do you want to overwrite it?</QT>").arg(fn).arg(os).arg(od).arg(oa).arg(ns).arg(nd).arg(na), contents));
     lay->addStretch(1);
- 
+
     dialog.setMainWidget(contents);
     dialog.enableButtonSeparator(false);
- 
+
     int result = dialog.exec();
     switch (result) {
 	case KDialogBase::Yes:
@@ -1234,7 +1300,7 @@ askOverwrite(PlpDirent e) {
 	default: // Huh?
 	    break;
     }
- 
+
     return false; // Default
 }
 
@@ -1431,6 +1497,126 @@ slotStartFormat() {
 	return;
     formatRunning = true;
     switchActions();
+
+    killSave();
+
+    for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+	if (i->isSelected() && (i->key() != "Z")) {
+	    int handle;
+	    int count;
+	    QString drive = i->key();
+	    const char dchar = drive[0].latin1();
+	    QString dname("");
+
+	    PlpDrive drv;
+	    if (plpRfsv->devinfo(dchar - 'A', drv) == rfsv::E_PSI_GEN_NONE)
+		dname = QString(drv.getName().c_str());
+
+	    statusBar()->changeItem(i18n("Formatting drive %1:").arg(dchar),
+				    STID_CONNECTION);
+	    update();
+
+	    emit setProgressText(QString(""));
+	    emit setProgress(0);
+	    emit enableProgressText(true);
+
+	    Enum<rfsv::errs> res = plpRpcs->formatOpen(dchar, handle, count);
+	    if (res != rfsv::E_PSI_GEN_NONE) {
+		KMessageBox::error(this, i18n(
+		    "<QT>Could not format drive %1:<BR/>"
+		    "%2</QT>").arg(dchar).arg(KGlobal::locale()->translate(res)));
+		emit setProgress(0);
+		emit enableProgressText(false);
+		statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
+					STID_CONNECTION);
+		continue;
+	    }
+	    progressTotal = 0;
+	    progressLocal = count;
+	    progressLocalCount = 0;
+	    progressLocalPercent = -1;
+	    updateProgress(0);
+	    for (int i = 0; i < count; i++) {
+		updateProgress(i);
+		res = plpRpcs->formatRead(handle);
+		if (res != rfsv::E_PSI_GEN_NONE) {
+		    KMessageBox::error(this, i18n(
+			"<QT>Error during format of drive %1:<BR/>"
+			"%2</QT>").arg(dchar).arg(KGlobal::locale()->translate(res)));
+		    emit setProgress(0);
+		    emit enableProgressText(false);
+		    statusBar()->changeItem(
+			i18n("Connected to %1").arg(machineName),
+			STID_CONNECTION);
+		    count = 0;
+		    continue;
+		}
+	    }
+	    setDriveName(dchar, dname);
+	}
+    }
+
+    runRestore();
+
+    formatRunning = false;
+    switchActions();
+
+    emit setProgress(0);
+    emit enableProgressText(false);
+    statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
+			    STID_CONNECTION);
+    statusBar()->message(i18n("Format done"), 2000);
+}
+
+void KPsionMainWindow::
+setDriveName(const char dchar, QString dname) {
+    KDialogBase dialog(this, "drivenameDialog", true, i18n("Assign drive name"),
+		       KDialogBase::Ok | KDialogBase::Cancel, KDialogBase::Ok,
+		       true);
+
+    QWidget *w = new QWidget(&dialog);
+    QGridLayout *gl = new QGridLayout(w, 1, 1, KDialog::marginHint()*2,
+				      KDialog::spacingHint()*2);
+
+    QLabel *l = new QLabel(i18n(
+	"<QT>Formatting of drive %1: finished. Please assign a name for "
+	"that drive.</QT>").arg(dchar), w);
+    gl->addMultiCellWidget(l, 0, 0, 0, 1);
+
+    l = new QLabel(i18n("New name of drive %1:").arg(dchar), w);
+    gl->addWidget(l, 1, 0);
+
+    KLineEdit *e = new KLineEdit(dname, w, "nameEntry");
+    gl->addWidget(e, 1, 1);
+
+    gl->setColStretch(1, 1);
+    dialog.setMainWidget(w);
+
+    int result = dialog.exec();
+    QString newname = QString("%1:").arg(dchar);
+    QString dstr;
+    dstr = dchar;
+
+    switch (result) {
+	case QDialog::Accepted:
+	    if (!e->text().isEmpty()) {
+		Enum<rfsv::errs> res;
+		res = plpRfsv->setVolumeName(dchar, e->text());
+		if (res == rfsv::E_PSI_GEN_NONE)
+		    newname = QString("%1 (%2:)").arg(e->text()).arg(dchar);
+	    }
+	    drives.replace(dchar, newname);
+	    for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
+		if (i->key() == dstr) {
+		    i->setText(newname);
+		    break;
+		}
+	    }
+	    emit rearrangeIcons(true);
+	    break;
+	default: // Huh?
+	    break;
+    }
 }
 
 void KPsionMainWindow::
@@ -1544,6 +1730,25 @@ killSave() {
 	    emit setProgressText(i18n("Stopping %1").arg(cmdargs.getString(0)));
 	    kapp->processEvents();
 	    plpRpcs->stopProgram(pbuf);
+	}
+    }
+    time_t tstart = time(0) + 5;
+    while (true) {
+	kapp->processEvents();
+	usleep(100000);
+	kapp->processEvents();
+	if ((res = plpRpcs->queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE) {
+	    cerr << "Could not get process list, Error: " << res << endl;
+	    return;
+	}
+	if (tmp.empty())
+	    break;
+	if (time(0) > tstart) {
+	    KMessageBox::error(this, i18n(
+		"<QT>Could not stop all processes.<BR/>"
+		"Please stop running programs manually on the Psion, "
+		"then klick <B>Ok</B>."));
+	    time_t tstart = time(0) + 5;
 	}
     }
     return;

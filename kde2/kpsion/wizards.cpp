@@ -37,6 +37,7 @@
 #include <klocale.h>
 #include <kfiledialog.h>
 #include <kmessagebox.h>
+#include <kstddirs.h>
 
 #include <qlayout.h>
 #include <qwhatsthis.h>
@@ -53,13 +54,7 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
 	QWhatsThis::add(cancelButton(),
 			i18n("<QT>If you click this button, the setup of <B>KPSion</B> will be aborted and next time you start <B>KPsion</B>, it will run this setup again.</QT>"));
 
-	// Getting the users home directory from the passwd-entry is MUCH safer
-	// than getting it from $HOME !!! (Environments can be tweaked)
-	struct passwd *pw = getpwuid(getuid());
-	bdirDefault = QString((pw) ? pw->pw_dir : 0L);
-	if (bdirDefault.isEmpty())
-	    bdirDefault = QDir::homeDirPath();
-	bdirDefault += "/KPsionBackup";
+	bdirDefault = locateLocal("data", "kpsion/backups");
 	bdirCreated = "";
 
 	// Page 1

@@ -127,7 +127,7 @@ runrestore(rfsv *a, rpcs *r) {
 		return 1;
 	}
 	ip >> cmd >> arg;
-			
+
 	if (strcmp(cmd, "#plpbackup") || strcmp(arg, "processlist")) {
 		ip.close();
 		cerr << "Error: " << psfile <<
@@ -247,7 +247,7 @@ mkdirp(char *path) {
 		*p = '\0';
 		switch (mkdir(path, S_IRWXU|S_IRWXG)) {
 			struct stat stbuf;
-			
+
 			case 0:
 				break;
 			default:
@@ -346,7 +346,7 @@ main(int argc, char **argv)
 		cerr << "Could not get user's home directory from /etc/passwd" << endl;
 		exit(-1);
 	}
-	
+
 	skt = new ppsocket();
 	if (!skt->connect(NULL, sockNum)) {
 		cerr << "plpbackup: could not connect to ncpd" << endl;
@@ -395,7 +395,7 @@ main(int argc, char **argv)
 				}
 			} else
 				cout << "all drives";
-			
+
 			cout << " to " << dstPath << endl;
 		}
 		if (verbose > 0) {
@@ -415,7 +415,7 @@ main(int argc, char **argv)
 			if (a->devlist(devbits) == rfsv::E_PSI_GEN_NONE) {
 				for (i = 0; i < 26; i++) {
 					PlpDrive psidr;
-					if ((devbits & 1) && a->devinfo(i, psidr) == rfsv::E_PSI_GEN_NONE) {
+					if ((devbits & 1) && a->devinfo(i + 'A', psidr) == rfsv::E_PSI_GEN_NONE) {
 						if (psidr.getMediaType() != 7) {
 							sprintf(drive, "%c:\0", 'A' + i);
 							if (verbose > 0)

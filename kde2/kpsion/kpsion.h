@@ -168,6 +168,7 @@ signals:
     void setProgress(int, int);
     void setProgressText(const QString &);
     void enableProgressText(bool);
+    void rearrangeIcons(bool);
 
 public slots:
     void slotStartRestore();
@@ -201,6 +202,7 @@ private:
     void runRestore();
     void createIndex();
     bool askOverwrite(PlpDirent e);
+    void setDriveName(const char dchar, QString dname);
 
     rfsv *plpRfsv;
     rpcs *plpRpcs;

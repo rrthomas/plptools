@@ -406,11 +406,10 @@ long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
 
 long rfsv_statdev(char letter) {
 	PlpDrive drive;
-	u_int32_t devnum = letter - 'A';
 
 	if (!a)
 		return -1;
-	return (a->devinfo(devnum, drive) != rfsv::E_PSI_GEN_NONE);
+	return (a->devinfo(letter, drive) != rfsv::E_PSI_GEN_NONE);
 }
 
 long rfsv_rename(const char *oldname, const char *newname) {
@@ -433,7 +432,7 @@ long rfsv_drivelist(int *cnt, device **dlist) {
 			PlpDrive drive;
 
 			if ((devbits & 1) &&
-			    ((a->devinfo(i, drive) == rfsv::E_PSI_GEN_NONE))) {
+			    ((a->devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE))) {
 
 				device *next = *dlist;
 				*dlist = (device *)malloc(sizeof(device));

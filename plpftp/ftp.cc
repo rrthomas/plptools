@@ -249,7 +249,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 
 	    for (i = 0; i < 26; i++) {
 		PlpDrive drive;
-		if ((devbits & 1) && a.devinfo(i, drive) == rfsv::E_PSI_GEN_NONE) {
+		if ((devbits & 1) && a.devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE) {
 		    defDrive[0] = 'A' + i;
 		    break;
 		}
@@ -419,7 +419,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		    PlpDrive drive;
 
 		    if ((devbits & 1) != 0) {
-			if (a.devinfo(i, drive) == rfsv::E_PSI_GEN_NONE)
+			if (a.devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE)
 			    cout << (char) ('A' + i) << "     " <<
 				hex << setw(4) << setfill('0') << drive.getMediaType() << " " <<
 				setw(12) << setfill(' ') << setiosflags(ios::left) <<
