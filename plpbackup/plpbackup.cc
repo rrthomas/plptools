@@ -175,7 +175,7 @@ generateBackupName()
         }
     }
     strftime(tstr, sizeof(tstr), "-%Y-%m-%d-%H-%M-%S", localtime(&now));
-    sprintf(nbuf, "%s/plpbackup/%16llx/%c%s.tar.gz", getHomeDir(),
+    sprintf(nbuf, "%s/plpbackup/%016llx/%c%s.tar.gz", getHomeDir(),
 	    machineUID, full ? 'F' : 'I', tstr);
     return nbuf;
 }
