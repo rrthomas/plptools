@@ -1,3 +1,5 @@
+/* $Id$
+ */
 #ifndef _mp_serial_h
 #define _mp_serial_h
 

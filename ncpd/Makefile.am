@@ -1,3 +1,5 @@
+# $Id$
+#
 INCLUDES=-I../lib
 
 HERE=$(shell pwd)
