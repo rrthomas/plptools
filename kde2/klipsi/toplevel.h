@@ -80,7 +80,7 @@ private:
     void getClipData();
     void closeConnection();
     bool checkConnection();
-    QImage *decode_image(unsigned char *);
+    QImage *decode_image(const unsigned char *);
 
     QClipboard  *clip;
     KPopupMenu  *menu;

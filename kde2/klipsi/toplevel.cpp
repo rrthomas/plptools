@@ -36,6 +36,7 @@
 #include <kdebug.h>
 #include <kmessagebox.h>
 
+#include <psibitmap.h>
 
 #define QUIT_ITEM    50
 #define CLIPFILE "C:/System/Data/Clpboard.cbd"
@@ -351,6 +352,14 @@ putClipText(char *data) {
 	closeConnection();
 }
 
+static QImage *putImage;
+
+static int
+getGrayPixel(int x, int y)
+{
+    return qGray(putImage->pixel(x, y));
+}
+
 void TopLevel::
 putClipImage(QImage &img) {
     Enum<rfsv::errs> res;
@@ -383,96 +392,8 @@ putClipImage(QImage &img) {
 
 	// Data
 	bufferStore ib;
-	int wx = img.width();
-	int wy = img.height();
-
-	ib.addDWord(0x00000028);   // hdrlen
-	ib.addDWord(wx);           // xPixels
-	ib.addDWord(wy);           // yPixels
-	ib.addDWord(0);            // xTwips (unspecified)
-	ib.addDWord(0);            // yTwips (unspecified)
-	ib.addDWord(2);            // bitsPerPixel
-	ib.addDWord(0);            // unknown1
-	ib.addDWord(0);            // unknown2
-	ib.addDWord(0);            // RLEflag
-
-
-	bufferStore rawBuf;
-	for (int y = 0; y < wy; y++) {
-	    int ov = 0;
-	    int shift = 0;
-	    int bc = 0;
-
-	    for (int x = 0; x < wx; x++) {
-		int v = qGray(img.pixel(x, y)) / 85;
-		ov |= (v << shift);
-		if (shift == 6) {
-		    rawBuf.addByte(ov);
-		    bc++;
-		    shift = 0;
-		    ov = 0;
-		} else
-		    shift += 2;
-	    }
-	    if (shift != 0) {
-		rawBuf.addByte(ov);
-		shift = 0;
-		ov = 0;
-		bc++;
-	    }
-	    while (bc % 4) {
-		rawBuf.addByte(0);
-		bc++;
-	    }
-	}
-
-#if 1
-	ib.addBuff(rawBuf);
-#else
-  TODO: RLE encoding
-
-	int rawLen = rawBuf.getLen();
-	int eqCount = 1;
-	int lastByte = rawBuf.getByte(0);
-	bufferStore diBuf;
-
-	for (int i = 1; i <= rawLen; i++) {
-	    int v;
-	    if (i < rawLen)
-		v = rawBuf.getByte(i);
-	    else
-		v = lastByte + 1;
-	    if (v == lastByte) {
-		if (diBuf.getLen()) {
-		    ib.addByte(0x100 - diBuf.getLen());
-		    ib.addBuff(diBuf);
-		    diBuf.init();
-		}
-		eqCount++;
-		if (eqCount > 0x7f) {
-		    ib.addByte(0x7f);
-		    ib.addByte(v);
-		    eqCount = 1;
-		}
-	    } else {
-		if (eqCount > 1) {
-		    ib.addByte(eqCount);
-		    ib.addByte(lastByte);
-		    eqCount = 1;
-		} else {
-		    diBuf.addByte(lastByte);
-		    if ((diBuf.getLen() > 0x7f) || (i == rawLen)) {
-			ib.addByte(0x100 - diBuf.getLen());
-			ib.addBuff(diBuf);
-			diBuf.init();
-		    }
-		}
-	    }
-	    lastByte = v;
-	}
-#endif
-
-	b.addDWord(ib.getLen() + 4);
+	putImage = &img;
+	encodeBitmap(img.width(), img.height(), getGrayPixel, false, ib);
 	b.addBuff(ib);
 
 	p = (const unsigned char *)b.getString(0);
@@ -483,106 +404,24 @@ putClipImage(QImage &img) {
 	closeConnection();
 }
 
-#define splitByte(v)                                \
-do {                                                \
-    int j;                                          \
-                                                    \
-    if (x < bytesPerLine)                           \
-	for (j = 0; j < pixelsPerByte; j++) {       \
-	    if (j && ((oidx % xPixels) == 0))       \
-		break;                              \
-	    else                                    \
-              if (oidx >= picsize)                  \
-		return 0;                           \
-	    else {                                  \
-		out.addByte((v & mask) * grayVal);  \
-                v >>= bitsPerPixel;                 \
-		oidx++;                             \
-	    }                                       \
-	}                                           \
-    if (++x >= linelen)                             \
-	x = 0;                                      \
-} while (0)
-
 QImage *TopLevel::
-decode_image(unsigned char *p)
+decode_image(const unsigned char *p)
 {
     bufferStore out;
-    u_int32_t totlen = *((u_int32_t*)p); p += 4;
-    u_int32_t hdrlen = *((u_int32_t*)p); p += 4;
-    u_int32_t datlen = totlen - hdrlen;
-    u_int32_t xPixels = *((u_int32_t*)p); p += 4;
-    u_int32_t yPixels = *((u_int32_t*)p); p += 4;
-    u_int32_t xTwips = *((u_int32_t*)p); p += 4;
-    u_int32_t yTwips = *((u_int32_t*)p); p += 4;
-    u_int32_t bitsPerPixel = *((u_int32_t*)p); p += 4;
-    u_int32_t unknown1 = *((u_int32_t*)p); p += 4;
-    u_int32_t unknown2 = *((u_int32_t*)p); p += 4;
-    u_int32_t RLEflag = *((u_int32_t*)p); p += 4;
+    bufferStore hout;
+    QImage *img = 0L;
+    int xPixels;
+    int yPixels;
+
+    if (!decodeBitmap(p, xPixels, yPixels, out))
+	return img;
 
     QString hdr = QString("P5\n%1 %2\n255\n").arg(xPixels).arg(yPixels);
-    out.addString(hdr.latin1());
+    hout.addString(hdr.latin1());
+    hout.addBuff(out);
 
-    u_int32_t picsize = xPixels * yPixels;
-    u_int32_t linelen;
-    int pixelsPerByte = (8 / bitsPerPixel);
-    int nColors = 1 << bitsPerPixel;
-    int grayVal = 255 / (nColors - 1);
-    int bytesPerLine = (xPixels + pixelsPerByte - 1) / pixelsPerByte;
-    int mask = (bitsPerPixel << 1) - 1;
-
-    int oidx = 0;
-    int x = 0;
-    int y = 0;
-    int offset = 0;
-
-    if (RLEflag) {
-	int i = 0;
-
-	while (offset < datlen) {
-	    unsigned char b = *(p + offset);
-	    if (b >= 0x80) {
-		offset += 0x100 - b + 1;
-		i += 0x100 - b;
-	    } else {
-		offset += 2;
-		i += b + 1;
-	    }
-	}
-	linelen = i / yPixels;
-	offset = 0;
-	while (offset < datlen) {
-	    unsigned char b = *(p + offset++);
-	    if (b >= 0x80) {
-		for (i = 0; i < 0x100 - b; i++, offset++) {
-		    if (offset >= datlen)
-			return 0; // data corrupted
-		    unsigned char b2 = *(p + offset);
-		    splitByte(b2);
-		}
-	    } else {
-		if (offset >= datlen)
-		    return 0;
-		else {
-		    unsigned char b2 = *(p + offset);
-		    unsigned char bs = b2;
-		    for (i = 0; i <= b; i++) {
-			splitByte(b2);
-			b2 = bs;
-		    }
-		}
-		offset++;
-	    }
-	}
-    } else {
-	linelen = datlen / yPixels;
-	while (offset < datlen) {
-	    unsigned char b = *(p + offset++);
-	    splitByte(b);
-	}
-    }
-    QImage *img = new QImage(xPixels, yPixels, 8);
-    if (!img->loadFromData((const uchar *)out.getString(0), out.getLen())) {
+    img = new QImage(xPixels, yPixels, 8);
+    if (!img->loadFromData((const uchar *)hout.getString(0), hout.getLen())) {
 	delete img;
 	img = 0L;
     }
@@ -658,7 +497,7 @@ getClipData() {
 			    p = buf + *td;
 			    if (clipImg)
 				delete clipImg;
-			    clipImg = decode_image((unsigned char *)p);
+			    clipImg = decode_image((const unsigned char *)p);
 			}
 			td++;
 			lcount -= 2;
