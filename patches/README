@@ -12,5 +12,18 @@ used the following login.conf for mgetty:
 /PLP/   -       -       /usr/sbin/ncpd -d -e
 *       -       -       /bin/login @
 
-
 -- MJG
+
+linux-2.2.18-ttytap.patch is a patch for linux 2.2.18 adding a ttytap feature.
+It enables you to sniff all data going in/out over a serial line. I use this
+for sniffing communication between the Psion and a PsiWin running under Win98
+in a vmware virtual machine. After applying this patch, you will find a new
+option "Tty tapping" in the Section "Character devices" of the kernel
+configuration. Enable this option and rebuild/install the kernel as usual.
+When running the new kernel, you will find a new pseudo-device /proc/ttytap.
+It implements various ioctl's and read. The userlevel program for dealing
+with it can be found in etc/ttytap.c. Compile that and then run it e.g.:
+ttytap /dev/ttyS0
+
+-Fritz
+

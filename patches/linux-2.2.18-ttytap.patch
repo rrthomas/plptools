@@ -1,0 +1,279 @@
+--- linux/drivers/char/tty_io.c	Mon Dec 11 01:49:42 2000
++++ linux-2.2.16/drivers/char/tty_io.c	Tue Jan 30 17:49:00 2001
+@@ -145,6 +145,168 @@
+ #define MIN(a,b)	((a) < (b) ? (a) : (b))
+ #endif
+ 
++#ifdef CONFIG_TTYTAP
++
++#include <linux/skbuff.h>
++#include <linux/ttytap.h>
++
++static int tap_major = 0;
++static int tap_minor = 0;
++static int tap_overrun = 0;
++static int tap_qmax = 1024;
++static int tap_used = 0;
++
++typedef struct {
++	struct sk_buff *skb;
++} tap_info;
++
++static struct sk_buff_head tap_queue;
++static struct wait_queue *tap_waitq;
++
++static void record_tap(int io, const char *buf, int len) {
++	struct sk_buff *skb = (struct sk_buff *)dev_alloc_skb(len + sizeof(tapheader));
++	tapheader th;
++
++	if (!skb) {
++		printk(KERN_WARNING "Out of memory in serial record_tap\n");
++		return;
++	}
++	if (skb_queue_len(&tap_queue) > tap_qmax) {
++		tap_overrun = TTYTAP_OVERRUN;
++		dev_kfree_skb(skb);
++		return;
++	}
++	th.io = io | tap_overrun;
++	tap_overrun = 0;
++	th.len = len;
++	th.stamp = xtime;
++	memcpy(skb_put(skb, sizeof(tapheader)), &th, sizeof(tapheader));
++	copy_from_user(skb_put(skb, len), buf, len);
++	skb_queue_tail(&tap_queue, skb);
++	wake_up_interruptible(&tap_waitq);
++}
++
++static ssize_t tap_read(struct file *file, char *buf, size_t count, loff_t *off)
++{
++	tap_info *info = (tap_info *) file->private_data;
++	int rcount = 0;
++
++	if (off != &file->f_pos)
++		return -ESPIPE;
++
++	while (!(info->skb || (info->skb = skb_dequeue(&tap_queue)))) {
++		if (file->f_flags & O_NONBLOCK)
++			return -EAGAIN;
++		interruptible_sleep_on(&tap_waitq);
++		if (signal_pending(current))
++			return -ERESTARTSYS;
++	}
++	while (count > 0) {
++		int len;
++
++		if (!info->skb)
++			info->skb = skb_dequeue(&tap_queue);
++		if (!info->skb)
++			break;
++		len = (info->skb->len > count) ? count : info->skb->len;
++		if (len > 0) {
++			if (copy_to_user(buf, info->skb->data, len))
++				return -EFAULT;
++			skb_pull(info->skb, len);
++			buf += len;
++			rcount += len;
++			count -= len;
++			if (info->skb->len == 0) {
++				kfree_skb(info->skb);
++				info->skb = NULL;
++			}
++		} else
++			break;
++	}
++	return rcount;
++}
++
++static int tap_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
++{
++	int v;
++
++	switch (cmd) {
++		case TTYTAP_SETDEV:
++			tap_major = (arg >> 8) & 255;
++			tap_minor = arg & 255;
++			if ((tap_major == 0) && (tap_minor == 0)) {
++				skb_queue_purge(&tap_queue);
++				tap_overrun = 0;
++			}
++			return 0;
++		case TTYTAP_GETDEV:
++			v = (tap_major << 8) | tap_minor;
++			if (copy_to_user((char *)arg, &v, sizeof(v)))
++				return -EFAULT;
++			return 0;
++		case TTYTAP_SETQLEN:
++			tap_qmax = arg;
++			return 0;
++		case TTYTAP_GETQLEN:
++			if (copy_to_user((char *)arg, &tap_qmax, sizeof(tap_qmax)))
++				return -EFAULT;
++			return 0;
++	}
++	return -EINVAL;
++}
++
++static int tap_open(struct inode *inode, struct file *file)
++{
++	tap_info *info;
++
++	if (test_and_set_bit(0, &tap_used))
++		return -EBUSY;
++	info = kmalloc(sizeof(tap_info), GFP_KERNEL);
++	if (!info) {
++		clear_bit(0, &tap_used);
++		return -ENOMEM;
++	}
++	memset(info, 0, sizeof(tap_info));
++	file->private_data = (void *)info;
++	return 0;
++}
++
++static int tap_close(struct inode *inode, struct file *file)
++{
++	tap_info *info = (tap_info *)file->private_data;
++	if (info->skb)
++		kfree_skb(info->skb);
++	kfree(info);
++	clear_bit(0, &tap_used);
++	return 0;
++}
++
++static struct file_operations tap_fops = {
++	NULL,		/* lseek */
++	tap_read,	/* read  */
++	NULL,		/* write */
++	NULL,		/* readdir */
++	NULL,		/* poll */
++	tap_ioctl,	/* ioctl */
++	NULL,		/* mmap */
++	tap_open,	/* open */
++	NULL,		/* flush */
++	tap_close,	/* close */
++	NULL,		/* fsync */
++};
++
++static struct inode_operations tap_iops = {
++	&tap_fops,
++};
++
++static struct proc_dir_entry tap_entry = {
++	0, 6, "ttytap",
++	S_IFREG | S_IRUSR | S_IWUSR, 1, 0, 0,
++	0, &tap_iops,
++};
++
++#endif
++
+ /*
+  * This routine returns the name of tty.
+  */
+@@ -649,6 +811,11 @@
+ 		i = -EIO;
+ 	if (i > 0)
+ 		inode->i_atime = CURRENT_TIME;
++#ifdef CONFIG_TTYTAP
++	if ((MAJOR(inode->i_rdev) == tap_major) &&
++	    (MINOR(inode->i_rdev) == tap_minor) && (i > 0))
++		record_tap(TTYTAP_IN, buf, i);
++#endif
+ 	return i;
+ }
+ 
+@@ -709,6 +876,9 @@
+ 	int is_console;
+ 	struct tty_struct * tty;
+ 	struct inode *inode;
++#ifdef CONFIG_TTYTAP
++	ssize_t ret;
++#endif
+ 
+ 	/* Can't seek (pwrite) on ttys.  */
+ 	if (ppos != &file->f_pos)
+@@ -743,8 +913,19 @@
+ #endif
+ 	if (!tty->ldisc.write)
+ 		return -EIO;
++#ifdef CONFIG_TTYTAP
++	ret = do_tty_write(tty->ldisc.write, tty, file,
++			    (const unsigned char *)buf, count);
++#else
+ 	return do_tty_write(tty->ldisc.write, tty, file,
+ 			    (const unsigned char *)buf, count);
++#endif
++#ifdef CONFIG_TTYTAP
++	if ((MAJOR(inode->i_rdev) == tap_major) &&
++	    (MINOR(inode->i_rdev) == tap_minor) && (ret > 0))
++		record_tap(TTYTAP_OUT, buf, ret);
++	return ret;
++#endif
+ }
+ 
+ /* Semaphore to protect creating and releasing a tty */
+@@ -2243,6 +2424,11 @@
+ #endif	
+ #ifdef CONFIG_VT
+ 	vcs_init();
++#endif
++#ifdef CONFIG_TTYTAP
++	skb_queue_head_init(&tap_queue);
++	clear_bit(0, &tap_used);
++	proc_register(&proc_root, &tap_entry);
+ #endif
+ 	return 0;
+ }
+--- linux/include/linux/ttytap.h	Thu Jan  1 01:00:00 1970
++++ linux-2.2.16/include/linux/ttytap.h	Mon Sep 11 08:47:09 2000
+@@ -0,0 +1,19 @@
++#ifndef _TTYTAP_H_
++#define _TTYTAP_H_
++
++#define TTYTAP_IN      0
++#define TTYTAP_OUT     1
++#define TTYTAP_OVERRUN 2
++
++#define TTYTAP_SETDEV	_IO('T', 1)
++#define TTYTAP_GETDEV	_IO('T', 2)
++#define TTYTAP_SETQLEN	_IO('T', 3)
++#define TTYTAP_GETQLEN	_IO('T', 4)
++
++typedef struct {
++	int io;
++	int len;
++	struct timeval stamp;
++} tapheader;
++
++#endif
+--- linux/Documentation/Configure.help	Mon Dec 11 01:49:41 2000
++++ linux-2.2.16/Documentation/Configure.help	Tue Jan 30 17:55:33 2001
+@@ -13506,6 +13506,19 @@
+   another UltraSPARC-IIi-cEngine boardset with digital display,
+   you should say N to this option.
+    
++Tty tapping
++CONFIG_TTYTAP
++  Enable this if you want to analyze traffic on serial lines.
++  You will get a special file /proc/ttytap which can be used
++  from userlevel to record all data that goes thru a specified
++  tty.
++  
++  WARNING:
++  Although /proc/ttytap is readable by root only, on multi-user
++  systems, this may be a security hole since root has the ability
++  to easily grab anything (including passwords) that was typed at
++  any tty. Users who care about security, therefore should say N here.
++  
+ #
+ # A couple of things I keep forgetting:
+ #   capitalize: AppleTalk, Ethernet, DOS, DMA, FAT, FTP, Internet, 
+--- linux/drivers/char/Config.in	Mon Dec 11 01:49:41 2000
++++ linux-2.2.16/drivers/char/Config.in	Tue Jan 30 17:57:25 2001
+@@ -5,6 +5,7 @@
+ comment 'Character devices'
+ 
+ bool 'Virtual terminal' CONFIG_VT
++bool 'Tty tapping' CONFIG_TTYTAP
+ if [ "$CONFIG_VT" = "y" ]; then
+   bool 'Support for console on virtual terminal' CONFIG_VT_CONSOLE
+ fi
