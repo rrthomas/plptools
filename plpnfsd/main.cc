@@ -116,7 +116,7 @@ long rfsv_fcreate(long attr, const char *file, long *handle) {
 long rfsv_read(char *buf, long offset, long len, long handle) {
 	if (!a)
 		return -1;
-	long ret = a->fseek(handle, offset, rfsv32::PSEEK_SET);
+	long ret = a->fseek(handle, offset, rfsv32::PSI_SEEK_SET);
 	if (ret >= 0)
 		ret = a->fread(handle, buf, len);
 	return ret;
@@ -125,7 +125,7 @@ long rfsv_read(char *buf, long offset, long len, long handle) {
 long rfsv_write(char *buf, long offset, long len, long handle) {
 	if (!a)
 		return -1;
-	long ret = a->fseek(handle, offset, rfsv32::PSEEK_SET);
+	long ret = a->fseek(handle, offset, rfsv32::PSI_SEEK_SET);
 	if (ret >= 0)
 		ret = a->fwrite(handle, buf, len);
 	return ret;
@@ -141,7 +141,7 @@ long rfsv_setsize(const char *name, long size) {
 	if (!a)
 		return -1;
 	long ph;
-	long ret = a->fopen(0x200, name, ph);
+	long ret = a->fopen(rfsv32::PSI_OMODE_READ_WRITE, name, ph);
 	if (!ret) {
 		ret = a->fsetsize(ph, size);
 		a->fclose(ph);
