@@ -48,7 +48,15 @@
 %define _kdelibdir %{_kdedir}/lib
 %define _kdedatadir %{_kdedir}/share
 %define realrelease %{myrelease}%{distro}
+
+#
+# Conditionals
+#
 %{?_without_distro: %define realrelease %{myrelease}}
+%{?_with_debug: %define __spec_install_post /usr/lib/rpm/brp-compress}
+%{?_with_debug: %define _with_debug --enable-debug}
+%{?_with_debug: %define optflags -g}
+%{!?_with_debug: %define _with_debug --disable-debug}
 
 Summary: Connectivity for psion series 5.
 Name: plptools
@@ -63,7 +71,6 @@ Group: Networking/Utilities
 Buildrequires: readline-devel newt-devel kdelibs-devel >= 2.1
 %if "%{isSUSE}" > "0"
 %if "%{REL}" >= "8.0"
-# aaa_base provides chkconfig
 Requires: aaa_base >= 2002.3.27-0
 %else
 Requires: aaa_base >= 2001.10.19-1
@@ -184,15 +191,37 @@ zwischen Psion und Rechner.
 
 %prep
 %setup -q
+%if "%{isSUSE}" > "0"
+# SuSE's depencies are pretty broken. Example: For the KDE stuff,
+# RPM's automatic find-requires generates a depency to libGLcore
+# if the build-system has Nvidia drivers installed. Our KDE stuff
+# definitively does NOT depend on it!
+# Therefore, we filter some unnecessary stuff out:
+cat<<EOF>find-requires
+#!/bin/sh
+%{__find_requires} "$@" |egrep -v 'libGL|freetype|libfam'
+EOF
+chmod a+x find-requires
+%define __find_requires %{_builddir}/%{buildsubdir}/find-requires
+%endif
+%if "%{isMDK}" > "0"
+# Mandrake's RPM generates similar odd depencies.
+cat<<EOF>find-requires
+#!/bin/sh
+%{__find_requires} "$@" |egrep -v 'libGL|freetype'
+EOF
+chmod a+x find-requires
+%define __find_requires %{_builddir}/%{buildsubdir}/find-requires
+%endif
 
 %build
 %if "%{isSUSE}" > "0"
 # SuSE's libtools are breaking everything
 %define __libtoolize true
 %if "%{REL}" >= "8.0"
-%configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde3
+%configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde3 %{_with_debug}
 %else
-%configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde2
+%configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde2 %{_with_debug}
 %endif
 %endif
 %if "%{isMDK}" > "0"
@@ -203,7 +232,7 @@ zwischen Psion und Rechner.
 %endif
 %if "%{isRH}" > "0"
 QD=%{_qtdir}
-%configure --enable-kde $QD --with-initdir=%{_initrddir}
+%configure --enable-kde $QD --with-initdir=%{_initrddir} %{_with_debug}
 %endif
 make
 

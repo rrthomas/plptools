@@ -18,13 +18,13 @@ lib_LTLIBRARIES = klipsi.la
 
 CLEANFILES = dummy.cpp
 
-klipsi_la_LIBADD = -L$(top_srcdir)/lib/.libs $(top_srcdir)/lib/libplp.la $(LIB_KDEUI)
+klipsi_la_LIBADD = $(LIB_PLP) $(LIB_KDEUI)
 klipsi_la_SOURCES = main.cpp toplevel.cpp
-klipsi_la_LDFLAGS = $(all_libraries) -module -avoid-version
+klipsi_la_LDFLAGS = $(PLP_LDFLAGS) $(KDE_LDFLAGS) $(LIBDEBUG) -module $(KDE_MODULE)
 
 klipsi_LDADD = klipsi.la
 klipsi_SOURCES = dummy.cpp
-klipsi_LDFLAGS = $(all_libraries) $(KDE_RPATH)
+klipsi_LDFLAGS = $(KDE_RPATH)
 
 
 applnkdir = $(kde_appsdir)/Utilities

@@ -3,7 +3,7 @@
 INCLUDES=-I$(top_srcdir)/lib
 
 sbin_PROGRAMS = plpnfsd
-plpnfsd_LDADD = $(top_srcdir)/lib/libplp.la
+plpnfsd_LDADD = $(LIB_PLP)
 plpnfsd_SOURCES = mp_main.c mp_mount.c nfs_prot_svc.c nfs_prot_xdr.c \
 	mp_pfs_ops.c mp_inode.c main.cc
 

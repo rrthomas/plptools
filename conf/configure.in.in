@@ -265,6 +265,11 @@ AC_ARG_WITH(initdir,
 )
 AC_SUBST(initdir)
 
+LIB_PLP='$(top_builddir)/lib/libplp.la'
+AC_SUBST(LIB_PLP)
+PLP_LDFLAGS='-L$(top_builddir)/lib/.libs'
+AC_SUBST(PLP_LDFLAGS)
+
 dnl KDE stuff
 PLP_HELP_MSG([Options for activating sub packages:])
 ac_enable_kde=no

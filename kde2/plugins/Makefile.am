@@ -1,17 +1,16 @@
 
 INCLUDES = $(all_includes) -I$(top_srcdir)/lib
-LDFLAGS  = $(all_libraries)
 
 kdemoduledir = $(kde_moduledir)
 kdemodule_LTLIBRARIES = libplpprops.la
-
-libplpprops_la_LDFLAGS = $(LIBDEBUG) $(all_libraries) $(KDE_PLUGIN)
 
 METASOURCES = AUTO
 
 libplpprops_la_SOURCES = plpprops.cc plppropsFactory.cc pie3dpiece.cpp \
 	pie3dwidget.cpp
-libplpprops_la_LIBADD = -L$(top_srcdir)/lib/.libs $(top_srcdir)/lib/libplp.la $(LIB_KIO) $(LIB_KFILE)
+libplpprops_la_LIBADD = $(LIB_PLP) $(LIB_KIO) $(LIB_KFILE)
+libplpprops_la_LDFLAGS = $(PLP_LDFLAGS) $(KDE_LDFLAGS) $(LIBDEBUG) $(KDE_PLUGIN)
+
 noinst_HEADERS = plpprops.h plppropsFactory.h pie3dpiece.h pie3dwidget.h
 
 services_DATA = plpprops.desktop
