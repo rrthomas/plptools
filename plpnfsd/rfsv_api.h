@@ -2,6 +2,8 @@
  *
  * C API for rfsv
  *
+ * Copyright (C) 1999 Fritz Elfert <felfert@to.com>
+ *
  */
 #ifndef _rfsv_api_h_
 #define _rfsv_api_h_

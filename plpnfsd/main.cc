@@ -1,7 +1,9 @@
+// $Id$
 //
 //  PLP - An implementation of the PSION link protocol
 //
 //  Copyright (C) 1999  Philip Proudman
+//  plptools extensions: Copyright (C) 1999 Fritz Elfert <felfert@to.com>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by

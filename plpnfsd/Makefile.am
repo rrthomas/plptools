@@ -1,3 +1,5 @@
+# $Id$
+#
 INCLUDES=-I../lib
 
 sbin_PROGRAMS = plpnfsd

@@ -1,3 +1,11 @@
+/* $Id$
+ *
+ * Original version of this file from p3nfsd-5.4 by
+ * Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
+ *
+ * Modifications for plputils by Fritz Elfert <felfert@to.com>
+ *
+ */
 #include <stdio.h>
 #include "nfs_prot.h"
 #include "mp.h"
