@@ -1,7 +1,9 @@
 Makefile.in
 Makefile
+Makevars
 stamp-cat-id
 POTFILES
 *.c
 *.gmo
 *.pot
+*.sed

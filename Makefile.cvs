@@ -3,6 +3,8 @@ AUTOMAKEFILES = conf/mkinstalldirs conf/missing conf/install-sh
 CONFIGHIN = include/config.h.in
 ACLOCAL = conf/aclocal.m4
 GETTEXT = intl/Makefile.in
+GETTEXTSHIT = Makefile.am.in configure.in.in
+GV = $(shell gettextize --version|head -1|cut -d ' ' -f4|cut -d. -f2)
 
 all:
 	@echo "Use make devel for development, make dist for distribution"
@@ -33,7 +35,7 @@ htmldoc:
 	done
 
 $(ACLOCAL):
-	aclocal -I conf/m4/plptools -I conf/m4/kde
+	aclocal -I conf/m4/plptools -I conf/m4/kde $(M4SUB)
 
 $(CONFIGHIN): acconfig.h configure.in
 	autoheader
@@ -41,8 +43,17 @@ $(CONFIGHIN): acconfig.h configure.in
 $(LIBTOOLFILES):
 	libtoolize --force
 
-$(GETTEXT): $(ACLOCAL)
-	echo n | gettextize -f
+$(GETTEXT): $(GETTEXTSHIT)
+ifeq ($(GV),11)
+	cp configure.in.in configure.in
+	cp Makefile.am.in Makefile.am
+	mkdir -p intl
+	echo n | gettextize --force --intl --no-changelog
+	cp po/Makevars.template po/Makevars
+	rm -f ChangeLog *~
+else
+	echo n | gettextize $(GP)
+endif
 	-test -f po/ChangeLog~ && mv -f po/ChangeLog~ po/ChangeLog
 
 $(AUTOMAKEFILES): $(ACLOCAL) $(CONFIGHIN)

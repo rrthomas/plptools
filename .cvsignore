@@ -8,5 +8,6 @@ config.cache
 config.log
 plptools-*.tar.gz
 intl
+m4
 .vimsession
 .emacs.desktop

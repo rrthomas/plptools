@@ -25,6 +25,7 @@ TMPDEST=
 #
 maintainer-clean-local:
 	rm -f configure aclocal.m4 Makefile.in libtool \
+	Makefile.am configure.in \
 	conf/config.guess conf/config.sub conf/install-sh conf/ltconfig \
 	conf/ltmain.sh conf/missing conf/mkinstalldirs \
 	etc/*.spec ABOUT-NLS
