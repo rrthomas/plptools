@@ -41,13 +41,13 @@
 #include <sys/stat.h>
 #include <signal.h>
 
-#include "intl.h"
+#include <plpintl.h>
+#include <rfsv.h>
+#include <rpcs.h>
+#include <bufferarray.h>
+#include <bufferstore.h>
+#include <Enum.h>
 #include "ftp.h"
-#include "rfsv.h"
-#include "rpcs.h"
-#include "bufferarray.h"
-#include "bufferstore.h"
-#include "Enum.h"
 
 #if HAVE_LIBREADLINE
 extern "C"  {
