@@ -106,6 +106,7 @@ protected:
 private:
   SOCKET m_Socket;
   struct sockaddr m_HostAddr, m_PeerAddr;
+  int m_Port;
   bool   m_Bound;
 #ifdef WIN32
   OVERLAPPED m_ReadOverlapped, m_WriteOverlapped;

@@ -38,26 +38,39 @@
 rfsv32::rfsv32(ppsocket * _skt) : serNum(0)
 {
 	skt = _skt;
-	bufferStore a;
-	status = DISCONNECTED;
-	a.addStringT(getConnectName());
-	if (skt->sendBufferStore(a)) {
-		if (skt->getBufferStore(a) == 1) {
-			if (strcmp(a.getString(0), "Ok"))
-				cerr << "Not got ok over socket\n";
-			else
-				status = NONE;
-		}
-	}
+	reset();
 }
 
 rfsv32::~rfsv32()
 {
 	bufferStore a;
 	a.addStringT("Close");
-	if (status == NONE)
+	if (status == PSI_ERR_NONE)
 		skt->sendBufferStore(a);
 	skt->closeSocket();
+}
+
+void rfsv32::
+reconnect()
+{
+	skt->closeSocket();
+	skt->reconnect();
+	serNum = 0;
+	reset();
+}
+
+void rfsv32::
+reset()
+{
+	bufferStore a;
+	status = PSI_ERR_DISCONNECTED;
+	a.addStringT(getConnectName());
+	if (skt->sendBufferStore(a)) {
+		if (skt->getBufferStore(a) == 1) {
+			if (!strcmp(a.getString(0), "Ok"))
+				status = PSI_ERR_NONE;
+		}
+	}
 }
 
 long rfsv32::
@@ -88,8 +101,8 @@ fopen(long attr, const char *name, long &handle)
 	convertSlash(name);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(OPEN_FILE, a);
-
+	if (!sendCommand(OPEN_FILE, a))
+		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
 	if (!res && a.getLen() == 4) {
 		handle = a.getDWord(0);
@@ -102,7 +115,8 @@ long rfsv32::
 mktemp(long *handle, char *tmpname)
 {
 	bufferStore a;
-	sendCommand(TEMP_FILE, a);
+	if (!sendCommand(TEMP_FILE, a))
+		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
 	if (res == 0) {
 		*handle = a.getDWord(0);
@@ -119,7 +133,8 @@ fcreatefile(long attr, const char *name, long &handle)
 	convertSlash(name);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(CREATE_FILE, a);
+	if (!sendCommand(CREATE_FILE, a))
+		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
 	if (!res && a.getLen() == 4)
 		handle = a.getDWord(0);
@@ -134,7 +149,8 @@ freplacefile(long attr, const char *name, long &handle)
 	a.addDWord(attr);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(REPLACE_FILE, a);
+	if (!sendCommand(REPLACE_FILE, a))
+		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
 	if (!res && a.getLen() == 4)
 		handle = a.getDWord(0);
@@ -149,7 +165,8 @@ fopendir(long attr, const char *name, long &handle)
 	a.addDWord(attr);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(OPEN_DIR, a);
+	if (!sendCommand(OPEN_DIR, a))
+		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
 	if (!res && a.getLen() == 4)
 		handle = a.getDWord(0);
@@ -161,7 +178,8 @@ fclose(long handle)
 {
 	bufferStore a;
 	a.addDWord(handle);
-	sendCommand(CLOSE_HANDLE, a);
+	if (!sendCommand(CLOSE_HANDLE, a))
+		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
 }
 
@@ -204,14 +222,15 @@ long rfsv32::
 dir(const char *name, bufferArray * files)
 {
 	long handle;
-	long res = fopendir(HIDDEN | SYSTEM | DIRECTORY, name, handle);
+	long res = fopendir(PSI_ATTR_HIDDEN | PSI_ATTR_SYSTEM | PSI_ATTR_DIRECTORY, name, handle);
 	if (res != 0)
 		return res;
 
 	while (1) {
 		bufferStore a;
 		a.addDWord(handle);
-		sendCommand(READ_DIR, a);
+		if (!sendCommand(READ_DIR, a))
+			return PSI_ERR_DISCONNECTED;
 		res = getResponse(a);
 		if (res)
 			break;
@@ -229,44 +248,23 @@ dir(const char *name, bufferArray * files)
 			long date = micro2time(modHi, modLow);
 
 			bufferStore s;
-			if (!files) {
-				char dateBuff[100];
-				struct tm *t;
-				t = localtime(&date);
-				strftime(dateBuff, 100, "%c", t);
-				cout << ((attributes & DIRECTORY) ? "d" : "-");
-				cout << ((attributes & READ_ONLY) ? "-" : "w");
-				cout << ((attributes & HIDDEN) ? "h" : "-");
-				cout << ((attributes & SYSTEM) ? "s" : "-");
-				cout << ((attributes & ARCHIVE) ? "a" : "-");
-				cout << ((attributes & VOLUME) ? "v" : "-");
-				cout << ((attributes & NORMAL) ? "n" : "-");
-				cout << ((attributes & TEMPORARY) ? "t" : "-");
-				cout << ((attributes & COMPRESSED) ? "c" : "-");
-				cout << " " << dec << setw(10) << setfill(' ') << size;
-				cout << " " << dateBuff;
-			} else {
-				s.addDWord(date);
-				s.addDWord(size);
-				s.addDWord(attributes);
-			}
+			s.addDWord(date);
+			s.addDWord(size);
+			s.addDWord(attributes);
 			int d = 36;
 			for (int i = 0; i < longLen; i++, d++)
 				s.addByte(a.getByte(d));
 			s.addByte(0);
 			while (d % 4)
 				d++;
-			if (!files)
-				cout << " " << s.getString() << endl;
-			else /* if ((attributes & DIRECTORY) == 0) */
-				files->pushBuffer(s);
+			files->pushBuffer(s);
 			d += shortLen;
 			while (d % 4)
 				d++;
 			a.discardFirstBytes(d);
 		}
 	}
-	if (res == EoF)
+	if (res == PSI_ERR_EoF)
 		res = 0;
 	fclose(handle);
 	return res;
@@ -279,7 +277,8 @@ fgetmtime(const char *name, long *mtime)
 	convertSlash(name);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(MODIFIED, a);
+	if (!sendCommand(MODIFIED, a))
+		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
 	if (res != 0)
 		return res;
@@ -298,7 +297,8 @@ fsetmtime(const char *name, long mtime)
 	a.addDWord(microHi);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(SET_MODIFIED, a);
+	if (!sendCommand(SET_MODIFIED, a))
+		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
 	if (res != 0)
 		return res;
@@ -312,7 +312,8 @@ fgetattr(const char *name, long *attr)
 	convertSlash(name);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(ATT, a);
+	if (!sendCommand(ATT, a))
+		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
 	if (res != 0)
 		return res;
@@ -327,7 +328,8 @@ fgeteattr(const char *name, long *attr, long *size, long *time)
 	convertSlash(name);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(REMOTE_ENTRY, a);
+	if (!sendCommand(REMOTE_ENTRY, a))
+		return PSI_ERR_DISCONNECTED;
 	long res = getResponse(a);
 	if (res != 0)
 		return res;
@@ -353,7 +355,8 @@ fsetattr(const char *name, long seta, long unseta)
 	a.addDWord(unseta);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(SET_ATT, a);
+	if (!sendCommand(SET_ATT, a))
+		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
 }
 
@@ -362,7 +365,7 @@ dircount(const char *name, long *count)
 {
 	long handle;
 	convertSlash(name);
-	long res = fopendir(HIDDEN | SYSTEM | DIRECTORY, name, handle);
+	long res = fopendir(PSI_ATTR_HIDDEN | PSI_ATTR_SYSTEM | PSI_ATTR_DIRECTORY, name, handle);
 	*count = 0;
 	if (res != 0)
 		return res;
@@ -370,7 +373,8 @@ dircount(const char *name, long *count)
 	while (1) {
 		bufferStore a;
 		a.addDWord(handle);
-		sendCommand(READ_DIR, a);
+		if (!sendCommand(READ_DIR, a))
+			return PSI_ERR_DISCONNECTED;
 		res = getResponse(a);
 		if (res)
 			break;
@@ -386,7 +390,7 @@ dircount(const char *name, long *count)
 		}
 	}
 	fclose(handle);
-	if (res == EoF)
+	if (res == PSI_ERR_EoF)
 		res = 0;
 	return res;
 }
@@ -397,7 +401,8 @@ devlist(long *devbits)
 	bufferStore a;
 	long res;
 
-	sendCommand(GET_DRIVE_LIST, a);
+	if (!sendCommand(GET_DRIVE_LIST, a))
+		return PSI_ERR_DISCONNECTED;
 	res = getResponse(a);
 	*devbits = 0;
 	if ((res == 0) && (a.getLen() == 26)) {
@@ -418,7 +423,8 @@ devinfo(int devnum, long *vfree, long *vtotal, long *vattr,
 	long res;
 
 	a.addDWord(devnum);
-	sendCommand(DRIVE_INFO, a);
+	if (!sendCommand(DRIVE_INFO, a))
+		return NULL;
 	res = getResponse(a);
 	if (res == 0) {
 		*vattr = a.getDWord(0);
@@ -435,6 +441,12 @@ devinfo(int devnum, long *vfree, long *vtotal, long *vattr,
 bool rfsv32::
 sendCommand(enum commands cc, bufferStore & data)
 {
+	if (status == PSI_ERR_DISCONNECTED) {
+		reconnect();
+		if (status == PSI_ERR_DISCONNECTED)
+			return false;
+	}
+	bool result;
 	bufferStore a;
 	a.addWord(cc);
 	a.addWord(serNum);
@@ -443,7 +455,10 @@ sendCommand(enum commands cc, bufferStore & data)
 	else
 		serNum = 0;
 	a.addBuff(data);
-	return skt->sendBufferStore(a);
+	result = skt->sendBufferStore(a);
+	if (!result)
+		status = PSI_ERR_DISCONNECTED;
+	return result;
 }
 
 long rfsv32::
@@ -455,8 +470,8 @@ getResponse(bufferStore & data)
 		data.discardFirstBytes(8);
 		return ret;
 	} else
-		status = DISCONNECTED;
-	return (enum errs) GENERAL;
+		status = PSI_ERR_DISCONNECTED;
+	return status;
 }
 
 char * rfsv32::
@@ -464,135 +479,135 @@ opErr(long status)
 {
 	enum errs e = (enum errs) status;
 	switch (e) {
-		case NONE:
+		case PSI_ERR_NONE:
 			return "";
-		case NOT_FOUND:
-			return "NOT_FOUND";
-		case GENERAL:
-			return "GENERAL";
+		case PSI_ERR_NOT_FOUND:
+			return "not found";
+		case PSI_ERR_GENERAL:
+			return "general";
 			break;
-		case CANCEL:
-			return "CANCEL";
+		case PSI_ERR_CANCEL:
+			return "cancelled";
 			break;
-		case NO_MEMORY:
-			return "NO_MEMORY";
+		case PSI_ERR_NO_MEMORY:
+			return "out of memory";
 			break;
-		case NOT_SUPPORTED:
-			return "NOT_SUPPORTED";
+		case PSI_ERR_NOT_SUPPORTED:
+			return "unsupported";
 			break;
-		case ARGUMENT:
-			return "ARGUMENT";
+		case PSI_ERR_ARGUMENT:
+			return "bad argument";
 			break;
-		case TOTAL_LOSS_OF_PRECISION:
-			return "TOTAL_LOSS_OF_PRECISION";
+		case PSI_ERR_TOTAL_LOSS_OF_PRECISION:
+			return "total loss of precision";
 			break;
-		case BAD_HANDLE:
-			return "BAD_HANDLE";
+		case PSI_ERR_BAD_HANDLE:
+			return "bad handle";
 			break;
-		case OVERFLOW:
-			return "OVERFLOW";
+		case PSI_ERR_OVERFLOW:
+			return "overflow";
 			break;
-		case UNDERFLOW:
-			return "UNDERFLOW";
+		case PSI_ERR_UNDERFLOW:
+			return "underflow";
 			break;
-		case ALREADY_EXISTS:
-			return "ALREADY_EXISTS";
+		case PSI_ERR_ALREADY_EXISTS:
+			return "file already exists";
 			break;
-		case PATH_NOT_FOUND:
-			return "PATH_NOT_FOUND";
+		case PSI_ERR_PATH_NOT_FOUND:
+			return "path not found";
 			break;
-		case DIED:
+		case PSI_ERR_DIED:
 			return "DIED";
 			break;
-		case IN_USE:
-			return "IN_USE";
+		case PSI_ERR_IN_USE:
+			return "resource in use";
 			break;
-		case SERVER_TERMINATED:
-			return "SERVER_TERMINATED";
+		case PSI_ERR_SERVER_TERMINATED:
+			return "server terminated";
 			break;
-		case SERVER_BUSY:
-			return "SERVER_BUSY";
+		case PSI_ERR_SERVER_BUSY:
+			return "server busy";
 			break;
-		case COMPLETION:
-			return "COMPLETION";
+		case PSI_ERR_COMPLETION:
+			return "completed";
 			break;
-		case NOT_READY:
-			return "NOT_READY";
+		case PSI_ERR_NOT_READY:
+			return "not ready";
 			break;
-		case UNKNOWN:
-			return "UNKNOWN";
+		case PSI_ERR_UNKNOWN:
+			return "unknown";
 			break;
-		case CORRUPT:
-			return "CORRUPT";
+		case PSI_ERR_CORRUPT:
+			return "corrupt";
 			break;
-		case ACCESS_DENIED:
-			return "ACCESS_DENIED";
+		case PSI_ERR_ACCESS_DENIED:
+			return "permission denied";
 			break;
-		case LOCKED:
-			return "LOCKED";
+		case PSI_ERR_LOCKED:
+			return "resource locked";
 			break;
-		case WRITE:
-			return "WRITE";
+		case PSI_ERR_WRITE:
+			return "write";
 			break;
-		case DISMOUNTED:
-			return "DISMOUNTED";
+		case PSI_ERR_DISMOUNTED:
+			return "dismounted";
 			break;
-		case EoF:
-			return "EOF";
+		case PSI_ERR_EoF:
+			return "end of file";
 			break;
-		case DISK_FULL:
-			return "DISK_FULL";
+		case PSI_ERR_DISK_FULL:
+			return "disk full";
 			break;
-		case BAD_DRIVER:
-			return "BAD_DRIVER";
+		case PSI_ERR_BAD_DRIVER:
+			return "bad driver";
 			break;
-		case BAD_NAME:
-			return "BAD_NAME";
+		case PSI_ERR_BAD_NAME:
+			return "bad name";
 			break;
-		case COMMS_LINE_FAIL:
-			return "COMMS_LINE_FAIL";
+		case PSI_ERR_COMMS_LINE_FAIL:
+			return "comms line failed";
 			break;
-		case COMMS_FRAME:
-			return "COMMS_FRAME";
+		case PSI_ERR_COMMS_FRAME:
+			return "comms framing error";
 			break;
-		case COMMS_OVERRUN:
-			return "COMMS_OVERRUN";
+		case PSI_ERR_COMMS_OVERRUN:
+			return "comms overrun";
 			break;
-		case COMMS_PARITY:
-			return "COMMS_PARITY";
+		case PSI_ERR_COMMS_PARITY:
+			return "comms parity error";
 			break;
-		case PSI_TIMEOUT:
-			return "TIMEOUT";
+		case PSI_ERR_TIMEOUT:
+			return "timed out";
 			break;
-		case COULD_NOT_CONNECT:
-			return "COULD_NOT_CONNECT";
+		case PSI_ERR_COULD_NOT_CONNECT:
+			return "could not connect";
 			break;
-		case COULD_NOT_DISCONNECT:
-			return "COULD_NOT_DISCONNECT";
+		case PSI_ERR_COULD_NOT_DISCONNECT:
+			return "could not disconnect";
 			break;
-		case DISCONNECTED:
-			return "DISCONNECTED";
+		case PSI_ERR_DISCONNECTED:
+			return "unit disconnected";
 			break;
-		case BAD_LIBRARY_ENTRY_POINT:
-			return "BAD_LIBRARY_ENTRY_POINT";
+		case PSI_ERR_BAD_LIBRARY_ENTRY_POINT:
+			return "bad library entry point";
 			break;
-		case BAD_DESCRIPTOR:
-			return "BAD_DESCRIPTOR";
+		case PSI_ERR_BAD_DESCRIPTOR:
+			return "bad descriptor";
 			break;
-		case ABORT:
-			return "ABORT";
+		case PSI_ERR_ABORT:
+			return "abort";
 			break;
-		case TOO_BIG:
-			return "TOO_BIG";
+		case PSI_ERR_TOO_BIG:
+			return "too big";
 			break;
-		case DIVIDE_BY_ZERO:
-			return "DIVIDE_BY_ZERO";
+		case PSI_ERR_DIVIDE_BY_ZERO:
+			return "division by zero";
 			break;
-		case BAD_POWER:
-			return "BAD_POWER";
+		case PSI_ERR_BAD_POWER:
+			return "bad power";
 			break;
-		case DIR_FULL:
-			return "DIR_FULL";
+		case PSI_ERR_DIR_FULL:
+			return "directory full";
 			break;
 		default:
 			return "Unknown error";
@@ -610,7 +625,8 @@ fread(long handle, char *buf, long len)
 		bufferStore a;
 		a.addDWord(handle);
 		a.addDWord(((len-count) > 2000)?2000:(len-count));
-		sendCommand(READ_FILE, a);
+		if (!sendCommand(READ_FILE, a))
+			return PSI_ERR_DISCONNECTED;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		res = a.getLen();
@@ -636,7 +652,8 @@ fwrite(long handle, char *buf, long len)
 		bufferStore tmp((unsigned char *)buf, count);
 		a.addDWord(handle);
 		a.addBuff(tmp);
-		sendCommand(WRITE_FILE, a);
+		if (!sendCommand(WRITE_FILE, a))
+			return PSI_ERR_DISCONNECTED;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		total += count;
@@ -652,7 +669,7 @@ copyFromPsion(const char *from, const char *to)
 	long res;
 	long len;
 
-	if ((res = fopen(SHARE_READERS | BINARY, from, handle)) != 0)
+	if ((res = fopen(PSI_OMODE_SHARE_READERS | PSI_OMODE_BINARY, from, handle)) != 0)
 		return res;
 	ofstream op(to);
 	if (!op) {
@@ -678,15 +695,12 @@ copyToPsion(const char *from, const char *to)
 
 	ifstream ip(from);
 	if (!ip)
-		return NOT_FOUND;
-	res = fcreatefile(BINARY | SHARE_EXCLUSIVE | READ_WRITE, to, handle);
+		return PSI_ERR_NOT_FOUND;
+	res = fcreatefile(PSI_OMODE_BINARY | PSI_OMODE_SHARE_EXCLUSIVE | PSI_OMODE_READ_WRITE, to, handle);
 	if (res != 0) {
-		res = freplacefile(BINARY | SHARE_EXCLUSIVE | READ_WRITE, to, handle);
-		if (res != 0) {
-			opErr(res);
-			cerr << endl;
+		res = freplacefile(PSI_OMODE_BINARY | PSI_OMODE_SHARE_EXCLUSIVE | PSI_OMODE_READ_WRITE, to, handle);
+		if (res != 0)
 			return res;
-		}
 	}
 	unsigned char *buff = new unsigned char[RFSV_SENDLEN];
 	int total = 0;
@@ -699,12 +713,10 @@ copyToPsion(const char *from, const char *to)
 		bufferStore a;
 		a.addDWord(handle);
 		a.addBuff(tmp);
-		sendCommand(WRITE_FILE, a);
+		if (!sendCommand(WRITE_FILE, a))
+			return PSI_ERR_DISCONNECTED;
 		res = getResponse(a);
 		if (res) {
-			cerr << "Unknown response to fwrite - ";
-			opErr(res);
-			cerr << " " << a << endl;
 			fclose(handle);
 			return res;
 		}
@@ -721,7 +733,8 @@ fsetsize(long handle, long size)
 	bufferStore a;
 	a.addDWord(handle);
 	a.addDWord(size);
-	sendCommand(SET_SIZE, a);
+	if (!sendCommand(SET_SIZE, a))
+		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
 }
 
@@ -752,15 +765,16 @@ fseek(long handle, long pos, long mode)
    ??no more?? 6 = text-rewind
  */
 
-	if ((mode < PSEEK_SET) || (mode > PSEEK_END))
-		return ARGUMENT;
+	if ((mode < PSI_SEEK_SET) || (mode > PSI_SEEK_END))
+		return PSI_ERR_ARGUMENT;
 
-	if ((mode == PSEEK_CUR) && (pos >= 0)) {
+	if ((mode == PSI_SEEK_CUR) && (pos >= 0)) {
 		/* get and save current position */
 		a.addDWord(0);
 		a.addDWord(handle);
-		a.addDWord(PSEEK_CUR);
-		sendCommand(SEEK_FILE, a);
+		a.addDWord(PSI_SEEK_CUR);
+		if (!sendCommand(SEEK_FILE, a))
+			return PSI_ERR_DISCONNECTED;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		savpos = a.getDWord(0);
@@ -768,12 +782,13 @@ fseek(long handle, long pos, long mode)
 			return savpos;
 		a.init();
 	}
-	if ((mode == PSEEK_END) && (pos >= 0)) {
+	if ((mode == PSI_SEEK_END) && (pos >= 0)) {
 		/* get and save end position */
 		a.addDWord(0);
 		a.addDWord(handle);
-		a.addDWord(PSEEK_END);
-		sendCommand(SEEK_FILE, a);
+		a.addDWord(PSI_SEEK_END);
+		if (!sendCommand(SEEK_FILE, a))
+			return PSI_ERR_DISCONNECTED;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		savpos = a.getDWord(0);
@@ -783,7 +798,8 @@ fseek(long handle, long pos, long mode)
 		a.init();
 		a.addDWord(handle);
 		a.addDWord(savpos + pos);
-		sendCommand(SET_SIZE, a);
+		if (!sendCommand(SET_SIZE, a))
+			return PSI_ERR_DISCONNECTED;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		pos = 0;
@@ -793,21 +809,19 @@ fseek(long handle, long pos, long mode)
 	a.addDWord(pos);
 	a.addDWord(handle);
 	a.addDWord(mode);
-	sendCommand(SEEK_FILE, a);
-	if ((res = getResponse(a)) != 0) {
-cout << "seekRES(" << handle << ")=" << res << endl;
+	if (!sendCommand(SEEK_FILE, a))
+		return PSI_ERR_DISCONNECTED;
+	if ((res = getResponse(a)) != 0)
 		return res;
-}
 	realpos = a.getDWord(0);
-cout << "seekPOS=" << realpos << endl;
 	switch (mode) {
-		case PSEEK_SET:
+		case PSI_SEEK_SET:
 			calcpos = pos;
 			break;
-		case PSEEK_CUR:
+		case PSI_SEEK_CUR:
 			calcpos = savpos + pos;
 			break;
-		case PSEEK_END:
+		case PSI_SEEK_END:
 			return realpos;
 			break;
 	}
@@ -816,13 +830,15 @@ cout << "seekPOS=" << realpos << endl;
 		a.init();
 		a.addDWord(handle);
 		a.addDWord(calcpos);
-		sendCommand(SET_SIZE, a);
+		if (!sendCommand(SET_SIZE, a))
+			return PSI_ERR_DISCONNECTED;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		a.addDWord(calcpos);
 		a.addDWord(handle);
-		a.addDWord(PSEEK_SET);
-		sendCommand(SEEK_FILE, a);
+		a.addDWord(PSI_SEEK_SET);
+		if (!sendCommand(SEEK_FILE, a))
+			return PSI_ERR_DISCONNECTED;
 		if ((res = getResponse(a)) != 0)
 			return res;
 		realpos = a.getDWord(0);
@@ -843,7 +859,8 @@ mkdir(const char *name)
 		a.addWord(strlen(name));
 		a.addString(name);
 	}
-	sendCommand(MK_DIR_ALL, a);
+	if (!sendCommand(MK_DIR_ALL, a))
+		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
 }
 
@@ -860,7 +877,8 @@ rmdir(const char *name)
 		a.addWord(strlen(name));
 		a.addString(name);
 	}
-	sendCommand(RM_DIR, a);
+	if (!sendCommand(RM_DIR, a))
+		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
 }
 
@@ -874,7 +892,8 @@ rename(const char *oldname, const char *newname)
 	a.addString(oldname);
 	a.addWord(strlen(newname));
 	a.addString(newname);
-	sendCommand(RENAME, a);
+	if (!sendCommand(RENAME, a))
+		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
 }
 
@@ -885,6 +904,7 @@ remove(const char *name)
 	convertSlash(name);
 	a.addWord(strlen(name));
 	a.addString(name);
-	sendCommand(DELETE, a);
+	if (!sendCommand(DELETE, a))
+		return PSI_ERR_DISCONNECTED;
 	return getResponse(a);
 }
