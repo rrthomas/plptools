@@ -51,7 +51,7 @@ if test "`uname -s 2>/dev/null`" = AIX ; then
   AC_MSG_RESULT(yes)
   AC_CHECK_LIB(bsd, hostname)
   EXTRA_OBJS=mount_aix.o
-  AC_DEFINE(_ALL_SOURCE)
+  AC_DEFINE([_ALL_SOURCE], [], [Define _ALL_SOURCE on AIX])
 else
   AC_MSG_RESULT(no)
 fi
@@ -320,7 +320,6 @@ fi
 AC_OUTPUT(
 	Makefile
 	intl/Makefile
-	po/Makefile.in
 	po/Makefile
 	lib/Makefile
 	ncpd/Makefile
