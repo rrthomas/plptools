@@ -3,6 +3,9 @@
 
 @TOP@
 
+/* Define this, if libc provides bind_textdomain_codeset */
+#undef HAVE_BIND_TEXTDOMAIN_CODESET
+
 /* Define this, if you have libreadline */
 #undef HAVE_LIBREADLINE
 

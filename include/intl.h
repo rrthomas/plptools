@@ -21,9 +21,14 @@ extern inline stpcpy(char *dest, const char *src) {
 #  include <libintl.h>
 #  define N_(x) (x)
 #  define _(x) gettext(x)
+#  ifndef HAVE_BINDTEXTDOMAIN_CODESET
+#    define bind_textdomain_codeset(p, c)
+#  endif
 #else
 #  define N_(x) (x)
 #  define _(x) (x)
+#  define textdomain(x)
+#  define bind_textdomain_codeset(p, c)
 #endif
 
 /* Define this, if you have gettext */

@@ -27,9 +27,7 @@
 #include <config.h>
 #endif
 
-#ifdef HAVE_LIBINTL_H
 #include <intl.h>
-#endif
 
 #include <map>
 #include <string>
@@ -309,7 +307,7 @@ name(#EnumName),defaultValue(initWith)
  */
 template <typename E>
 inline ostream& operator << (ostream& out, const Enum<E> &e) {
-    return out << gettext(e.toString().c_str());
+    return out << _(e.toString().c_str());
 }
 
 #endif /* _ENUM_H_ */

@@ -37,7 +37,9 @@ namespace LIBPLP {
 extern "C" {
 #include <intl.h>
 	void init_libplp_i18n() {
+#ifdef HAVE_BINDTEXTDOMAIN_CODESET
 		bind_textdomain_codeset(PACKAGE, "latin1");
+#endif
 		textdomain(PACKAGE);
 	}
 };
@@ -58,7 +60,8 @@ static KCmdLineOptions options[] = {
 
 int main(int argc, char **argv) {
     KAboutData *about = new KAboutData("kpsion", I18N_NOOP("KPsion"),
-				       VERSION, I18N_NOOP("Psion connectivity utility"),
+				       VERSION,
+				       I18N_NOOP("Psion connectivity utility"),
 				       KAboutData::License_GPL,
 				       "(C) 2001, Fritz Elfert", 0L,
 				       "http://plptools.sourceforge.net",

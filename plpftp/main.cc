@@ -29,6 +29,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <intl.h>
 
 #include "ppsocket.h"
 #include "rfsv.h"
@@ -72,6 +73,7 @@ main(int argc, char **argv)
 
     bind_textdomain_codeset(PACKAGE, "latin1");
     textdomain(PACKAGE);
+
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
     if (se != 0L)

@@ -1,5 +1,8 @@
 # $Id$
 
+maintainer-clean-local:
+	rm -f Makefile.in
+
 INCLUDES = $(all_includes) -I$(top_srcdir)/lib
 LDFLAGS  = $(all_libraries) $(KDE_RPATH)
 

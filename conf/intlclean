@@ -1,0 +1,6 @@
+cat<<EOF>intl/Makefile
+
+maintainer-clean:
+	rm -f *.[ch] *.in *.sed VERSION ChangeLog Makefile
+
+EOF

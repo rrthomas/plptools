@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-03-01 01:24+0100\n"
+"POT-Creation-Date: 2001-03-06 18:13+0100\n"
 "PO-Revision-Date: 2001-02-28 02:44CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -488,43 +488,43 @@ msgstr "Polnisch"
 msgid "Slovenian"
 msgstr "Slowenisch"
 
-#: lib/psitime.h:62
+#: lib/psitime.h:63
 msgid " years "
 msgstr " Jahre "
 
-#: lib/psitime.h:62
+#: lib/psitime.h:63
 msgid " year "
 msgstr " Jahr "
 
-#: lib/psitime.h:64
+#: lib/psitime.h:65
 msgid " days "
 msgstr " Tage "
 
-#: lib/psitime.h:64
+#: lib/psitime.h:65
 msgid " day "
 msgstr " Tag "
 
-#: lib/psitime.h:66
+#: lib/psitime.h:67
 msgid " hours "
 msgstr " Stunden "
 
-#: lib/psitime.h:66
+#: lib/psitime.h:67
 msgid " hour "
 msgstr " Stunde "
 
-#: lib/psitime.h:68
+#: lib/psitime.h:69
 msgid " minutes "
 msgstr " Minuten "
 
-#: lib/psitime.h:68
+#: lib/psitime.h:69
 msgid " minute "
 msgstr " Minute "
 
-#: lib/psitime.h:69 plpftp/ftp.cc:797
+#: lib/psitime.h:70 plpftp/ftp.cc:797
 msgid " seconds"
 msgstr " Sekunden"
 
-#: lib/psitime.h:69
+#: lib/psitime.h:70
 msgid " second"
 msgstr " Sekunde"
 
@@ -548,75 +548,75 @@ msgstr "Falsche Protokoll-Version"
 msgid "no response from ncpd"
 msgstr "Keine Antwort vom ncpd"
 
-#: lib/plpdirent.cc:159
+#: lib/plpdirent.cc:173
 msgid "Not present"
 msgstr "Nicht vorhanden"
 
-#: lib/plpdirent.cc:160
+#: lib/plpdirent.cc:174
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: lib/plpdirent.cc:161
+#: lib/plpdirent.cc:175
 msgid "Floppy"
 msgstr "Diskette"
 
-#: lib/plpdirent.cc:162
+#: lib/plpdirent.cc:176
 msgid "Disk"
 msgstr "Platte"
 
-#: lib/plpdirent.cc:163
+#: lib/plpdirent.cc:177
 msgid "CD-ROM"
 msgstr "CD-ROM"
 
-#: lib/plpdirent.cc:164
+#: lib/plpdirent.cc:178
 msgid "RAM"
 msgstr "RAM"
 
-#: lib/plpdirent.cc:165
+#: lib/plpdirent.cc:179
 msgid "Flash Disk"
 msgstr "Flash Disk"
 
-#: lib/plpdirent.cc:166 lib/plpdirent.cc:193
+#: lib/plpdirent.cc:180 lib/plpdirent.cc:207
 msgid "ROM"
 msgstr "ROM"
 
-#: lib/plpdirent.cc:167
+#: lib/plpdirent.cc:181
 msgid "Remote"
 msgstr "Netzlaufwerk"
 
-#: lib/plpdirent.cc:191
+#: lib/plpdirent.cc:205
 msgid "local"
 msgstr "Lokal"
 
-#: lib/plpdirent.cc:195
+#: lib/plpdirent.cc:209
 msgid "redirected"
 msgstr "Umgeleitet"
 
-#: lib/plpdirent.cc:197
+#: lib/plpdirent.cc:211
 msgid "substituted"
 msgstr "Ersetzt"
 
-#: lib/plpdirent.cc:199
+#: lib/plpdirent.cc:213
 msgid "internal"
 msgstr "Intern"
 
-#: lib/plpdirent.cc:201
+#: lib/plpdirent.cc:215
 msgid "removable"
 msgstr "Wechselmedium"
 
-#: lib/plpdirent.cc:214
+#: lib/plpdirent.cc:228
 msgid "variable size"
 msgstr "Variable Größe"
 
-#: lib/plpdirent.cc:216
+#: lib/plpdirent.cc:230
 msgid "dual density"
 msgstr "Doppelte Dichte"
 
-#: lib/plpdirent.cc:218
+#: lib/plpdirent.cc:232
 msgid "formattable"
 msgstr "Formatierbar"
 
-#: lib/plpdirent.cc:220
+#: lib/plpdirent.cc:234
 msgid "write protected"
 msgstr "Schreibgeschützt"
 

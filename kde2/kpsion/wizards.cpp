@@ -553,13 +553,24 @@ accept() {
 	pcfg.getOptionName(KPsionConfig::OPT_UIDS));
     machines += uid;
     config->writeEntry(pcfg.getOptionName(KPsionConfig::OPT_UIDS), machines);
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_MACHNAME));
     QString tmp = pcfg.getOptionName(KPsionConfig::OPT_MACHNAME).arg(uid);
     config->writeEntry(tmp, nameEdit->text());
     tmp = nameEdit->text();
     psion->setMachineName(tmp);
-    QListViewItemIterator li(backupListView);
     driveMap dlist = psion->getDrives();
     driveMap::Iterator di;
+    QStringList drives;
+    for (di = dlist.begin(); di != dlist.end(); di++) {
+	QString drv = "";
+	drv += di.key();
+	drives += drv;
+    }
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_DRIVES));
+    config->writeEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_DRIVES).arg(uid), drives);
+
+    QListViewItemIterator li(backupListView);
     QStringList bdrives;
     for (; li.current(); li++) {
 	QCheckListItem *qcli = (QCheckListItem *)(li.current());
@@ -573,6 +584,7 @@ accept() {
 		}
 	}
     }
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_BACKUPDRIVES));
     config->writeEntry(
 	pcfg.getOptionName(KPsionConfig::OPT_BACKUPDRIVES).arg(uid), bdrives);
     hide();

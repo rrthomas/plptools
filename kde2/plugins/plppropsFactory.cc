@@ -1,12 +1,20 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#ifdef ENABLE_NLS
 namespace LIBPLP {
 extern "C" {
 #include <intl.h>
 	void init_libplp_i18n() {
+#ifdef HAVE_BINDTEXTDOMAIN_CODESET
 		bind_textdomain_codeset(PACKAGE, "latin1");
+#endif
 		textdomain(PACKAGE);
 	}
 };
 };
+#endif
 
 #include "plppropsFactory.h"
 #include "plpprops.h"
@@ -25,7 +33,9 @@ plppropsFactory::plppropsFactory(QObject *parent, const char *name)
 	: KLibFactory(parent, name) {
 	s_global = new KInstance("plpprops");
 	// Install the translations
+#ifdef ENABLE_NLS
 	LIBPLP::init_libplp_i18n();
+#endif
 	KGlobal::locale()->insertCatalogue(QString::fromLatin1("plptools"));
 	KGlobal::locale()->insertCatalogue(QString::fromLatin1("libplpprops"));
 }

@@ -39,6 +39,7 @@ KPsionConfig::KPsionConfig() {
     optionNames.insert(OPT_UIDS, QString("Psion/MachineUIDs"));
     optionNames.insert(OPT_MACHNAME, QString("Psion/Name_%1"));
     optionNames.insert(OPT_BACKUPDRIVES, QString("Psion/BackupDrives_%1"));
+    optionNames.insert(OPT_DRIVES, QString("Psion/Drives_%1"));
 
     defaults.insert(DEF_INCINTERVAL, QString("1"));
     defaults.insert(DEF_FULLINTERVAL, QString("7"));

@@ -22,6 +22,8 @@ AC_PATH_PROG(SED,sed)
 dnl NLS support
 ALL_LINGUAS="de"
 AM_GNU_GETTEXT
+dnl Additional glibc-intl checks
+PLP_CHECK_INTL
 
 dnl This is stupid for two resaons:
 dnl

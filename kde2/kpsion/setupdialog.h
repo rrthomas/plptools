@@ -50,6 +50,8 @@ private slots:
     void slotDefaultClicked();
     void slotSaveSettings();
     void slotBdirBrowse();
+    void slotDeleteMachine();
+    void slotMachineChanged(int);
 
 private:
     bool checkBackupDir(QString &dir);
@@ -63,11 +65,15 @@ private:
     KIntSpinBox *genSpin;
     KIntSpinBox *rconSpin;
     QPushButton *bdirButton;
+    QPushButton *mdelButton;
     QCheckBox *remCheck;
     KComboBox *iIntCombo;
     KComboBox *fIntCombo;
     KComboBox *devCombo;
     KComboBox *speedCombo;
+    KComboBox *machCombo;
+    KLineEdit *nameEdit;
+    KListView *backupListView;
 
     QString bdirDefault;
     QString bdirCreated;

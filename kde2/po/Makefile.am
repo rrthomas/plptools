@@ -1,4 +1,7 @@
 
+maintainer-clean-local:
+	rm -f Makefile.in
+
 SUBDIRS = de
 
 APPS = kpsion libplpprops

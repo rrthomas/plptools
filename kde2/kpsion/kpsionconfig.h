@@ -42,6 +42,7 @@ public:
 	OPT_UIDS = 7,
 	OPT_MACHNAME = 8,
 	OPT_BACKUPDRIVES = 9,
+	OPT_DRIVES = 10,
     };
 
     enum cfgDefaults {

@@ -1,5 +1,8 @@
 # $Id$
 
+maintainer-clean-local:
+	rm -f Makefile.in
+
 METASOURCES = AUTO
 
 KDE_ICON = AUTO
