@@ -1,3 +1,41 @@
+Changes from Version 0.6 to now (not yet released)
+
+ - Changed timezone-stuff again. With S5, now the machine-info is
+   evaluated. This info holds the Psion's time-offset so that we
+   are able to calculate the offset correctly, regardless of the
+   Psion's setting. All that is done in a new class PsiTime.
+   For S3, a Fallback is provided using an Env-Variable "PSI_TZ" which
+   can be set to the Psion's time-offset in seconds.
+ - Added lots of rpc related stuff:
+ - Implemented a procfs-like subdir in plpnfsd. Processes can
+   be examined and misc. parameters can be examined/changed using
+   the entries in <psionMountDir>/proc/
+   Several parameters can now be changed on the fly:
+     attribute-cache timeout in seconds: proc/acache     (rw)
+     debuglevel:                         proc/debuglevel (rw)
+     directory-cache timeout in seconds: proc/dcache     (rw)
+     Psion's owner-info:                 proc/owner      (ro)
+     Unix-owner of mounted directory:    proc/unixowner  (rw)
+
+   Stopping of plpnfsd has now changed:
+     Old:
+       reference /mnt/psion/exit
+     New:
+       echo stop > /mnt/psion/proc/exit
+   This should be safer than accidentally referencing a file.
+
+   For every process running on the psion, a subdir in proc/ is
+   created with two files "cmd" and "args" (both ro). cmd is the
+   process-name, args is it's commandline.
+   
+ - Added machinfo command in plpftp for displaying lot of interesting
+   information about S5. (E.g. battery status etc.)
+ - Added killsave and runrestore to plpftpd. Both take a unix file
+   as argument. killsave kills all processes on the Psion and saves
+   restart-information to the specified file. runrestore reads a file
+   created by killsave and starts all processes saved in this file.
+   -> Functionality similar to the behavior of PsiWin before/after backup.
+   
 Changes from Version 0.5 to 0.6:
 
  - Maintenance release: bugfixes in plpnfsd and libs which make
