@@ -1,4 +1,4 @@
-AC_DEFUN(KDE_MISC_TESTS,
+AC_DEFUN([KDE_MISC_TESTS],
 [
    AC_LANG_C
    dnl Checks for libraries.

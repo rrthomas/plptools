@@ -5,7 +5,7 @@ dnl and $(QT_INCLUDES) will be -Iqthdrlocation (if needed)
 dnl ------------------------------------------------------------------------
 dnl
 dnl
-AC_DEFUN(AC_TRY_PATH_QT,[
+AC_DEFUN([AC_TRY_PATH_QT],[
 	AC_REQUIRE([K_PATH_X])
 	AC_REQUIRE([KDE_USE_QT])
 
@@ -123,7 +123,7 @@ AC_DEFUN(AC_TRY_PATH_QT,[
 ])
 
 
-AC_DEFUN(AC_PATH_QT_ANY,[
+AC_DEFUN([AC_PATH_QT_ANY],[
 
 	AC_MSG_CHECKING([for Qt])
 	AC_CACHE_VAL(ac_cv_have_qt,[

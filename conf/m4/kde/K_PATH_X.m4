@@ -1,7 +1,7 @@
 # KDE_PATH_X_DIRECT
 dnl Internal subroutine of AC_PATH_X.
 dnl Set ac_x_includes and/or ac_x_libraries.
-AC_DEFUN(KDE_PATH_X_DIRECT,
+AC_DEFUN([KDE_PATH_X_DIRECT],
 [if test "$ac_x_includes" = NO; then
   # Guess where to find include files, by looking for this one X11 .h file.
   test -z "$x_direct_test_include" && x_direct_test_include=X11/Intrinsic.h
@@ -125,7 +125,7 @@ dnl Find the header files and libraries for X-Windows. Extended the
 dnl macro AC_PATH_X
 dnl ------------------------------------------------------------------------
 dnl
-AC_DEFUN(K_PATH_X,[
+AC_DEFUN([K_PATH_X],[
 	AC_REQUIRE([AC_PROG_CPP])
 	AC_MSG_CHECKING(for X)
 	AC_LANG_SAVE

@@ -1,4 +1,4 @@
-AC_DEFUN(KDE_CHECK_FINAL,
+AC_DEFUN([KDE_CHECK_FINAL],
 [
   AC_ARG_ENABLE(final, [  --enable-final          build size optimized apps (needs lots of memory)],
 	kde_use_final=yes, kde_use_final=no, kde_use_final=no)

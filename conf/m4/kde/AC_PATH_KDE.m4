@@ -1,5 +1,5 @@
 dnl
-AC_DEFUN(AC_PATH_KDE,[
+AC_DEFUN([AC_PATH_KDE],[
 	AC_BASE_PATH_KDE
 	AC_ARG_ENABLE(path-check,
 		[  --disable-path-check    don't try to find out, where to install],

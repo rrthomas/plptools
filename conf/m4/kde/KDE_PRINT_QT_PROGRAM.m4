@@ -1,4 +1,4 @@
-AC_DEFUN(KDE_PRINT_QT_PROGRAM,[
+AC_DEFUN([KDE_PRINT_QT_PROGRAM],[
 	AC_REQUIRE([KDE_USE_QT])
 	cat > conftest.$ac_ext <<-EOF
 		#include "confdefs.h"

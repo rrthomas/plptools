@@ -14,7 +14,7 @@ dnl PARTICULAR PURPOSE.
 dnl >
 dnl for this file it is relicensed under LGPL
 
-AC_DEFUN(AM_KDE_WITH_NLS,
+AC_DEFUN([AM_KDE_WITH_NLS],
   [AC_MSG_CHECKING([whether NLS is requested])
     dnl Default is enabled NLS
     AC_ARG_ENABLE(nls,

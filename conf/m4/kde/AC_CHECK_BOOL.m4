@@ -1,4 +1,4 @@
-AC_DEFUN(AC_CHECK_BOOL,
+AC_DEFUN([AC_CHECK_BOOL],
 [
 	AC_MSG_CHECKING([for bool])
         AC_CACHE_VAL(ac_cv_have_bool,

@@ -1,6 +1,6 @@
 dnl KDE_FIND_PATH(programm-name, variable-name, list of directories,
 dnl	if-not-found, test-parameter)
-AC_DEFUN(KDE_FIND_PATH,
+AC_DEFUN([KDE_FIND_PATH],
 [
    AC_MSG_CHECKING([for $1])
    kde_cache=`echo $1 | sed 'y%./+-%__p_%'`

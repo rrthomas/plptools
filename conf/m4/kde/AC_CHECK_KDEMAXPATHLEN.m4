@@ -2,7 +2,7 @@ dnl ------------------------------------------------------------------------
 dnl Check for MAXPATHLEN macro, defines KDEMAXPATHLEN. faure@kde.org
 dnl ------------------------------------------------------------------------
 dnl
-AC_DEFUN(AC_CHECK_KDEMAXPATHLEN,
+AC_DEFUN([AC_CHECK_KDEMAXPATHLEN],
 [
 AC_MSG_CHECKING(for MAXPATHLEN)
 AC_CACHE_VAL(ac_cv_maxpathlen,

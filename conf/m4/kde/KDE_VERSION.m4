@@ -1,7 +1,7 @@
 dnl
 dnl Check KDE version
 dnl
-AC_DEFUN(KDE_VERSION,
+AC_DEFUN([KDE_VERSION],
 [
 	ac_kde_version=2
 	AC_MSG_CHECKING(for KDE version)

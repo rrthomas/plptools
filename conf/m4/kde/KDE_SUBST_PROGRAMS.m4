@@ -1,4 +1,4 @@
-AC_DEFUN(KDE_SUBST_PROGRAMS,
+AC_DEFUN([KDE_SUBST_PROGRAMS],
 [AC_REQUIRE([AC_CREATE_KFSSTND])dnl
 
         kde_default_bindirs="/usr/bin /usr/local/bin /opt/local/bin /usr/X11R6/bin /opt/kde/bin /opt/kde2/bin /usr/kde/bin /usr/local/kde/bin"

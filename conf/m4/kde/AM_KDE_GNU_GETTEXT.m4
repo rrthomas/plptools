@@ -4,7 +4,7 @@
 # serial 1
 # Stephan Kulow: I put a KDE in it to avoid name conflicts
 
-AC_DEFUN(AM_KDE_GNU_GETTEXT,
+AC_DEFUN([AM_KDE_GNU_GETTEXT],
   [AC_REQUIRE([AC_PROG_MAKE_SET])dnl
    AC_REQUIRE([AC_PROG_RANLIB])dnl
    AC_REQUIRE([AC_HEADER_STDC])dnl

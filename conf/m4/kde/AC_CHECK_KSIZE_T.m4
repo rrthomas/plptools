@@ -1,5 +1,5 @@
 dnl Check for the type of the third argument of getsockname
-AC_DEFUN(AC_CHECK_KSIZE_T,
+AC_DEFUN([AC_CHECK_KSIZE_T],
 [AC_MSG_CHECKING(for the third argument of getsockname)
 AC_CACHE_VAL(ac_cv_ksize_t,
 AC_LANG_SAVE

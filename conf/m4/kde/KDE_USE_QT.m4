@@ -1,4 +1,4 @@
-AC_DEFUN(KDE_USE_QT,
+AC_DEFUN([KDE_USE_QT],
 [
 if test -z "$1"; then
   kde_qtver=2
