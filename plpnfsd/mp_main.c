@@ -79,7 +79,7 @@ debuglog(char *fmt, ...)
     buf = (char *)malloc(1024);
     va_start(ap, fmt);
     vsnprintf(buf, 1024, fmt, ap);
-    syslog(LOG_DEBUG, buf);
+    syslog(LOG_DEBUG, "%s", buf);
     free(buf);
     va_end(ap);
     return 0;
@@ -94,7 +94,7 @@ errorlog(char *fmt, ...)
     va_start(ap, fmt);
     vsnprintf(buf, 1024, fmt, ap);
     va_end(ap);
-    syslog(LOG_ERR, buf);
+    syslog(LOG_ERR, "%s", buf);
     free(buf);
     return 0;
 }
@@ -107,7 +107,7 @@ infolog(char *fmt, ...)
 
     va_start(ap, fmt);
     vsnprintf(buf, 1024, fmt, ap);
-    syslog(LOG_INFO, buf);
+    syslog(LOG_INFO, "%s", buf);
     free(buf);
     va_end(ap);
     return 0;
