@@ -212,8 +212,8 @@ socketPoll()
 		    ncpRegister();
 		break;
 	    case -1:
-		ncpConnectTerminate();
-	       break;
+		terminateWhenAsked();
+		break;
 	}
     } else if (connected) {
 	bufferStore a;

@@ -224,10 +224,10 @@ decodeControlMessage(bufferStore & buff)
 		lChan->setVerbose(verbose);
 	    } else {
 		if (verbose & NCP_DEBUG_LOG)
-		    cout << "ncp: Link DOWN" << endl;
+		    cout << "ncp: REJECT connect" << endl;
 		bufferStore b;
 		b.addByte(remoteChan);
-		controlChannel(localChan, NCON_MSG_CHANNEL_DISCONNECT, b);
+		controlChannel(0, NCON_MSG_CHANNEL_DISCONNECT, b);
 	    }
 	    break;
 
