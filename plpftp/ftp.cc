@@ -22,6 +22,8 @@
 //
 //  e-mail philip.proudman@btinternet.com
 
+#define EXPERIMENTAL
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -197,13 +199,14 @@ const char *datefmt = "%c";
 int ftp::
 session(rfsv & a, rpcs & r, int xargc, char **xargv)
 {
-	int argc;
+        int argc;
 	char *argv[10];
 	char f1[256];
 	char f2[256];
 	Enum<rfsv::errs> res;
 	bool prompt = true;
 	bool hash = false;
+	bool S5mx = false;
 	cpCallback_t cab = checkAbortNoHash;
 	bool once = false;
 
@@ -213,15 +216,24 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		for (int i = 0; i < argc; i++)
 			argv[i] = xargv[i+1];
 	}
-	if (!once) {
+	{
+		Enum<rpcs::machs> machType;
 		bufferArray b;
 		if ((res = r.getOwnerInfo(b)) == rfsv::E_PSI_GEN_NONE) {
-			Enum<rpcs::machs> machType;
 			r.getMachineType(machType);
-			cout << "Connected to a " << machType << ", OwnerInfo:" << endl;
-			while (!b.empty())
-				cout << "  " << b.pop().getString() << endl;
-			cout << endl;
+			if (!once) {
+				cout << "Connected to a " << machType << ", OwnerInfo:" << endl;
+				while (!b.empty())
+					cout << "  " << b.pop().getString() << endl;
+				cout << endl;
+			}
+			if (machType == rpcs::PSI_MACH_S5) {
+				rpcs::machineInfo mi;
+				if ((res = r.getMachineInfo(mi)) == rfsv::E_PSI_GEN_NONE) {
+					if (!strcmp(mi.machineName, "SERIES5mx"))
+						S5mx = true;
+				}
+			}
 		} else
 			cerr << "OwnerInfo returned error " << res << endl;
 	}
@@ -710,7 +722,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		// RPCS commands
 #ifdef EXPERIMENTAL
 		if (!strcmp(argv[0], "x")) {
-			r.configOpen();
+			r.regOpenIter();
 			continue;
 		}
 		if (!strcmp(argv[0], "y")) {
@@ -796,8 +808,8 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				cerr << "Could not read processlist " << argv[1] << endl;
 				continue;
 			}
-			ip >> cmd;
-			if (strcmp(cmd, "#plpftp processlist")) {
+			ip >> cmd >> arg;
+			if (strcmp(cmd, "#plpftp") || strcmp(arg, "processlist")) {
 				ip.close();
 				cerr << "Error: " << argv[1] <<
 					" is not a process list saved with killsave" << endl;
@@ -805,9 +817,16 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			}
 			while (!ip.eof()) {
 				ip >> cmd >> arg;
-				if ((res = r.execProgram(cmd, arg)) != rfsv::E_PSI_GEN_NONE) {
-					cerr << "Could not start " << cmd << " " << arg << endl;
-					cerr << "Error: " << res << endl;
+				if (strlen(cmd) > 0) {
+					// Workaround for broken programs like Backlite. These do not store
+					// the full program path. In that case we try running the arg1 which
+					// results in starting the program via recog. facility.
+					if (!strchr(cmd, '\\') && !strchr(arg, ' '))
+						strcpy(cmd, arg);
+					if ((res = r.execProgram(cmd, arg)) != rfsv::E_PSI_GEN_NONE) {
+						cerr << "Could not start " << cmd << " " << arg << endl;
+						cerr << "Error: " << res << endl;
+					}
 				}
 			}
 			ip.close();
@@ -830,7 +849,10 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 					bufferStore bs = tmp.pop();
 					int pid = bs.getWord(0);
 					const char *proc = bs.getString(2);
-					sprintf(pbuf, "%s.$%d", proc, pid);
+					if (S5mx)
+						sprintf(pbuf, "%s.$%02d", proc, pid);
+					else
+						sprintf(pbuf, "%s.$%d", proc, pid);
 					bs = tmp.pop();
 					if (r.getCmdLine(pbuf, cmdargs) == 0)
 						op << cmdargs.getString(0) << " " << bs.getString(0) << endl;
@@ -861,7 +883,10 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 						const char *proc = bs.getString(2);
 						if (kpid == -1 || kpid == pid) {
 							char pbuf[128];
-							sprintf(pbuf, "%s.$%d", proc, pid);
+							if (S5mx)
+								sprintf(pbuf, "%s.$%02d", proc, pid);
+							else
+								sprintf(pbuf, "%s.$%d", proc, pid);
 							r.stopProgram(pbuf);
 							anykilled = true;
 						}
@@ -908,7 +933,7 @@ static char *all_commands[] = {
 };
 
 static char *localfile_commands[] = {
-	"lcd ", "put ", "mput ", NULL
+	"lcd ", "put ", "mput ", "killsave ", "runrestore ", NULL
 };
 
 static char *remote_dir_commands[] = {
@@ -945,7 +970,7 @@ filename_generator(char *text, int state)
 		if (!(strncmp(s.getString(12), text, len))) {
 			char fnbuf[512];
 			strcpy(fnbuf, s.getString(12));
-			if (attr & 0x10)
+			if (attr & rfsv::PSI_A_DIR)
 				strcat(fnbuf, "/");
 			return (strdup(fnbuf));
 		}
@@ -1001,7 +1026,7 @@ do_completion(char *text, int start, int end)
 		while ((name = remote_dir_commands[idx])) {
 			idx++;
 			if (!strncmp(name, rl_line_buffer, strlen(name)))
-				maskAttr = 0x0010;
+				maskAttr = rfsv::PSI_A_DIR;
 		}
 		
 		matches = completion_matches(text, filename_generator);
