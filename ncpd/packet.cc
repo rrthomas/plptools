@@ -56,24 +56,42 @@ iow(_iow)
 	inLen = outLen = termLen = 0;
 	foundSync = 0;
 	esc = false;
+	lastFatal = false;
+	serialStatus = -1;
 	crcIn = crcOut = 0;
 
 	fd = init_serial(devname, baud, 0);
-	iow.addIO(fd);
+	if (fd == -1)
+		lastFatal = true;
+	else
+		iow.addIO(fd);
 }
 
 void packet::reset()
 {
-	iow.remIO(fd);
-	ser_exit(fd);
+	if (verbose & PKT_DEBUG_LOG)
+		cout << "resetting serial connection" << endl;
+	if (fd != -1) {
+		iow.remIO(fd);
+		ser_exit(fd);
+	}
 	usleep(100000);
 	inLen = outLen = termLen = 0;
+	inPtr = inBuffer;
+	outPtr = outBuffer;
 	foundSync = 0;
+	serialStatus = -1;
 	esc = false;
 	crcIn = crcOut = 0;
 
 	fd = init_serial(devname, baud, 0);
-	iow.addIO(fd);
+	if (fd != -1) {
+		iow.addIO(fd);
+		lastFatal = false;
+	}
+	if (verbose & PKT_DEBUG_LOG)
+		cout << "serial connection reset, fd=" << fd << endl;
+	sleep(1);
 }
 
 short int packet::
@@ -90,8 +108,10 @@ setVerbose(short int _verbose)
 
 packet::~packet()
 {
-	iow.remIO(fd);
-	ser_exit(fd);
+	if (fd != -1) {
+		iow.remIO(fd);
+		ser_exit(fd);
+	}
 	usleep(100000);
 	delete[]inBuffer;
 	delete[]outBuffer;
@@ -287,24 +307,45 @@ bool packet::
 linkFailed()
 {
 	int arg;
+	int res;
 	bool failed = false;
-	int res = ioctl(fd, TIOCMGET, &arg);
+
+	if (lastFatal)
+		reset();
+	res = ioctl(fd, TIOCMGET, &arg);
 	if (res < 0)
-		failed = true;
-	if (verbose & PKT_DEBUG_HANDSHAKE)
-		cout << "packet: DTR:" << ((arg & TIOCM_DTR)?1:0)
-			<< " RTS:" << ((arg & TIOCM_RTS)?1:0)
-			<< " DCD:" << ((arg & TIOCM_CAR)?1:0)
-			<< " DSR:" << ((arg & TIOCM_DSR)?1:0)
-			<< " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
+		lastFatal = true;
+	if ((serialStatus == -1) || (arg != serialStatus)) {
+		if (verbose & PKT_DEBUG_HANDSHAKE)
+			cout << "packet: < DTR:" << ((arg & TIOCM_DTR)?1:0)
+			     << " RTS:" << ((arg & TIOCM_RTS)?1:0)
+			     << " DCD:" << ((arg & TIOCM_CAR)?1:0)
+			     << " DSR:" << ((arg & TIOCM_DSR)?1:0)
+			     << " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
+		if (!((arg & TIOCM_RTS) && (arg & TIOCM_DTR))) {
+			arg |= (TIOCM_DTR | TIOCM_RTS);
+			res = ioctl(fd, TIOCMSET, &arg);
+			if (res < 0)
+				lastFatal = true;
+			if (verbose & PKT_DEBUG_HANDSHAKE)
+				cout << "packet: > DTR:" << ((arg & TIOCM_DTR)?1:0)
+				     << " RTS:" << ((arg & TIOCM_RTS)?1:0)
+				     << " DCD:" << ((arg & TIOCM_CAR)?1:0)
+				     << " DSR:" << ((arg & TIOCM_DSR)?1:0)
+				     << " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
+		}
+		serialStatus = arg;
+	}
 #ifdef sun
 	if ((arg & TIOCM_CTS) == 0)
 #else
 	if (((arg & TIOCM_DSR) == 0) || ((arg & TIOCM_CTS) == 0))
 #endif
 		failed = true;
+	if ((verbose & PKT_DEBUG_LOG) && lastFatal)
+		cout << "packet: linkFATAL\n";
 	if ((verbose & PKT_DEBUG_LOG) && failed)
 		cout << "packet: linkFAILED\n";
-	return failed;
+	return lastFatal || failed;
 }
 

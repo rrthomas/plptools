@@ -81,6 +81,9 @@
  ldconfig after installation. Another option is to run configure
  with the option --prefix=/usr
 
+ Please read the man pages ncpd(8) plpftp(1) and plpnfsd(8)! The
+ information there is more up-to-date.
+
  The programs:
 
  ncpd is the daemon which handles the serial link to your Psion.

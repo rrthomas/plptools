@@ -66,8 +66,10 @@ class packet {
 		int termLen;
 		int foundSync;
 		int fd;
+		int serialStatus;
 		short int verbose;
 		bool esc;
+		bool lastFatal;
 		char *devname;
 		int baud;
 		IOWatch &iow;

@@ -44,6 +44,7 @@ class link {
   		bool stuffToSend();
   		bool hasFailed();
 		void reset();
+		void flush();
 		void setVerbose(short int);
 		short int getVerbose();
 		void setPktVerbose(short int);

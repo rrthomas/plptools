@@ -43,6 +43,23 @@
 #include "log.h"
 
 static bool verbose = false;
+static bool active = true;
+
+static RETSIGTYPE
+term_handler(int)
+{
+	cout << "Got SIGTERM" << endl;
+	signal(SIGTERM, term_handler);
+	active = false;
+};
+
+static RETSIGTYPE
+int_handler(int)
+{
+	cout << "Got SIGINT" << endl;
+	signal(SIGINT, int_handler);
+	active = false;
+};
 
 void
 checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp * a, IOWatch & iow)
@@ -97,7 +114,7 @@ main(int argc, char **argv)
 
 	int sockNum = DPORT;
 	int baudRate = DSPEED;
-	const char *serialDevice = DDEV;
+	const char *serialDevice = NULL;
 	short int nverbose = 0;
 	short int pverbose = 0;
 	short int lverbose = 0;
@@ -135,7 +152,8 @@ main(int argc, char **argv)
 			if (!strcmp(argv[i], "all")) {
 				nverbose = NCP_DEBUG_LOG | NCP_DEBUG_DUMP;
 				lverbose = LNK_DEBUG_LOG | LNK_DEBUG_DUMP;
-				pverbose = PKT_DEBUG_LOG | PKT_DEBUG_DUMP;
+				pverbose = PKT_DEBUG_LOG | PKT_DEBUG_DUMP |
+					PKT_DEBUG_HANDSHAKE;
 				verbose = true;
 			}
 		} else if (!strcmp(argv[i], "-b") && i + 1 < argc) {
@@ -151,16 +169,27 @@ main(int argc, char **argv)
 			usage();
 	}
 
+	if (serialDevice == NULL) {
+		// If started with -e, assume being started from mgetty and
+		// use the tty opened by mgetty instead of the builtin default.
+		if (autoexit)
+			serialDevice = ttyname(0);
+		else
+			serialDevice = DDEV;
+	}
+			
 	if (dofork)
 		pid = fork();
 	else
 		pid = 0;
 	switch (pid) {
 		case 0:
+			signal(SIGTERM, term_handler);
+			signal(SIGINT, int_handler);
 			if (!skt.listen("127.0.0.1", sockNum))
 				cerr << "listen on port " << sockNum << ": " << strerror(errno) << endl;
 			else {
-				if (dofork) {
+				if (dofork || autoexit) {
 					logbuf dlog(LOG_DEBUG);
 					logbuf elog(LOG_ERR);
 					ostream lout(&dlog);
@@ -168,6 +197,9 @@ main(int argc, char **argv)
 					cout = lout;
 					cerr = lerr;
 					openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
+					syslog(LOG_INFO,
+					       "daemon started. Listening at 127.0.0.1:%d, using device %s\n",
+					       sockNum, serialDevice);
 				}
 				ncp *a = new ncp(serialDevice, baudRate, iow);
 				int numScp = 0;
@@ -177,7 +209,7 @@ main(int argc, char **argv)
 				a->setLinkVerbose(lverbose);
 				a->setPktVerbose(pverbose);
 				iow.addIO(skt.socket());
-				while (true) {
+				while (active) {
 					// sockets
 					pollSocketConnections(numScp, scp);
 					checkForNewSocketConnection(skt, numScp, scp, a, iow);

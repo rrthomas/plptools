@@ -50,6 +50,7 @@ link::link(const char *fname, int baud, IOWatch & iow, unsigned short _verbose)
 
 link::~link()
 {
+	flush();
 	delete p;
 }
 
@@ -61,7 +62,7 @@ reset() {
 	somethingToSend = false;
 	timesSent = 0;
 	failed = false;
-//	p->reset();
+	// p->reset();
 }
 
 short int link::
@@ -214,6 +215,12 @@ poll()
 			countToResend--;
 	}
 	return ret;
+}
+
+void link::
+flush() {
+	while ((!failed) && stuffToSend())
+		poll();
 }
 
 bool link::

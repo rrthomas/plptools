@@ -53,6 +53,16 @@ ncp::ncp(const char *fname, int baud, IOWatch & iow)
 
 ncp::~ncp()
 {
+	bufferStore b;
+	for (int i = 0; i < MAX_CHANNEL; i++) {
+		if (channelPtr[i]) {
+			bufferStore b2;
+			b2.addByte(remoteChanList[i]);
+			controlChannel(i, NCON_MSG_CHANNEL_DISCONNECT, b2);
+		}
+		channelPtr[i] = NULL;
+	}
+	controlChannel(0, NCON_MSG_NCP_END, b);
 	delete l;
 }
 
@@ -65,6 +75,7 @@ reset() {
 	}
 	failed = false;
 	lChan = NULL;
+ 	protocolVersion = PV_SERIES_5; // until detected on receipt of INFO
 	l->reset();
 }
 
@@ -363,6 +374,10 @@ send(int channel, bufferStore & a)
 void ncp::
 disconnect(int channel)
 {
+	if (channelPtr[channel] == NULL) {
+		cerr << "ncp: Ignored disconnect for unknown channel #" << channel << endl;
+		return;
+	}
 	channelPtr[channel]->terminateWhenAsked();
 	if (verbose & NCP_DEBUG_LOG)
 		cout << "ncp: disconnect: channel=" << channel << endl;
