@@ -1,6 +1,13 @@
 # $Id$
 #
-SUBDIRS = lib ncpd plpnfsd plpftp doc
+
+if BUILD_KDE
+KDESUB = kde2
+else
+KDESUB =
+endif
+
+SUBDIRS = lib ncpd plpnfsd plpftp plpbackup $(KDESUB) doc
 EXTRA_DIST = CHANGES COPYING README TODO INSTALL README.mjg include/*.h* etc/*magic etc/*.in patches
 DISTCLEANFILES = etc/psion
 AUTOMAKE_OPTIONS = foreign
@@ -11,8 +18,10 @@ TMPDEST=
 # Makefile.cvs
 #
 maintainer-clean-local:
-	rm -f configure aclocal.m4 config.guess config.sub Makefile.in \
-		install-sh ltconfig ltmain.sh missing mkinstalldirs etc/*.spec
+	rm -f configure aclocal.m4 Makefile.in libtool \
+	conf/config.guess conf/config.sub conf/install-sh conf/ltconfig \
+	conf/ltmain.sh conf/missing conf/mkinstalldirs \
+	etc/*.spec
 
 dist-hook:
 	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile

@@ -1,0 +1,17 @@
+AC_DEFUN(AC_SUBST_KFSSTND,
+[
+AC_SUBST(kde_htmldir)
+AC_SUBST(kde_appsdir)
+AC_SUBST(kde_icondir)
+AC_SUBST(kde_sounddir)
+AC_SUBST(kde_datadir)
+AC_SUBST(kde_locale)
+AC_SUBST(kde_cgidir)
+AC_SUBST(kde_confdir)
+AC_SUBST(kde_mimedir)
+AC_SUBST(kde_toolbardir)
+AC_SUBST(kde_wallpaperdir)
+AC_SUBST(kde_bindir)
+AC_SUBST(kde_servicesdir)
+AC_SUBST(kde_servicetypesdir)
+])

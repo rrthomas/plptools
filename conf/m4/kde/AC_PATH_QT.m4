@@ -1,0 +1,4 @@
+AC_DEFUN(AC_PATH_QT,
+[
+AC_PATH_QT_1_3
+])
