@@ -30,7 +30,8 @@
 #include <unistd.h>		/* for usleep() */
 #include <string.h>		/* for bzero() */
 #include <termios.h>
-#if defined(linux) || defined(_IBMR2) || defined(__NetBSD__)
+#if defined(linux) || defined(_IBMR2) || \
+	defined(__NetBSD__) || defined(__FreeBSD__)
 #include <sys/ioctl.h>		/* for ioctl() */
 #endif
 #include <sys/errno.h>
@@ -151,7 +152,8 @@ init_serial(const char *dev, int speed, int debug)
 #if defined(hpux) || defined(_IBMR2)
 	ti.c_cflag = CS8 | HUPCL | clocal | CREAD;
 #endif
-#if defined(sun) || defined(linux) || defined(__sgi) || defined(__NetBSD__)
+#if defined(sun) || defined(linux) || defined(__sgi) || \
+	defined(__NetBSD__) || defined(__FreeBSD__)
 	ti.c_cflag = CS8 | HUPCL | clocal | CRTSCTS | CREAD;
 	ti.c_iflag = IGNBRK | IGNPAR | IXON | IXOFF;
 	ti.c_cc[VMIN] = 1;
@@ -182,10 +184,11 @@ void
 ser_exit(int fd)
 {
 	struct termios ti;
-	if (ioctl(fd, TCGETS, (caddr_t) & ti) < 0)
-		perror("TCGETSW");
+
+	if (tcgetattr(fd, &ti) < 0)
+		perror("tcgetattr");
 	ti.c_cflag &= ~CRTSCTS;
 	if (tcsetattr(fd, TCSANOW, &ti) < 0)
-		perror("TCSETSW");
+		perror("tcsetattr");
 	(void) close(fd);
 }
