@@ -131,8 +131,9 @@ mp_main(int verbose, char *dir, char *user)
 
 	gettimeofday(&tv, &tz);
 
-	printf("plpnfsd: version %s, mounting on %s\n", VERSION, dir);
 	debug = verbose;
+	if (debug)
+		printf("plpnfsd: version %s, mounting on %s\n", VERSION, dir);
 
 	/* Check if mountdir is empty (or else you can overmount e.g /etc)
 	   It is done here, because exit hangs, if hardware flowcontrol is

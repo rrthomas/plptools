@@ -23,7 +23,8 @@ case "$1" in
 	;;
   stop)
 	echo -n "Shutting down Psion support: "
-	killproc plpnfsd
+	killproc plpnfsd -HUP
+	sleep 10 # allow plpnfsd flushing it's cache
 	killproc ncpd
 	echo
 	rm -f /var/lock/subsys/psion
