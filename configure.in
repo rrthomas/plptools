@@ -310,6 +310,7 @@ AC_OUTPUT(
 	doc/api/Makefile
 	include/config.h
 	etc/psion
+	etc/plptools.spec
 	doc/ncpd.man
 	doc/plpnfsd.man
 	doc/plpftp.man

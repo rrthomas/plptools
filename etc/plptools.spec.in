@@ -1,11 +1,11 @@
 Summary: Connectivity for psion series 5.
 Name: plptools
-%define version _VERSION_
+%define version @@VERSION@@
 Version: %{version}
 Release: 1
 Vendor: The plptools project
 Packager: Fritz Elfert <fritz.elfert@to.com>
-URL: http://sourceforge.net/projects/plptools
+URL: http://plptools.sourceforge.net/
 Source0: http://download.sourceforge.net/plptools/plptools-%{version}.tar.gz
 Copyright: GPL
 Group: Networking/Utilities
@@ -75,10 +75,13 @@ This package contains a KDE utility program for backup, restore and formatting
 Psion drives.
 
 %description -l de -n kpsion
-Dieses Packet enthält ein KDE werkzeug zum Backup, Restore und Farmatieren
+Dieses Packet enthält ein KDE werkzeug zum Backup, Restore und Formatieren
 von Psion Laufwerken.
 
 %changelog
+* Thu May 17 2001 Fritz Elfert <fritz.elfert@to.com>
+- Official release of version 0.8
+
 * Thu Mar  1 2001 Fritz Elfert <fritz.elfert@to.com>
 - Added KDE sub-packages
 
@@ -102,7 +105,8 @@ make
 
 %install
 mkdir -p $RPM_BUILD_ROOT/usr $RPM_BUILD_ROOT/etc/rc.d/init.d
-%makeinstall
+# rpm's makeinstall doesn't work here!
+make DESTDIR=$RPM_BUILD_ROOT install
 install -m755 etc/psion $RPM_BUILD_ROOT/etc/rc.d/init.d
 
 %clean
@@ -112,7 +116,7 @@ rm -rf $RPM_BUILD_ROOT
 ldconfig
 test ! -d /mnt/psion && mkdir -p /mnt/psion
 /sbin/chkconfig --add psion
-/etc/rc.d/init.d/psion restart
+/etc/rc.d/init.d/psion condrestart
 
 %preun
 if [ "$1" = 0 ]
@@ -143,6 +147,8 @@ fi
 %{_libdir}/libplpprops.so*
 %{_libdir}/libplpprops.la
 %{_datadir}/services/*
+%{_datadir}/icons/*/*/mimetypes/*
+%{_datadir}/icons/*/*/devices/*
 %{_datadir}/locale/*/LC_MESSAGES/libplpprops.mo
 %{_datadir}/mimelnk/*/*
 
@@ -151,5 +157,7 @@ fi
 %{_libdir}/libkpsion.*
 %{_datadir}/applnk/*/*
 %{_datadir}/apps/*/*
-%{_datadir}/icons/*/*/*/*
+%{_datadir}/icons/*/*/apps/*
+%{_datadir}/icons/*/*/actions/*
 %{_datadir}/locale/*/LC_MESSAGES/kpsion.mo
+%{_datadir}/doc/HTML/*/kpsion
