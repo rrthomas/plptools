@@ -38,8 +38,8 @@ sub add_doc($) {
 	my @files = collect_specified($_[0]);
 	return if ($#files lt 0);
 	foreach $idx (@files) {
-		my $id = get_id($files[0]);
-		die "Can't read ID attribute\n" if ($id eq "");
+		my $id = get_id($idx);
+		die "Can't read ID attribute in $idx\n" if ($id eq "");
 		my $ed = '<!ENTITY kio-' . $id . ' SYSTEM "' .
 			"$_[0].docbook" . '">';
 		my $er = '&kio-' . $id . ';';

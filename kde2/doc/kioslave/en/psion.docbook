@@ -12,7 +12,7 @@ To see the drives of a Psion, enter
 <para>
 or (if the Psion is connected at a remote machine)
 </para>
-<userinput><command>psion://</command><replaceable>host</replaceable></userinput>.
+<userinput><command>psion://</command><replaceable>host/</replaceable></userinput>.
 
 <para>
 The psion ioslave connects to a Psion using the ncpd daemon. Therefore,

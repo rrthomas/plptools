@@ -8,10 +8,12 @@ Psion PDAs möglich.
 
 <para>
 Um die Laufwerke eines Psion anzuzeigen, verwendet man
-<userinput><command>psion:/</command></userinput>
-oder (falls der Psion an einem anderen Rechner im Netz angeschlossen ist)
-<userinput><command>psion://</command><replaceable>host</replaceable></userinput>.
 </para>
+<userinput><command>psion:/</command></userinput>
+<para>
+oder (falls der Psion an einem anderen Rechner im Netz angeschlossen ist)
+</para>
+<userinput><command>psion://</command><replaceable>host/</replaceable></userinput>.
 
 <para>
 Das psion-Modul stellt die Verbindung zum Psion unter Verwendung des
