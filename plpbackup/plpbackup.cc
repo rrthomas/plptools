@@ -1422,7 +1422,7 @@ usage(ostream *hlp)
 	      "    -f, --full             Do a full backup (incremental otherwise).\n"
 	      "    -b, --backup[=TGZ]     Backup to specified archive TGZ.\n"
 	      "    -r, --restore=TGZ      Restore from specified archive TGZ.\n"
-	      "    -F, --format           Format drive (can be combined with restore).\n"
+	      "    -F, --format           Format drive (can be combined with restore) [UNIMPLEMENTED].\n"
 	      "\n"
 	      "  <drive> A drive character. If none given, scan all drives.\n"
 	      "\n");
