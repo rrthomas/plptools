@@ -31,7 +31,7 @@ class rfsvDirhandle {
  * of a Psion connected via ncpd. This class defines the
  * interface and a small amount of common constants and
  * methods. The majority of implementation is provided
- * by @ref rfsv32 and @ref rfsv16, which implement the
+ * by @ref rfsv32 and @ref rfsv16 , which implement the
  * variations of the protocol for EPOC and SIBO respectively.
  * Usually, the class @ref rfsvfactory is used to instantiate
  * the correct variant depending on the remote machine,
@@ -193,7 +193,7 @@ class rfsv {
 		 *               and @ref open_mode to the machine-specific representation.
 		 * @param name   The name of the file to open.
 		 * @param handle The handle for usage with @ref fread ,
-		 *               @ref frwrite , @ref fseek or @ref fclose is returned here.
+		 *               @ref fwrite , @ref fseek or @ref fclose is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
@@ -204,7 +204,7 @@ class rfsv {
 		 * The file is opened for reading and writing.
 		 *
 		 * @param handle The handle for usage with @ref fread ,
-		 *               @ref frwrite , @ref fseek or @ref fclose is returned here.
+		 *               @ref fwrite , @ref fseek or @ref fclose is returned here.
 		 * @param name   The name of the temporary file is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
@@ -218,7 +218,7 @@ class rfsv {
 		 *               and @ref open_mode to the machine-specific representation.
 		 * @param name   The name of the file to create.
 		 * @param handle The handle for usage with @ref fread ,
-		 *               @ref frwrite , @ref fseek or @ref fclose is returned here.
+		 *               @ref fwrite , @ref fseek or @ref fclose is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
@@ -231,7 +231,7 @@ class rfsv {
 		 *               and @ref open_mode to the machine-specific representation.
 		 * @param name   The name of the file to create.
 		 * @param handle The handle for usage with @ref fread ,
-		 *               @ref frwrite , @ref fseek or @ref fclose is returned here.
+		 *               @ref fwrite , @ref fseek or @ref fclose is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
@@ -247,14 +247,13 @@ class rfsv {
 
 		/**
 		 * Reads a directory on the Psion.
-		 * The returned array of @ref bufferArray contains one @ref bufferStore element
-		 * for each directory entry. For a description of the layout of the elements
-		 * in each directory entry, see @ref readdir .
+		 * The returned STL deque of @ref PlpDirent contains all
+		 * requested directory entries.
 		 *
 		 * @param name The name of the directory
 		 * @param ret  An STL deque of @ref PlpDirent entries.
 		 *
-		 * @returns A Psion error code (One of enum @ref #errs ).
+		 * @returns A Psion error code (One of enum @ref rfsv::errs ).
 		 */
 		virtual Enum<errs> dir(const char * const name, PlpDir &ret) = 0;
 
@@ -551,7 +550,7 @@ class rfsv {
 		 * @param mode The generic open mode.
 		 *
 		 * @returns The machine specific representation for use with
-		 *          @ref fopen, @ref fcreatefile and @freplacefile.
+		 *          @ref fopen , @ref fcreatefile and @freplacefile.
 		 */
 		virtual long opMode(const long mode) = 0;
 protected:

@@ -83,7 +83,7 @@ public:
 	void setName(const char *str);
 
 	/**
-	 * Assignment opreator
+	 * Assignment operator
 	 * Mainly used by STL container classes.
 	 *
 	 * @param e The new value to assign.
