@@ -1,7 +1,9 @@
 Makefile.in
+Makefile.am
 Makefile
 aclocal.m4
 configure
+configure.in
 libtool
 config.status
 config.cache
