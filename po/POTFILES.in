@@ -15,4 +15,8 @@ plpftp/main.cc
 plpftp/ftp.cc
 plpbackup/plpbackup.cc
 sisinstall/sismain.cpp
+ncpd/main.cc
+ncpd/link.cc
+plpnfsd/main.cc
+plpprint/plpprintd.cc
 

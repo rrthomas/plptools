@@ -5,14 +5,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-03-18 08:28+0100\n"
-"PO-Revision-Date: 2002-03-18 08:54CET\n"
+"POT-Creation-Date: 2002-07-08 00:00+0200\n"
+"PO-Revision-Date: 2002-07-08 00:06CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 0.9.5\n"
+"X-Generator: KBabel 0.9.6\n"
 
 #: lib/rfsv.cc:31 lib/rfsvfactory.cc:43 lib/rpcsfactory.cc:43
 msgid "no error"
@@ -520,7 +520,7 @@ msgstr " Minuten "
 msgid " minute "
 msgstr " Minute "
 
-#: lib/psitime.h:80 plpftp/ftp.cc:842
+#: lib/psitime.h:80 plpftp/ftp.cc:818 plpftp/ftp.cc:820 plpftp/ftp.cc:903
 msgid " seconds"
 msgstr " Sekunden"
 
@@ -552,7 +552,7 @@ msgstr "Keine Antwort vom ncpd"
 msgid "Not present"
 msgstr "Nicht vorhanden"
 
-#: lib/plpdirent.cc:174
+#: lib/plpdirent.cc:174 ncpd/link.cc:54
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -620,237 +620,257 @@ msgstr "Formatierbar"
 msgid "write protected"
 msgstr "Schreibgeschützt"
 
-#: lib/siscomponentrecord.cpp:56
+#: lib/siscomponentrecord.cpp:61
 #, c-format
 msgid "Length too large for name record %d.\n"
-msgstr ""
+msgstr "Länge %d zu groß für einen Komponenten-Eintrag.\n"
 
-#: lib/siscomponentrecord.cpp:70
+#: lib/siscomponentrecord.cpp:76
 #, c-format
 msgid "Position/length too large for name record %d.\n"
-msgstr ""
+msgstr "Position/Länge %d zu groß für einen Namens-Eintrag.\n"
 
-#: lib/siscomponentrecord.cpp:75 lib/sisreqrecord.cpp:67
+#: lib/siscomponentrecord.cpp:81
 #, c-format
 msgid "Name %d (for %s) is %.*s\n"
-msgstr ""
+msgstr "Name %d (für %s) ist %.*s\n"
 
-#: lib/siscomponentrecord.cpp:86
+#: lib/siscomponentrecord.cpp:92
 #, c-format
 msgid "%d .. %d (%d bytes): Name records\n"
-msgstr ""
+msgstr "%d .. %d (%d bytes): Namens-Einträge\n"
 
-#: lib/sisfile.cpp:44
+#: lib/sisfile.cpp:58
 #, c-format
 msgid "Could not read header, rc = %d\n"
 msgstr "Konnte Vorspann nicht lesen, rc = %d\n"
 
-#: lib/sisfile.cpp:48
+#: lib/sisfile.cpp:62
 #, c-format
 msgid "Ate header, got ix = %d\n"
 msgstr "Vorspann konsumiert, ergab ix = %d\n"
 
-#: lib/sisfile.cpp:63
+#: lib/sisfile.cpp:77
 #, c-format
 msgid "Problem reading language record %d, rc = %d.\n"
 msgstr "Problem beim Lesen des Sprach-Eintrags %d, rc = %d.\n"
 
-#: lib/sisfile.cpp:80
+#: lib/sisfile.cpp:95
 #, c-format
 msgid "Problem reading requisite record %d, rc = %d.\n"
 msgstr "Problem beim Lesen des Requisiten-Eintrags %d, rc = %d.\n"
 
-#: lib/sisfile.cpp:91
+#: lib/sisfile.cpp:109
 #, c-format
 msgid "Problem reading the name record, rc = %d.\n"
-msgstr ""
+msgstr "Problem beim Lesen des Namens-Eintrags, rc = %d.\n"
 
-#: lib/sisfile.cpp:107
+#: lib/sisfile.cpp:126
 #, c-format
 msgid "Problem reading file record %d, rc = %d.\n"
-msgstr ""
+msgstr "Problem beim Lesen des Datei-Eintrags %d, rc = %d.\n"
 
 #: lib/sisfileheader.cpp:57
 #, c-format
 msgid "Got uid1 = %08x\n"
-msgstr ""
+msgstr "Uid1 (%08x) ermittelt\n"
 
 #: lib/sisfileheader.cpp:61
 msgid "Got bad uid2.\n"
-msgstr ""
+msgstr "Ungültige Uid2 entdeckt.\n"
 
 #: lib/sisfileheader.cpp:65
 #, c-format
 msgid "Got uid2 = %08x\n"
-msgstr ""
+msgstr "Uid2 (%08x) ermittelt\n"
 
 #: lib/sisfileheader.cpp:69
 msgid "Got bad uid3.\n"
-msgstr ""
+msgstr "Ungültige Uid3 entdeckt.\n"
 
 #: lib/sisfileheader.cpp:73
 #, c-format
 msgid "Got uid3 = %08x\n"
-msgstr ""
+msgstr "Uid3 (%08x) ermittelt\n"
 
 #: lib/sisfileheader.cpp:83
 #, c-format
 msgid "Got first crc = %08x, wanted %08x\n"
-msgstr ""
+msgstr "Erste CRC = %08x, erwartet wurde: %08x\n"
 
 #: lib/sisfileheader.cpp:87
 msgid "Got bad crc.\n"
-msgstr ""
+msgstr "Ungültige CRC erhalten.\n"
 
 #: lib/sisfileheader.cpp:93
 #, c-format
 msgid "Got %d languages\n"
-msgstr ""
+msgstr "%d Sprachen ermittelt.\n"
 
 #: lib/sisfileheader.cpp:96
-#, fuzzy, c-format
+#, c-format
 msgid "Got %d files\n"
-msgstr " Dateien."
+msgstr "%d Dateien ermittelt\n"
 
 #: lib/sisfileheader.cpp:99
 #, c-format
 msgid "Got %d reqs\n"
-msgstr ""
+msgstr "%d Abhängigkeiten ermittelt\n"
 
 #: lib/sisfileheader.cpp:102
 #, c-format
 msgid "Selected language is %d\n"
-msgstr ""
+msgstr "Gewählte Sprache is %d\n"
 
 #: lib/sisfileheader.cpp:105
 #, c-format
 msgid "Installed files: %d / %d\n"
-msgstr ""
+msgstr "Installierte Dateien: %d / %d\n"
 
 #: lib/sisfileheader.cpp:108
 #, c-format
 msgid "Installed on drive %c\n"
-msgstr ""
+msgstr "Installiert auf Laufwerk %c\n"
 
 #: lib/sisfileheader.cpp:111
 #, c-format
 msgid "Got installer version: %08x\n"
-msgstr ""
+msgstr "Installationsprogramm, Version %08x ermittelt\n"
 
 #: lib/sisfileheader.cpp:114
 #, c-format
 msgid "Got options: %04x\n"
-msgstr ""
+msgstr "Optionen %04x ermittelt\n"
 
 #: lib/sisfileheader.cpp:117
 #, c-format
-msgid "Got type: %0x\n"
-msgstr ""
+msgid "Got type: %04x\n"
+msgstr "Typ %04x ermittelt\n"
 
 #: lib/sisfileheader.cpp:120
 #, c-format
 msgid "Got major: %d\n"
-msgstr ""
+msgstr "Hauptversion %d ermittelt\n"
 
 #: lib/sisfileheader.cpp:123
 #, c-format
 msgid "Got minor: %d\n"
-msgstr ""
+msgstr "Unterversion %d ermittelt\n"
 
 #: lib/sisfileheader.cpp:126
 #, c-format
 msgid "Got variant: %d\n"
-msgstr ""
+msgstr "Variante %d ermittelt\n"
 
 #: lib/sisfileheader.cpp:129
 #, c-format
 msgid "Languages begin at %d\n"
-msgstr ""
+msgstr "Sprachen beginnen bei %d\n"
 
 #: lib/sisfileheader.cpp:134
 #, c-format
 msgid "Files begin at %d\n"
-msgstr ""
+msgstr "Dateien beginnen bei %d\n"
 
 #: lib/sisfileheader.cpp:139
 #, c-format
 msgid "Requisites begin at %d\n"
-msgstr ""
+msgstr "Abhängigkeiten beginnen bei %d\n"
 
 #: lib/sisfileheader.cpp:145
 #, c-format
 msgid "Components begin at %d\n"
-msgstr ""
-
-#: lib/sisfilerecord.cpp:39
-#, c-format
-msgid "Got flags %d\n"
-msgstr ""
+msgstr "Komponenten beginnen bei %d\n"
 
 #: lib/sisfilerecord.cpp:42
 #, c-format
-msgid "Got file type %d\n"
-msgstr ""
+msgid "Got flags %d\n"
+msgstr "Flags %d ermittelt\n"
 
 #: lib/sisfilerecord.cpp:45
 #, c-format
-msgid "Got file details %d\n"
-msgstr ""
+msgid "Got file type %d\n"
+msgstr "Dateityp %d ermittelt\n"
 
-#: lib/sisfilerecord.cpp:52
+#: lib/sisfilerecord.cpp:48
+#, c-format
+msgid "Got file details %d\n"
+msgstr "Dateidetails %d ermittelt\n"
+
+#: lib/sisfilerecord.cpp:55
 #, c-format
 msgid "Got source name %.*s\n"
-msgstr ""
+msgstr "Quell-Dateiname %.*s ermittelt\n"
 
-#: lib/sisfilerecord.cpp:58
+#: lib/sisfilerecord.cpp:61
 #, c-format
 msgid "Got destination name %.*s\n"
-msgstr ""
+msgstr "Ziel-Dateiname %.*s ermittelt\n"
 
-#: lib/sisfilerecord.cpp:69
+#: lib/sisfilerecord.cpp:72
 #, c-format
 msgid "File is %d bytes long (at %d) (to %d)\n"
-msgstr ""
+msgstr "Datei is %d bytes groß (bei %d) (bis %d)\n"
 
-#: lib/sisfilerecord.cpp:73
+#: lib/sisfilerecord.cpp:76
 #, c-format
 msgid "%d .. %d (%d bytes): Single file record type %d, %.*s\n"
-msgstr ""
+msgstr "%d .. %d (%d bytes): Einzelner Dateieintrag typ %d, %.*s\n"
 
-#: lib/sisfilerecord.cpp:103
+#: lib/sisfilerecord.cpp:106
 #, c-format
 msgid "File %d (for %s) is %d bytes long (at %d)\n"
-msgstr ""
+msgstr "Datei %d (für %s) ist %d bytes groß (bei %d)\n"
 
-#: lib/sisfilerecord.cpp:109
+#: lib/sisfilerecord.cpp:112
 #, c-format
 msgid "%d .. %d (%d bytes): File record (%s) for %.*s\n"
-msgstr ""
+msgstr "%d .. %d (%d bytes): Dateieintrag (%s) für %.*s\n"
 
-#: lib/sisfilerecord.cpp:121
+#: lib/sisfilerecord.cpp:124
 #, c-format
 msgid "Unknown file flags %d\n"
-msgstr ""
+msgstr "Unbekannte Datei-Flags: %d\n"
 
 #: lib/sislangrecord.cpp:37
 #, c-format
 msgid "Got language %d (%s)\n"
-msgstr ""
+msgstr "Sprache %d (%s) ermittelt\n"
 
 #: lib/sislangrecord.cpp:39
 #, c-format
 msgid "%d .. %d (%d bytes): Language record for %s\n"
-msgstr ""
+msgstr "%d .. %d (%d bytes): Sprach-Eintrag für %s\n"
 
-#: lib/sisreqrecord.cpp:62
+#: lib/sisreqrecord.cpp:46
+#, c-format
+msgid "Requisite: uid=%08x, version=%d.%d-%d.\n"
+msgstr "Requisite: uid=%08x, version=%d,%d-%d.\n"
+
+#: lib/sisreqrecord.cpp:56
+#, c-format
+msgid "Got namelength %d\n"
+msgstr "Ermittelte Namenslänge %d\n"
+
+#: lib/sisreqrecord.cpp:66
+#, c-format
+msgid "Got namepos %d\n"
+msgstr "Ermittelte Namens-Position %d\n"
+
+#: lib/sisreqrecord.cpp:69
 #, c-format
 msgid "Position/length too large for req record %d.\n"
-msgstr ""
+msgstr "Position/Länge %d zu groß für einen Abhängigkeits-Eintrag.\n"
 
 #: lib/sisreqrecord.cpp:74
 #, c-format
-msgid "%d .. %d (%d bytes): Req record\n"
-msgstr ""
+msgid "Name of requisite for %s is %.*s\n"
+msgstr "Name der Prärequisite für %s ist %.*s\n"
+
+#: lib/sisreqrecord.cpp:80
+#, c-format
+msgid "%d .. %d (%d bytes): Req record for uid %08x\n"
+msgstr "%d .. %d (%d bytes): Req eintrag für UID %08x\n"
 
 #: plpftp/main.cc:50
 msgid ""
@@ -934,301 +954,397 @@ msgstr "Bekannte FTP Kommandos:"
 msgid "Known RPC commands:"
 msgstr "Bekannte RPC Kommandos:"
 
-#: plpftp/ftp.cc:227
+#: plpftp/ftp.cc:228
 msgid "Connected to a "
 msgstr "Verbunden mit einem "
 
-#: plpftp/ftp.cc:227
+#: plpftp/ftp.cc:228
 msgid " at "
 msgstr " bei "
 
-#: plpftp/ftp.cc:228
+#: plpftp/ftp.cc:229
 msgid " baud, OwnerInfo:"
 msgstr " baud, Benutzerinfo:"
 
-#: plpftp/ftp.cc:234
+#: plpftp/ftp.cc:235
 msgid "OwnerInfo returned error "
 msgstr "OwnerInfo lieferte Fehler "
 
-#: plpftp/ftp.cc:254
+#: plpftp/ftp.cc:255
 msgid "FATAL: Couldn't find default Drive"
 msgstr "FATAL: Konnte Standard-Laufwerk nicht ermitteln"
 
-#: plpftp/ftp.cc:263
+#: plpftp/ftp.cc:264
 msgid "Psion dir is: \""
 msgstr "Psion Ordner ist: \""
 
-#: plpftp/ftp.cc:278
+#: plpftp/ftp.cc:279
 msgid "Prompting now "
 msgstr "Prompt ist nun "
 
-#: plpftp/ftp.cc:278 plpftp/ftp.cc:283
+#: plpftp/ftp.cc:279 plpftp/ftp.cc:284
 msgid "on"
 msgstr "an"
 
-#: plpftp/ftp.cc:278 plpftp/ftp.cc:283
+#: plpftp/ftp.cc:279 plpftp/ftp.cc:284 plpftp/ftp.cc:796 plpftp/ftp.cc:799
+#: plpftp/ftp.cc:802
 msgid "off"
 msgstr "aus"
 
-#: plpftp/ftp.cc:283
+#: plpftp/ftp.cc:284
 msgid "Hash printing now "
 msgstr "Fortschrittsanzeige ist nun "
 
-#: plpftp/ftp.cc:288
+#: plpftp/ftp.cc:289
 msgid "Local dir: \""
 msgstr "Lokaler Ordner: \""
 
-#: plpftp/ftp.cc:289
+#: plpftp/ftp.cc:290
 msgid "Psion dir: \""
 msgstr "Psion Ordner: \""
 
-#: plpftp/ftp.cc:294 plpftp/ftp.cc:304 plpftp/ftp.cc:313 plpftp/ftp.cc:321
-#: plpftp/ftp.cc:329 plpftp/ftp.cc:339 plpftp/ftp.cc:351 plpftp/ftp.cc:401
-#: plpftp/ftp.cc:407 plpftp/ftp.cc:435 plpftp/ftp.cc:477 plpftp/ftp.cc:534
-#: plpftp/ftp.cc:557 plpftp/ftp.cc:583 plpftp/ftp.cc:620 plpftp/ftp.cc:648
-#: plpftp/ftp.cc:709 plpftp/ftp.cc:729 plpftp/ftp.cc:736 plpftp/ftp.cc:743
-#: plpftp/ftp.cc:806 plpftp/ftp.cc:816 plpftp/ftp.cc:879 plpftp/ftp.cc:921
-#: plpftp/ftp.cc:931 plpftp/ftp.cc:952 plpftp/ftp.cc:978 plpftp/ftp.cc:1043
+#: plpftp/ftp.cc:295 plpftp/ftp.cc:305 plpftp/ftp.cc:314 plpftp/ftp.cc:322
+#: plpftp/ftp.cc:330 plpftp/ftp.cc:340 plpftp/ftp.cc:352 plpftp/ftp.cc:402
+#: plpftp/ftp.cc:408 plpftp/ftp.cc:436 plpftp/ftp.cc:478 plpftp/ftp.cc:535
+#: plpftp/ftp.cc:558 plpftp/ftp.cc:584 plpftp/ftp.cc:621 plpftp/ftp.cc:649
+#: plpftp/ftp.cc:710 plpftp/ftp.cc:730 plpftp/ftp.cc:737 plpftp/ftp.cc:744
+#: plpftp/ftp.cc:784 plpftp/ftp.cc:867 plpftp/ftp.cc:877 plpftp/ftp.cc:940
+#: plpftp/ftp.cc:982 plpftp/ftp.cc:992 plpftp/ftp.cc:1013 plpftp/ftp.cc:1039
+#: plpftp/ftp.cc:1104
 msgid "Error: "
 msgstr "Fehler: "
 
-#: plpftp/ftp.cc:409
+#: plpftp/ftp.cc:410
 msgid " Entries"
 msgstr " Einträge"
 
-#: plpftp/ftp.cc:415
+#: plpftp/ftp.cc:416
 msgid "Drive Type Volname     Total     Free      UniqueID"
 msgstr "LW    Typ  Vol.Name    Total     Frei      Eind.ID"
 
-#: plpftp/ftp.cc:493
+#: plpftp/ftp.cc:494
 msgid "No such directory"
 msgstr "Kein solcher Ordner"
 
-#: plpftp/ftp.cc:494 plpftp/ftp.cc:535
+#: plpftp/ftp.cc:495 plpftp/ftp.cc:536
 msgid "Keeping original directory \""
 msgstr "Behalte ursprünglichen Ordner \""
 
-#: plpftp/ftp.cc:574 plpftp/ftp.cc:665
+#: plpftp/ftp.cc:575 plpftp/ftp.cc:666
 msgid "Transfer complete, ("
 msgstr "Übertragung abgeschlossen, ("
 
-#: plpbackup/plpbackup.cc:1060 plpftp/ftp.cc:575 plpftp/ftp.cc:666
+#: plpbackup/plpbackup.cc:1200 plpftp/ftp.cc:576 plpftp/ftp.cc:667
 msgid " bytes in "
 msgstr " Bytes in "
 
-#: plpftp/ftp.cc:576 plpftp/ftp.cc:667
+#: plpftp/ftp.cc:577 plpftp/ftp.cc:668
 msgid " secs = "
 msgstr " sek. = "
 
-#: plpftp/ftp.cc:596
+#: plpftp/ftp.cc:597
 msgid "Get \""
 msgstr "Hole \""
 
-#: plpftp/ftp.cc:625 plpftp/ftp.cc:714
+#: plpftp/ftp.cc:626 plpftp/ftp.cc:715
 msgid "Transfer complete\n"
 msgstr "Übertragung abgeschlossen\n"
 
-#: plpftp/ftp.cc:691
+#: plpftp/ftp.cc:692
 msgid "Put \""
 msgstr "Sende \""
 
-#: plpftp/ftp.cc:721
+#: plpftp/ftp.cc:722
 msgid "Error in directory name \""
 msgstr "Fehler in Ordner-Namen \""
 
-#: plpftp/ftp.cc:757
+#: plpftp/ftp.cc:758
 msgid "Starting subshell ...\n"
 msgstr "Starte Sub-Shell ...\n"
 
-#: plpftp/ftp.cc:820
-msgid "General:"
-msgstr "Allgemein:"
+#: plpftp/ftp.cc:788
+msgid "Unknown setup info received"
+msgstr "Unbekannte Einstellungen empfangen"
+
+#: plpftp/ftp.cc:791
+msgid "Setup information:"
+msgstr "Einstellungen:"
+
+#: plpftp/ftp.cc:792
+msgid "  Screen contrast:                  "
+msgstr "  Anzeige Kontrast:                        "
+
+#: plpftp/ftp.cc:794
+msgid "  Keyboard click:                   "
+msgstr "  Tastatur Klick:                          "
+
+#: plpftp/ftp.cc:796 plpftp/ftp.cc:799 plpftp/ftp.cc:802
+msgid "high"
+msgstr "laut"
+
+#: plpftp/ftp.cc:796 plpftp/ftp.cc:799 plpftp/ftp.cc:802
+msgid "low"
+msgstr "leise"
+
+#: plpftp/ftp.cc:797
+msgid "  Screen click:                     "
+msgstr "  Bildschirm Klick:                        "
+
+#: plpftp/ftp.cc:800
+msgid "  Error sound:                      "
+msgstr "  Fehlerton:                               "
+
+#: plpftp/ftp.cc:803
+msgid "  Auto-switch off:                  "
+msgstr "  Automatisches Ausschalten:               "
+
+#: plpftp/ftp.cc:806 plpftp/ftp.cc:832
+msgid "never"
+msgstr "nie"
+
+#: plpftp/ftp.cc:809
+msgid "if running on battery power"
+msgstr "bei Batteriebetrieb"
+
+#: plpftp/ftp.cc:812 plpftp/ftp.cc:838
+msgid "always"
+msgstr "immer"
+
+#: plpftp/ftp.cc:817
+msgid "  Switch off after:                 "
+msgstr "  Ausschalten nach:                        "
+
+#: plpftp/ftp.cc:819
+msgid "  Backlight off after:              "
+msgstr "  Hintergrundbeleuchtung ausschalten nach: "
 
 #: plpftp/ftp.cc:821
-msgid "  Machine Type: "
-msgstr "  Geräte Typ:     "
+msgid "  Switch on when tapping on screen: "
+msgstr "  Einschalten beim Tippen auf die Anzeige: "
 
-#: plpftp/ftp.cc:822
-msgid "  Machine Name: "
-msgstr "  Modell Name:    "
-
-#: plpftp/ftp.cc:823
-msgid "  Machine UID:  "
-msgstr "  Geräte-ID:      "
-
-#: plpftp/ftp.cc:824
-msgid "  UI Language:  "
-msgstr "  UI-Sprache:     "
-
-#: plpftp/ftp.cc:825
-msgid "ROM:"
-msgstr "ROM:"
-
-#: plpftp/ftp.cc:826
-msgid "  Version:      "
-msgstr "  Version:        "
-
-#: plpftp/ftp.cc:828 plpftp/ftp.cc:832
-msgid "  Size:         "
-msgstr "  Größe:          "
-
-#: plpftp/ftp.cc:829
-msgid "  Programmable: "
-msgstr "  Programmierbar: "
-
-#: plpftp/ftp.cc:830 plpftp/ftp.cc:844 plpftp/ftp.cc:862
+#: plpftp/ftp.cc:822 plpftp/ftp.cc:824 plpftp/ftp.cc:826 plpftp/ftp.cc:828
+#: plpftp/ftp.cc:891 plpftp/ftp.cc:905 plpftp/ftp.cc:923
 msgid "yes"
 msgstr "ja"
 
-#: plpftp/ftp.cc:830 plpftp/ftp.cc:844 plpftp/ftp.cc:862
+#: plpftp/ftp.cc:822 plpftp/ftp.cc:824 plpftp/ftp.cc:826 plpftp/ftp.cc:828
+#: plpftp/ftp.cc:891 plpftp/ftp.cc:905 plpftp/ftp.cc:923
 msgid "no"
 msgstr "nein"
 
-#: plpftp/ftp.cc:831
+#: plpftp/ftp.cc:823
+msgid "  Switch on when opening:           "
+msgstr "  Einschalten beim Öffnen:                 "
+
+#: plpftp/ftp.cc:825
+msgid "  Switch off when closing:          "
+msgstr "  Ausschalten beim Schließen:              "
+
+#: plpftp/ftp.cc:827
+msgid "  Ask for password on startup:      "
+msgstr "  Beim Einschalten nach Passwort fragen:   "
+
+#: plpftp/ftp.cc:829
+msgid "  Show Owner info on startup:       "
+msgstr "  Beim Einschalten Eigentümer anzeigen:    "
+
+#: plpftp/ftp.cc:835
+msgid "once a day"
+msgstr "einmal täglich"
+
+#: plpftp/ftp.cc:881
+msgid "General:"
+msgstr "Allgemein:"
+
+#: plpftp/ftp.cc:882
+msgid "  Machine Type: "
+msgstr "  Geräte Typ:     "
+
+#: plpftp/ftp.cc:883
+msgid "  Machine Name: "
+msgstr "  Modell Name:    "
+
+#: plpftp/ftp.cc:884
+msgid "  Machine UID:  "
+msgstr "  Geräte-ID:      "
+
+#: plpftp/ftp.cc:885
+msgid "  UI Language:  "
+msgstr "  UI-Sprache:     "
+
+#: plpftp/ftp.cc:886
+msgid "ROM:"
+msgstr "ROM:"
+
+#: plpftp/ftp.cc:887
+msgid "  Version:      "
+msgstr "  Version:        "
+
+#: plpftp/ftp.cc:889 plpftp/ftp.cc:893
+msgid "  Size:         "
+msgstr "  Größe:          "
+
+#: plpftp/ftp.cc:890
+msgid "  Programmable: "
+msgstr "  Programmierbar: "
+
+#: plpftp/ftp.cc:892
 msgid "RAM:"
 msgstr "RAM:"
 
-#: plpftp/ftp.cc:833
+#: plpftp/ftp.cc:894
 msgid "  Free:         "
 msgstr "  Frei:           "
 
-#: plpftp/ftp.cc:834
+#: plpftp/ftp.cc:895
 msgid "  Free max:     "
 msgstr "  Max frei:       "
 
-#: plpftp/ftp.cc:835
+#: plpftp/ftp.cc:896
 msgid "RAM disk size:  "
 msgstr "RAM Disk Größe:   "
 
-#: plpftp/ftp.cc:836
+#: plpftp/ftp.cc:897
 msgid "Registry size:  "
 msgstr "Registry-Größe:   "
 
-#: plpftp/ftp.cc:837
+#: plpftp/ftp.cc:898
 msgid "Display size:   "
 msgstr "Anzeige-Größe:    "
 
-#: plpftp/ftp.cc:839
+#: plpftp/ftp.cc:900
 msgid "Time:"
 msgstr "Zeit:"
 
-#: plpftp/ftp.cc:841
+#: plpftp/ftp.cc:902
 msgid "  Current time: "
 msgstr "  Aktuelle Zeit:  "
 
-#: plpftp/ftp.cc:842
+#: plpftp/ftp.cc:903
 msgid "  UTC offset:   "
 msgstr "  UTC-Abweichung: "
 
-#: plpftp/ftp.cc:843
+#: plpftp/ftp.cc:904
 msgid "  DST:          "
 msgstr "  Sommerzeit:     "
 
-#: plpftp/ftp.cc:845
+#: plpftp/ftp.cc:906
 msgid "  Timezone:     "
 msgstr "  Zeitzone:       "
 
-#: plpftp/ftp.cc:846
+#: plpftp/ftp.cc:907
 msgid "  Country Code: "
 msgstr "  Länder-Code:    "
 
-#: plpftp/ftp.cc:847
+#: plpftp/ftp.cc:908
 msgid "Main battery:"
 msgstr "Hauptbatterie:"
 
-#: plpftp/ftp.cc:849
+#: plpftp/ftp.cc:910
 msgid "  Changed at:   "
 msgstr "  Gewechselt am:  "
 
-#: plpftp/ftp.cc:850 plpftp/ftp.cc:863
+#: plpftp/ftp.cc:911 plpftp/ftp.cc:924
 msgid "  Used for:     "
 msgstr "  Benutzt:        "
 
-#: plpftp/ftp.cc:851 plpftp/ftp.cc:857
+#: plpftp/ftp.cc:912 plpftp/ftp.cc:918
 msgid "  Status:       "
 msgstr "  Status:         "
 
-#: plpftp/ftp.cc:852
+#: plpftp/ftp.cc:913
 msgid "  Current:      "
 msgstr "  Strom:          "
 
-#: plpftp/ftp.cc:853
+#: plpftp/ftp.cc:914
 msgid "  UsedPower:    "
 msgstr "  Verbrauch:      "
 
-#: plpftp/ftp.cc:854 plpftp/ftp.cc:858
+#: plpftp/ftp.cc:915 plpftp/ftp.cc:919
 msgid "  Voltage:      "
 msgstr "  Spannung:       "
 
-#: plpftp/ftp.cc:855 plpftp/ftp.cc:859
+#: plpftp/ftp.cc:916 plpftp/ftp.cc:920
 msgid "  Max. voltage: "
 msgstr "  Max. Spannung:  "
 
-#: plpftp/ftp.cc:856
+#: plpftp/ftp.cc:917
 msgid "Backup battery:"
 msgstr "Sicherungs-Batterie:"
 
-#: plpftp/ftp.cc:860
+#: plpftp/ftp.cc:921
 msgid "External power:"
 msgstr "Externe Stromversorgung:"
 
-#: plpftp/ftp.cc:861
+#: plpftp/ftp.cc:922
 msgid "  Supplied:     "
 msgstr "  Angeschlossen:  "
 
-#: plpftp/ftp.cc:872
+#: plpftp/ftp.cc:933
 msgid "Could not read processlist "
 msgstr "Konnte Prozessliste nicht lesen "
 
-#: plpftp/ftp.cc:880
+#: plpftp/ftp.cc:941
 msgid " is not a process list saved with killsave"
 msgstr " ist keine mit killsave gespeicherte Prozessliste"
 
-#: plpftp/ftp.cc:920
+#: plpftp/ftp.cc:981
 msgid "Could not start "
 msgstr "Konnte nicht starten: "
 
-#: plpftp/ftp.cc:935
+#: plpftp/ftp.cc:996
 msgid "Could not write processlist "
 msgstr "Konnte Prozessliste nicht schreiben "
 
-#: plpftp/ftp.cc:971
+#: plpftp/ftp.cc:1032
 msgid "no such process"
 msgstr "Kein solcher Prozess"
 
-#: plpftp/ftp.cc:987
+#: plpftp/ftp.cc:1048
 msgid "syntax error. Try \"help\""
 msgstr "Syntaxfehler. Probieren Sie \"help\""
 
-#: plpbackup/plpbackup.cc:94
+#: plpbackup/plpbackup.cc:98
 msgid "Could not get user's home directory from /etc/passwd"
 msgstr "Konnte das persönliche Verzeichnis nicht ermitteln"
 
-#: plpbackup/plpbackup.cc:109
+#: plpbackup/plpbackup.cc:118
 msgid "Could not get machine UID"
 msgstr "Konnte Geräte-UID nicht ermitteln"
 
-#: plpbackup/plpbackup.cc:137
+#: plpbackup/plpbackup.cc:138
+msgid "Could not read SIBO UID file"
+msgstr "Konnte SIBO UID Datei nicht lesen"
+
+#: plpbackup/plpbackup.cc:143
+msgid "Could not get Psion owner info"
+msgstr "Konnte Geräte-Eigner nicht ermitteln"
+
+#: plpbackup/plpbackup.cc:170
+msgid "Could not write SIBO UID file "
+msgstr "Konnte SIBO UID Datei nicht schreiben "
+
+#: plpbackup/plpbackup.cc:200
 msgid "Got signal "
 msgstr "Empfang von Signal "
 
-#: plpbackup/plpbackup.cc:149
+#: plpbackup/plpbackup.cc:212
 msgid "Abort? (y/N) "
 msgstr "Abbruch? (j/N) "
 
-#: plpbackup/plpbackup.cc:150 plpbackup/plpbackup.cc:671
+#: plpbackup/plpbackup.cc:213
 msgid "Y"
 msgstr "J"
 
-#: plpbackup/plpbackup.cc:166
+#: plpbackup/plpbackup.cc:229
 msgid "Stopping programs ..."
 msgstr "Stoppe Programme ..."
 
-#: plpbackup/plpbackup.cc:168
+#: plpbackup/plpbackup.cc:231
 msgid "plpbackup: Could not get process list: "
 msgstr "plpbackup: Konnte Prozessliste nicht lesen "
 
-#: plpbackup/plpbackup.cc:188
+#: plpbackup/plpbackup.cc:251
 msgid ""
 "Could not stop all processes. Please stop running\n"
 "programs manually on the Psion, then hit return."
@@ -1236,111 +1352,232 @@ msgstr ""
 "Konnte nicht alle Prozesse stoppen. Bitte beenden Sie\n"
 "laufende Programme manuell auf dem Psion. Drücken Sie dann RETURN."
 
-#: plpbackup/plpbackup.cc:203
+#: plpbackup/plpbackup.cc:266
 msgid "Restarting programs ..."
 msgstr "Starte Programme ..."
 
-#: plpbackup/plpbackup.cc:816 plpbackup/plpbackup.cc:947
+#: plpbackup/plpbackup.cc:485
+msgid "Performing "
+msgstr "Ausführen von "
+
+#: plpbackup/plpbackup.cc:487
+msgid "format"
+msgstr "Formatierung"
+
+#: plpbackup/plpbackup.cc:490 plpbackup/plpbackup.cc:505
+#: plpbackup/plpbackup.cc:720
+msgid " and "
+msgstr " und "
+
+#: plpbackup/plpbackup.cc:491
+msgid "restore"
+msgstr "Rücksicherung"
+
+#: plpbackup/plpbackup.cc:493
+msgid "full"
+msgstr "kompletter"
+
+#: plpbackup/plpbackup.cc:493
+msgid "incremental"
+msgstr "inkrementeller"
+
+#: plpbackup/plpbackup.cc:493
+msgid " backup"
+msgstr " Sicherung"
+
+#: plpbackup/plpbackup.cc:494
+msgid " of "
+msgstr " von "
+
+#: plpbackup/plpbackup.cc:496
+msgid "all drives"
+msgstr "allen Laufverken"
+
+#: plpbackup/plpbackup.cc:498
+msgid "Drive "
+msgstr "Laufwerk "
+
+#: plpbackup/plpbackup.cc:511
+msgid " to "
+msgstr " nach "
+
+#: plpbackup/plpbackup.cc:513
+msgid " from "
+msgstr " von "
+
+#: plpbackup/plpbackup.cc:713
+msgid "It contains Backups of drive "
+msgstr "Es enthält Sicherungen von Laufwerk "
+
+#: plpbackup/plpbackup.cc:733
+msgid ""
+"Select (I)ndividual files, (W)hole archive, (N)one from this archive? (I/W/"
+"N) "
+msgstr "Wähle (I)ndividuelle Dateien, (G)esamtes Archiv, (N)ichts? (I/G/N) "
+
+#: plpbackup/plpbackup.cc:735
+msgid "IWA"
+msgstr "IGN"
+
+#: plpbackup/plpbackup.cc:759
+msgid "Could not run external editor"
+msgstr "Konnte externen Editor nicht starten"
+
+#: plpbackup/plpbackup.cc:792
+msgid ""
+"Archive skipped, because it does not contain any files on selected drives"
+msgstr ""
+"Archiv übersprungen, da es keine Dateien von den gewählten Lauferken enthält"
+
+#: plpbackup/plpbackup.cc:837
+msgid "OAS"
+msgstr "OAS"
+
+#: plpbackup/plpbackup.cc:878
+msgid "Could not get backup index"
+msgstr "Konnte Sicherungs-Index nicht einlesen"
+
+#: plpbackup/plpbackup.cc:886
+msgid "' is a full backup"
+msgstr " ist eine Komplett-Sicherung"
+
+#: plpbackup/plpbackup.cc:890
+msgid "' is an incremental backup"
+msgstr " ist eine inkrementelle Sicherung"
+
+#: plpbackup/plpbackup.cc:895
+msgid "' is NOT a plpbackup"
+msgstr " ist KEINE mit plpbackup erzeugte Sicherung"
+
+#: plpbackup/plpbackup.cc:932
+msgid "Extracting tar archive ..."
+msgstr "Entpacke tar-Archiv ..."
+
+#: plpbackup/plpbackup.cc:934
+msgid "Execution of "
+msgstr "Ausführen von "
+
+#: plpbackup/plpbackup.cc:943 plpbackup/plpbackup.cc:1030
+#: plpbackup/plpbackup.cc:1078
 msgid "Restore aborted by user"
 msgstr "Rücksicherung durch Benutzer abgebrochen"
 
-#: plpbackup/plpbackup.cc:824 plpbackup/plpbackup.cc:939
+#: plpbackup/plpbackup.cc:951 plpbackup/plpbackup.cc:1070
 msgid "Restore "
 msgstr "Rücksichern "
 
-#: plpbackup/plpbackup.cc:899 plpbackup/plpbackup.cc:998
-#: plpbackup/plpbackup.cc:1050 plpbackup/plpbackup.cc:1092
-#: plpbackup/plpbackup.cc:1141
-msgid "Backup aborted by user"
-msgstr "Sicherung wegen Fehler abgebrochen"
+#: plpbackup/plpbackup.cc:964
+msgid "Could not create directory "
+msgstr "Fehler beim Anlegen von Verzeichnis "
 
-#: plpbackup/plpbackup.cc:911 plpbackup/plpbackup.cc:1104
+#: plpbackup/plpbackup.cc:980
+msgid "Could not create "
+msgstr "Konnte nicht anlegen "
+
+#: plpbackup/plpbackup.cc:990
+msgid "Could not get attributes of "
+msgstr "Fehler beim Lesen der Dateiattribute von "
+
+#: plpbackup/plpbackup.cc:1007
+msgid "Could not set attributes of"
+msgstr "Fehler beim Setzen der Dateiattribute von"
+
+#: plpbackup/plpbackup.cc:1019
+msgid "Could not set modification time of "
+msgstr "Fehler beim Setzen der Änderungszeit von "
+
+#: plpbackup/plpbackup.cc:1042 plpbackup/plpbackup.cc:1244
 msgid "Skipping "
 msgstr "Überspringe "
 
-#: plpbackup/plpbackup.cc:914 plpbackup/plpbackup.cc:954
+#: plpbackup/plpbackup.cc:1045 plpbackup/plpbackup.cc:1085
 msgid "Error during restore of "
 msgstr "Fehler beim Rücksichern von "
 
 # This are the characters for valid answers
 # of the next message.
-#: plpbackup/plpbackup.cc:920 plpbackup/plpbackup.cc:1113
+#: plpbackup/plpbackup.cc:1051 plpbackup/plpbackup.cc:1253
 msgid "STAR"
 msgstr "SDAW"
 
-#: plpbackup/plpbackup.cc:922 plpbackup/plpbackup.cc:1115
+#: plpbackup/plpbackup.cc:1053 plpbackup/plpbackup.cc:1255
 msgid "(S)kip all, Skip (t)his, (A)bort, (R)etry: "
 msgstr "Über(S)pringe alle, Überspringe (D)iese, (A)bbruch, (W)iederholen: "
 
-#: plpbackup/plpbackup.cc:1017 plpbackup/plpbackup.cc:1035
-msgid "Scanning Drive "
-msgstr "Durchsuche Laufwerk "
-
-#: plpbackup/plpbackup.cc:1030
-msgid "plpbackup: Couldn't get Drive list"
-msgstr "plpbackup: Konnte Laufwerks-Liste nicht ermitteln"
-
-#: plpbackup/plpbackup.cc:1060
-msgid "Size of backup: "
-msgstr "Umfang der Sicherung: "
-
-#: plpbackup/plpbackup.cc:1061
-msgid " files."
-msgstr " Dateien."
-
-#: plpbackup/plpbackup.cc:1064
-msgid "Nothing to backup"
-msgstr "Nichts zu sichern"
-
-#: plpbackup/plpbackup.cc:1080 plpbackup/plpbackup.cc:1133
-msgid "Backing up "
-msgstr "Sichere "
-
-#: plpbackup/plpbackup.cc:1107 plpbackup/plpbackup.cc:1148
-msgid "Error during backup of "
-msgstr "Fehler beim Sichern von "
-
-#: plpbackup/plpbackup.cc:1167
-msgid "Writing index ..."
-msgstr "Schreibe Index ..."
-
-#: plpbackup/plpbackup.cc:1194
-msgid "plpbackup: Could not write index "
-msgstr "plpbackup: Konnte Index nicht schreiben "
-
-#: plpbackup/plpbackup.cc:1204
-msgid "Creating tar archive ..."
-msgstr "Lege tar-Archiv an ..."
-
-#: plpbackup/plpbackup.cc:1217
-msgid "plpbackup: Error during execution of "
-msgstr "plpbackup: Fehler beim Ausführen von "
-
-#: plpbackup/plpbackup.cc:1227
-msgid "Resetting archive attributes ..."
-msgstr "Archiv-Attribute zurücksetzen ..."
-
-#: plpbackup/plpbackup.cc:1246
-msgid "Backup aborted due to error"
-msgstr "Sicherung wegen Fehler abgebrochen"
-
-#: plpbackup/plpbackup.cc:1252
+#: plpbackup/plpbackup.cc:1104 plpbackup/plpbackup.cc:1392
 msgid "Total time elapsed:     "
 msgstr "Gesamtzeit:     "
 
-#: plpbackup/plpbackup.cc:1254
+#: plpbackup/plpbackup.cc:1138 plpbackup/plpbackup.cc:1190
+#: plpbackup/plpbackup.cc:1232 plpbackup/plpbackup.cc:1281
+msgid "Backup aborted by user"
+msgstr "Sicherung wegen Fehler abgebrochen"
+
+#: plpbackup/plpbackup.cc:1157 plpbackup/plpbackup.cc:1175
+msgid "Scanning Drive "
+msgstr "Durchsuche Laufwerk "
+
+#: plpbackup/plpbackup.cc:1170
+msgid "plpbackup: Couldn't get Drive list"
+msgstr "plpbackup: Konnte Laufwerks-Liste nicht ermitteln"
+
+#: plpbackup/plpbackup.cc:1200
+msgid "Size of backup: "
+msgstr "Umfang der Sicherung: "
+
+#: plpbackup/plpbackup.cc:1201
+msgid " files."
+msgstr " Dateien."
+
+#: plpbackup/plpbackup.cc:1204
+msgid "Nothing to backup"
+msgstr "Nichts zu sichern"
+
+#: plpbackup/plpbackup.cc:1220 plpbackup/plpbackup.cc:1273
+msgid "Backing up "
+msgstr "Sichere "
+
+#: plpbackup/plpbackup.cc:1247 plpbackup/plpbackup.cc:1288
+msgid "Error during backup of "
+msgstr "Fehler beim Sichern von "
+
+#: plpbackup/plpbackup.cc:1307
+msgid "Writing index ..."
+msgstr "Schreibe Index ..."
+
+#: plpbackup/plpbackup.cc:1334
+msgid "plpbackup: Could not write index "
+msgstr "plpbackup: Konnte Index nicht schreiben "
+
+#: plpbackup/plpbackup.cc:1344
+msgid "Creating tar archive ..."
+msgstr "Lege tar-Archiv an ..."
+
+#: plpbackup/plpbackup.cc:1357
+msgid "plpbackup: Error during execution of "
+msgstr "plpbackup: Fehler beim Ausführen von "
+
+#: plpbackup/plpbackup.cc:1367
+msgid "Resetting archive attributes ..."
+msgstr "Archiv-Attribute zurücksetzen ..."
+
+#: plpbackup/plpbackup.cc:1386
+msgid "Backup aborted due to error"
+msgstr "Sicherung wegen Fehler abgebrochen"
+
+#: plpbackup/plpbackup.cc:1394
 msgid "Time for scanning:      "
 msgstr "Zeit für Durchsuchen:     "
 
-#: plpbackup/plpbackup.cc:1257
+#: plpbackup/plpbackup.cc:1397
 msgid "Time for transfer:      "
 msgstr "Zeit für Übertragung:     "
 
-#: plpbackup/plpbackup.cc:1259
+#: plpbackup/plpbackup.cc:1399
 msgid "Average transfer speed: "
 msgstr "Durchschnittliche Übertragungsgeschwindigkeit: "
 
-#: plpbackup/plpbackup.cc:1270
+#: plpbackup/plpbackup.cc:1410
 msgid ""
 "Usage: plpbackup OPTIONS [<drive>:] [<drive>:] ...\n"
 "\n"
@@ -1377,55 +1614,208 @@ msgstr ""
 "Laufwerke.\n"
 "\n"
 
-#: plpbackup/plpbackup.cc:1287
+#: plpbackup/plpbackup.cc:1427
 msgid "Try 'plpbackup --help' for more information."
 msgstr "Versuchen Sie 'plpbackup --help' für weitere Informationen."
 
-#: plpbackup/plpbackup.cc:1358
+#: plpbackup/plpbackup.cc:1498
 msgid "plpbackup version "
 msgstr "plpbackup Version "
 
-#: plpbackup/plpbackup.cc:1396
+#: plpbackup/plpbackup.cc:1536
 msgid "Invalid drive argument "
 msgstr "Ungültiges Laufwerk "
 
-#: plpbackup/plpbackup.cc:1402
+#: plpbackup/plpbackup.cc:1542
 msgid "Backup mode can not be combined with format or restore."
 msgstr ""
 "Sicherungs-Modus kann nicht mit Formatieren oder Rücksicherung kombiniert "
 "werden."
 
-#: plpbackup/plpbackup.cc:1407
+#: plpbackup/plpbackup.cc:1547
 msgid "Format mode needs at least one drive specified."
 msgstr "Formatier-Modus benötigt mindestens eine Laufwerksangabe."
 
-#: plpbackup/plpbackup.cc:1411
+#: plpbackup/plpbackup.cc:1551
 msgid "Backup can only create one archive at a time."
 msgstr "Die Sicherung kann nur jeweils ein Archiv zu einer Zeit anlegen."
 
-#: plpbackup/plpbackup.cc:1420 plpbackup/plpbackup.cc:1425
+#: plpbackup/plpbackup.cc:1560 plpbackup/plpbackup.cc:1565
 msgid "plpbackup: could not connect to ncpd"
 msgstr "plpbackup: Konnte ncpd nicht kontaktieren"
 
-#: sisinstall/sismain.cpp:48
-#, c-format
-msgid "Installing sis file %s%s\n"
-msgstr "Installiere SIS-Datei %s%s\n"
+#: sisinstall/sismain.cpp:43
+msgid ""
+"Usage: sisinstall [OPTIONS]... SISFILE\n"
+"\n"
+"Supported options:\n"
+"\n"
+" -h, --help              Display this text.\n"
+" -V, --version           Print version and exit.\n"
+" -v, --verbose=LEVEL     Set the verbosity level, by default 0.\n"
+" -n, --dry-run           Just parse file file.\n"
+" -w, --newt              Use the Newt interface.\n"
+msgstr ""
+"Anwendung: sisinstall [OPTIONEN]... SISDATEI\n"
+"\n"
+"Unterstütze Optionen:\n"
+"\n"
+" -h, --help              Zeige diesen Text.\n"
+" -V, --version           Version anzeigen und beenden.\n"
+" -v, --verbose=LEVEL     Setze Log-stufe, Vorgabe ist 0.\n"
+" -n, --dry-run           Nur parsen; keine Installation.\n"
+" -w, --newt              Benutze NEWT Oberfläche.\n"
 
-#: sisinstall/sismain.cpp:49
+#: sisinstall/sismain.cpp:98
+msgid "sisinstall version 0.1\n"
+msgstr "Installationsprogramm, Version 0.1\n"
+
+#: sisinstall/sismain.cpp:117 sisinstall/sismain.cpp:125
+#, c-format
+msgid "Installing sis file %s%s.\n"
+msgstr "Installiere SIS-Datei %s%s.\n"
+
+#: sisinstall/sismain.cpp:119 sisinstall/sismain.cpp:126
 msgid ", not really"
 msgstr ", nicht wirklich"
 
-#: sisinstall/sismain.cpp:56
+#: sisinstall/sismain.cpp:133
 #, c-format
 msgid "File is %d bytes long\n"
 msgstr "Datei ist %d bytes lang\n"
 
-#: sisinstall/sismain.cpp:71
+#: sisinstall/sismain.cpp:148
 msgid "Couldn't connect with the Psion\n"
 msgstr "Konnte nicht mit dem Psion verbinden\n"
 
-#: sisinstall/sismain.cpp:88
+#: sisinstall/sismain.cpp:169
 msgid "Could not parse the sis file.\n"
 msgstr "Konnte SIS-Datei nicht parsen.\n"
 
+#: sisinstall/sismain.cpp:178
+msgid "Installation complete. Press any key to exit."
+msgstr "Installation beendet. Beenden mit beliebiger Taste."
+
+#: ncpd/main.cc:136
+msgid ""
+"Usage: ncpd [OPTIONS]...\n"
+"\n"
+"Supported options:\n"
+"\n"
+" -d, --dontfork          Run in foreground don't fork\n"
+" -h, --help              Display this text.\n"
+" -V, --version           Print version and exit.\n"
+" -e, --autoexit          Exit after device is disconnected.\n"
+" -v, --verbose=LOGCLASS  Enable logging of LOGCLASS events\n"
+"                         Valid log classes are:\n"
+"                           m   - main program\n"
+"                           nl  - NCP protocol log\n"
+"                           nd  - NCP protocol data dump\n"
+"                           ll  - PLP protocol log\n"
+"                           ld  - PLP protocol data dump\n"
+"                           pl  - physical I/O log\n"
+"                           ph  - physical I/O handshake\n"
+"                           pd  - physical I/O data dump\n"
+"                           all - All of the above\n"
+" -s, --serial=DEV        Use serial device DEV.\n"
+" -b, --baudrate=RATE     Set serial speed to BAUD.\n"
+msgstr ""
+"Anwendung: ncpd [OPTIONEN]...\n"
+"\n"
+"Unterstützte Optionen:\n"
+"\n"
+" -d, --dontfork          Starte im Vordergrund.\n"
+" -h, --help              Zeige diesen Text.\n"
+" -V, --version           Version ausgeben und beenden.\n"
+" -e, --autoexit          Beenden, wenn Verbindung unterbrochen wurde.\n"
+" -v, --verbose=KLASSE    Aktiviere protokoll für Ereignisse in KLASSE.\n"
+"                         Gültige Werte für KLASSE sind:\n"
+"                           m   - Hauptprogramm\n"
+"                           nl  - NCP Protokoll log\n"
+"                           nd  - NCP Protokoll daten\n"
+"                           ll  - PLP Protokoll log\n"
+"                           ld  - PLP Protokoll daten\n"
+"                           pl  - physikalische E/A log\n"
+"                           ph  - physikalische E/A handshake\n"
+"                           pd  - physikalische E/A daten\n"
+"                           all - Alles obige\n"
+" -s, --serial=DEV        Benutze serielle Schnittstelle DEV.\n"
+" -b, --baudrate=RATE     Setze Schnittstellengeschwindigkeit auf BAUD.\n"
+
+#: ncpd/main.cc:161
+msgid "                         Default: "
+msgstr "                         Vorgabe: "
+
+#: ncpd/main.cc:163
+msgid ""
+"                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n"
+msgstr ""
+"                         Vorgabe: Automatisch 115.2k, 57.6k 38.4k, 19.2k\n"
+
+#: ncpd/main.cc:166
+msgid ""
+" -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
+"                         Default for HOST: 127.0.0.1\n"
+"                         Default for PORT: "
+msgstr ""
+" -p, --port=[HOST:]PORT  Warte auf Verbindung über host HOST, port PORT.\n"
+"                         Vorgabe für HOST: 127.0.0.1\n"
+"                         Vorgabe für PORT: "
+
+#: ncpd/main.cc:174
+msgid "Try `ncpd --help' for more information"
+msgstr "Versuchen Sie `ncpd --help' für weitere Informationen."
+
+#: ncpd/main.cc:264
+msgid "ncpd Version "
+msgstr "ncpd Version "
+
+#: ncpd/link.cc:55
+msgid "SIBO"
+msgstr "SIBO"
+
+#: ncpd/link.cc:56
+msgid "EPOC"
+msgstr "EPOC"
+
+#: plpnfsd/main.cc:475
+msgid ""
+"Usage: plpnfsd [OPTIONS]...\n"
+"\n"
+"Supported options:\n"
+"\n"
+" -d, --mountpoint=DIR    Specify DIR as mountpoint\n"
+" -u, --user=USER         Specify USER who owns mounted dir.\n"
+" -v, --verbose           Increase verbosity\n"
+" -D, --debug             Increase debug level\n"
+" -h, --help              Display this text.\n"
+" -V, --version           Print version and exit.\n"
+" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
+"                         Default for HOST is 127.0.0.1\n"
+"                         Default for PORT is "
+msgstr ""
+"Anwendung: plpnfsd [OPTIONEN]...\n"
+"\n"
+"Unterstützte Optionen:\n"
+"\n"
+" -d, --mountpoint=DIR    Verwende DIR als Einhängepunkt.\n"
+" -u, --user=USER         Bestimme Eigner des eingehängten Verzeichnisses.\n"
+" -v, --verbose           Erhöhe Log-Ebene\n"
+" -D, --debug             Erhöhe Debug-Ebene\n"
+" -h, --help              Zeige diesen Text.\n"
+" -V, --version           Version ausgeben und beenden.\n"
+" -p, --port=[HOST:]PORT  Verbinde mot port PORT auf host HOST.\n"
+"                         Vorgabe für HOST ist 127.0.0.1\n"
+"                         Vorgabe für PORT ist "
+
+#: plpnfsd/main.cc:493
+msgid "Try `plpnfsd --help' for more information"
+msgstr "Versuchen Sie `plpnfsd --help' für weitere Informationen."
+
+#: plpnfsd/main.cc:560
+msgid "plpnfsd Version "
+msgstr "ncpd Version "
+
+#: plpprint/plpprintd.cc:795
+msgid "plpprintd: could not connect to ncpd"
+msgstr "plpprintd: Konnte ncpd nicht kontaktieren."
