@@ -109,7 +109,7 @@ extern char *index(), *rindex(), *strdup();
 #define PBUFSIZE       8192
 
 #define TIMEOUT       -54
-#define BLOCKSIZE      1024
+#define BLOCKSIZE      512
 #define FID            7 /* File system id */
 
 #if defined(sun) && defined(__SVR4)
