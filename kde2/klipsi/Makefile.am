@@ -1,16 +1,16 @@
 libdir=$(kde_libraries)
- 
+
 bindir=$(kde_bindir)
-  
+
 maintainer-clean-local:
 	rm -f Makefile.in
-	   
+
 METASOURCES = AUTO
-	    
+
 KDE_ICON = AUTO
-	     
+
 INCLUDES = $(all_includes) -I$(top_srcdir)/lib
-	      
+
 DISTCLEANFILES = $(klipsi_METASOURCES) ./.deps/* ./.deps/.P
 
 bin_PROGRAMS = klipsi
@@ -20,7 +20,7 @@ CLEANFILES = dummy.cpp
 
 klipsi_la_LIBADD = $(LIB_PLP) $(LIB_KDEUI)
 klipsi_la_SOURCES = main.cpp toplevel.cpp
-klipsi_la_LDFLAGS = $(PLP_LDFLAGS) $(KDE_LDFLAGS) $(LIBDEBUG) -module $(KDE_MODULE)
+klipsi_la_LDFLAGS = $(PLP_LDFLAGS) $(KDE_LDFLAGS) $(LIBDEBUG) -module
 
 klipsi_LDADD = klipsi.la
 klipsi_SOURCES = dummy.cpp
@@ -36,7 +36,7 @@ apps_DATA = eventsrc
 EXTRA_DIST += $(apps_DATA)
 
 noinst_HEADERS = toplevel.h
-	 
+
 messages:
 	$(XGETTEXT) -C -ki18n -kI18N_NOOP -ktranslate -kaliasLocale *.cpp *.h && mv messages.po ../po/klipsi.pot
 
