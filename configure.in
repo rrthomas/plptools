@@ -2,6 +2,8 @@ AC_REVISION($Revision$)dnl revision of this configure.in script
 
 AC_CONFIG_AUX_DIR(conf)
 AC_INIT(Makefile.am)
+AC_PROG_CC
+AC_AIX
 AC_CANONICAL_SYSTEM
 AM_CONFIG_HEADER(include/config.h)
 AM_INIT_AUTOMAKE(plptools, 0.10)
@@ -12,7 +14,6 @@ dnl Enable Maintainer stuff
 AM_MAINTAINER_MODE
 
 dnl checks for programs
-AC_AIX
 AC_PROG_MAKE_SET
 AC_PROG_CXX
 PLP_CHECK_COMPILERS
@@ -136,46 +137,15 @@ dnl Type of sighandlers
 AC_TYPE_SIGNAL
 
 dnl checks for header files
-AC_CHECK_HEADERS(sys/time.h sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h)
+AC_CHECK_HEADERS(
+	sys/time.h sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h \
+	sys/int_types.h stdint.h
+)
 
 PLP_HELP_MSG([Debugging (developer only!):])
-LIBCCMALLOC=
-AC_ARG_WITH(ccmalloc,
-    [  --with-ccmalloc=DIR     link against ccmalloc leak-checking lib],
-    [
-      search_dirs="/usr/lib /lib /usr/local/lib"
-      case "${withval}" in
-      	yes)
-		ccmalloc_dirs=${search_dirs}
-		;;
-	no)
-		ccmalloc_dirs=
-		;;
-	*)
-		ccmalloc_dirs="${withval} ${search_dirs}"
-		;;
-      esac
-      AC_MSG_CHECKING(for libccmalloc)
-      save_LIBS="$LIBS"
-      ccmalloc_found=NO
-      for d in ${ccmalloc_dirs} ; do
-      	LIBS="-L$d -lccmalloc -ldl"
-      	AC_TRY_LINK_FUNC(ccmalloc_report,ccmalloc_found=$d ; break)
-      done
-      LIBS="$save_LIBS"
-      if test "${ccmalloc_found}" = "NO" ; then
-      	AC_MSG_RESULT(not found)
-      else
-      	AC_MSG_RESULT(found)
-	LIBCCMALLOC="-L$ccmalloc_found -lccmalloc -ldl"
-      fi
-    ]
-)
-AC_SUBST(LIBCCMALLOC)
-
+AC_CHECK_CCMALLOC
 
 dnl special options for customization
-
 PLP_HELP_MSG([Options for overriding builtin defaults:])
 
 AC_ARG_WITH(serial,
@@ -269,7 +239,7 @@ if test "x$ac_enable_kde" = "xyes" ; then
 		kde_exec_prefix=${kde_prefix}
 	fi
 	AC_ARG_WITH(kdedir,
-	[  --with-kdedir=DIR       specify KDE directory [\${prefix}]],
+	[  --with-kdedir=DIR       specify KDE directory [${prefix:-${ac_default_prefix}}]],
 	[
 		kde_prefix=${withval}
 		kde_exec_prefix=${withval}
@@ -307,6 +277,7 @@ AC_OUTPUT(
 	kde2/doc/en/Makefile
 	kde2/doc/de/Makefile
 	plpbackup/Makefile
+	plpprint/Makefile
 	doc/Makefile
 	doc/api/Makefile
 	include/config.h

@@ -72,6 +72,9 @@
 /* Define this, if sys/int_types.h is on your system */
 #undef HAVE_SYS_INT_TYPES_H
 
+/* Define this, if stdint.h is on your system */
+#undef HAVE_STDINT_H
+
 /* Define this, if your int-types have an underscore after the first u/s */
 #undef GNU_INTTYPES
 

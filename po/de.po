@@ -4,15 +4,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-05-21 17:29+0200\n"
-"PO-Revision-Date: 2001-02-28 02:44CET\n"
+"Project-Id-Version: plptools 0.11\n"
+"POT-Creation-Date: 2002-02-13 19:00+0100\n"
+"PO-Revision-Date: 2002-02-13 19:10CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 0.8\n"
+"X-Generator: KBabel 0.9.5\n"
 
 #: lib/rfsv.cc:31 lib/rfsvfactory.cc:43 lib/rpcsfactory.cc:43
 msgid "no error"
@@ -296,7 +296,7 @@ msgstr "beendet"
 
 #: lib/rfsv.cc:101
 msgid "died"
-msgstr "abgestürtzt"
+msgstr "abgestürzt"
 
 #: lib/rfsv.cc:102
 msgid "bad handle"
@@ -424,7 +424,7 @@ msgstr "Schweizer Deutsch"
 
 #: lib/rpcs.cc:75
 msgid "Portugese"
-msgstr "Potugiesisch"
+msgstr "Portugiesisch"
 
 #: lib/rpcs.cc:76
 msgid "Turkish"
@@ -464,7 +464,7 @@ msgstr "Österreichisch"
 
 #: lib/rpcs.cc:85
 msgid "New Zealand"
-msgstr "Neu-Seeländisch"
+msgstr "Neuseeländisch"
 
 #. FIXME: not shure about ISO code
 #: lib/rpcs.cc:86
@@ -654,7 +654,7 @@ msgstr "Dies ist freie Software. Sie können Sie unter den Bedingungen"
 
 #: plpftp/main.cc:59
 msgid "under GPL conditions; see the COPYING file in the distribution."
-msgstr "der GPL weitergeben. Siehe die Datei COPYING im Packet."
+msgstr "der GPL weitergeben. Siehe die Datei COPYING im Paket."
 
 #: plpftp/main.cc:61
 msgid "FTP like interface started. Type \"?\" for help."
@@ -714,7 +714,7 @@ msgstr "Lokaler Ordner: \""
 
 #: plpftp/ftp.cc:295
 msgid "Psion dir: \""
-msgstr "Psion Orner: \""
+msgstr "Psion Ordner: \""
 
 #: plpftp/ftp.cc:300 plpftp/ftp.cc:310 plpftp/ftp.cc:319 plpftp/ftp.cc:327
 #: plpftp/ftp.cc:335 plpftp/ftp.cc:345 plpftp/ftp.cc:357 plpftp/ftp.cc:403
@@ -722,7 +722,7 @@ msgstr "Psion Orner: \""
 #: plpftp/ftp.cc:519 plpftp/ftp.cc:545 plpftp/ftp.cc:582 plpftp/ftp.cc:610
 #: plpftp/ftp.cc:671 plpftp/ftp.cc:691 plpftp/ftp.cc:698 plpftp/ftp.cc:705
 #: plpftp/ftp.cc:761 plpftp/ftp.cc:771 plpftp/ftp.cc:831 plpftp/ftp.cc:873
-#: plpftp/ftp.cc:883 plpftp/ftp.cc:914 plpftp/ftp.cc:950 plpftp/ftp.cc:1006
+#: plpftp/ftp.cc:883 plpftp/ftp.cc:914 plpftp/ftp.cc:950 plpftp/ftp.cc:1016
 msgid "Error: "
 msgstr "Fehler: "
 
@@ -746,9 +746,9 @@ msgstr "Behalte ursprünglichen Ordner \""
 msgid "Transfer complete, ("
 msgstr "Übertragung abgeschlossen, ("
 
-#: plpftp/ftp.cc:537 plpftp/ftp.cc:628
+#: plpbackup/plpbackup.cc:499 plpftp/ftp.cc:537 plpftp/ftp.cc:628
 msgid " bytes in "
-msgstr " bytes in "
+msgstr " Bytes in "
 
 #: plpftp/ftp.cc:538 plpftp/ftp.cc:629
 msgid " secs = "
@@ -925,3 +925,157 @@ msgstr "Kein solcher Prozess"
 #: plpftp/ftp.cc:966
 msgid "syntax error. Try \"help\""
 msgstr "Syntaxfehler. Probieren Sie \"help\""
+
+#: plpbackup/plpbackup.cc:83
+msgid "Could not get user's home directory from /etc/passwd"
+msgstr "Konnte das persönliche Verzeichnis nicht ermitteln"
+
+#: plpbackup/plpbackup.cc:98
+msgid "Could not get machine UID"
+msgstr "Konnte Geräte-UID nicht ermitteln"
+
+#: plpbackup/plpbackup.cc:126
+msgid "Stopping programs ..."
+msgstr "Stoppe Programme ..."
+
+#: plpbackup/plpbackup.cc:128
+msgid "plpbackup: Could not get process list: "
+msgstr "plpbackup: Konnte Prozessliste nicht lesen "
+
+#: plpbackup/plpbackup.cc:162
+msgid "Restarting programs ..."
+msgstr "Starte Programme ..."
+
+#: plpbackup/plpbackup.cc:469 plpbackup/plpbackup.cc:485
+msgid "Scanning Drive "
+msgstr "Durchsuche Laufwerk "
+
+#: plpbackup/plpbackup.cc:480
+msgid "plpbackup: Couldn't get Drive list"
+msgstr "plpbackup: Konnte Laufwerks-Liste nicht ermitteln"
+
+#: plpbackup/plpbackup.cc:499
+msgid "Size of backup: "
+msgstr "Umfang der Sicherung: "
+
+#: plpbackup/plpbackup.cc:500
+msgid " files."
+msgstr " Dateien."
+
+#: plpbackup/plpbackup.cc:503
+msgid "Nothing to backup"
+msgstr "Nichts zu sichern"
+
+#: plpbackup/plpbackup.cc:518 plpbackup/plpbackup.cc:560
+msgid "Backing up "
+msgstr "Sichere "
+
+#: plpbackup/plpbackup.cc:531
+msgid "Skipping "
+msgstr "Überspringe "
+
+#: plpbackup/plpbackup.cc:534 plpbackup/plpbackup.cc:566
+msgid "Error during backup of "
+msgstr "Fehler beim Sichern von "
+
+#: plpbackup/plpbackup.cc:540
+# This are the characters for valid answers
+# of the next message.
+msgid "STAR"
+msgstr "SDAW"
+
+#: plpbackup/plpbackup.cc:542
+msgid "(S)kip all, Skip (t)his, (A)bort, (R)etry: "
+msgstr "Über(S)pringe alle, Überspringe (D)iese, (A)bbruch, (W)iederholen: "
+
+#: plpbackup/plpbackup.cc:584
+msgid "Writing index ..."
+msgstr "Schreibe Index ..."
+
+#: plpbackup/plpbackup.cc:611
+msgid "plpbackup: Could not write index "
+msgstr "plpbackup: Konnte Index nicht schreiben "
+
+#: plpbackup/plpbackup.cc:621
+msgid "Creating tar archive ..."
+msgstr "Lege tar-Archiv an ..."
+
+#: plpbackup/plpbackup.cc:631
+msgid "plpbackup: Error during execution of "
+msgstr "plpbackup: Fehler beim Ausführen von "
+
+#: plpbackup/plpbackup.cc:640
+msgid "Resetting archive attributes ..."
+msgstr "Archiv-Attribute zurücksetzen ..."
+
+#: plpbackup/plpbackup.cc:660
+msgid "Backup aborted due to error"
+msgstr "Sicherung wegen Fehler abgebrochen"
+
+#: plpbackup/plpbackup.cc:671
+msgid ""
+"Usage: plpbackup OPTIONS [<drive>:] [<drive>:] ...\n"
+"\n"
+"  Options:\n"
+"    -h, --help         Print this message and exit.\n"
+"    -V, --version      Print version and exit.\n"
+"    -p, --port=<port>  Connect to ncpd using given port.\n"
+"    -v, --verbose      Increase verbosity.\n"
+"    -q, --quiet        Decrease verbosity.\n"
+"    -f, --full         Do a full backup (incremental otherwise).\n"
+"    -b, --backup[=TGZ] Backup to specified archive TGZ.\n"
+"    -r, --restore=TGZ  Restore from specified archive TGZ.\n"
+"    -F, --format       Format drive (can be combined with restore).\n"
+"\n"
+"  <drive> A drive character. If none given, scan all drives.\n"
+"\n"
+msgstr ""
+"Benutzung: plpbackup OPTIONEN [<laufwerk>:] [<laufwerk>:] ...\n"
+"\n"
+"  Optionen:\n"
+"    -h, --help         Anzeige dieses Textes und beenden.\n"
+"    -V, --version      Anzeige der Version und beenden.\n"
+"    -p, --port=<port>  Mit ncpd über angegebenen Port verbinden.\n"
+"    -v, --verbose      Ausführlichere Meldungen.\n"
+"    -q, --quiet        Weniger ausführliche Meldungen.\n"
+"    -f, --full         Komplettsicherung durchführen (andernfalls "
+"inkrementell).\n"
+"    -b, --backup[=TGZ] Sicherung in das angegebene Archiv TGZ.\n"
+"    -r, --restore=TGZ  Rücksicherung vom angegebenen Archiv TGZ.\n"
+"    -F, --format       Formatiere Laufwerk (kann mit restore kombiniert "
+"werden).\n"
+"\n"
+"  <laufwerk> Ein Laufwerksbuchstabe. Wird keiner angegeben, durchsuche alle "
+"Laufwerke.\n"
+"\n"
+
+#: plpbackup/plpbackup.cc:688
+msgid "Try 'plpbackup --help' for more information."
+msgstr "Versuchen Sie 'plpbackup --help' für weitere Informationen."
+
+#: plpbackup/plpbackup.cc:727
+msgid "plpbackup version "
+msgstr "plpbackup Version "
+
+#: plpbackup/plpbackup.cc:765
+msgid "Invalid drive argument "
+msgstr "Ungültiges Laufwerk "
+
+#: plpbackup/plpbackup.cc:771
+msgid "Backup mode can not be combined with format or restore."
+msgstr ""
+"Sicherungs-Modus kann nicht mit Formatieren oder Rücksicherung kombiniert "
+"werden."
+
+#: plpbackup/plpbackup.cc:776
+msgid "Format mode needs at least one drive specified."
+msgstr "Formatier-Modus benötigt mindestens eine Laufwerksangabe."
+
+#: plpbackup/plpbackup.cc:780
+msgid "Backup can only create one archive at a time."
+msgstr "Die Sicherung kann nur jeweils ein Archiv zu einer Zeit anlegen."
+
+#: plpbackup/plpbackup.cc:787 plpbackup/plpbackup.cc:792
+msgid "plpbackup: could not connect to ncpd"
+msgstr "plpbackup: Konnte ncpd nicht kontaktieren"
+

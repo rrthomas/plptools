@@ -7,3 +7,4 @@ lib/rfsvfactory.cc
 
 plpftp/main.cc
 plpftp/ftp.cc
+plpbackup/plpbackup.cc
