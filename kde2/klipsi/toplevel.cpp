@@ -326,12 +326,119 @@ putClipData(char *data) {
 	closeConnection();
 }
 
+#define splitByte(v)                                \
+do {                                                \
+    int j;                                          \
+                                                    \
+    if (x < bytesPerLine)                           \
+	for (j = 0; j < pixelsPerByte; j++) {       \
+	    if (j && ((oidx % xPixels) == 0))       \
+		break;                              \
+	    else                                    \
+              if (oidx >= picsize)                  \
+		return 0;                           \
+	    else {                                  \
+		out.addByte((v & mask) * grayVal);  \
+                v >>= bitsPerPixel;                 \
+		oidx++;                             \
+	    }                                       \
+	}                                           \
+    if (++x >= linelen)                             \
+	x = 0;                                      \
+} while (0)
+
+QImage *TopLevel::
+decode_image(unsigned char *p)
+{
+    bufferStore out;
+    u_int32_t totlen = *((u_int32_t*)p); p += 4;
+    u_int32_t hdrlen = *((u_int32_t*)p); p += 4;
+    u_int32_t datlen = totlen - hdrlen;
+    u_int32_t xPixels = *((u_int32_t*)p); p += 4;
+    u_int32_t yPixels = *((u_int32_t*)p); p += 4;
+    u_int32_t xTwips = *((u_int32_t*)p); p += 4;
+    u_int32_t yTwips = *((u_int32_t*)p); p += 4;
+    u_int32_t bitsPerPixel = *((u_int32_t*)p); p += 4;
+    u_int32_t unknown1 = *((u_int32_t*)p); p += 4;
+    u_int32_t unknown2 = *((u_int32_t*)p); p += 4;
+    u_int32_t RLEflag = *((u_int32_t*)p); p += 4;
+
+    QString hdr = QString("P5\n%1 %2\n255\n").arg(xPixels).arg(yPixels);
+    out.addString(hdr.latin1());
+
+    u_int32_t picsize = xPixels * yPixels;
+    u_int32_t linelen;
+    int pixelsPerByte = (8 / bitsPerPixel);
+    int nColors = 1 << bitsPerPixel;
+    int grayVal = 255 / (nColors - 1);
+    int bytesPerLine = (xPixels + pixelsPerByte - 1) / pixelsPerByte;
+    int mask = (bitsPerPixel << 1) - 1;
+
+    int oidx = 0;
+    int x = 0;
+    int y = 0;
+    int offset = 0;
+
+    if (RLEflag) {
+	int i = 0;
+
+	while (offset < datlen) {
+	    unsigned char b = *(p + offset);
+	    if (b >= 0x80) {
+		offset += 0x100 - b + 1;
+		i += 0x100 - b;
+	    } else {
+		offset += 2;
+		i += b + 1;
+	    }
+	}
+	linelen = i / yPixels;
+	offset = 0;
+	while (offset < datlen) {
+	    unsigned char b = *(p + offset++);
+	    if (b >= 0x80) {
+		for (i = 0; i < 0x100 - b; i++, offset++) {
+		    if (offset >= datlen)
+			return 0; // data corrupted
+		    unsigned char b2 = *(p + offset);
+		    splitByte(b2);
+		}
+	    } else {
+		if (offset >= datlen)
+		    return 0;
+		else {
+		    unsigned char b2 = *(p + offset);
+		    unsigned char bs = b2;
+		    for (i = 0; i <= b; i++) {
+			splitByte(b2);
+			b2 = bs;
+		    }
+		}
+		offset++;
+	    }
+	}
+    } else {
+	linelen = datlen / yPixels;
+	while (offset < datlen) {
+	    unsigned char b = *(p + offset++);
+	    splitByte(b);
+	}
+    }
+    QImage *img = new QImage(xPixels, yPixels, 8);
+    if (!img->loadFromData((const uchar *)out.getString(0), out.getLen())) {
+	delete img;
+	img = 0L;
+    }
+    return img;
+}
+
 void TopLevel::
 getClipData() {
     Enum<rfsv::errs> res;
     PlpDirent de;
     u_int32_t fh;
-    QString clipData;
+    QString clipText;
+    QImage *clipImg = 0L;
 
     res = rf->fgeteattr(CLIPFILE, de);
     if (res == rfsv::E_PSI_GEN_NONE) {
@@ -380,13 +487,21 @@ getClipData() {
 
 		    u_int32_t *td = (u_int32_t*)p;
 		    while (lcount > 0) {
-			if (*td++ == 0x10000033) {
+			u_int32_t sType = *td++;
+			if (sType == 0x10000033) {
 			    // An ASCII section
 			    p = buf + *td;
 			    len = *((u_int32_t*)p);
 			    p += 4;
 			    psiText2ascii(p, len);
-			    clipData += (char *)p;
+			    clipText += (char *)p;
+			}
+			if (sType == 0x1000003d) {
+			    // A paint data section
+			    p = buf + *td;
+			    if (clipImg)
+				delete clipImg;
+			    clipImg = decode_image((unsigned char *)p);
 			}
 			td++;
 			lcount -= 2;
@@ -400,9 +515,14 @@ getClipData() {
     } else
 	closeConnection();
 
-    if (!clipData.isEmpty()) {
+    if (!clipText.isEmpty()) {
 	inSetting = true;
-	clip->setText(clipData);
+	clip->setText(clipText);
+	inSetting = false;
+	KNotifyClient::event("data received");
+    } else if (clipImg) {
+	inSetting = true;
+	clip->setImage(*clipImg);
 	inSetting = false;
 	KNotifyClient::event("data received");
     }

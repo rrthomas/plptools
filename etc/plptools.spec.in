@@ -1,6 +1,6 @@
 Summary: Connectivity for psion series 5.
 Name: plptools
-%define version @@VERSION@@
+%define version @VERSION@
 Version: %{version}
 Release: 1
 Vendor: The plptools project
@@ -78,7 +78,23 @@ Psion drives.
 Dieses Packet enthält ein KDE werkzeug zum Backup, Restore und Formatieren
 von Psion Laufwerken.
 
+%package -n klipsi
+Summary: Psion remote clipboard utility for KDE 2.1.
+Group: User Interface/Desktops
+Requires: %{name} = %{version} kdelibs >= 2.1 qt >= 2.2.4
+
+%description -n klipsi
+This package contains a KDE utility for using the Psion's remote clipboard
+function.
+
+%description -l de -n klipsi
+Dieses Packet enthält ein KDE Werkzeug zum Transfer der Zwischenablage
+zwischen Psion und Rechner.
+
 %changelog
+* Fri May 25 2001 Fritz Elfert <fritz.elfert@to.com>
+- Added klipsi subpackage
+
 * Thu May 17 2001 Fritz Elfert <fritz.elfert@to.com>
 - Official release of version 0.8
 
@@ -155,9 +171,18 @@ fi
 %files -n kpsion
 %{_bindir}/kpsion
 %{_libdir}/libkpsion.*
-%{_datadir}/applnk/*/*
-%{_datadir}/apps/*/*
-%{_datadir}/icons/*/*/apps/*
-%{_datadir}/icons/*/*/actions/*
+%{_datadir}/applnk/*/kpsion*
+%{_datadir}/apps/kpsion/*
+%{_datadir}/apps/konqueror/*
+%{_datadir}/icons/*/*/apps/kpsion*
+%{_datadir}/icons/*/*/actions/psion*
 %{_datadir}/locale/*/LC_MESSAGES/kpsion.mo
 %{_datadir}/doc/HTML/*/kpsion
+
+%files -n klipsi
+%{_bindir}/klipsi
+%{_libdir}/klipsi.*
+%{_datadir}/apps/klipsi/*
+%{_datadir}/icons/*/*/apps/klipsi*
+%{_datadir}/icons/*/*/actions/klipsi*
+%{_datadir}/locale/*/LC_MESSAGES/klipsi.mo
