@@ -22,6 +22,7 @@
  */
 #include "psitime.h"
 #include <stdlib.h>
+#include <plp_inttypes.h>
 
 PsiTime::PsiTime(void) {
     ptzValid = false;
@@ -168,12 +169,12 @@ ostream &operator<<(ostream &s, const PsiTime &t) {
 
 static unsigned long long
 evalOffset(psi_timezone ptz, time_t time, bool valid) {
-    u_int64_t offset = 0;
+    s_int64_t offset = 0;
 
     if (valid) {
 	offset = ptz.utc_offset;
 	if (!(ptz.dst_zones & 0x40000000) || (ptz.dst_zones & ptz.home_zone))
-	    offset += 3600;
+	    offset -= 3600;
     } else {
 	/**
 	* Fallback. If no Psion zone given, use
@@ -199,6 +200,12 @@ evalOffset(psi_timezone ptz, time_t time, bool valid) {
 		offset += 3600;
 	}
     }
+    // Substract out local timezone, it gets added
+    // later
+    time_t now = ::time(0);
+    struct tm *now_tm = localtime(&now);
+    offset -= timezone;
+
     offset *= 1000000;
     return offset;
 }
@@ -216,7 +223,7 @@ void PsiTime::psi2unix(void) {
 }
 
 void PsiTime::unix2psi(void) {
-    u_int64_t micro = utv.tv_sec * 1000000 + utv.tv_usec;
+    u_int64_t micro = (u_int64_t)utv.tv_sec * 1000000ULL + utv.tv_usec;
 
     /* Add Psion's idea of UTC offset */
     micro += evalOffset(ptz, utv.tv_sec, ptzValid);

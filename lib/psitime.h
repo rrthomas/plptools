@@ -105,7 +105,7 @@ typedef struct psi_timezone_t {
 	s.flags(old);
 	return s;
     }
-    unsigned long utc_offset;
+    signed long   utc_offset;
     unsigned long dst_zones;
     unsigned long home_zone;
 } psi_timezone;
