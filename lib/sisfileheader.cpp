@@ -29,11 +29,11 @@ const int OFF_NUMBER_OF_FILES = 26;
 const int OFF_INSTALLATION_DRIVE = 28;
 
 SisRC
-SISFileHeader::fillFrom(uchar* buf, int* base, off_t len)
+SISFileHeader::fillFrom(uint8_t* buf, int* base, off_t len)
 {
 	if (*base + 68 > len)
 		return SIS_TRUNCATED;
-	uchar* start = buf + *base;
+	uint8_t* start = buf + *base;
 	m_buf = buf;
 	m_uid1 = read32(start);
 	if (logLevel >= 1)
@@ -56,10 +56,10 @@ SISFileHeader::fillFrom(uchar* buf, int* base, off_t len)
 		printf("Got uid3 = %08x\n", m_uid3);
 	m_uid4 = read32(start + 12);
 //	printf("Got uid4 = %08x\n", m_uid4);
-	uint16 crc1 = 0;
+	uint16_t crc1 = 0;
 	for (int i = 0; i < 12; i += 2)
 		crc1 = updateCrc(crc1, buf[*base + i]);
-	uint16 crc2 = 0;
+	uint16_t crc2 = 0;
 	for (int i = 0; i < 12; i += 2)
 		crc2 = updateCrc(crc2, buf[*base + i + 1]);
 	if (logLevel >= 2)

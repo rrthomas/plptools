@@ -32,18 +32,18 @@ SISComponentNameRecord::~SISComponentNameRecord()
 }
 
 SisRC
-SISComponentNameRecord::fillFrom(uchar* buf, int base, off_t len,
+SISComponentNameRecord::fillFrom(uint8_t* buf, int base, off_t len,
 								 SISFile* sisFile)
 {
 	int n = sisFile->m_header.m_nlangs;
 	if (base + 8 + n * 4 * 2)
 		return SIS_TRUNCATED;
 
-	uchar* p = buf + base;
+	uint8_t* p = buf + base;
 	int size = 0;
 
-	m_nameLengths = new uint32[n];
-	m_namePtrs = new uint32[n];
+	m_nameLengths = new uint32_t[n];
+	m_namePtrs = new uint32_t[n];
 
 	// First read lengths.
 	//
@@ -60,7 +60,7 @@ SISComponentNameRecord::fillFrom(uchar* buf, int base, off_t len,
 
 	// Then read ptrs.
 	//
-	m_names = new uchar*[n];
+	m_names = new uint8_t*[n];
 	for (int i = 0; i < n; ++i)
 		{
 		m_namePtrs[i] = read32(p + size);
@@ -77,7 +77,7 @@ SISComponentNameRecord::fillFrom(uchar* buf, int base, off_t len,
 				   m_nameLengths[i],
 				   buf + m_namePtrs[i]);
 		int len = m_nameLengths[i];
-		m_names[i] = new uchar[len + 1];
+		m_names[i] = new uint8_t[len + 1];
 		memcpy(m_names[i], buf + m_namePtrs[i], len);
 		m_names[i][len] = 0;
 		}
@@ -86,7 +86,7 @@ SISComponentNameRecord::fillFrom(uchar* buf, int base, off_t len,
 	return SIS_OK;
 }
 
-uchar*
+uint8_t*
 SISComponentNameRecord::getName(int no)
 {
 	return m_names[no];

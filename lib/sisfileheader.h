@@ -1,4 +1,4 @@
-/** -*-c++-*-
+/* -*-c++-*-
  * $Id$
  *
  * This file is part of plptools.
@@ -23,8 +23,6 @@
 #ifndef _SISFILEHEADER_H
 #define _SISFILEHEADER_H
 
-#include <sys/types.h>
-
 #include "sistypes.h"
 
 /**
@@ -37,7 +35,7 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	SisRC fillFrom(uchar* buf, int* base, off_t len);
+	SisRC fillFrom(uint8_t* buf, int* base, off_t len);
 
 	/**
 	 * Update the drive letter, and patch the parsed buffer.
@@ -69,32 +67,32 @@ public:
 #endif
 	};
 
-	uint32 m_uid1;
-	uint32 m_uid2;
-	uint32 m_uid3;
-	uint32 m_uid4;
-	uint16 m_crc;
-	uint16 m_nlangs;
-	uint16 m_nfiles;
-	uint16 m_nreqs;
-	uint16 m_installationLanguage;
-	uint16 m_installationFiles;
-	uint32 m_installationDrive;
-	uint32 m_installerVersion;
-	uint16 m_options;
-	uint16 m_type;
-	uint16 m_major;
-	uint16 m_minor;
-	uint32 m_variant;
-	uint32 m_languagePtr;
-	uint32 m_filesPtr;
-	uint32 m_reqPtr;
-	uint32 m_unknown;
-	uint32 m_componentPtr;
+	uint32_t m_uid1;
+	uint32_t m_uid2;
+	uint32_t m_uid3;
+	uint32_t m_uid4;
+	uint16_t m_crc;
+	uint16_t m_nlangs;
+	uint16_t m_nfiles;
+	uint16_t m_nreqs;
+	uint16_t m_installationLanguage;
+	uint16_t m_installationFiles;
+	uint32_t m_installationDrive;
+	uint32_t m_installerVersion;
+	uint16_t m_options;
+	uint16_t m_type;
+	uint16_t m_major;
+	uint16_t m_minor;
+	uint32_t m_variant;
+	uint32_t m_languagePtr;
+	uint32_t m_filesPtr;
+	uint32_t m_reqPtr;
+	uint32_t m_unknown;
+	uint32_t m_componentPtr;
 
 private:
 
-	uchar* m_buf;
+	uint8_t* m_buf;
 
 };
 

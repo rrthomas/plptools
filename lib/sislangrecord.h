@@ -1,4 +1,4 @@
-/** -*-c++-*-
+/* -*-c++-*-
  * $Id$
  *
  * This file is part of plptools.
@@ -23,8 +23,6 @@
 #ifndef _SISLANGRECORD_H
 #define _SISLANGRECORD_H
 
-#include <sys/types.h>
-
 #include "sistypes.h"
 
 /**
@@ -38,9 +36,9 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	SisRC fillFrom(uchar* buf, int* base, off_t len);
+	SisRC fillFrom(uint8_t* buf, int* base, off_t len);
 
-	uint16 m_lang;
+	uint16_t m_lang;
 };
 
 #endif

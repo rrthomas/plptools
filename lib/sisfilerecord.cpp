@@ -26,12 +26,12 @@
 #include <stdio.h>
 
 SisRC
-SISFileRecord::fillFrom(uchar* buf, int* base, off_t len, SISFile* sisFile)
+SISFileRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 {
 	if (*base + 28 + 4 * 2 > len)
 		return SIS_TRUNCATED;
 
-	uchar* p = buf + *base;
+	uint8_t* p = buf + *base;
 	int size = 0;
 	m_flags = read32(p);
 	if (logLevel >= 2)
@@ -59,8 +59,8 @@ SISFileRecord::fillFrom(uchar* buf, int* base, off_t len, SISFile* sisFile)
 	switch (m_flags)
 		{
 		case 0: // Only one file.
-			m_fileLengths = new uint32[1];
-			m_filePtrs = new uint32[1];
+			m_fileLengths = new uint32_t[1];
+			m_filePtrs = new uint32_t[1];
 			m_fileLengths[0] = read32(p + size);
 			m_filePtrs[0] = read32(p + size + 4);
 			size += 8;
@@ -80,8 +80,8 @@ SISFileRecord::fillFrom(uchar* buf, int* base, off_t len, SISFile* sisFile)
 		case 1: // One file per language.
 			{
 			int n = sisFile->m_header.m_nlangs;
-			m_fileLengths = new uint32[n];
-			m_filePtrs = new uint32[n];
+			m_fileLengths = new uint32_t[n];
+			m_filePtrs = new uint32_t[n];
 			if (*base + size + n * 8 > len)
 				return SIS_TRUNCATED;
 			for (int i = 0; i < n; ++i)

@@ -1,4 +1,4 @@
-/** -*-c++-*-
+/* -*-c++-*-
  * $Id$
  *
  * This file is part of plptools.
@@ -27,8 +27,6 @@
 #include "sisfileheader.h"
 #include "siscomponentrecord.h"
 
-#include <sys/types.h>
-
 class SISLangRecord;
 class SISFileRecord;
 class SISReqRecord;
@@ -43,7 +41,7 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	SisRC fillFrom(uchar* buf, off_t len);
+	SisRC fillFrom(uint8_t* buf, off_t len);
 
 	/**
 	 * Return the currently selected installation language.
@@ -59,7 +57,7 @@ public:
 	/**
 	 * Get the name of this component, in the selected language.
 	 */
-	uchar* getName();
+	uint8_t* getName();
 
 	/**
 	 * Set the installed drive.

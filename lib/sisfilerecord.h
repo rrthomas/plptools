@@ -1,4 +1,4 @@
-/** -*-c++-*-
+/* -*-c++-*-
  * $Id$
  *
  * This file is part of plptools.
@@ -25,8 +25,6 @@
 
 #include "sistypes.h"
 
-#include <sys/types.h>
-
 class SISFile;
 
 /**
@@ -42,12 +40,12 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	SisRC fillFrom(uchar* buf, int* base, off_t len, SISFile* sisFile);
+	SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile);
 
 	/**
 	 * 1 if multiple language versions, otherwise 0.
 	 */
-	uint32 m_flags;
+	uint32_t m_flags;
 
 	/**
 	 * Type of file.
@@ -59,7 +57,7 @@ public:
 	 *  - 4. Does not exist yet, but will be created when app is run, so
 	 *       it should not be removed during an upgrade.
 	 */
-	uint32 m_fileType;
+	uint32_t m_fileType;
 
 	/**
 	 * If file type is 1:
@@ -74,14 +72,14 @@ public:
 	 *  - 1. Run during removal.
 	 *  - 2. Run during both installation and removal.
 	 */
-	uint32 m_fileDetails;
+	uint32_t m_fileDetails;
 
-	uint32 m_sourceLength;
-	uint32 m_sourcePtr;
-	uint32 m_destLength;
-	uint32 m_destPtr;
-	uint32* m_fileLengths;
-	uint32* m_filePtrs;
+	uint32_t m_sourceLength;
+	uint32_t m_sourcePtr;
+	uint32_t m_destLength;
+	uint32_t m_destPtr;
+	uint32_t* m_fileLengths;
+	uint32_t* m_filePtrs;
 };
 
 #endif

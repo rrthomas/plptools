@@ -40,33 +40,33 @@ void createCRCTable()
 		}
 }
 
-uint16 updateCrc(uint16 crc, uchar value)
+uint16_t updateCrc(uint16_t crc, uint8_t value)
 {
 	return (crc << 8) ^ s_crcTable[((crc >> 8) ^ value) & 0xff];
 }
 
-uint16 calcCRC(uchar* data, int len)
+uint16_t calcCRC(uint8_t* data, int len)
 {
-	uint16 crc = 0;
+	uint16_t crc = 0;
 	for (int i = 0; i < len; ++i)
 		{
-		uchar value = data[i];
+		uint8_t value = data[i];
 		crc = (crc << 8) ^ s_crcTable[((crc >> 8) ^ value) & 0xff];
 		}
 	return crc;
 }
 
-uint16 read16(uchar* p)
+uint16_t read16(uint8_t* p)
 {
 	return p[0] | (p[1] << 8);
 }
 
-uint32 read32(uchar* p)
+uint32_t read32(uint8_t* p)
 {
 	return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
-void write16(uchar* p, int val)
+void write16(uint8_t* p, int val)
 {
 	p[0] = val & 255;
 	p[1] = (val >> 8) & 255;

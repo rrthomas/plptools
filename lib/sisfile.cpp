@@ -28,7 +28,7 @@
 #include <stdio.h>
 
 SisRC
-SISFile::fillFrom(uchar* buf, off_t len)
+SISFile::fillFrom(uint8_t* buf, off_t len)
 {
 	int ix = 0;
 	SisRC rc = m_header.fillFrom(buf, &ix, len);
@@ -117,7 +117,7 @@ SISFile::getLanguage(int i)
 	return &langTable[m_langRecords[i].m_lang];
 }
 
-uchar*
+uint8_t*
 SISFile::getName()
 {
 	return m_componentRecord.getName(m_header.m_installationLanguage);

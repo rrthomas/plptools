@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 SisRC
-SISLangRecord::fillFrom(uchar* buf, int* base, off_t len)
+SISLangRecord::fillFrom(uint8_t* buf, int* base, off_t len)
 {
 	if (*base + 2 > len)
 		return SIS_TRUNCATED;

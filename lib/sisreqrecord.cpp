@@ -26,21 +26,21 @@
 #include <stdio.h>
 
 SisRC
-SISReqRecord::fillFrom(uchar* buf, int* base, off_t len, SISFile* sisFile)
+SISReqRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 {
 	int n = sisFile->m_header.m_nreqs;
 	if (*base + 12 + n * 4 * 2)
 		return SIS_TRUNCATED;
 
-	uchar* p = buf + *base;
+	uint8_t* p = buf + *base;
 	int size = 0;
 
 	m_uid = read32(p);
 	m_major = read16(p + 4);
 	m_minor = read16(p + 6);
 	m_variant = read32(p + 8);
-	m_nameLengths = new uint32[n];
-	m_namePtrs = new uint32[n];
+	m_nameLengths = new uint32_t[n];
+	m_namePtrs = new uint32_t[n];
 
 	// First read lengths.
 	//

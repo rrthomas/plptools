@@ -1,4 +1,4 @@
-/** -*-c++-*-
+/* -*-c++-*-
  * $Id$
  *
  * This file is part of plptools.
@@ -23,9 +23,7 @@
 #ifndef _SISTYPES_H
 #define _SISTYPES_H
 
-typedef unsigned short uint16;
-typedef unsigned int uint32;
-typedef unsigned char uchar;
+#include "plp_inttypes.h"
 
 /**
  * Return Codes.
@@ -36,15 +34,15 @@ enum SisRC {
 	SIS_CORRUPTED,
 };
 
-extern uint16 read16(uchar* p);
+extern uint16_t read16(uint8_t* p);
 
-extern uint32 read32(uchar* p);
+extern uint32_t read32(uint8_t* p);
 
-extern void write16(uchar* p, int val);
+extern void write16(uint8_t* p, int val);
 
 extern void createCRCTable();
 
-extern uint16 updateCrc(uint16 crc, uchar value);
+extern uint16_t updateCrc(uint16_t crc, uint8_t value);
 
 extern int logLevel;
 
@@ -54,7 +52,7 @@ extern int logLevel;
  */
 struct LangTableEntry
 {
-	uint16 m_no;
+	uint16_t m_no;
 	char   m_code[3];
 	char*  m_name;
 };

@@ -1,4 +1,4 @@
-/** -*-c++-*-
+/* -*-c++-*-
  * $Id$
  *
  * This file is part of plptools.
@@ -25,8 +25,6 @@
 
 #include "sistypes.h"
 
-#include <sys/types.h>
-
 class SISFile;
 
 /**
@@ -40,14 +38,14 @@ public:
 	/**
 	 * Populate the fields.
 	 */
-	SisRC fillFrom(uchar* buf, int* base, off_t len, SISFile* file);
+	SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* file);
 
-	uint32 m_uid;
-	uint16 m_major;
-	uint16 m_minor;
-	uint32 m_variant;
-	uint32* m_nameLengths;
-	uint32* m_namePtrs;
+	uint32_t m_uid;
+	uint16_t m_major;
+	uint16_t m_minor;
+	uint32_t m_variant;
+	uint32_t* m_nameLengths;
+	uint32_t* m_namePtrs;
 };
 
 #endif
