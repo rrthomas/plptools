@@ -1136,6 +1136,7 @@ special(const QByteArray &a) {
 
 	    Enum<rfsv::errs>res = plpRpcs->getOwnerInfo(b);
 	    if (res != rfsv::E_PSI_GEN_NONE) {
+		kdDebug(PLP_DEBUGAREA) << "get Ownerinfo returned " << res << endl;
 		error(ERR_COULD_NOT_STAT, "Owner");
 		return;
 	    }
