@@ -59,15 +59,21 @@ SISInstaller::createDirs(char* filename)
 			{
 			*end = 0;
 			if (logLevel >= 1)
-				printf("Checking for existance of %s\n", filename);
+				fprintf(stderr, "Checking for existance of %s\n", filename);
 //			if (!m_psion->dirExists(filename))
 				{
-				printf("Creating dir %s\n", filename);
+				if (logLevel >= 1)
+					fprintf(stderr, "Creating dir %s\n", filename);
 				Enum<rfsv::errs> res;
 				res = m_psion->mkdir(filename);
 				if ((res != rfsv::E_PSI_GEN_NONE) &&
 					(res != rfsv::E_PSI_FILE_EXIST))
-					printf(" -> Failed: %s\n", (const char*)res);
+					{
+#if HAVE_LIBNEWT
+					if (!m_useNewt)
+#endif
+						fprintf(stderr, " -> Failed: %s\n", (const char*)res);
+					}
 				}
 			*end = ch;
 			return;
@@ -96,14 +102,37 @@ SISInstaller::copyFile(SISFileRecord* fileRecord)
 		dest[0] = m_drive;
 		fileRecord->setMainDrive(m_drive);
 		if (logLevel >= 2)
-			printf("Setting drive at index %d to %c\n",
+			fprintf(stderr, "Setting drive at index %d to %c\n",
 				   destptr, m_drive);
 		}
-	printf("Copying %d bytes to %s\n",
-		   fileRecord->m_fileLengths[m_fileNo], dest);
+
+	char msgbuf[1024];
+	sprintf(msgbuf,
+			"Copying %d bytes to %s\n",
+			fileRecord->m_fileLengths[m_fileNo], dest);
+#if HAVE_LIBNEWT
+		if (m_useNewt)
+			{
+			newtPushHelpLine(msgbuf);
+			newtRefresh();
+			}
+		else
+#endif
+			{
+			printf("%s\n", msgbuf);
+			}
+
 	copyBuf(fileRecord->getFilePtr(m_fileNo),
 			fileRecord->m_fileLengths[m_fileNo],
 			dest);
+
+#if HAVE_LIBNEWT
+	if (m_useNewt)
+		{
+		newtPopHelpLine();
+		newtRefresh();
+		}
+#endif
 }
 
 void
@@ -115,12 +144,16 @@ SISInstaller::copyBuf(const uint8_t* buf, int len, char* name)
 	int fd = mkstemp(srcName);
 	if (-1 == fd)
 		{
-		printf("Couldn't create temp file: %s\n", strerror(errno));
+#if HAVE_LIBNEWT
+		if (!m_useNewt)
+#endif
+			fprintf(stderr,
+					"Couldn't create temp file: %s\n", strerror(errno));
 		return;
 		}
 	Enum<rfsv::errs> res;
 	if (logLevel >= 2)
-		printf("Storing in %s\n", srcName);
+		fprintf(stderr, "Storing in %s\n", srcName);
 	write(fd, buf, len);
 	close(fd);
 	continueRunning = 1;
@@ -128,14 +161,18 @@ SISInstaller::copyBuf(const uint8_t* buf, int len, char* name)
 	if (res == rfsv::E_PSI_GEN_NONE)
 		{
 		if (logLevel >= 1)
-			printf(" -> Success.\n");
+			fprintf(stderr, " -> Success.\n");
 		}
 	else
 		{
-		printf(" -> Fail: %s\n", (const char*)res);
+#if HAVE_LIBNEWT
+		if (!m_useNewt)
+#endif
+			{
+			fprintf(stderr, " -> Fail: %s\n", (const char*)res);
+			}
 		}
 	unlink(srcName);
-	//sleep(10);
 }
 
 int
@@ -148,40 +185,117 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 			copyFile(fileRecord);
 			break;
 		case 1:
-			printf("Info:\n%.*s\n",
-				   fileRecord->m_fileLengths[m_fileNo],
-				   fileRecord->getFilePtr(m_fileNo));
-			switch (fileRecord->m_fileDetails)
+
+#if HAVE_LIBNEWT
+			if (m_useNewt)
 				{
-				case 0:
-					printf("Continue\n");
-					fgets(readbuf, sizeof(readbuf), stdin);
-					break;
-				case 1:
-					printf("(Install next file?) [Y]es/No\n");
-					fgets(readbuf, sizeof(readbuf), stdin);
-					if (strchr("Nn", readbuf[0]))
-						{
-						return FILE_SKIP;
-						}
-					break;
-				case 2:
-					printf("(Continue installation?) [Y]es/No\n");
-					fgets(readbuf, sizeof(readbuf), stdin);
-					if (strchr("Nn", readbuf[0]))
-						{
-						// Watch out if we have copied any files
-						// already.
-						//
-						return FILE_ABORT;
-						}
-					break;
+				int len = fileRecord->m_fileLengths[m_fileNo];
+				char* msgbuf = new char[len + 1];
+				memcpy(msgbuf, fileRecord->getFilePtr(m_fileNo), len);
+				msgbuf[len] = 0;
+				int j = 0;
+				for (int i = 0; i < len; ++i)
+					{
+					if (msgbuf[i] != '\r')
+						msgbuf[j++] = msgbuf[i];
+					}
+				msgbuf[j] = 0;
+				int cols = 0;
+				int rows = 0;
+				char* reflowedText =
+					newtReflowText(msgbuf, 40, 20, 30, &cols, &rows);
+				int flags = NEWT_FLAG_WRAP;
+				if (rows > 15)
+					{
+					rows = 15;
+					flags |= NEWT_FLAG_SCROLL;
+					}
+				newtComponent text = newtTextbox(0, 0, cols, rows, flags);
+				newtTextboxSetText(text, reflowedText);
+				newtOpenWindow(10, 5, cols + 2, rows + 5, "Info");
+				newtComponent form = newtForm(NULL, NULL, 0);
+				newtFormAddComponent(form, text);
+				newtComponent button1;
+				newtComponent button2 = 0;
+				const char* b1;
+				const char* b2;
+				int rc = FILE_OK;
+				switch (fileRecord->m_fileDetails)
+					{
+					case 0:
+						b1 = _("Continue");
+						button1 = newtButton((cols - strlen(b1)) / 2 - 1,
+											 rows + 1, b1);
+						break;
+					case 1:
+						b1 = _("Yes");
+						b2 = _("No");
+						button1 = newtButton(cols / 3 - strlen(b1) / 2 - 1,
+											 rows + 1, b1);
+						button2 = newtButton(cols / 3 * 2 - strlen(b2) / 2 - 1,
+											 rows + 1, b2);
+						rc = FILE_SKIP;
+						break;
+					case 2:
+						b1 = _("Yes");
+						b2 = _("No");
+						button1 = newtButton(cols / 3 - strlen(b1) / 2 - 1,
+											 rows + 1, b1);
+						button2 = newtButton(cols / 3 * 2 - strlen(b2) / 2 - 1,
+											 rows + 1, b2);
+						rc = FILE_ABORT;
+						break;
+					}
+				newtFormAddComponent(form, button1);
+				if (button2)
+					newtFormAddComponent(form, button2);
+				newtComponent ender = newtRunForm(form);
+				if (ender == button1)
+					rc = FILE_OK;
+				newtFormDestroy(form);
+				newtPopWindow();
+				delete reflowedText;
+				delete msgbuf;
+				return rc;
+				}
+			else
+#endif
+				{
+				printf("Info:\n%.*s\n",
+					   fileRecord->m_fileLengths[m_fileNo],
+					   fileRecord->getFilePtr(m_fileNo));
+				switch (fileRecord->m_fileDetails)
+					{
+					case 0:
+						printf("Continue\n");
+						fgets(readbuf, sizeof(readbuf), stdin);
+						break;
+					case 1:
+						printf("(Install next file?) [Y]es/No\n");
+						fgets(readbuf, sizeof(readbuf), stdin);
+						if (strchr("Nn", readbuf[0]))
+							{
+							return FILE_SKIP;
+							}
+						break;
+					case 2:
+						printf("(Continue installation?) [Y]es/No\n");
+						fgets(readbuf, sizeof(readbuf), stdin);
+						if (strchr("Nn", readbuf[0]))
+							{
+							// Watch out if we have copied any files
+							// already.
+							//
+							return FILE_ABORT;
+							}
+						break;
+					}
 				}
 			break;
 		case 2:
 			{
 			if (logLevel >= 1)
-				printf("Recursive sis file...\n");
+				fprintf(stderr, "Recursive sis file...\n");
 			SISFile sisFile;
 			uint8_t* buf2 = fileRecord->getFilePtr(m_fileNo);
 			off_t len = fileRecord->m_fileLengths[m_fileNo];
@@ -190,11 +304,15 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 			SisRC rc = sisFile.fillFrom(buf2, len);
 			if (rc != SIS_OK)
 				{
-				printf("Could not read contained sis file, rc = %d\n", rc);
+				fprintf(stderr,
+						"Could not read contained sis file, rc = %d\n", rc);
 				break;
 				}
 			SISInstaller installer;
 			installer.setPsion(m_psion);
+#if HAVE_LIBNEWT
+			installer.useNewt(m_useNewt);
+#endif
 			installer.setInstalled(m_installed);
 			rc = installer.run(&sisFile, buf2, len, m_file);
 			if (0 == m_drive)
@@ -202,20 +320,21 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 				m_drive = sisFile.m_header.m_installationDrive;
 				m_file->setDrive(m_drive);
 				if (logLevel >= 1)
-					printf("Updated drive to %c from recursive sis file\n",
-						   m_drive);
+					fprintf(stderr,
+							"Updated drive to %c from recursive sis file\n",
+							m_drive);
 				}
 			break;
 			}
 		case 3:
-			printf("Run %.*s during installation/remove\n",
-				   fileRecord->m_destLength, fileRecord->getDestPtr());
+			if (logLevel >= 1)
+				fprintf(stderr, "Run %.*s during installation/remove\n",
+						fileRecord->m_destLength, fileRecord->getDestPtr());
 			break;
 		case 4:
 			if (logLevel >= 2)
-				printf("Running the app will create %.*s\n",
-					   fileRecord->m_destLength,
-					   fileRecord->getDestPtr());
+				fprintf(stderr, "Running the app will create %.*s\n",
+						fileRecord->m_destLength, fileRecord->getDestPtr());
 			break;
 		}
 	return FILE_OK;
@@ -235,16 +354,30 @@ SISInstaller::loadInstalled()
 		}
 	else
 		{
+#if HAVE_LIBNEWT
+		if (m_useNewt)
+			{
+			newtPushHelpLine(_("Loading installed sis files."));
+			newtRefresh();
+			}
+#endif
 		while (!files.empty())
 			{
 			PlpDirent file = files[0];
 			if (logLevel >= 1)
-				printf("Loading sis file `%s'\n", file.getName());
+				fprintf(stderr, "Loading sis file `%s'\n", file.getName());
 			char sisname[256];
 			sprintf(sisname, "%s%s", SYSTEMINSTALL, file.getName());
 			loadPsionSis(sisname);
 			files.pop_front();
 			}
+#if HAVE_LIBNEWT
+		if (m_useNewt)
+			{
+			newtPopHelpLine();
+			newtRefresh();
+			}
+#endif
 		}
 }
 
@@ -256,19 +389,19 @@ SISInstaller::loadPsionSis(const char* name)
 	int fd = mkstemp(srcName);
 	if (-1 == fd)
 		{
-		printf("Couldn't create temp file: %s\n", strerror(errno));
+		fprintf(stderr, "Couldn't create temp file: %s\n", strerror(errno));
 		return;
 		}
 	Enum<rfsv::errs> res;
 	continueRunning = 1;
 	if (logLevel >= 2)
-		printf("Copying from %s to temp file %s\n", name, srcName);
+		fprintf(stderr, "Copying from %s to temp file %s\n", name, srcName);
 	res = m_psion->copyFromPsion(name, fd, checkAbortHash);
 	if (res == rfsv::E_PSI_GEN_NONE)
 		{
 		off_t fileLen = lseek(fd, 0, SEEK_END);
 		if (logLevel >= 2)
-			printf("Read %d bytes from the Psion file %s\n",
+			fprintf(stderr, "Read %d bytes from the Psion file %s\n",
 				   (int)fileLen, name);
 		lseek(fd, SEEK_SET, 0);
 		uint8_t* sisbuf = new uint8_t[fileLen];
@@ -280,7 +413,7 @@ SISInstaller::loadPsionSis(const char* name)
 			if (rc2 == SIS_OK)
 				{
 				if (logLevel >= 1)
-					printf(" Ok.\n");
+					fprintf(stderr, " Ok.\n");
 				SISFileLink* link = new SISFileLink(sisFile);
 				link->m_next = m_installed;
 				m_ownInstalled = true;
@@ -296,7 +429,6 @@ SISInstaller::loadPsionSis(const char* name)
 		}
 	close(fd);
 	unlink(srcName);
-	//sleep(10);
 }
 
 void
@@ -307,7 +439,7 @@ SISInstaller::removeFile(SISFileRecord* fileRecord)
 	memcpy(dest, fileRecord->getDestPtr(), len);
 	dest[len] = 0;
 	if (logLevel >= 1)
-		printf("Removing file component %s.\n", dest);
+		fprintf(stderr, "Removing file component %s.\n", dest);
 	m_psion->remove(dest);
 }
 
@@ -324,34 +456,103 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	int lang;
 	m_file = file;
 	m_buf = buf;
+#if HAVE_LIBNEWT
+	newtComponent form, button, text, listbox;
+#endif
+	char msgbuf[1024];
 	if (parent == 0)
 		{
 		n = m_file->m_header.m_nlangs;
 		if (n == 1)
 			{
-			printf("You have only one language: %s\n",
-				   m_file->getLanguage(0)->m_name);
+			sprintf(msgbuf,
+					_("You have only one language: %s"),
+					m_file->getLanguage(0)->m_name);
+#if HAVE_LIBNEWT
+			if (m_useNewt)
+				{
+# if 0
+				text = newtTextboxReflowed(1, 1, msgbuf, 37, 5, 5, 0);
+				int th = newtTextboxGetNumLines(text);
+				const char* okText = _("Ok");
+				button = newtButton(18 - strlen(okText) / 2, th + 2, okText);
+				newtOpenWindow(10, 5, 40, th + 6, "Language");
+				form = newtForm(NULL, NULL, 0);
+				newtFormAddComponent(form, text);
+				newtFormAddComponent(form, button);
+				newtRunForm(form);
+				newtFormDestroy(form);
+				newtPopWindow();
+# endif
+				}
+			else
+#endif
+				{
+				printf("%s\n", msgbuf);
+				}
 			lang = 0;
 			}
 		else
 			{
-			printf("Select a language (%d alternatives):\n", n);
-			for (int i = 0; i < n; ++i)
+#if HAVE_LIBNEWT
+			if (m_useNewt)
 				{
-				printf(" %d. %s\n", i, m_file->getLanguage(i)->m_name);
+				sprintf(msgbuf, _("Select a language."));
+				text = newtTextboxReflowed(1, 1, msgbuf, 37, 5, 5, 0);
+				int th = newtTextboxGetNumLines(text);
+				listbox = newtListbox(1, th + 2, 6,
+									  NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+				int boxwidth = 0;
+				for (int i = 0; i < n; ++i)
+					{
+					const char* txt = m_file->getLanguage(i)->m_name;
+					if (strlen(txt) > boxwidth)
+						boxwidth = strlen(txt);
+					newtListboxAppendEntry(listbox, txt, (void*) i);
+					}
+				newtOpenWindow(10, 5, 40, th + 8, "Language");
+				form = newtForm(NULL, NULL, 0);
+				newtFormAddComponent(form, text);
+				newtFormAddComponent(form, listbox);
+				newtRunForm(form);
+				lang = (int)newtListboxGetCurrent(listbox);
+				newtFormDestroy(form);
+				newtPopWindow();
 				}
-			lang = 0;
+			else
+#endif
+				{
+				printf("Select a language (%d alternatives):\n", n);
+				for (int i = 0; i < n; ++i)
+					printf(" %d. %s\n", i, m_file->getLanguage(i)->m_name);
+				lang = 0;
+				}
 			}
 		}
 	else
 		{
-		lang = parent->getLanguage();
+//		This needs to check the _name_ of the language, since the
+//		recursive sis file might have a different language list.
+//		For now, defalt to 0.
+//		lang = parent->getLanguage();
+		lang = 0;
 		if (logLevel >= 1)
-			printf("Forcing language to %d\n", lang);
+			fprintf(stderr, "Forcing language to %d\n", lang);
 		}
 	m_file->setLanguage(lang);
 	uint8_t* compName = m_file->getName();
-	printf("Installing component: `%s'\n", compName);
+	sprintf(msgbuf, _("Installing component: `%s'"), compName);
+#if HAVE_LIBNEWT
+	if (m_useNewt)
+		{
+		newtPushHelpLine(msgbuf);
+		newtRefresh();
+		}
+	else
+#endif
+		{
+		printf("%s\n", msgbuf);
+		}
 
 	// In order to check requisites and previous versions, we need to
 	// load all sis files from the c:/system/install directory.
@@ -366,20 +567,20 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	//
 	n = m_file->m_header.m_nreqs;
 	if (logLevel >= 1)
-		printf("Found %d requisites, of some sort.\n", n);
+		fprintf(stderr, "Found %d requisites, of some sort.\n", n);
 	for (int i = 0; i < n; ++i)
 		{
 		SISReqRecord* reqRecord = &m_file->m_reqRecords[i];
-		printf(" Check if app with uid %08x exists with version >= %d.%d\n",
-		   reqRecord->m_uid,
-		   reqRecord->m_major,
-		   reqRecord->m_minor);
+		if (logLevel >= 1)
+			fprintf(stderr,
+				" Check if app with uid %08x exists with version >= %d.%d\n",
+				reqRecord->m_uid, reqRecord->m_major, reqRecord->m_minor);
 		}
 
 	// Check previous version.
 	//
 	if (logLevel >= 1)
-		printf(
+		fprintf(stderr, 
   "Checking if this app (uid %08x) exists with a version less than %d.%d.\n",
 		   m_file->m_header.m_uid1,
 		   m_file->m_header.m_major,
@@ -419,18 +620,38 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 //		if (!m_forced)
 //			return SIS_ABORTED;
 //		printf("Forced mode... Installing anyway!\n");
-		printf("Uninstalling the previous version first.\n");
 		if (oldFile == 0)
-			printf("Already installed, but 0?\n");
+			fprintf(stderr, "Already installed, but 0?\n");
 		else
+			{
+			sprintf(msgbuf, _("Uninstalling the previous version first."));
+#if HAVE_LIBNEWT
+			if (m_useNewt)
+				{
+				newtPushHelpLine(msgbuf);
+				newtRefresh();
+				}
+			else
+#endif
+				{
+				printf("%s\n", msgbuf);
+				}
 			uninstall(oldFile);
+#if HAVE_LIBNEWT
+			if (m_useNewt)
+				{
+				newtPopHelpLine();
+				newtRefresh();
+				}
+#endif
+			}
 		}
 
 	// Install file components.
 	//
 	n = m_file->m_header.m_nfiles;
 	if (logLevel >= 1)
-		printf("Found %d files.\n", n);
+		fprintf(stderr, "Found %d files.\n", n);
 	m_drive = (parent == 0) ? 0 : parent->m_header.m_installationDrive;
 	int nCopiedFiles = 0;
 	int firstFile = -1;
@@ -478,10 +699,12 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 		}
 	m_file->setFiles(nCopiedFiles);
 	if (logLevel >= 1)
-		printf("Installed %d files of %d, cutting at offset max(%d,%d)\n",
-			   m_file->m_header.m_installationFiles,
-			   m_file->m_header.m_nfiles,
-			   firstFile, m_lastSisFile);
+		fprintf(stderr,
+				"Installed %d files of %d, cutting at offset max(%d,%d)\n",
+				m_file->m_header.m_installationFiles,
+				m_file->m_header.m_nfiles,
+				firstFile,
+				m_lastSisFile);
 	if (firstFile < m_lastSisFile)
 		firstFile = m_lastSisFile;
 	if (nCopiedFiles == 0)
@@ -503,8 +726,15 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 		namelen++;
 		}
 	sprintf(resname, "C:\\System\\Install\\%.*s.sis", namelen, compName);
-	printf("Creating residual sis file %s\n", resname);
+	if (logLevel >= 1)
+		fprintf(stderr, "Creating residual sis file %s\n", resname);
 	copyBuf(buf, firstFile, resname);
+#if HAVE_LIBNEWT
+	if (m_useNewt)
+		{
+		newtPopHelpLine();
+		}
+#endif
 	if (aborted)
 		return SIS_ABORTED;
 	return SIS_OK;
@@ -516,6 +746,8 @@ SISInstaller::selectDrive()
 	u_int32_t devbits = 0;
 	Enum<rfsv::errs> res;
 	char drivelist[26];
+	int space[26];
+	int size[26];
 	int ndrives = 0;
 	if ((res = m_psion->devlist(devbits)) == rfsv::E_PSI_GEN_NONE)
 		{
@@ -528,11 +760,19 @@ SISInstaller::selectDrive()
 				u_int32_t mediaType = plpdrive.getMediaType();
 				if ((mediaType == 3) || (mediaType == 5))
 					{
-					drivelist[ndrives++] = 'A' + i;
-					printf("%c: %d bytes free, %d bytes total\n",
-						   'A' + i,
-						   plpdrive.getSpace(),
-						   plpdrive.getSize());
+					drivelist[ndrives] = 'A' + i;
+					space[ndrives] = plpdrive.getSpace();
+					size[ndrives] = plpdrive.getSize();
+#if HAVE_LIBNEWT
+					if (!m_useNewt)
+#endif
+						{
+						printf("%c: %d bytes free, %d bytes total\n",
+							   'A' + i,
+							   plpdrive.getSpace(),
+							   plpdrive.getSize());
+						}
+					++ndrives;
 					}
 				}
 			devbits >>= 1;
@@ -542,32 +782,69 @@ SISInstaller::selectDrive()
 	if (ndrives == 0)
 		{
 		m_drive = 'C';
-		printf("Selecting the only drive %c\n", m_drive);
+		if (logLevel >= 1)
+			printf("Selecting the only drive %c\n", m_drive);
 		}
 	else if (ndrives == 1)
 		{
 		m_drive = drivelist[0];
-		printf("Selecting the only drive %c\n", m_drive);
+		if (logLevel >= 1)
+			printf("Selecting the only drive %c\n", m_drive);
 		}
 	else
 		{
-		printf("Please select a drive\n");
-		char ch;
-		char readbuf[2];
-		while (m_drive == 0)
+
+#if HAVE_LIBNEWT
+		if (m_useNewt)
 			{
-			fgets(readbuf, 2, stdin);
-			ch = readbuf[0];
-			if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
+			char msgbuf[256];
+			sprintf(msgbuf, _("Select a drive."));
+			newtComponent text = newtTextboxReflowed(1, 1, msgbuf, 37, 5, 5, 0);
+			int th = newtTextboxGetNumLines(text);
+			newtComponent listbox =
+				newtListbox(1, th + 2, 6,
+							NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+			int boxwidth = 0;
+			for (int i = 0; i < ndrives; ++i)
 				{
-				m_drive = toupper(ch);
-				if (!strchr(drivelist, m_drive))
+				char txt[256];
+				sprintf(txt, "%c: %d kbytes free, %d kbytes total",
+						drivelist[i], space[i] / 1024, size[i] / 1024);
+				if (strlen(txt) > boxwidth)
+					boxwidth = strlen(txt);
+				newtListboxAppendEntry(listbox, txt, (void*) i);
+				}
+			newtOpenWindow(10, 5, boxwidth + 5, th + 8, "Drive");
+			newtComponent form = newtForm(NULL, NULL, 0);
+			newtFormAddComponent(form, text);
+			newtFormAddComponent(form, listbox);
+			newtRunForm(form);
+			m_drive = 'A' + (int)newtListboxGetCurrent(listbox);
+			newtFormDestroy(form);
+			newtPopWindow();
+			}
+		else
+#endif
+			{
+			printf("Please select a drive\n");
+			char ch;
+			char readbuf[2];
+			while (m_drive == 0)
+				{
+				fgets(readbuf, 2, stdin);
+				ch = readbuf[0];
+				if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
 					{
-					m_drive = 0;
-					printf("Please select a valid drive: %s\n", drivelist);
+					m_drive = toupper(ch);
+					if (!strchr(drivelist, m_drive))
+						{
+						m_drive = 0;
+						printf("Please select a valid drive: %s\n", drivelist);
+						}
 					}
 				}
 			}
+
 		}
 }
 
@@ -583,9 +860,9 @@ SISInstaller::uninstall(SISFile* file)
 	int n = file->m_header.m_nfiles;
 	int fileix = n - file->m_header.m_installationFiles;
 	if (logLevel >= 1)
-		printf("Uninstalling %d files, from a total of %d.\n",
-			   file->m_header.m_installationFiles,
-			   file->m_header.m_nfiles);
+		fprintf(stderr, "Uninstalling %d files, from a total of %d.\n",
+				file->m_header.m_installationFiles,
+				file->m_header.m_nfiles);
 	int lang = file->getLanguage();
 	while (fileix < n)
 		{
@@ -615,7 +892,7 @@ SISInstaller::uninstallFile(SISFileRecord* fileRecord)
 			// file no the target machine.
 			//
 			if (logLevel >= 1)
-				printf("Recursive sis file...\n");
+				fprintf(stderr, "Recursive sis file...\n");
 			SISFile sisFile;
 			int fileptr = fileRecord->m_filePtrs[m_fileNo];
 			uint8_t* buf2 = m_buf + fileptr;
@@ -625,11 +902,15 @@ SISInstaller::uninstallFile(SISFileRecord* fileRecord)
 			SisRC rc = sisFile.fillFrom(buf2, len);
 			if (rc != SIS_OK)
 				{
-				printf("Could not read contained sis file, rc = %d\n", rc);
+				fprintf(stderr,
+						"Could not read contained sis file, rc = %d\n", rc);
 				break;
 				}
 			SISInstaller installer;
 			installer.setPsion(m_psion);
+#if HAVE_LIBNEWT
+			installer.useNewt(m_useNewt);
+#endif
 			installer.setInstalled(m_installed);
 			rc = installer.run(&sisFile, buf2, len, m_file);
 			if (0 == m_drive)
@@ -637,8 +918,9 @@ SISInstaller::uninstallFile(SISFileRecord* fileRecord)
 				m_drive = sisFile.m_header.m_installationDrive;
 				m_file->setDrive(m_drive);
 				if (logLevel >= 1)
-					printf("Updated drive to %c from recursive sis file\n",
-						   m_drive);
+					fprintf(stderr,
+							"Updated drive to %c from recursive sis file\n",
+							m_drive);
 				}
 #endif
 			break;
