@@ -494,7 +494,7 @@ setPeer(const char * const Peer, int Port)
 				m_LastError = errno;
 				return false;
 			}
-			he = gethostbyaddr(&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
+			he = gethostbyaddr((const char *)&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
 			if (!he) {
 				m_LastError = errno;
 				return (false);
@@ -546,7 +546,7 @@ setHost(const char * const Host, int Port)
 				m_LastError = errno;
 				return false;
 			}
-			he = gethostbyaddr(&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
+			he = gethostbyaddr((const char *)&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
 			if (!he) {
 				m_LastError = errno;
 				return false;

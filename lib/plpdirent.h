@@ -5,13 +5,36 @@
 #include "psitime.h"
 #include "rfsv.h"
 
+/**
+ * A class, representing the UIDs of a file on the Psion.
+ * Every File on the Psion has a unique UID for determining
+ * the application-mapping. This class stores these UIDs.
+ * An object of this class is contained in every @ref PlpDirent
+ * object.
+ *
+ * @author Fritz Elfert <felfert@to.com>
+ */
 class PlpUID
 {
 	friend inline bool operator<(const PlpUID &u1, const PlpUID &u2);
 public:
+	/**
+	 * Default constructor.
+	 */
 	PlpUID();
+
+	/**
+	 * Constructor.
+	 * Create an instance, presetting all thre uid values.
+	 */
 	PlpUID(const long u1, const long u2, const long u3);
 
+	/**
+	 * Retrieve a UID value.
+	 *
+	 * @param idx The index of the desired UID. Range must be (0..2),
+	 *            otherwise an assertion is triggered.
+	 */
 	long operator[](int idx);
 
 private:
@@ -24,8 +47,11 @@ inline bool operator<(const PlpUID &u1, const PlpUID &u2) {
 
 /**
  * A class, representing a directory entry of the Psion.
- * Objects of this type are used by @ref rfsv::readdir and
- * @ref rfsv::dir for returning the entries of a directory.
+ * Objects of this type are used by @ref rfsv::readdir ,
+ * @ref rfsv::dir and @ref rfsv::fgeteattr for returning
+ * the entries of a directory.
+ *
+ * @author Fritz Elfert <felfert@to.com>
  */
 class PlpDirent {
 	friend class rfsv32;

@@ -21,6 +21,8 @@ class bufferArray;
  * @ref rpcs32 or @ref rpcs16 respectively.
  * These normally are instantiated by using
  * @ref rpcsfactory .
+ *
+ * @author Fritz Elfert <felfert@to.com>
  */
 class rpcs {
 	public:
