@@ -783,11 +783,12 @@ const
 static void
 service_loop()
 {
-    serviceLoop = true;
-    while (serviceLoop) {
+    bool jobLoop = true;
+    while (jobLoop) {
 	bool spoolOpen = false;
 	bool pageStart = true;
 	bool cancelled = false;
+	bool jobEnd;
 	unsigned long plen;
 	int pageCount;
 	bufferStore buf;
@@ -799,96 +800,102 @@ service_loop()
 	    (char *)malloc(strlen(spooldir) +
 			   strlen(TEMPLATE) + 2);
 
-	while (1) {
+	while (jobLoop) {
 	    /* Job loop */
 	    buf.init();
-	    if (wPrt->getData(buf) == rfsv::E_PSI_GEN_NONE) {
-		if ((buf.getLen() == 15) &&
-		    (!memcmp(buf.getString(0), fakePage, 15))) {
-		    cancelled = false;
-		    if (spoolOpen) {
-			fclose(f);
-			infolog("Cancelled job %s", jname);
-			unlink(jname);
-			break;
+	    switch (wPrt->getData(buf)) {
+		case rfsv::E_PSI_FILE_DISC:
+		    jobLoop = false;
+		    break;
+		case rfsv::E_PSI_GEN_NONE:
+		    if ((buf.getLen() == 15) &&
+			(!memcmp(buf.getString(0), fakePage, 15))) {
+			cancelled = false;
+			if (spoolOpen) {
+			    fclose(f);
+			    infolog("Cancelled job %s", jname);
+			    unlink(jname);
+			    break;
+			}
+			continue;
 		    }
-		    continue;
-		}
-		if (!spoolOpen && !cancelled) {
-		    sprintf(jname, "%s/%s", spooldir, TEMPLATE);
-		    if ((fd = mkstemp(jname)) != -1) {
-			infolog("Receiving new job %s", jname);
-			spoolOpen = true;
-			pageStart = true;
-			pageCount = 0;
-		    } else {
-			errorlog("Could not create spool file.");
+		    if (!spoolOpen && !cancelled) {
+			sprintf(jname, "%s/%s", spooldir, TEMPLATE);
+			if ((fd = mkstemp(jname)) != -1) {
+			    infolog("Receiving new job %s", jname);
+			    spoolOpen = true;
+			    pageStart = true;
+			    pageCount = 0;
+			} else {
+			    errorlog("Could not create spool file.");
+			    cancelled = true;
+			    wPrt->cancelJob();
+			}
+			f = fdopen(fd, "w");
+			plen = 0;
+		    }
+		    b = buf.getByte(0);
+		    if ((b != 0x2a) && (b != 0xff)) {
+			errorlog("Invalid packet type 0x%02x.", b);
 			cancelled = true;
 			wPrt->cancelJob();
 		    }
-		    f = fdopen(fd, "w");
-		    plen = 0;
-		}
-		b = buf.getByte(0);
-		if ((b != 0x2a) && (b != 0xff)) {
-		    errorlog("Invalid packet type 0x%02x.", b);
-		    cancelled = true;
-		    wPrt->cancelJob();
-		}
-		bool jobEnd = (b == 0xff);
-		if (!cancelled) {
-		    buf.discardFirstBytes(1);
-		    if (pageStart) {
-			b = buf.getByte(0);
-			plen = buf.getDWord(1) - 8;
-			buf.discardFirstBytes(5+8);
-			pageStart = false;
-			pageBuf.init();
-		    }
-		    pageBuf.addBuff(buf);
-		    plen -= buf.getLen();
-		    if (plen <= 0) {
-			convertPage(f, pageCount++, jobEnd, pageBuf);
-			pageBuf.init();
-			pageStart = true;
-		    }
-		}
-		if (jobEnd) {
-		    if (spoolOpen)
-			fclose(f);
+		    jobEnd = (b == 0xff);
 		    if (!cancelled) {
-			if (pageCount > 0) {
-			    if (!printcmd)
-				infolog("Output stored in %s", jname);
-			    else {
-				int r;
-				char cbuf[4096];
-
-				infolog("Spooling %d pages", pageCount);
-				FILE *pipe = popen(printcmd, "w");
-				if (!pipe) {
-				    errorlog("Could not execute %s: %m",
-					     printcmd);
-				    unlink(jname);
-				}
-				f = fopen(jname, "r");
-				if (!f) {
-				    errorlog("Could not read %s: %m",
-					     jname);
-				    pclose(pipe);
-				    unlink(jname);
-				}
-				while ((r = fread(cbuf, 1, sizeof(cbuf), f)) > 0)
-				    fwrite(cbuf, 1, r, pipe);
-				pclose(pipe);
-				fclose(f);
-				unlink(jname);
-			    }
+			buf.discardFirstBytes(1);
+			if (pageStart) {
+			    b = buf.getByte(0);
+			    plen = buf.getDWord(1) - 8;
+			    buf.discardFirstBytes(5+8);
+			    pageStart = false;
+			    pageBuf.init();
 			}
-		    } else
-			unlink(jname);
-		    spoolOpen = false;
-		}
+			pageBuf.addBuff(buf);
+			plen -= buf.getLen();
+			if (plen <= 0) {
+			    convertPage(f, pageCount++, jobEnd, pageBuf);
+			    pageBuf.init();
+			    pageStart = true;
+			}
+		    }
+		    if (jobEnd) {
+			if (spoolOpen)
+			    fclose(f);
+			if (!cancelled) {
+			    if (pageCount > 0) {
+				if (!printcmd)
+				    infolog("Output stored in %s", jname);
+				else {
+				    int r;
+				    char cbuf[4096];
+
+				    infolog("Spooling %d pages", pageCount);
+				    FILE *pipe = popen(printcmd, "w");
+				    if (!pipe) {
+					errorlog("Could not execute %s: %m",
+						 printcmd);
+					unlink(jname);
+				    }
+				    f = fopen(jname, "r");
+				    if (!f) {
+					errorlog("Could not read %s: %m",
+						 jname);
+					pclose(pipe);
+					unlink(jname);
+				    }
+				    while ((r = fread(cbuf, 1,
+						      sizeof(cbuf), f)) > 0)
+					fwrite(cbuf, 1, r, pipe);
+				    pclose(pipe);
+				    fclose(f);
+				    unlink(jname);
+				}
+			    }
+			} else
+			    unlink(jname);
+			spoolOpen = false;
+		    }
+		    break;
 	    }
 	}
 	free(jname);
