@@ -17,7 +17,6 @@ plpbackup \- Backup and restore for Psion data.
 .B [-f]
 .BI "[-b [" archive-name ]]
 .BI "[-r " archive-name ]
-.B [-F]
 .B [-V]
 .BI "[-p [" host :] port ]
 .BI [ long-options ]
@@ -26,7 +25,7 @@ plpbackup \- Backup and restore for Psion data.
 .SH DESCRIPTION
 
 plpbackup provides a facility for backup and restore of Psion drives on
-your PC. It also can format Psion drives before performing a restore.
+your PC.
 
 .SH OPTIONS
 
@@ -102,10 +101,6 @@ editor to be used can be specified in the environment variable
 If this environment variable is not available, the builtin default
 .B vi
 is used.
-.TP
-.B \-F, --format
-Format specified drives. This option can be combined with restore mode.
-.B USE WITH EXTREME CARE!
 .TP
 .B \-V, --version
 Display the version and exit
