@@ -60,13 +60,15 @@ main(int argc, char **argv)
 	// Command line parameter processing
 	int sockNum = DPORT;
 
-	if (!strcmp(argv[1], "-s") && (argc > 2)) {
+	if ((argc > 2) && !strcmp(argv[1], "-s")) {
 		sockNum = atoi(argv[2]);
 		argc -= 2;
-		for (int i=1; i < argc; i++)
+		for (int i=1; i<argc; i++)
 			argv[i] = argv[i+2];
 	}
 
+	if (argc < 2)
+		ftpHeader();
 	skt = new ppsocket();
 	skt->startup();
 	res = skt->connect(NULL, sockNum);

@@ -99,7 +99,7 @@ session(rfsv32 & a, int xargc, char **xargv)
 	long res;
 	int  once = 0;
 
-	if (xargc > 0) {
+	if (xargc > 1) {
 		once = 1;
 		argc = (xargc<10)?xargc:10;
 		for (int i = 0; i < argc; i++)
