@@ -159,6 +159,10 @@ poll()
 				return ret;
 		}
 	}
+	if (p->linkFailed()) {
+		failed = true;
+		return ret;
+	}
 
 	if (!somethingToSend) {
 		countToResend = 0;

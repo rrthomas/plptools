@@ -76,7 +76,7 @@ pollSocketConnections(int &numScp, socketChan ** scp)
 void
 usage()
 {
-	cerr << "Usage : ncpd [-V] [-v logclass] [-p <port>] [-d <device>] [-b <baudrate>]\n";
+	cerr << "Usage : ncpd [-V] [-v logclass] [-d] [-p <port>] [-s <device>] [-b <baudrate>]\n";
 	exit(1);
 }
 
@@ -86,6 +86,7 @@ main(int argc, char **argv)
 	ppsocket skt;
 	IOWatch iow;
 	int pid;
+	bool dofork = true;
 
 	// Command line parameter processing
 	int sockNum = DPORT;
@@ -99,7 +100,7 @@ main(int argc, char **argv)
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-p") && i + 1 < argc) {
 			sockNum = atoi(argv[++i]);
-		} else if (!strcmp(argv[i], "-d") && i + 1 < argc) {
+		} else if (!strcmp(argv[i], "-s") && i + 1 < argc) {
 			serialDevice = argv[++i];
 		} else if (!strcmp(argv[i], "-v") && i + 1 < argc) {
 			i++;
@@ -119,6 +120,8 @@ main(int argc, char **argv)
 				verbose = true;
 		} else if (!strcmp(argv[i], "-b") && i + 1 < argc) {
 			baudRate = atoi(argv[++i]);
+		} else if (!strcmp(argv[i], "-d")) {
+			dofork = 0;
 		} else if (!strcmp(argv[i], "-V")) {
 			cout << "ncpd version " << VERSION << endl;
 			exit(0);
@@ -126,18 +129,24 @@ main(int argc, char **argv)
 			usage();
 	}
 
-	switch ((pid = fork())) {
+	if (dofork)
+		pid = fork();
+	else
+		pid = 0;
+	switch (pid) {
 		case 0:
 			if (!skt.listen("127.0.0.1", sockNum))
 				cerr << "listen on port " << sockNum << ": " << strerror(errno) << endl;
 			else {
-				logbuf dlog(LOG_DEBUG);
-				logbuf elog(LOG_ERR);
-				ostream lout(&dlog);
-				ostream lerr(&elog);
-				cout = lout;
-				cerr = lerr;
-				openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
+				if (dofork) {
+					logbuf dlog(LOG_DEBUG);
+					logbuf elog(LOG_ERR);
+					ostream lout(&dlog);
+					ostream lerr(&elog);
+					cout = lout;
+					cerr = lerr;
+					openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
+				}
 				ncp *a = new ncp(serialDevice, baudRate, iow);
 				int numScp = 0;
 				socketChan *scp[8];
@@ -157,7 +166,7 @@ main(int argc, char **argv)
 					if (a->stuffToSend())
 						iow.watch(0, 100000);
 					else
-						iow.watch(100000, 0);
+						iow.watch(1, 0);
 
 					if (a->hasFailed()) {
 						if (verbose)

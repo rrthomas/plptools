@@ -29,6 +29,7 @@
 #include <fstream.h>
 #include <iomanip.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 
 extern "C" {
 #include "mp_serial.h"
@@ -155,6 +156,8 @@ bool packet::
 get(unsigned char &type, bufferStore & ret)
 {
 	while (!terminated()) {
+		if (linkFailed())
+			return false;
 		int res = read(fd, inPtr, BUFFERLEN - inLen);
 		if (res > 0) {
 			if (verbose & PKT_DEBUG_LOG)
@@ -241,3 +244,25 @@ terminated()
 	termLen = l;
 	return false;
 }
+
+bool packet::
+linkFailed()
+{
+	int arg;
+	bool failed = false;
+	int res = ioctl(fd, TIOCMGET, &arg);
+	if (res < 0)
+		failed = true;
+	if (verbose & PKT_DEBUG_DUMP)
+		cout << "packet: DTR:" << ((arg & TIOCM_DTR)?1:0)
+			<< " RTS:" << ((arg & TIOCM_RTS)?1:0)
+			<< " DCD:" << ((arg & TIOCM_CAR)?1:0)
+			<< " DSR:" << ((arg & TIOCM_DSR)?1:0)
+			<< " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
+	if (((arg & TIOCM_DSR) == 0) || ((arg & TIOCM_CTS) == 0))
+		failed = true;
+	if ((verbose & PKT_DEBUG_LOG) && failed)
+		cout << "packet: linkFAILED\n";
+	return failed;
+}
+

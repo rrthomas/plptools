@@ -19,6 +19,7 @@ class packet {
 		bool get(unsigned char &type, bufferStore &b);
 		void setVerbose(short int);
 		short int getVerbose();
+		bool linkFailed();
   
 	private:
 		bool terminated();
