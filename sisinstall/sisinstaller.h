@@ -17,9 +17,9 @@ class SISInstaller
 {
 public:
 
-	SisRC run(SISFile* file, uchar* buf, off_t len);
+	SisRC run(SISFile* file, uint8_t* buf, off_t len);
 
-	SisRC run(SISFile* file, uchar* buf, off_t len, SISFile* parent);
+	SisRC run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent);
 
 	/**
 	 * Ask the user which drive to install to.
@@ -39,7 +39,7 @@ private:
 
 	Psion* m_psion;
 
-	uchar* m_buf;
+	uint8_t* m_buf;
 
 	SISFile* m_file;
 
@@ -52,7 +52,7 @@ private:
 	/**
 	 * Store the contents of a buffer in a file on the Psion.
 	 */
-	void copyBuf(const uchar* buf, int len, char* name);
+	void copyBuf(const uint8_t* buf, int len, char* name);
 
 	/**
 	 * Copy a file to the Psion.

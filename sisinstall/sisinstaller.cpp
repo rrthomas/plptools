@@ -77,7 +77,7 @@ SISInstaller::copyFile(SISFileRecord* fileRecord)
 }
 
 void
-SISInstaller::copyBuf(const uchar* buf, int len, char* name)
+SISInstaller::copyBuf(const uint8_t* buf, int len, char* name)
 {
 	createDirs(name);
 	char srcName[32];
@@ -151,7 +151,7 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 			if (logLevel >= 1)
 				printf("Recursive sis file...\n");
 			SISFile sisFile;
-			uchar* buf2 = m_buf + fileRecord->m_filePtrs[m_fileNo];
+			uint8_t* buf2 = m_buf + fileRecord->m_filePtrs[m_fileNo];
 			off_t len = fileRecord->m_fileLengths[m_fileNo];
 			SisRC rc = sisFile.fillFrom(buf2, len);
 			if (rc != SIS_OK)
@@ -193,13 +193,13 @@ SISInstaller::setPsion(Psion* psion)
 }
 
 SisRC
-SISInstaller::run(SISFile* file, uchar* buf, off_t len)
+SISInstaller::run(SISFile* file, uint8_t* buf, off_t len)
 {
 	return run(file, buf, len, 0);
 }
 
 SisRC
-SISInstaller::run(SISFile* file, uchar* buf, off_t len, SISFile* parent)
+SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 {
 	int n;
 	int lang;
@@ -231,7 +231,7 @@ SISInstaller::run(SISFile* file, uchar* buf, off_t len, SISFile* parent)
 			printf("Forcing language to %d\n", lang);
 		}
 	m_file->setLanguage(lang);
-	uchar* compName = m_file->getName();
+	uint8_t* compName = m_file->getName();
 	printf("Installing component: `%s'\n", compName);
 
 	// Check Requisites.

@@ -48,7 +48,7 @@ void main(int argc, char* argv[])
 	off_t len = st.st_size;
 	if (logLevel >= 2)
 		printf("File is %d bytes long\n", len);
-	uchar* buf = new uchar[len];
+	uint8_t* buf = new uint8_t[len];
 	int fd = open(filename, O_RDONLY);
 	if (-1 == fd)
 		error(__LINE__);
