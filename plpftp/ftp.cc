@@ -115,6 +115,7 @@ void ftp::usage() {
     cout << "  runrestore <unixfile>" << endl;
     cout << "  machinfo" << endl;
     cout << "  ownerinfo" << endl;
+    cout << "  setupinfo" << endl;
 }
 
 static int Wildmat(const char *s, char *p);
@@ -763,7 +764,6 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    continue;
 	}
 	// RPCS commands
-#define EXPERIMENTAL
 #ifdef EXPERIMENTAL
 	if (!strcmp(argv[0], "x")) {
 	    u_int16_t hhh;
@@ -775,50 +775,72 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    }
 	    continue;
 	}
-	if (!strcmp(argv[0], "y") && (argc == 2)) {
-	    u_int32_t size;
+#endif
+	if (!strcmp(argv[0], "setupinfo")) {
 	    Enum<rfsv::errs> res;
 	    bufferStore db;
-	    bufferStore db2;
 
-	    sscanf(argv[1], "%lu", &size);
-//	    while (1) {
-		res = r.configRead(size, db);
-		if (res != rfsv::E_PSI_GEN_NONE) {
-		    cerr << "err: " << res << endl;
+	    if ((res = r.configRead(0, db)) != rfsv::E_PSI_GEN_NONE) {
+		cerr << _("Error: ") << res << endl;
+		continue;
+	    }
+	    if (db.getLen() < 1152) {
+		cerr << _("Unknown setup info received") << endl;
+		continue;
+	    }
+	    cout << _("Setup information:") << endl;
+	    cout << _("  Screen contrast:                  ") << dec
+		 << db.getDWord(0x4c) + 1 << endl;
+	    cout << _("  Keyboard click:                   ")
+		 << (db.getDWord(0x200) ?
+		(db.getDWord(0x204) ? _("high") : _("low")) : _("off")) << endl;
+	    cout << _("  Screen click:                     ")
+		 << (db.getDWord(0x20c) ?
+		(db.getDWord(0x210) ? _("high") : _("low")) : _("off")) << endl;
+	    cout << _("  Error sound:                      ")
+		 << (db.getDWord(0x214) ?
+		(db.getDWord(0x218) ? _("high") : _("low")) : _("off")) << endl;
+	    cout << _("  Auto-switch off:                  ");
+	    switch (db.getDWord(0x228)) {
+		case 0:
+		    cout << _("never");
 		    break;
-		}
-		if (db.getLen() != db2.getLen())
-		    cout << "New length: " << db.getLen() << endl;
-		if (db.getLen() == 1268) {
-		    char *p = (char *)db.getString(0);
-//		    p[0x164] = 2;
-		    cout << "wr: " << r.configWrite(db) << endl;
-		}
-		res = r.configRead(size, db2);
-		if (res != rfsv::E_PSI_GEN_NONE) {
-		    cerr << "err: " << res << endl;
+		case 1:
+		    cout << _("if running on battery power");
 		    break;
-		}
-//		else {
-		    for (int i = 0; i < db.getLen(); i++) {
-			unsigned char c = db.getByte(i);
-			unsigned char c2 = db2.getByte(i);
-			if ((c != c2) && ((i < 0x350) || (i > 0x353)))
-			    cout << hex << setw(4) << setfill('0') << i
-				 << " " << setw(2) << setfill('0') << (int)c2
-				 << " " << setw(2) << setfill('0') << (int)c
-				 << dec << endl;
-		    }
-#if 0
-		}
-		db2 = db;
-		sleep(1);
-#endif
-//	    }
+		case 2:
+		    cout << _("always");
+		    break;
+	    }
+	    cout << endl;
+	    if (db.getDWord(0x228) != 0)
+		cout << _("  Switch off after:                 ") << dec
+		     << db.getDWord(0x22c) << _(" seconds") << endl;
+	    cout << _("  Backlight off after:              ") << dec
+		 << db.getDWord(0x234) << _(" seconds") << endl;
+	    cout << _("  Switch on when tapping on screen: ")
+		 << (db.getDWord(0x238) ? _("yes") : _("no")) << endl;
+	    cout << _("  Switch on when opening:           ")
+		 << (db.getDWord(0x23c) ? _("yes") : _("no")) << endl;
+	    cout << _("  Switch off when closing:          ")
+		 << (db.getDWord(0x23c) ? _("yes") : _("no")) << endl;
+	    cout << _("  Ask for password on startup:      ")
+		 << (db.getDWord(0x29c) ? _("yes") : _("no")) << endl;
+	    cout << _("  Show Owner info on startup:       ");
+	    switch (db.getByte(0x3b0)) {
+		case 0x31:
+		    cout << _("never");
+		    break;
+		case 0x32:
+		    cout << _("once a day");
+		    break;
+		case 0x33:
+		    cout << _("always");
+		    break;
+	    }
+	    cout << endl;
 	    continue;
 	}
-#endif
 	if (!strcmp(argv[0], "run") && (argc >= 2)) {
 	    char argbuf[1024];
 	    char cmdbuf[1024];
@@ -1045,7 +1067,7 @@ static char *all_commands[] = {
     "dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
     "del", "rm", "mkdir", "rmdir", "prompt", "bye", "cp", "volname",
     "ps", "kill", "killsave", "runrestore", "run", "machinfo",
-    "ownerinfo", "help", NULL
+    "ownerinfo", "help", "setupinfo", NULL
 };
 
 static char *localfile_commands[] = {
