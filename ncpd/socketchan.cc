@@ -207,6 +207,13 @@ socketPoll()
 		//
 		// All commands begin with "NCP$".
 
+		if (memchr(a.getString(), 0, a.getLen()) == 0) {
+			// Not 0 terminated, -> invalid
+			cerr << "ncpd: command " << a << " unrecognized."
+			     << endl;
+			return;
+		}
+
 		// There is a magic process name called "NCP$INFO.*"
 		// which is announced by the rfsvfactory. This causes a
 		// response to be issued containing the NCP version

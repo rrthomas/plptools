@@ -297,6 +297,8 @@ getBufferStore(bufferStore & a, bool wait)
 	return -1;
     }
     l = ntohl(l);
+    if (l > 16384)
+	    return -1;
     bp = buff = new unsigned char[l];
     while (l > 0) {
 	int j = recv(bp, l, MSG_NOSIGNAL);
