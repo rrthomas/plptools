@@ -102,6 +102,7 @@ public:
 	PSI_O_EXCL   = 00200,
 	PSI_O_TRUNC  = 01000,
 	PSI_O_APPEND = 02000,
+	PSI_O_SHARE  = 04000,
     };
 
     /**

@@ -98,7 +98,7 @@ sendCommand(enum commands cc, bufferStore & data)
     }
     bool result;
     bufferStore a;
-    a.addByte(cc);
+    a.addWord(cc);
     a.addBuff(data);
     result = skt->sendBufferStore(a);
     if (!result) {

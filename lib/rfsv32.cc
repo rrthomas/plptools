@@ -211,6 +211,8 @@ opMode(const u_int32_t mode)
     ret |= (((mode & 03) == PSI_O_RDONLY) ? 0 : EPOC_OMODE_READ_WRITE);
     if (!ret)
 	ret |= (mode & PSI_O_EXCL) ? 0 : EPOC_OMODE_SHARE_READERS;
+    if ((!ret) && (mode & PSI_O_SHARE))
+	ret |= EPOC_OMODE_SHARE_ANY;
     return ret;
 }
 

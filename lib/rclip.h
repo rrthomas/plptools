@@ -65,23 +65,24 @@ public:
     */
     Enum<rfsv::errs> getStatus();
 
-    /**
-    * Get Remote ClipBoard Data
-    */
-    Enum<rfsv::errs> getData(bufferStore &buf);
+    Enum<rfsv::errs> initClipbd();
 
-    /**
-    * Put Data to Remote ClipBoard
-    */
-    Enum<rfsv::errs> putData(bufferStore &buf);
+    Enum<rfsv::errs> sendListen();
+
+    Enum<rfsv::errs> checkNotify();
+
+    Enum<rfsv::errs> waitNotify();
+
+    Enum<rfsv::errs> notify();
 
 protected:
     /**
     * The possible commands.
     */
     enum commands {
-	RCLIP_INIT = 0x0100,
-	RCLIP_GET  = 0xf0f0,
+	RCLIP_INIT   = 0x00,
+	RCLIP_NOTIFY = 0x08,
+	RCLIP_LISTEN = 0x04,
     };
 
     /**
@@ -109,7 +110,7 @@ protected:
     *
     * @returns true on success, false on failure.
     */
-    bool sendCommand(enum commands cc, bufferStore &data);
+    bool sendCommand(enum commands cc);
     Enum<rfsv::errs> getResponse(bufferStore &data);
     const char *getConnectName();
 
