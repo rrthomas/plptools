@@ -3,6 +3,9 @@
 
 @TOP@
 
+/* Define this, if you have sys/time.h */
+#undef HAVE_SYS_TIME_H
+
 /* Define this, if libc provides bind_textdomain_codeset */
 #undef HAVE_BIND_TEXTDOMAIN_CODESET
 
