@@ -14,4 +14,6 @@ dist:
 	automake --include-deps
 	autoconf
 	touch stamp-h.in
+	./configure
+	$(MAKE) dist
 
