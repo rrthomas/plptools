@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-14 20:57+0200\n"
+"POT-Creation-Date: 2002-07-14 21:15+0200\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -872,7 +872,7 @@ msgstr "Namn %d (för %s) är %.*s\n"
 msgid "%d .. %d (%d bytes): Req record for uid %08x\n"
 msgstr "%d .. %d (%d bytes): Kravpost\n"
 
-#: plpftp/main.cc:50
+#: plpftp/main.cc:52
 msgid ""
 "Usage: plpftp [OPTIONS]... [FTPCOMMAND]\n"
 "\n"
@@ -904,47 +904,47 @@ msgstr ""
 "                        Om inget är angivet är VÄRD 127.0.0.1\n"
 "                        och PORT är "
 
-#: plpftp/main.cc:69
+#: plpftp/main.cc:71
 msgid "Try `plpftp --help' for more information"
 msgstr "Prova 'plpftp --help' för mer information"
 
-#: plpftp/main.cc:82
+#: plpftp/main.cc:84
 msgid "PLPFTP Version "
 msgstr ""
 
-#: plpftp/main.cc:83
+#: plpftp/main.cc:85
 msgid " Copyright (C) 1999  Philip Proudman"
 msgstr ""
 
-#: plpftp/main.cc:84
+#: plpftp/main.cc:86
 msgid " Additions Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>"
 msgstr " Tillägg Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>"
 
-#: plpftp/main.cc:85
+#: plpftp/main.cc:87
 msgid "                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>"
 msgstr ""
 
-#: plpftp/main.cc:86
+#: plpftp/main.cc:88
 msgid "PLPFTP comes with ABSOLUTELY NO WARRANTY."
 msgstr "PLPFTP har INGEN SOM HELST GARANTI."
 
-#: plpftp/main.cc:87
+#: plpftp/main.cc:89
 msgid "This is free software, and you are welcome to redistribute it"
 msgstr "Det hr r fri mjukvara, och du fr grna distribuera den"
 
-#: plpftp/main.cc:88
+#: plpftp/main.cc:90
 msgid "under GPL conditions; see the COPYING file in the distribution."
 msgstr "enligt villkoren i GPL; se filen COPYING i distributionen."
 
-#: plpftp/main.cc:90
+#: plpftp/main.cc:92
 msgid "FTP like interface started. Type \"?\" for help."
 msgstr "FTP-liknande interface startat.  Skriv \"?\" fr hjlp."
 
-#: plpftp/main.cc:153
+#: plpftp/main.cc:155
 msgid "plpftp Version "
 msgstr ""
 
-#: plpftp/main.cc:168 plpftp/main.cc:173
+#: plpftp/main.cc:170 plpftp/main.cc:175
 msgid "plpftp: could not connect to ncpd"
 msgstr "plpftp: kunde inte f kontakt med ncpd"
 

@@ -13,7 +13,7 @@ used the following login.conf for mgetty:
 /PLP/   -       -       /usr/sbin/ncpd -d -e
 *       -       -       /bin/login @
 
-2. KDE libs
+2. KDE libs 2.1.2
 In stable kdelibs there is a bug which prevents all kioslaves from delivering
 mime-types they know. Although this is fixed in KDE's CVS since some time now,
 this fix did not made it into the latest maintenance release of kdelibs (2.1.2)
