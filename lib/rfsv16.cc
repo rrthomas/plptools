@@ -627,7 +627,7 @@ copyFromPsion(const char *from, const char *to, cpCallback_t cb)
 	long handle;
 	Enum<rfsv::errs> res;
 	long len;
-	long total;
+	long total = 0;
 
 	if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != E_PSI_GEN_NONE)
 		return res;
