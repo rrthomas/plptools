@@ -1,7 +1,7 @@
 /* include/config.h.  Generated automatically by configure.  */
 /* include/config.h.in.  Generated automatically from configure.in by autoheader.  */
 
-#define VERSION "0.2" 
+#define VERSION "0.3" 
 
 #define PACKAGE "plpnfsd"
 

@@ -169,6 +169,7 @@ main(int argc, char **argv)
 						iow.watch(1, 0);
 
 					if (a->hasFailed()) {
+						iow.watch(5, 0);
 						if (verbose)
 							cout << "ncp: restarting\n";
 						a->reset();

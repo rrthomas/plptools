@@ -2,7 +2,7 @@ AC_REVISION($ Revision: 0.1 $)dnl revision of this configure.in script
 
 AC_INIT(acinclude.m4)
 AM_CONFIG_HEADER(include/config.h)
-AM_INIT_AUTOMAKE(plpnfsd, 0.2)
+AM_INIT_AUTOMAKE(plpnfsd, 0.3)
 AM_PROG_LIBTOOL
 
 dnl Enable Mainatiner stuff
@@ -95,4 +95,5 @@ AC_OUTPUT(
 	etc/Makefile
 	include/config.h
 	include/defs.h
+	etc/psion
 )
