@@ -169,9 +169,9 @@ public:
 	 * version, assert, that it is really in the Range of
 	 * this Enumeration.
 	 */
-	inline Enum& operator = (E init) {
-		value = init;
-		assert(inRange(init));
+	inline Enum& operator = (E setval) {
+		value = setval;
+		assert(inRange(setval));
 		return *this;
 	}
 

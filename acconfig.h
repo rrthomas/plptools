@@ -42,7 +42,11 @@
 /* Define this to your default mountpoint for plpnfsd */
 #undef DMOUNTPOINT
 
+/* Define this to enable debugging code */
+#undef DEBUG
+
 @BOTTOM@
+
 /* Some reasonable defaults */
 
 #ifndef PSIONHOSTNAME
@@ -54,6 +58,11 @@
 #ifdef _IBMR2
 # undef DONT_UPDATE_MTAB
 # define DONT_UPDATE_MTAB /* The mount table is obtained from the kernel (!?) */
+#endif
+
+/* Disable assert macro if DEBUG is not defined */
+#ifndef DEBUG
+# define NDEBUG
 #endif
 
 #endif /* _CONFIG_H_ */

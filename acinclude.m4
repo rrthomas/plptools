@@ -89,8 +89,12 @@ dnl this was AC_PROG_CC. I had to include it manualy, since I had to patch it
   *-*-sysv4.2uw*) CFLAGS="$CFLAGS -D_UNIXWARE";;
   esac
 
-  if test -z "$LDFLAGS" && test "$ac_use_debug_code" = "no" && test "$GCC" = "yes"; then
-     LDFLAGS="-s"
+  if test "$ac_use_debug_code" = "no"; then
+  	if test -z "$LDFLAGS" && test "$GCC" = "yes"; then
+		LDFLAGS="-s"
+	fi
+  else
+  	AC_DEFINE_UNQUOTED(DEBUG)
   fi
 
 
