@@ -23,7 +23,9 @@
 #ifndef _PLPDIRENT_H_
 #define _PLPDIRENT_H_
 
+#include <iostream>
 #include <string>
+
 #include <psitime.h>
 #include <rfsv.h>
 
@@ -175,7 +177,7 @@ public:
     * The output is in human readable similar to the
     * output of a "ls" command.
     */
-    friend ostream &operator<<(ostream &o, const PlpDirent &e);
+    friend std::ostream &operator<<(std::ostream &o, const PlpDirent &e);
 
 private:
     u_int32_t size;

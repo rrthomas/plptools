@@ -25,18 +25,14 @@
 #include "config.h"
 #endif
 
-#include <stream.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fstream.h>
-#include <iomanip.h>
-#include <time.h>
-#include <string.h>
-
 #include "rpcs16.h"
 #include "bufferstore.h"
 #include "bufferarray.h"
 #include "ppsocket.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
 

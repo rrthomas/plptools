@@ -25,8 +25,9 @@
 #include <config.h>
 #endif
 
-#include <stream.h>
+#include <iostream>
 #include <string>
+
 #include <time.h>
 
 #include <bufferstore.h>

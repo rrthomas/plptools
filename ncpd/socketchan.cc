@@ -24,17 +24,20 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stream.h>
+
+#include <string>
+
+#include <ppsocket.h>
+#include <rfsv.h>
+
 #include <stdio.h>
-#include <string.h>
 #include <malloc.h>
 
 #include "socketchan.h"
 #include "ncp.h"
-#include <ppsocket.h>
-#include <rfsv.h>
+#include "main.h"
 
-extern std::ostream lerr;
+using namespace std;
 
 socketChan:: socketChan(ppsocket * _skt, ncp * _ncpController):
     channel(_ncpController)

@@ -21,8 +21,8 @@
  *
  */
 #include "psiprocess.h"
-#include <stream.h>
-#include <strstream>
+
+#include <sstream>
 #include <iomanip>
 
 using namespace std;
@@ -63,13 +63,13 @@ getArgs() {
 
 const char *PsiProcess::
 getProcId() {
-    ostrstream tmp;
+    ostringstream tmp;
 
     if (s5mx)
 	tmp << name << ".$" << setw(2) << setfill('0') << pid << '\0';
     else
 	tmp << name << ".$" << pid << '\0';
-    return tmp.str();
+    return tmp.str().c_str();
 }
 
 void PsiProcess::

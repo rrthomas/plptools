@@ -40,7 +40,7 @@
 #include <qwhatsthis.h>
 #include <qpushbutton.h>
 
-#include <strstream>
+#include <sstream>
 #include <iomanip>
 
 #ifdef ENABLE_NLS
@@ -937,9 +937,9 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 	d->machType->setText(KGlobal::locale()->translate(d->mi.machineType));
 	d->machName->setText(QString(d->mi.machineName));
 	// ??! None of QString's formatting methods knows about long long.
-	ostrstream s;
+	ostringstream s;
 	s << hex << setw(16) << d->mi.machineUID << '\0';
-	d->machUID->setText(QString(s.str()));
+	d->machUID->setText(QString(s.str().c_str()));
 	d->machLang->setText(KGlobal::locale()->translate(d->mi.uiLanguage));
 	d->dispGeo->setText(QString("%1x%2").arg(
 				d->mi.displayWidth).arg(d->mi.displayHeight));
@@ -980,9 +980,9 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 	d->machDST->setText((d->mi.tz.dst_zones & PsiTime::PSI_TZ_HOME)
 			    ? i18n("yes") : i18n("no"));
 
-	ostrstream mbs;
+	ostringstream mbs;
 	mbs << d->mi.mainBatteryUsedTime << '\0';
-	d->mbattUsage->setText(QString(mbs.str()));
+	d->mbattUsage->setText(QString(mbs.str().c_str()));
 	pt.setPsiTime(&d->mi.mainBatteryInsertionTime);
 	dt.setTime_t(pt.getTime());
 	d->mbattChanged->setText(KGlobal::locale()->formatDateTime(dt, false));
@@ -1010,9 +1010,9 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 	    QString("%1 mV").arg(KGlobal::locale()->formatNumber(
 				     d->mi.backupBatteryMaxVoltage, 0)));
 
-	ostrstream bbs;
+	ostringstream bbs;
 	bbs << d->mi.externalPowerUsedTime << '\0';
-	d->epowerUsage->setText(QString(bbs.str()));
+	d->epowerUsage->setText(QString(bbs.str().c_str()));
 	d->epowerSupplied->setText(
 	    d->mi.externalPower ? i18n("Yes") : i18n("No"));
     }

@@ -21,7 +21,7 @@
  *
  */
 #include "plpdirent.h"
-#include <stream.h>
+
 #include <iomanip>
 
 using namespace std;

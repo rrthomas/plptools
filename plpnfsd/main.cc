@@ -24,28 +24,30 @@
 #include <config.h>
 #endif
 
-#include <stream.h>
-#include <string.h>
+#include <rfsv.h>
+#include <rpcs.h>
+#include <rfsvfactory.h>
+#include <rpcsfactory.h>
+#include <bufferstore.h>
+#include <bufferarray.h>
+#include <ppsocket.h>
+
+#include <iostream>
+#include <string>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
 #include <syslog.h>
 
-#include "rfsv.h"
-#include "rpcs.h"
-#include "rfsvfactory.h"
-#include "rpcsfactory.h"
-#include "bufferstore.h"
-#include "bufferarray.h"
-#include "ppsocket.h"
-extern "C" {
 #include "rfsv_api.h"
-}
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
 #include <getopt.h>
+
+using namespace std;
 
 static rfsv *a;
 static rfsvfactory *rf;

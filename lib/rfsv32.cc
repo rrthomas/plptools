@@ -25,18 +25,17 @@
 #include "config.h"
 #endif
 
-#include <stream.h>
-#include <stdlib.h>
-#include <fstream>
-#include <iomanip>
-#include <time.h>
-#include <string>
-
 #include "rfsv32.h"
 #include "bufferstore.h"
 #include "ppsocket.h"
 #include "bufferarray.h"
 #include "plpdirent.h"
+
+#include <iostream>
+#include <fstream>
+
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
 
@@ -856,14 +855,14 @@ static enum rfsv::errs e2psi[] = {
 };
 
 Enum<rfsv::errs> rfsv32::
-err2psierr(int32_t status)
+err2psierr(int32_t istatus)
 {
-    if ((status > E_EPOC_NONE) || (status < E_EPOC_DIR_FULL)) {
-	cerr << "FATAL: inavlid error-code" << endl;
-	cerr << "status: " << status << " " << hex << status << endl;
+    if ((istatus > E_EPOC_NONE) || (istatus < E_EPOC_DIR_FULL)) {
+	cerr << "FATAL: invalid error-code" << endl;
+	cerr << "status: " << istatus << " " << hex << istatus << endl;
 	return E_PSI_INTERNAL;
     }
-    return e2psi[status - E_EPOC_DIR_FULL];
+    return e2psi[istatus - E_EPOC_DIR_FULL];
 }
 
 

@@ -24,13 +24,12 @@
 #include <config.h>
 #endif
 
-#include "kio_plp.h"
+#include <rfsvfactory.h>
+#include <rpcsfactory.h>
+#include <bufferarray.h>
 
 #include <iomanip>
-#include <stdio.h>
-#include <pwd.h>
-#include <grp.h>
-#include <sys/stat.h>
+#include <string>
 
 #include <qfile.h>
 #include <qregexp.h>
@@ -41,11 +40,12 @@
 #include <klocale.h>
 #include <kconfig.h>
 
-#include <rfsvfactory.h>
-#include <rpcsfactory.h>
-#include <bufferarray.h>
+#include "kio_plp.h"
 
-#include <string>
+#include <stdio.h>
+#include <pwd.h>
+#include <grp.h>
+#include <sys/stat.h>
 
 using namespace KIO;
 
@@ -1107,7 +1107,7 @@ special(const QByteArray &a) {
 	    char drv;
 
 	    stream >> param;
-	    cout << "p='" << param << "'" << endl;
+	    kdDebug(PLP_DEBUGAREA) << "p='" << param << "'" << endl;
 	    if (param.isEmpty()) {
 		error(ERR_MALFORMED_URL, i18n("(empty)"));
 		return;

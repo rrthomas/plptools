@@ -21,10 +21,13 @@
  *
  */
 #include "psitime.h"
+#include "plp_inttypes.h"
+
 #include <stdlib.h>
-#include <plp_inttypes.h>
 
 #define OnePM 3600 // 13:00 offset for SIBO
+
+using namespace std;
 
 PsiTime::PsiTime(void) {
     ptzValid = false;
@@ -63,7 +66,7 @@ PsiTime::PsiTime(const u_int32_t _ptvHi, const u_int32_t _ptvLo) {
     psi2unix();
 }
 
-PsiTime::PsiTime(struct timeval *_utv, struct timezone *_utz = 0L) {
+PsiTime::PsiTime(struct timeval *_utv, struct timezone *_utz) {
     if (_utv != 0L)
 	utv = *_utv;
     if (_utz != 0L)

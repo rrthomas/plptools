@@ -23,6 +23,10 @@
 #ifndef _rfsv_api_h_
 #define _rfsv_api_h_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mp.h"
 #include "builtins.h"
 
@@ -63,6 +67,10 @@ extern long rpcs_ps();
 #define PSI_A_EXEC		0x0400
 #define PSI_A_STREAM		0x0800
 #define PSI_A_TEXT		0x1000
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

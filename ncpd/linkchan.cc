@@ -21,14 +21,14 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#include <stream.h>
 #include <iomanip>
 #include <string>
 
+#include <bufferstore.h>
+#include <bufferarray.h>
+
 #include "linkchan.h"
 #include "ncp.h"
-#include "bufferstore.h"
-#include "bufferarray.h"
 #include "main.h"
 
 using namespace std;

@@ -24,18 +24,18 @@
 #include "config.h"
 #endif
 
-#include <stream.h>
-#include <stdlib.h>
-#include <fstream.h>
-#include <iomanip.h>
-#include <time.h>
-#include <string.h>
-
 #include "wprt.h"
 #include "bufferstore.h"
 #include "ppsocket.h"
 #include "bufferarray.h"
 #include "Enum.h"
+
+#include <iostream>
+
+#include <stdlib.h>
+#include <time.h>
+
+using namespace std;
 
 wprt::wprt(ppsocket * _skt)
 {

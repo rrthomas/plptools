@@ -27,6 +27,8 @@
 #include <config.h>
 #endif
 
+#include <iostream>
+
 #if TIME_WITH_SYS_TIME
 #  include <sys/time.h>
 #  include <time.h>
@@ -41,7 +43,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-#include <ostream.h>
 #include <plpintl.h>
 
 /**
@@ -54,8 +55,8 @@ typedef struct psi_timeval_t {
     /**
      * Prints a psi_timeval in human readable format.
      */
-    friend ostream &operator<<(ostream &o, const psi_timeval_t &ptv) {
-	ostream::fmtflags old = o.flags();
+    friend std::ostream &operator<<(std::ostream &o, const psi_timeval_t &ptv) {
+	std::ostream::fmtflags old = o.flags();
 	u_int64_t micro = ptv.tv_high;
 	micro = (micro << 32) | ptv.tv_low;
 	micro /= 1000000;
@@ -95,8 +96,8 @@ typedef struct psi_timeval_t {
  * holds a Psion time zone description.
  */
 typedef struct psi_timezone_t {
-    friend ostream &operator<<(ostream &s, const psi_timezone_t &ptz) {
-	ostream::fmtflags old = s.flags();
+    friend std::ostream &operator<<(std::ostream &s, const psi_timezone_t &ptz) {
+	std::ostream::fmtflags old = s.flags();
 	int h = ptz.utc_offset / 3600;
 	int m = ptz.utc_offset % 3600;
 	s << "offs: " << std::dec << h << "h";
@@ -291,7 +292,7 @@ public:
     *
     * @returns The stream.
     */
-    friend ostream &operator<<(ostream &s, const PsiTime &t);
+    friend std::ostream &operator<<(std::ostream &s, const PsiTime &t);
 
     /**
     * Assignment operator
@@ -310,7 +311,7 @@ public:
 	PSI_TZ_EUROPEAN = 1,
 	PSI_TZ_NORTHERN = 2,
 	PSI_TZ_SOUTHERN = 4,
-	PSI_TZ_HOME = 0x40000000,
+	PSI_TZ_HOME = 0x40000000
     };
 
 private:

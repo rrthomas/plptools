@@ -55,7 +55,11 @@
 #include <bufferarray.h>
 #include <psiprocess.h>
 
+#include <iostream>
+
 #define STID_CONNECTION 1
+
+using namespace std;
 
 KPsionMainWindow::KPsionMainWindow()
     : KMainWindow() {

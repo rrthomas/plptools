@@ -44,7 +44,7 @@ class rpcsfactory {
 	FACERR_AGAIN = 2,
 	FACERR_NOPSION = 3,
 	FACERR_PROTVERSION = 4,
-	FACERR_NORESPONSE = 5,
+	FACERR_NORESPONSE = 5
     };
 
     /**

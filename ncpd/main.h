@@ -24,7 +24,7 @@
 #ifndef _main_h_
 #define _main_h_
 
-#include <ostream.h>
+#include <iostream>
 
 extern std::ostream lout;
 extern std::ostream lerr;

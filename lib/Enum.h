@@ -27,10 +27,10 @@
 #include <config.h>
 #endif
 
-#include <plpintl.h>
-
 #include <map>
 #include <string>
+
+#include <plpintl.h>
 
 /**
  * the Base for the Enum template.

@@ -23,7 +23,7 @@
 #ifndef _SISTYPES_H
 #define _SISTYPES_H
 
-#include "plp_inttypes.h"
+#include <plp_inttypes.h>
 
 /**
  * Return Codes.
@@ -38,7 +38,7 @@ enum SisRC {
 	SIS_DIFFERENT_APP,
 	SIS_VER_EARLIER,
 	SIS_SAME_OR_LATER,
-	SIS_OTHER_VARIANT,
+	SIS_OTHER_VARIANT
 };
 
 extern uint16_t read16(uint8_t* p);
@@ -61,7 +61,7 @@ struct LangTableEntry
 {
 	uint16_t m_no;
 	char   m_code[3];
-	char*  m_name;
+	const char*  m_name;
 };
 
 extern LangTableEntry langTable[];

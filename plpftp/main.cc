@@ -25,11 +25,6 @@
 #include <config.h>
 #endif
 
-#include <stream.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include <plpintl.h>
 #include <ppsocket.h>
 #include <rfsv.h>
@@ -38,12 +33,20 @@
 #include <rpcsfactory.h>
 #include <bufferstore.h>
 
+#include <iostream>
+#include <string>
+
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "ftp.h"
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
 #include <getopt.h>
+
+using namespace std;
 
 static void
 help()

@@ -25,10 +25,15 @@
 #include "config.h"
 #endif
 
+#include "bufferstore.h"
+#include "ppsocket.h"
+#include "iowatch.h"
+
+#include <iostream>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <iostream.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -37,10 +42,6 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
-#include "bufferstore.h"
-#include "ppsocket.h"
-#include "iowatch.h"
 
 #define  INVALID_SOCKET	-1
 #define  SOCKET_ERROR	-1

@@ -10,11 +10,18 @@ all:
 	@echo "Use make devel for development, make dist for distribution"
 	@echo $(KDEVER)
 
+strictbuild: devel
+	rm -f config.cache
+	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-kde --enable-strict
+	make
+
 build: devel
+	rm -f config.cache
 	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-kde
 	make
 
 buildnox: devel
+	rm -f config.cache
 	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug
 	make
 

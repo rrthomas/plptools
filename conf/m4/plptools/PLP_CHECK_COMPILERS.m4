@@ -93,7 +93,7 @@ AC_DEFUN(PLP_CHECK_COMPILERS,
       esac
 
       if test "$plp_use_strict_options" = "yes"; then
-        CXXFLAGS="-ansi -pedantic -W -Wconversion -Wcast-qual -Wwrite-strings -Wbad-function-cast -Wshadow -Wcast-align $CXXFLAGS"
+        CXXFLAGS="-ansi -pedantic -W -Wconversion -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align $CXXFLAGS"
       fi
     else
       CXXFLAGS="-O2 $CXXFLAGS"

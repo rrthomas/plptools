@@ -23,7 +23,7 @@
 #ifndef _SISCOMPONENTRECORD_H
 #define _SISCOMPONENTRECORD_H
 
-#include "sistypes.h"
+#include <sistypes.h>
 
 class SISFile;
 

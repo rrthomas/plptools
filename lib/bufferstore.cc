@@ -25,15 +25,16 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stream.h>
-// Should be iostream.h, but won't build on Sun WorkShop C++ 5.0
-#include <iomanip>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <assert.h>
 
 #include "bufferstore.h"
+
+// Should be iostream.h, but won't build on Sun WorkShop C++ 5.0
+#include <iomanip>
+#include <string>
+
+#include <stdlib.h>
+#include <ctype.h>
+#include <assert.h>
 
 using namespace std;
 

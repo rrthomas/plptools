@@ -24,20 +24,16 @@
 #include "config.h"
 #endif
 
-#include <stream.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fstream.h>
-#include <iomanip.h>
-#include <time.h>
-#include <string.h>
-
 #include "rpcs.h"
 #include "bufferstore.h"
 #include "ppsocket.h"
 #include "bufferarray.h"
 #include "psiprocess.h"
 #include "Enum.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
 
@@ -387,23 +383,20 @@ getOwnerInfo(bufferArray &owner)
     if ((res = (enum rfsv::errs)getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
 	return res;
     a.addByte(0);
-    int l = a.getLen();
-    char *s = (char *)a.getString(0);
-    for (int i = 0; i < l; i++)
-	if (s[i] == 6)
-	    s[i] = 0;
+    string s = a.getString(0);
     owner.clear();
-    while (l > 0) {
-	if (*s != '\0') {
-	    bufferStore b;
-	    b.addStringT(s);
-	    owner += b;
-	    l -= (strlen(s) + 1);
-	    s += (strlen(s) + 1);
-	} else {
-	    l--;
-	    s++;
-	}
+    int p = 0;
+    int l;
+    while ((l = s.find('\006', p)) != s.npos) {
+	bufferStore b;
+	b.addStringT(s.substr(p, l - p).c_str());
+	owner += b;
+	p = l + 1;
+    }
+    if (s.substr(p).length()) {
+	bufferStore b;
+	b.addStringT(s.substr(p).c_str());
+	owner += b;
     }
     return res;
 }

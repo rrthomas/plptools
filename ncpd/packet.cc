@@ -25,22 +25,21 @@
 #include <config.h>
 #endif
 
+#include <string>
+#include <fstream>
+#include <iomanip>
+
 #include <stdio.h>
 #include <malloc.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <string>
-#include <fstream>
-#include <iomanip>
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <signal.h>
 
-extern "C" {
 #include "mp_serial.h"
-}
 #include "packet.h"
 #include "link.h"
 #include "main.h"

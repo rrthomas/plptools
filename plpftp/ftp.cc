@@ -27,26 +27,28 @@
 #include "config.h"
 #endif
 
-#include <sys/types.h>
-#include <dirent.h>
-#include <stream.h>
-#include <fstream.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iomanip.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <signal.h>
-
 #include <plpintl.h>
 #include <rfsv.h>
 #include <rpcs.h>
 #include <bufferarray.h>
 #include <bufferstore.h>
 #include <Enum.h>
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iomanip>
+
+#include <sys/types.h>
+#include <dirent.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <signal.h>
+
 #include "ftp.h"
 
 #if HAVE_LIBREADLINE

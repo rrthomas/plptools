@@ -25,14 +25,25 @@
 #include <config.h>
 #endif
 
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <dirent.h>
 #include <fstream>
-#include <strstream>
+#include <sstream>
+#include <iostream>
 #include <iomanip>
 #include <vector>
 #include <set>
+
+#include <plpintl.h>
+#include <ppsocket.h>
+#include <rfsv.h>
+#include <rfsvfactory.h>
+#include <rpcs.h>
+#include <rpcsfactory.h>
+#include <bufferstore.h>
+#include <bufferarray.h>
+
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <dirent.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -45,15 +56,6 @@
 #include <pwd.h>
 #include <getopt.h>
 #include <fcntl.h>
-
-#include <plpintl.h>
-#include <ppsocket.h>
-#include <rfsv.h>
-#include <rfsvfactory.h>
-#include <rpcs.h>
-#include <rpcsfactory.h>
-#include <bufferstore.h>
-#include <bufferarray.h>
 
 using namespace std;
 
@@ -295,10 +297,10 @@ startPrograms() {
 			int i;
 			for (i = 0; i < 26; i++) {
 			    if (devbits & 1) {
-				ostrstream tmp;
+				ostringstream tmp;
 				tmp << 'A' + i << "\\System\\Apps\\"
 				    << cmd << "\\" << cmd << ".app";
-				res = Rpcs->execProgram(tmp.str(), "");
+				res = Rpcs->execProgram(tmp.str().c_str(), "");
 			    }
 			    if (res == rfsv::E_PSI_GEN_NONE)
 				break;
@@ -867,7 +869,7 @@ runRestore()
 {
     unsigned int i;
     char indexbuf[40];
-    ostrstream tarcmd;
+    ostringstream tarcmd;
     string dstPath;
     struct timeval start_tv, end_tv, cstart_tv, cend_tv;
 
@@ -875,7 +877,7 @@ runRestore()
 	tarcmd << "tar --to-stdout -xzf " << archList[i]
 	       << " 'KPsion*Index'" << ends;
 	char backupType = '?';
-	FILE *f = popen(tarcmd.str(), "r");
+	FILE *f = popen(tarcmd.str().c_str(), "r");
 	if (!f) {
 	    perror(_("Could not get backup index"));
 	    continue;
@@ -932,7 +934,7 @@ runRestore()
 		tarcmd << "tar xzCf " << dstPath << " " << fn << ends;
 		if (verbose > 0)
 		    cout << _("Extracting tar archive ...") << endl;
-		if (system(tarcmd.str()) != 0)
+		if (system(tarcmd.str().c_str()) != 0)
 		    cerr << _("Execution of ") << tarcmd.str() << _(" failed.")
 			 << endl;
 		continue;
@@ -1340,7 +1342,7 @@ runBackup()
 
 	// tar it all up
 	if (!bErr) {
-	    ostrstream tarcmd;
+	    ostringstream tarcmd;
 
 	    if (verbose > 0)
 		cout << _("Creating tar archive ...") << endl;
@@ -1355,7 +1357,7 @@ runBackup()
 	    tarcmd << ends;
 
 	    mkdirp(archPath.c_str());
-	    if (system(tarcmd.str())) {
+	    if (system(tarcmd.str().c_str())) {
 		cerr << _("plpbackup: Error during execution of ")
 		     << tarcmd.str() << endl;
 		unlink(archPath.c_str());

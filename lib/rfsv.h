@@ -26,6 +26,7 @@
 
 #include <deque>
 #include <string>
+
 #include <Enum.h>
 #include <plpdirent.h>
 #include <bufferstore.h>
@@ -91,7 +92,7 @@ public:
     enum open_flags {
 	PSI_O_RDONLY = 0000,
 	PSI_O_WRONLY = 0001,
-	PSI_O_RDWR   = 0002,
+	PSI_O_RDWR   = 0002
     };
 
     /**
@@ -102,7 +103,7 @@ public:
 	PSI_O_EXCL   = 00200,
 	PSI_O_TRUNC  = 01000,
 	PSI_O_APPEND = 02000,
-	PSI_O_SHARE  = 04000,
+	PSI_O_SHARE  = 04000
     };
 
     /**
@@ -210,7 +211,7 @@ public:
 	PSI_A_READ       = 0x0200,
 	PSI_A_EXEC       = 0x0400,
 	PSI_A_STREAM     = 0x0800,
-	PSI_A_TEXT       = 0x1000,
+	PSI_A_TEXT       = 0x1000
     };
 
     virtual ~rfsv();

@@ -24,8 +24,9 @@
 #ifndef _BUFFERSTORE_H_
 #define _BUFFERSTORE_H_
 
+#include <iostream>
+
 #include <sys/types.h>
-#include <stream.h>
 
 /**
  * A generic container for an array of bytes.

@@ -40,7 +40,7 @@ if test -n "$kde_use_extra_libs" && \
    for dir in $kde_use_extra_libs; do
      kde_extra_libs="$kde_extra_libs $dir"
      all_libraries="$all_libraries -L$dir"
-     KDE_EXTRA_RPATH="$KDE_EXTRA_RPATH -rpath $dir"
+     KDE_EXTRA_RPATH="$KDE_EXTRA_RPATH -R $dir"
      USER_LDFLAGS="$USER_LDFLAGS -L$dir"
    done
    IFS=$ac_save_ifs

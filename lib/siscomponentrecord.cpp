@@ -83,10 +83,10 @@ SISComponentNameRecord::fillFrom(uint8_t* buf, int* basePos, off_t len,
 				   sisFile->getLanguage(i)->m_name,
 				   m_nameLengths[i],
 				   buf + m_namePtrs[i]);
-		int len = m_nameLengths[i];
-		m_names[i] = new uint8_t[len + 1];
-		memcpy(m_names[i], buf + m_namePtrs[i], len);
-		m_names[i][len] = 0;
+		int nlen = m_nameLengths[i];
+		m_names[i] = new uint8_t[nlen + 1];
+		memcpy(m_names[i], buf + m_namePtrs[i], nlen);
+		m_names[i][nlen] = 0;
 		}
 	if (logLevel >= 1)
 		printf(_("%d .. %d (%d bytes): Name records\n"), base, base + size, size);

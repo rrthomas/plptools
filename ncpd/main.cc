@@ -25,9 +25,15 @@
 #include "config.h"
 #endif
 
-#include <stdio.h>
 #include <string>
-#include <stream.h>
+#include <iostream>
+
+#include <bufferstore.h>
+#include <ppsocket.h>
+#include <iowatch.h>
+#include <log.h>
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <errno.h>
@@ -38,14 +44,10 @@
 #include <plpintl.h>
 
 #include "ncp.h"
-#include "bufferstore.h"
-#include "ppsocket.h"
 #include "socketchan.h"
-#include "iowatch.h"
 #include "linkchan.h"
 #include "link.h"
 #include "packet.h"
-#include "log.h"
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE

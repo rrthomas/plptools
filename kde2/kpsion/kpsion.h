@@ -23,6 +23,10 @@
 #ifndef _KPSION_H_
 #define _KPSION_H_
 
+#include <rfsv.h>
+#include <rpcs.h>
+#include <ppsocket.h>
+
 // get KDE_VERSION
 #include <kapplication.h>
 
@@ -34,10 +38,6 @@
 #include <kcmdlineargs.h>
 #include <kiconview.h>
 #include <kdialogbase.h>
-
-#include <rfsv.h>
-#include <rpcs.h>
-#include <ppsocket.h>
 
 typedef QMap<char,QString> driveMap;
 typedef QMap<QString,QString> psionMap;

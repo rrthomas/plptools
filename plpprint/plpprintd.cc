@@ -24,8 +24,13 @@
 #include <config.h>
 #endif
 
-#include <stream.h>
-#include <string.h>
+#include <ppsocket.h>
+#include <wprt.h>
+#include <psibitmap.h>
+
+#include <iostream>
+#include <string>
+
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -34,10 +39,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
-#include <ppsocket.h>
-#include <wprt.h>
-#include <psibitmap.h>
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE

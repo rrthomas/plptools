@@ -7,14 +7,14 @@ AC_ARG_ENABLE(rpath,
 
 if test -z "$KDE_RPATH" && test "$USE_RPATH" = "yes"; then
 
-  KDE_RPATH="-rpath \$(kde_libraries)"
+  KDE_RPATH="-R \$(kde_libraries)"
 
   if test -n "$qt_libraries"; then
-    KDE_RPATH="$KDE_RPATH -rpath \$(qt_libraries)"
+    KDE_RPATH="$KDE_RPATH -R \$(qt_libraries)"
   fi
   dnl $x_libraries is set to /usr/lib in case
   if test -n "$X_LDFLAGS"; then
-    KDE_RPATH="$KDE_RPATH -rpath \$(x_libraries)"
+    KDE_RPATH="$KDE_RPATH -R \$(x_libraries)"
   fi
   if test -n "$KDE_EXTRA_RPATH"; then
     KDE_RPATH="$KDE_RPATH \$(KDE_EXTRA_RPATH)"

@@ -25,18 +25,20 @@
 #include "config.h"
 #endif
 
-#include <stream.h>
+#include <iostream>
+
+#include <bufferstore.h>
+#include <bufferarray.h>
+#include <plp_inttypes.h>
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include <plp_inttypes.h>
 
 #include "link.h"
 #include "packet.h"
 #include "ncp.h"
-#include "bufferstore.h"
-#include "bufferarray.h"
 #include "main.h"
 
 extern "C" {

@@ -23,11 +23,12 @@
 #ifndef _RPCS_H_
 #define _RPCS_H_
 
-#include <vector>
 #include <psitime.h>
 #include <psiprocess.h>
 #include <rfsv.h>
 #include <Enum.h>
+
+#include <vector>
 
 class ppsocket;
 class bufferStore;
@@ -66,7 +67,7 @@ public:
 	PSI_MACH_SIENNA = 7,
 	PSI_MACH_S3C = 8,
 	PSI_MACH_S5 = 32,
-	PSI_MACH_WINC = 33,
+	PSI_MACH_WINC = 33
 	// TODO: Code for 5mx
     };
 
@@ -102,7 +103,7 @@ public:
 	PSI_LANG_cs_CZ	= 25,
 	PSI_LANG_sk_SK	= 26,
 	PSI_LANG_pl_PL	= 27,
-	PSI_LANG_sl_SI	= 28,
+	PSI_LANG_sl_SI	= 28
     };
 
     /**
@@ -112,7 +113,7 @@ public:
 	PSI_BATT_DEAD = 0,
 	PSI_BATT_VERYLOW = 1,
 	PSI_BATT_LOW = 2,
-	PSI_BATT_GOOD = 3,
+	PSI_BATT_GOOD = 3
     };
 
     /**

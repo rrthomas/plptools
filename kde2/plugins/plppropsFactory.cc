@@ -5,7 +5,7 @@
 #include "plppropsFactory.h"
 #include "plpprops.h"
 
-#include <stream.h>
+#include <iostream>
 #include <kdebug.h>
 #include <klocale.h>
 

@@ -26,17 +26,16 @@
 #include "config.h"
 #endif
 
-#include <stream.h>
-#include <stdlib.h>
-#include <fstream.h>
-#include <iomanip>
-#include <time.h>
-#include <string>
-
 #include "rfsv16.h"
 #include "bufferstore.h"
 #include "ppsocket.h"
 #include "bufferarray.h"
+
+#include <iostream>
+#include <fstream>
+
+#include <stdlib.h>
+#include <time.h>
 
 #define	RFSV16_MAXDATALEN	852	// 640
 
@@ -347,7 +346,6 @@ devlist(u_int32_t &devbits)
 	return status;
 
     while (1) {
-	bufferStore a;
 	a.init();
 	a.addWord(fileHandle & 0xFFFF);
 	if (!sendCommand(FDEVICEREAD, a))

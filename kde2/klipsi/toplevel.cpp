@@ -40,9 +40,13 @@
 
 #include <psibitmap.h>
 
+#include <iostream>
+
 #define QUIT_ITEM    50
 #define ABOUT_ITEM    51
 #define CLIPFILE "C:/System/Data/Clpboard.cbd"
+
+using namespace std;
 
 TopLevel::TopLevel()
   : KMainWindow(0)

@@ -23,7 +23,7 @@
 #ifndef _SISREQRECORD_H
 #define _SISREQRECORD_H
 
-#include "sistypes.h"
+#include <sistypes.h>
 
 class SISFile;
 

@@ -26,7 +26,7 @@
 #include <klocale.h>
 #include <kstddirs.h>
 
-#include <iostream.h>
+#include <iostream>
 
 KPsionConfig::KPsionConfig() {
     optionNames.insert(OPT_BACKUPDIR, QString("Settings/BackupDir"));

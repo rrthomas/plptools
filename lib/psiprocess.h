@@ -24,7 +24,7 @@
 #define _PSIPROCESS_H_
 
 #include <string>
-#include <stream.h>
+#include <iostream>
 
 class rpcs;
 

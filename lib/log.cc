@@ -22,13 +22,14 @@
  *
  */
 #include "log.h"
+
 #include <unistd.h>
 
-logbuf::logbuf(int level, int fd) {
+logbuf::logbuf(int loglevel, int fd) {
     ptr = buf;
     len = 0;
     _on = true;
-    _level = level;
+    _level = loglevel;
     _fd = fd;
 }
 

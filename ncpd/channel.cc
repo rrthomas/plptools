@@ -24,7 +24,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stream.h>
+#include <iostream>
 #include <string>
 
 #include "channel.h"

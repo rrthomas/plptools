@@ -104,14 +104,14 @@ fi
 AC_SUBST(kde_libraries)
 AC_SUBST(kde_includes)
 
-if test "$kde_includes" = "$x_includes" || test "$kde_includes" = "$qt_includes" ; then
+if test "$kde_includes" = "$x_includes" || test "$kde_includes" = "$qt_includes" || test "$kde_includes" = "/usr/include" ; then
  KDE_INCLUDES=""
 else
  KDE_INCLUDES="-I$kde_includes"
  all_includes="$KDE_INCLUDES $all_includes"
 fi
 
-if test "$kde_libraries" = "$x_libraries" || test "$kde_libraries" = "$qt_libraries" ; then
+if test "$kde_libraries" = "$x_libraries" || test "$kde_libraries" = "$qt_libraries" || test "$kde_libraries" = "/usr/lib" ; then
  KDE_LDFLAGS=""
 else
  KDE_LDFLAGS="-L$kde_libraries"

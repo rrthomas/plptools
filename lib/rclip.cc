@@ -24,18 +24,14 @@
 #include "config.h"
 #endif
 
-#include <stream.h>
-#include <stdlib.h>
-#include <fstream.h>
-#include <iomanip.h>
-#include <time.h>
-#include <string.h>
+#include "rclip.h"
+#include "bufferstore.h"
+#include "ppsocket.h"
+#include "bufferarray.h"
+#include "Enum.h"
 
-#include <rclip.h>
-#include <bufferstore.h>
-#include <ppsocket.h>
-#include <bufferarray.h>
-#include <Enum.h>
+#include <stdlib.h>
+#include <time.h>
 
 rclip::rclip(ppsocket * _skt)
 {

@@ -24,7 +24,8 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
-#include <ostream.h>
+#include <iostream>
+
 #include <syslog.h>
 
 /**
@@ -51,32 +52,32 @@
  * file. If it is omitted or set to -1, logging can be switched on
  * or off. The initial state is on.
  */
-class logbuf : public streambuf {
+class logbuf : public std::streambuf {
 public:
 
     /**
     * Constructs a new instance.
     *
-    * @param level The log level for this instance.
+    * @param loglevel The log level for this instance.
     * 	see syslog(3) for symbolic names to use.
     * @param fd An optional file descriptor to use
     *   if switched off.
     */
-    logbuf(int level, int fd = -1);
+    logbuf(int loglevel, int fd = -1);
 
     /**
     * Switches loggin on or off.
     *
-    * @param on The desired state.
+    * @param newstate The desired state.
     */
-    void setOn(bool on) { _on = on; }
+    void setOn(bool newstate) { _on = newstate; }
 
     /**
     * Modifies the loglevel of this instance.
     * 
-    * @param level The new loglevel.
+    * @param newlevel The new loglevel.
     */
-    void setLevel(int level) { _level = level; }
+    void setLevel(int newlevel) { _level = newlevel; }
 
     /**
     * Retrieve the current state.

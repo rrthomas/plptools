@@ -23,7 +23,7 @@
 #ifndef _SISFILEHEADER_H
 #define _SISFILEHEADER_H
 
-#include "sistypes.h"
+#include <sistypes.h>
 
 /**
  * The first part of a SISFile.
@@ -62,21 +62,23 @@ public:
 
 	enum FileOptions {
 		op_isUnicode = 1,
-		op_isDistributable = 2,
+		op_isDistributable = 2
 #ifdef EPOC6
+		,
 		op_noCompress = 8,
-		op_shutdownApps = 16,
+		op_shutdownApps = 16
 #endif
 	};
 
 	enum FileType {
-		FT_App = 0,
+		FT_App = 0
 #ifdef EPOC6
+		,
 		FT_System = 1,
 		FT_Option = 2,
 		FT_Config = 3,
 		FT_Patch = 4,
-		FT_Upgrade = 5,
+		FT_Upgrade = 5
 #endif
 	};
 
