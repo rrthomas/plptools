@@ -15,7 +15,7 @@ packaged programs or libraries on the Psion.
 .B [-h]
 .B [-V]
 .B [-n]
-.BI "[-l " level ]
+.BI "[-v " level ]
 .BI [ long-options ]
 .B FILE
 
@@ -38,7 +38,7 @@ Display a short help text and exit.
 .B \-n, --dryryn
 Just parse the sis file, don't touch the Psion machine.
 .TP
-.BI "\-l, --loglevel=" level
+.BI "\-v, --verbose=" level
 Specify the log level.
 
 Level 0 is the default, and is pretty quiet.
