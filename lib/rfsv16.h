@@ -60,7 +60,7 @@ public:
     Enum<rfsv::errs> fread(const u_int32_t, unsigned char * const, const u_int32_t, u_int32_t &);
     Enum<rfsv::errs> fwrite(const u_int32_t, const unsigned char * const, const u_int32_t, u_int32_t &);
     Enum<rfsv::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
-    Enum<rfsv::errs> copyFromPsion(const char *from, int fd, void *ptr, cpCallback_t cb);
+    Enum<rfsv::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb);
     Enum<rfsv::errs> copyToPsion(const char * const, const char * const, void *, cpCallback_t);
     Enum<rfsv::errs> copyOnPsion(const char *, const char *, void *, cpCallback_t);
     Enum<rfsv::errs> fsetsize(const u_int32_t, const u_int32_t);

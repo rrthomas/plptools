@@ -641,7 +641,7 @@ copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 }
 
 Enum<rfsv::errs> rfsv16::
-copyFromPsion(const char *from, int fd, void *ptr, cpCallback_t cb)
+copyFromPsion(const char *from, int fd, cpCallback_t cb)
 {
     Enum<rfsv::errs> res;
     u_int32_t handle;
@@ -656,7 +656,7 @@ copyFromPsion(const char *from, int fd, void *ptr, cpCallback_t cb)
 	    if (len > 0)
 		write(fd, buf, len);
 	    total += len;
-	    if (cb && !cb(ptr, total))
+	    if (cb && !cb(NULL, total))
 		res = E_PSI_FILE_CANCEL;
 	}
     } while (len > 0 && (res == E_PSI_GEN_NONE));
