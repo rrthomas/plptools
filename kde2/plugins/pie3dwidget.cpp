@@ -17,7 +17,7 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *  Pie3DWidget was inspired by Christian Poulter's KDiskFree
- * 
+ *
  ****************************************************************************/
 
 #include <qpainter.h>
@@ -38,9 +38,9 @@ void  Pie3DWidget::addPiece(int size, const QColor& color)
   _totalsize += size;
 
   _piecelist.append(new Pie3DPiece(size, color));
-  
+
   repaint();
-} 
+}
 
 
 int  Pie3DWidget::heightForWidth(int w) const
@@ -57,14 +57,14 @@ QSize  Pie3DWidget::minimumSizeHint() const
 
 QSize  Pie3DWidget::sizeHint() const
 {
-  return QSize(width(), width()*0.6);
+  return QSize(width(), (int)(width()*0.6));
 }
 
 
 /*
  * Protected methods
  ********************/
- 
+
 void  Pie3DWidget::paintEvent(QPaintEvent *ev)
 {
   QPainter  p;
@@ -77,44 +77,44 @@ void  Pie3DWidget::paintEvent(QPaintEvent *ev)
   int       fullrot  = 360*16;
   int       bowpos   = 0;
   int       i, bowlen, bowcut;
-  
+
   if (_piecelist.isEmpty()) return;
-  
+
   p.begin(this);
   p.setClipRegion(ev->region());
-  
+
   for (Pie3DPiece *piece = _piecelist.first(); piece; piece = _piecelist.next())
   {
     QPalette  piecepal(piece->color(), widgetbg);
 
     bowlen = (int) (((double) piece->size())/_totalsize*fullrot);
-    
+
     p.setPen((_piecelist.count() > 1) ? black : _piecelist.first()->color());
     p.setBrush(piecepal.normal().button());
     p.drawPie(0, 0, w, h-pieh, bowpos, bowlen);
-    
+
     if (bowpos+bowlen >= halfrot)	// Part of the footer is visible
     {
       bowcut  = (bowpos < halfrot) ? halfrot-bowpos : 0;
       bowpos += bowcut;
       bowlen -= bowcut;
-      
+
       p.setPen(piecepal.normal().mid());
-    
+
       for (i = 0; i < pieh; i++) p.drawArc(0, i, w, h-pieh, bowpos, bowlen);
     }
-    
+
     bowpos += bowlen;
   }
-   
-  p.setPen(black);  
-    
-  p.drawArc(0,    0,          w,   h-pieh, 0,  fullrot);  
-  p.drawArc(0,    pieh-1,     w,   h-pieh, 0, -halfrot);  
-  
-  p.drawLine(0,   (h-pieh)/2, 0,   (h+pieh)/2-1);   
-  p.drawLine(w-1, (h-pieh)/2, w-1, (h+pieh)/2-1);   
-  
+
+  p.setPen(black);
+
+  p.drawArc(0,    0,          w,   h-pieh, 0,  fullrot);
+  p.drawArc(0,    pieh-1,     w,   h-pieh, 0, -halfrot);
+
+  p.drawLine(0,   (h-pieh)/2, 0,   (h+pieh)/2-1);
+  p.drawLine(w-1, (h-pieh)/2, w-1, (h+pieh)/2-1);
+
   p.end();
 }
 

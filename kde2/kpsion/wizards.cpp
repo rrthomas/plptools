@@ -527,7 +527,6 @@ next() {
 
 bool NewPsionWizard::
 checkPsionName(QString &name) {
-    KConfig *config = kapp->config();
     if (name.isEmpty()) {
 	KMessageBox::sorry(this, i18n("The name cannot be empty."));
 	return false;

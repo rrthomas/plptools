@@ -529,7 +529,6 @@ checkConnection() {
     if (rf && rc)
 	return true;
 
-    Enum<rfsv::errs> res;
     if (!rfsvSocket) {
 	rfsvSocket = new ppsocket();
 	if (!rfsvSocket->connect(NULL, sockNum)) {
