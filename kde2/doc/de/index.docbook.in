@@ -1,0 +1,579 @@
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook V3.1-Based Variant V1.0//EN" [
+  <!ENTITY kpsion  "<application>KPsion</application>"
+    -- delete this, if kpsion is in global KDE entities -->
+  <!ENTITY kappname "&kpsion;" -- this only *seems* redundant -->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % German "INCLUDE">
+  <!ENTITY % ents PUBLIC "-//KDE//ENTITIES Documentation V1.0//EN">
+  <!-- DO NOT DELETE! $Revision$ -->
+  <!-- DO NOT DELETE! $Date$ -->
+  %ents;
+]>
+
+<book lang="&language;">
+<bookinfo>
+
+<title>Das &kpsion; Handbuch</title>
+
+<authorgroup>
+<author>
+<firstname>Fritz</firstname>
+<surname>Elfert</surname>
+<affiliation>
+<address><email>felfert@to.com</email></address>
+</affiliation>
+</author>
+
+<!--
+<othercredit role="reviewer">
+<firstname>Whoever</firstname>
+<surname>Lastname</surname>
+<affiliation>
+<address><email>mail@somewhere.org</email></address>
+</affiliation>
+<contrib>Reviewer</contrib>
+</othercredit>
+-->
+
+</authorgroup>
+
+<copyright>
+<year>2001</year>
+<holder>Fritz Elfert</holder>
+</copyright>
+
+<legalnotice>&FDLNotice;</legalnotice>
+
+<date>__DATE__</date>
+<releaseinfo>__VERSION__</releaseinfo>
+
+
+<abstract><para>
+&kpsion; ist ein Programm zur Daten-sicherung/rücksicherung
+von Psion PDAs, sowie zum Formatieren von Lauferken derselben.
+</para></abstract>
+
+<keywordset>
+<keyword>KDE</keyword>
+<keyword>plptools</keyword>
+<keyword>KPsion</keyword>
+<keyword>Psion</keyword>
+<keyword>PDA</keyword>
+<keyword>Sicherung</keyword>
+<keyword>Rücksicherung</keyword>
+<keyword>formatieren</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="Introduction">
+<title>Einführung</title>
+
+<para>Willkommen bei &kpsion;! &kpsion; ist ein KDE-Programm zum Sichern und
+Rücksichern von Daten eines Psion PDAs sowie zum Formatieren von
+Laufwerken solcher PDAs. Es benutzt den Daemonen <command>ncpd</command>
+und die Bibliotheken aus dem Packet plptools.
+</para>
+
+<para>Dieses Programm kann von der Kommandozeile oder über eine
+<filename>.desktop</filename> Datei gestartet werden.
+</para>
+
+</chapter>
+
+<chapter id="installation">
+<title>Installation</title>
+
+<sect1 id="downloading">
+<title>Download</title>
+
+<para>&kpsion; ist Bestandteil des Packets plptools. Das Packet plptools
+ist auf <ulink url="http://plptools.sourceforge.net/">http://plptools.sourceforge.net/</ulink> zum Download verfügbar.</para>
+
+</sect1>
+
+<sect1 id="compiling">
+<title>Kompilieren</title>
+
+<para>Das Packet plptools ist eigentlich kein KDE packet, sondern eine Sammlung
+von Anwendungen zum Umgang mit dem PLP-Protokoll (dem Protokoll zur Kommunikation mit einem Psion (EPOC) PDA). Deshalb ist beim Bau des Packets plptools der
+KDE-spezifische Teil explizit zu aktivieren. Hierzu wird die Option
+<option>--enable-kde</option> beim Ausführen des configure von plptools
+benutzt.</para>
+
+<para>Das Bauen läuft üblicherweise folgendermaßen ab:</para>
+
+<screen>
+<prompt>$</prompt> <command>./configure <option>--enable-kde</option></command>
+<prompt>$</prompt> <command>make</command>
+<prompt>$</prompt> <command>make <option>install</option></command>
+</screen>
+
+<para>Der letzte Schritt ist hierbei unter der Benutzerkennung root durchzuführen. Der Installationsprozess benötigt Schreibzugriff auf die systemweiten
+KDE-Verzeichnisse.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="using-kpsion">
+<title>&kpsion; verwenden</title>
+
+<para>
+Die Verwendung von &kpsion; ist einfach. Normalerweise wird &kpsion; über den
+entsprechenden Eintrag im Untermenü Werkzeuge des K-Menüs gestartet.
+
+Sie können &kpsion; aber auch von der Kommandozeile starten. In diesem Fall
+benutzen Sie eine der folgenden Befehle:
+</para>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+    </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+      <arg>--autobackup</arg>
+    </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+      <arg>--backup <replaceable>DRIVE</replaceable></arg>
+    </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+      <arg>--restore <replaceable>DRIVE</replaceable></arg>
+    </cmdsynopsis>
+
+    <cmdsynopsis>
+      <command>kpsion</command>
+      <arg>--format <replaceable>DRIVE</replaceable></arg>
+    </cmdsynopsis>
+
+<para>Wenn &kpsion; ohne jede Option gestartet wird, so startet das
+Programm im interaktiven Modus. Werden Optionen verwendet, führt &kpsion;
+die angegebene Aufgabe automatisch durch.</para>
+
+<variablelist>
+<varlistentry>
+<term><option>--autobackup</option></term>
+<listitem><para>
+Diese Option weist &kpsion; an, eine geplante Sicherung des angeschlossenen
+Gerätes durchzuführen. Ist zum Zeitpunkt des Starts kein Psion angeschlossen,
+beendet sich das Programm sofort.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--backup <replaceable>DRIVE</replaceable></option></term>
+<listitem><para>
+Diese Option startet die Sicherung des angegebenen Laufwerks <replaceable>DRIVE</replaceable>.
+<replaceable>DRIVE</replaceable> ist hierbei ein einzelner Laufwerks-Buchstabe.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--restore <replaceable>DRIVE</replaceable></option></term>
+<listitem><para>
+Diese Option startet die Rückicherung des angegebenen Laufwerks <replaceable>DRIVE</replaceable>.
+<replaceable>DRIVE</replaceable> ist hierbei ein einzelner Laufwerks-Buchstabe.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--format <replaceable>DRIVE</replaceable></option></term>
+<listitem><para>
+Diese Option startet das Formatieren des angegebenen Laufwerks <replaceable>DRIVE</replaceable>.
+<replaceable>DRIVE</replaceable> ist hierbei ein einzelner Laufwerks-Buchstabe.
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="commands">
+<title>Kommandoreferenz</title>
+
+<sect1 id="kpsion-mainwindow">
+<title>Das &kpsion; Hauptfenster</title>
+<para>
+<screenshot>
+<screeninfo>&kpsion; mainwindow.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="toplevel.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>&kpsion; mainwindow</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+Ist ein Psion PDA angeschlossen, so werden dessen Laufwerke im zentralen
+Icon-Fenster des Programms angezeigt. Durch einen Mausklick auf ein
+Laufwerk, können Sie dieses Laufwerk an- bzw. abwählen. Sind Laufwerke
+angewählt, so werden die Einträge der möglichen Aktionen im Datei-Menü und
+in der Werkzeugleiste aktiviert. In der Werkzeugleiste sind die am
+häufigsten benötigten <guimenu>Aktionen</guimenu> verfügbar. Diese sind:</para>
+<para>
+<itemizedlist>
+<listitem><para>
+<guiicon>
+  <inlinemediaobject>
+    <imageobject>
+      <imagedata fileref="psion_backup.png" format="PNG">
+    </imageobject>
+  </inlinemediaobject>
+</guiicon> Komplettsicherung.
+</para></listitem>
+<listitem><para>
+<guiicon>
+  <inlinemediaobject>
+    <imageobject>
+      <imagedata fileref="psion_restore.png" format="PNG">
+    </imageobject>
+  </inlinemediaobject>
+</guiicon> Rücksicherung.
+</para></listitem>
+</itemizedlist>
+</para>
+
+<sect2><title>Das Datei Menü</title><para><variablelist>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>k</keycap></keycombo>
+</shortcut>
+<guimenu>Datei</guimenu>
+<guimenuitem>Starte Komplettsicherung</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+Startet eine <action>Komplettsicherung</action> der gewählten Laufwerke.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>i</keycap></keycombo>
+</shortcut>
+<guimenu>Datei</guimenu>
+<guimenuitem>Start Inkrementelle Sicherung</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+Startet eine <action>inkrementelle Sicherung</action> der gewählten Laufwerke.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>r</keycap></keycombo>
+</shortcut>
+<guimenu>Datei</guimenu>
+<guimenuitem>Starte Rücksicherung</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+Startet eine <action>Rücksicherung</action> der gewählten Laufwerke.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>f</keycap></keycombo>
+</shortcut>
+<guimenu>Datei</guimenu>
+<guimenuitem>Starte Formatierung</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+Startet das <action>Formatieren</action> der gewählten Laufwerke.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><menuchoice>
+<shortcut>
+<keycombo><keycap>Ctrl</keycap><keycap>e</keycap></keycombo>
+</shortcut>
+<guimenu>Datei</guimenu>
+<guimenuitem>Beenden</guimenuitem>
+</menuchoice></term>
+<listitem><para>
+<action>Beendet</action> &kpsion;.
+</para></listitem>
+</varlistentry>
+
+</variablelist></para></sect2>
+
+</sect1>
+
+</chapter>
+
+<chapter id="Configuration">
+<title>Konfiguration</title>
+
+<sect1 id="firsttime">
+<title>Erstmaliger Start</title>
+
+<para>
+Wenn Sie &kpsion; zum ersten Mal starten, erscheint ein Assistent zur
+Einrichtung und einfachen Anpassung von &kpsion; an Ihre persönlichen
+Vorgaben. Dieser Vorgang ist in drei Schritte unterteilt:
+</para>
+
+<sect2>
+<title>Auswahl des Sicherungs-Ordners</title>
+<para>
+<screenshot>
+<screeninfo>Step one. Select a backup directory.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="firstwizard-1.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Selecting the backup directory</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+Der Sicherungs-Ordner wird von &kpsion; zur Ablage von Sicherungs-Archiven
+verwendet. Im Normalfall können Sie einfach den vorgeschlagenen Ordner
+unterhalb Ihres Heimatverzeichnisses unverändert übernehmen. Sollten Sie
+einen anderen Ordner wünschen (z.B. weil der Plattenplatz auf der
+entsprechenden Partition knapp ist.), so können Sie dies durch einen
+Mausklick auf die Schaltfäche Durchsuchen. Natürlich sind zum Anlegen
+des Ordners Schreibrechte im übergeordneten Ordner nötig.
+</para>
+<para></para>
+</sect2>
+
+<sect2>
+<title>Einstellung der Sicherungs-Strategie</title>
+<para>
+<screenshot>
+<screeninfo>Step two. backup strategy.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="firstwizard-2.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Setting the backup strategy</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+Im zweiten Schritt können Sie die Sicherungs-Strategie anpassen. Sowohl
+für inkrementelle als auch komplette Sicherungen können Sie einen Intervall
+angeben. Ist mindestens einer dieser Intervalle aktiviert, so legt &kpsion;
+einen <filename>.desktop</filename> Eintrag in Ihrem KDE-Autostart-Ordner an.
+Jedes Mal, wenn Sie in Zukunft KDE starten, wird dann &kpsion; im automatischen
+Sicherungs-Modus gestartet. Wenn dabei dann ein Intervall abgelaufen ist (und
+ein Psion angeschlossen ist), so wird &kpsion; eine entspechende automatische
+Sicherung durchführen.
+</para>
+<para>
+Die dritte Einstellung, die Sie anpassen können, ist die Anzahl von
+Sicherungs-Generationen. Eine Sicherungs-Generation besteht aus einer
+Komplett-Sicherung und den darauf aufbauenden inkrementellen Sicherungen.
+In Anschluss an eine erfolgreiche Komplett-Sicherung prüft &kpsion;, ob
+mehr als die hier angegebene Anzahl Generationen bestehen und löscht
+ggf. ältere Sicherungs-Generationen.
+</para>
+<para></para>
+</sect2>
+
+<sect2>
+<title>Verbindungsparameter</title>
+<para>
+<screenshot>
+<screeninfo>Step three. connection parameters.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="firstwizard-3.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Setting connection parameters</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+Im dritten Schritt, können Sie das Verhalten von &kpsion; während des
+Verbindungs-Aufbaus beeinflussen. Wenn Sie den Verbindungs-Intervall
+auf einen Wert ungleich Null einstellen, so wird &kpsion; kontinuierlich
+einen gescheiterten Verbindungsaufbau wiederholen. Da &kpsion; hierzu
+den Daemonen ncpd benötigt, ist es zudem möglich, diesen bei Bedarf
+automatisch zu starten. Damit dies funktioniert, müssen Sie zusätzlich
+Schreibrechte für die entsprechende serielle Schnittstelle besitzen.
+</para>
+<para></para>
+</sect2>
+
+</sect1>
+
+<sect1 id="newpsion">
+<title>Neue Verbindung</title>
+
+<para>
+Wenn &kpsion; eine Verbindung zum Psion aufbaut, so fragt er dessen
+Seriennummer ab. Ist der angeschlossene Psion noch nie vorher angeschlossen
+gewesen, so erscheint ein Assistent mit dem Sie dem angeschlossenen Psion
+einen Namen geben, sowie die Laufwerke für automatische Sicherungen auswählen
+können.
+</para>
+
+<sect2>
+<title>Psion Name</title>
+<para>
+<screenshot>
+<screeninfo>Step one. psion name.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="newpsionwizard-1.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Setting a psion name</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+Der vergebene Name wird nur zur Anzeige verwendent. Intern benutzt &kpsion;
+stets die Seriennummer des Psion zur Identifikation.
+</para>
+<para></para>
+</sect2>
+
+<sect2>
+<title>Wahl der zu sichernden Laufwerke</title>
+<para>
+<screenshot>
+<screeninfo>Step two. specifying backup drives.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="newpsionwizard-2.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Specifying backup drives</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+Üblicherweise wählen Sie hier alle Laufwerke ausgenommen das ROM Laufwerk.
+Das ROM Laufwerk kann zwar gesichert werden, aber natürlich ist damit
+keine Rücksicherung möglich.
+</para>
+<para></para>
+</sect2>
+</sect1>
+
+<sect1 id="settings">
+<title>Einstellungen</title>
+
+<para>
+Alle Einstellungen die in den Assistenten vorgenommen wurden, können Sie
+zu einem beliebigen späteren Zeitpunkt mit dem Dialog Einstellungen
+modifizieren. Der Dialog Einstellungen besteht aus drei Seiten:
+</para>
+
+<sect2>
+<title>Sicherung</title>
+<para>
+<screenshot>
+<screeninfo>Setup, Backup.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="settings-backup.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Settings, Backup</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+</para>
+<para></para>
+</sect2>
+
+<sect2>
+<title>Verbindung</title>
+<para>
+<screenshot>
+<screeninfo>Settings, Connection.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="settings-connection.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Settings, Connection</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+</para>
+<para></para>
+</sect2>
+
+<sect2>
+<title>Geräte</title>
+<para>
+<screenshot>
+<screeninfo>Settings, Machines.</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="settings-machines.png" format="PNG">
+    </imageobject>
+    <textobject>
+      <phrase>Settings, Machines</phrase>
+    </textobject>
+  </mediaobject>
+</screenshot>
+</para>
+<para></para>
+</sect2>
+
+</sect1>
+
+</chapter>
+
+<chapter id="Interna">
+<title>Internals</title>
+
+<para>TBD</para>
+</chapter>
+
+<chapter id="faq">
+<title>Fragen und Antworten</title>
+
+&reporting.bugs;
+ 
+<qandaset id="faqlist">
+<qandaentry>
+<question>
+<para>Ich habe einen Psion Serie 3 und &kpsion; funktioniert nicht.</para>
+</question>
+<answer>
+<para>Dies ist ein bekanntes Problem der aktuellen plptools Bibliothek. Das Problem ist in Arbeit. Sorry.
+</para>
+</answer>
+</qandaentry>
+</qandaset>
+</chapter>
+
+<chapter id="Author">
+<title>Autor</title>
+
+<para>Copyright 2001 Fritz Elfert</para>
+
+<para>&kpsion; wurde erstellt von Fritz Elfert.</para>
+
+<para>Der Autor kann über e-Mail unter der Adresse
+<email>felfert@to.com</email> erreicht werden.  Bitte melden Sie Fehler
+und Wünsche an mich so daß diese in zukünftigen Versionen behoben/berücksichtigt werden können.</para>
+
+&underFDL;
+&underGPL;
+
+</chapter>
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+sgml-set-face: t
+End:
+-->

@@ -1,5 +1,5 @@
 
-KDE_LANG = en
+KDE_LANG = de
 KDE_DOCS = kpsion
 
 EXTRA_DIST = index.docbook.in
