@@ -163,12 +163,13 @@
  PLPNFSD
  plpnfsd is a daemon, which provides NFS-like access to your Psion.
  It automatically makes the psion's filesystems available below
- an NFS-mounted directory (default /mnt/psion).
- By default, plpnfsd is installed suid-root, so any normal user
- can start it and get's the mounted directory owned by himself.
- As this program is usually used on single-user machines, this
- does not hurt security. Like the others, this program
- auto-reconnects after a link-failure, so you can keep the
+ an NFS-mounted directory (default /mnt/psion). Of course you
+ must have NFS support enabled in the kernel and the portmapper
+ must be running for this. By default, plpnfsd is installed
+ suid-root, so any normal user can start it and get's the mounted
+ directory owned by himself. As this program is usually used on
+ single-user machines, this does not hurt security. Like the others,
+ this program auto-reconnects after a link-failure, so you can keep the
  psion mounted all the time, even when it is not connected.
  Due to Rudol Koenig's clever error-handling, you don't need to
  worry about blocked io-processes if the psion isn't available.

@@ -10,7 +10,6 @@
 %if "%{isMDK}" > "0"
 %define isRH 1
 %endif
-%define distro ""
 #
 # Running the above, results in:
 #
@@ -19,6 +18,7 @@
 # SuSE:     isSUSE=1 isRH=0 isMDK=0
 #
 
+%define _qtdir ""
 %if "%{isSUSE}" > "0"
 %define REL %(grep VERSION %{srel} | sed -e 's/VERSION = //')
 %if "%{REL}" >= "8.0"
@@ -31,12 +31,12 @@
 %endif
 %define distro SuSE%{REL}
 %endif
-%define _qtdir ""
 %if "%{isRH}" > "1"
 %define REL %(rpm -qf --queryformat '%%{version}' %{rrel})
 %define distro RH%{REL}
 %define _kdedir /usr
-%define _qtdir %(test -n "$QTDIR" && echo \"--with-qt-dir=$QTDIR\" || echo '""')
+# Old RH7.2 has QT in qt-2.x.x which is not autodetected in configure
+%define _qtdir %(test -n "$QTDIR" && echo \"--with-qt-dir=$QTDIR\" || :)
 %endif
 %if "%{isMDK}" > "0"
 %define REL %(rpm -qf --queryformat '%%{version}' %{mrel})
@@ -48,6 +48,7 @@
 %define _kdelibdir %{_kdedir}/lib
 %define _kdedatadir %{_kdedir}/share
 %define realrelease %{myrelease}%{distro}
+%{?_without_distro: %define realrelease %{myrelease}}
 
 Summary: Connectivity for psion series 5.
 Name: plptools
@@ -201,7 +202,8 @@ zwischen Psion und Rechner.
 %define __libtoolize true
 %endif
 %if "%{isRH}" > "0"
-%configure --enable-kde %{_qtdir} --with-initdir=%{_initrddir}
+QD=%{_qtdir}
+%configure --enable-kde $QD --with-initdir=%{_initrddir}
 %endif
 make
 
