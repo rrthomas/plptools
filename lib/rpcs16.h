@@ -11,8 +11,8 @@ class rpcs16 : public rpcs {
 		rpcs16(ppsocket *);
 		~rpcs16();
 
-		int queryDrive(const char, bufferArray &);
-		int getCmdLine(const char *, bufferStore &); 
+		Enum<rfsv::errs> queryDrive(const char, bufferArray &);
+		Enum<rfsv::errs> getCmdLine(const char *, bufferStore &); 
 };
 
 #endif

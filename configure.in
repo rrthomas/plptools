@@ -142,6 +142,8 @@ AC_OUTPUT(
 	ncpd/Makefile
 	plpftp/Makefile
 	plpnfsd/Makefile
+	doc/Makefile
+	doc/api/Makefile
 	include/config.h
 	etc/psion
 )

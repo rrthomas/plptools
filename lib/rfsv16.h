@@ -11,38 +11,37 @@ class rfsv16 : public rfsv {
 	void reconnect();
 
 	// these are the original publics
-	long dir(const char *, bufferArray *);
+	Enum<rfsv::errs> dir(const char *, bufferArray *);
 	/*long read(const char* psionName, const char* localName);
 	long write(const char* localName, const char* psionName);*/
-	long mkdir(const char *);
+	Enum<rfsv::errs> mkdir(const char *);
 
 	// these are FS' promotions
-	long dircount(const char *, long *);
-	long copyFromPsion(const char *, const char *, cpCallback_t);
-	long copyToPsion(const char *, const char *, cpCallback_t);
-	long rmdir(const char *);
-	long remove(const char *); // MJG: was this del? FE: yes
-	long rename(const char *, const char *);
-	long mktemp(long *, char *);
-	long fgeteattr(const char *, long *, long *, long *);
-	long fgetattr(const char *, long *);
-	long fsetattr(const char *, long seta, long unseta);
-	long fgetmtime(const char *, long *);
-	long fsetmtime(const char *, long);
-	long fopendir(long, const char *, long &);
-	long fopen(long, const char *, long &);
-	long fcreatefile(long, const char *, long &);
-	long freplacefile(long, const char *, long &);
+	Enum<rfsv::errs> dircount(const char *, long *);
+	Enum<rfsv::errs> copyFromPsion(const char *, const char *, cpCallback_t);
+	Enum<rfsv::errs> copyToPsion(const char *, const char *, cpCallback_t);
+	Enum<rfsv::errs> rmdir(const char *);
+	Enum<rfsv::errs> remove(const char *); // MJG: was this del? FE: yes
+	Enum<rfsv::errs> rename(const char *, const char *);
+	Enum<rfsv::errs> mktemp(long *, char *);
+	Enum<rfsv::errs> fgeteattr(const char *, long *, long *, long *);
+	Enum<rfsv::errs> fgetattr(const char *, long *);
+	Enum<rfsv::errs> fsetattr(const char *, long seta, long unseta);
+	Enum<rfsv::errs> fgetmtime(const char *, long *);
+	Enum<rfsv::errs> fsetmtime(const char *, long);
+	Enum<rfsv::errs> fopendir(long, const char *, long &);
+	Enum<rfsv::errs> fopen(long, const char *, long &);
+	Enum<rfsv::errs> fcreatefile(long, const char *, long &);
+	Enum<rfsv::errs> freplacefile(long, const char *, long &);
 	long fseek(long, long, long);
 	long fread(long, unsigned char *, long);
 	long fwrite(long, unsigned char *, long);
-	long fsetsize(long, long);
-	long fclose(long);
+	Enum<rfsv::errs> fsetsize(long, long);
+	Enum<rfsv::errs> fclose(long);
 
-	long devlist(long *);
+	Enum<rfsv::errs> devlist(long *);
 	char *devinfo(int, long *, long *, long *, long *);
-	long getStatus();
-	char *opErr(long);
+	Enum<rfsv::errs> getStatus();
 	char *opAttr(long);
 	long opMode(long);
 
@@ -113,17 +112,17 @@ private:
   //long fclose(int fileHandle);
 
 	// Miscellaneous
-	int convertName(const char*, char *);
+	Enum<rfsv::errs> convertName(const char*, char *);
 
 	// Communication
 	bool sendCommand(enum commands, bufferStore &);
-	long getResponse(bufferStore &);
+	Enum<rfsv::errs> getResponse(bufferStore &);
   
 	// Vars
 	ppsocket *skt;
 	// MJG: not sure what these are yet
 	int serNum;
-	long status;	// current connection status
+	Enum<errs> status;	// current connection status
 	int tDiff;	// don't think this is used anywhere
 };
 

@@ -14,4 +14,4 @@ maintainer-clean-local:
 		install-sh ltconfig ltmain.sh missing mkinstalldirs
 
 kdoc:
-	kdoc -d doc/api -n libplp -P lib/*.h
+	kdoc -d doc/api -n libplp lib/*.h

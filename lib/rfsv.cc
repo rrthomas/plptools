@@ -1,158 +1,80 @@
 #include "rfsv.h"
+#include "Enum.h"
 
-char *rfsv::
-opErr(long status)
-{
-	enum errs e = (enum errs) status;
-	switch (e) {
-		case E_PSI_GEN_NONE:
-			return "no error";
-		case E_PSI_GEN_FAIL:
-			return "general";
-		case E_PSI_GEN_ARG:
-			return "bad argument";
-		case E_PSI_GEN_OS:
-			return "OS error";
-		case E_PSI_GEN_NSUP:
-			return "not supported";
-		case E_PSI_GEN_UNDER:
-			return "numeric underflow";
-		case E_PSI_GEN_OVER:
-			return "numeric overflow";
-		case E_PSI_GEN_RANGE:
-			return "numeric exception";
-		case E_PSI_GEN_INUSE:
-			return "in use";
-		case E_PSI_GEN_NOMEMORY:
-			return "out of memory";
-		case E_PSI_GEN_NOSEGMENTS:
-			return "out of segments";
-		case E_PSI_GEN_NOSEM:
-			return "out of semaphores";
-		case E_PSI_GEN_NOPROC:
-			return "out of processes";
-		case E_PSI_GEN_OPEN:
-			return "already open";
-		case E_PSI_GEN_NOTOPEN:
-			return "not open";
-		case E_PSI_GEN_IMAGE:
-			return "bad image";
-		case E_PSI_GEN_RECEIVER:
-			return "receiver error";
-		case E_PSI_GEN_DEVICE:
-			return "device error";
-		case E_PSI_GEN_FSYS:
-			return "no filesystem";
-		case E_PSI_GEN_START:
-			return "not ready";
-		case E_PSI_GEN_NOFONT:
-			return "no font";
-		case E_PSI_GEN_TOOWIDE:
-			return "too wide";
-		case E_PSI_GEN_TOOMANY:
-			return "too many";
-		case E_PSI_FILE_EXIST:
-			return "file already exists";
-		case E_PSI_FILE_NXIST:
-			return "no such file";
-		case E_PSI_FILE_WRITE:
-			return "write error";
-		case E_PSI_FILE_READ:
-			return "read error";
-		case E_PSI_FILE_EOF:
-			return "end of file";
-		case E_PSI_FILE_FULL:
-			return "disk/serial read buffer full";
-		case E_PSI_FILE_NAME:
-			return "invalid name";
-		case E_PSI_FILE_ACCESS:
-			return "access denied";
-		case E_PSI_FILE_LOCKED:
-			return "ressource locked";
-		case E_PSI_FILE_DEVICE:
-			return "no such device";
-		case E_PSI_FILE_DIR:
-			return "no such directory";
-		case E_PSI_FILE_RECORD:
-			return "no such record";
-		case E_PSI_FILE_RDONLY:
-			return "file is read-only";
-		case E_PSI_FILE_INV:
-			return "invalid I/O operation";
-		case E_PSI_FILE_PENDING:
-			return "I/O pending (not yet completed)";
-		case E_PSI_FILE_VOLUME:
-			return "invalid volume name";
-		case E_PSI_FILE_CANCEL:
-			return "cancelled";
-		case E_PSI_FILE_ALLOC:
-			return "no memory for control block";
-		case E_PSI_FILE_DISC:
-			return "unit disconnected";
-		case E_PSI_FILE_CONNECT:
-			return "already connected";
-		case E_PSI_FILE_RETRAN:
-			return "retransmission threshold exceeded";
-		case E_PSI_FILE_LINE:
-			return "physical link failure";
-		case E_PSI_FILE_INACT:
-			return "inactivity timer expired";
-		case E_PSI_FILE_PARITY:
-			return "serial parity error";
-		case E_PSI_FILE_FRAME:
-			return "serial framing error";
-		case E_PSI_FILE_OVERRUN:
-			return "serial overrun error";
-		case E_PSI_MDM_CONFAIL:
-			return "modem cannot connect to remote modem";
-		case E_PSI_MDM_BUSY:
-			return "remote modem busy";
-		case E_PSI_MDM_NOANS:
-			return "remote modem did not answer";
-		case E_PSI_MDM_BLACKLIST:
-			return "number blacklisted by the modem";
-		case E_PSI_FILE_NOTREADY:
-			return "drive not ready";
-		case E_PSI_FILE_UNKNOWN:
-			return "unknown media";
-		case E_PSI_FILE_DIRFULL:
-			return "directory full";
-		case E_PSI_FILE_PROTECT:
-			return "write-protected";
-		case E_PSI_FILE_CORRUPT:
-			return "media corrupt";
-		case E_PSI_FILE_ABORT:
-			return "aborted operation";
-		case E_PSI_FILE_ERASE:
-			return "failed to erase flash media";
-		case E_PSI_FILE_INVALID:
-			return "invalid file for DBF system";
-		case E_PSI_GEN_POWER:
-			return "power failure";
-		case E_PSI_FILE_TOOBIG:
-			return "too big";
-		case E_PSI_GEN_DESCR:
-			return "bad descriptor";
-		case E_PSI_GEN_LIB:
-			return "bad entry point";
-		case E_PSI_FILE_NDISC:
-			return "could not diconnect";
-		case E_PSI_FILE_DRIVER:
-			return "bad driver";
-		case E_PSI_FILE_COMPLETION:
-			return "operation not completed";
-		case E_PSI_GEN_BUSY:
-			return "server busy";
-		case E_PSI_GEN_TERMINATED:
-			return "terminated";
-		case E_PSI_GEN_DIED:
-			return "died";
-		case E_PSI_FILE_HANDLE:
-			return "bad handle";
-		case E_PSI_NOT_SIBO:
-			return "invalid operation for RFSV16";
-		default:
-			return "Unknown error";
-	}
+ENUM_DEFINITION(rfsv::errs, rfsv::E_PSI_GEN_NONE) {
+	stringRep.add(rfsv::E_PSI_GEN_NONE,		"no error");
+	stringRep.add(rfsv::E_PSI_GEN_FAIL,		"general");
+	stringRep.add(rfsv::E_PSI_GEN_ARG,		"bad argument");
+	stringRep.add(rfsv::E_PSI_GEN_OS,		"OS error");
+	stringRep.add(rfsv::E_PSI_GEN_NSUP,		"not supported");
+	stringRep.add(rfsv::E_PSI_GEN_UNDER,		"numeric underflow");
+	stringRep.add(rfsv::E_PSI_GEN_OVER,		"numeric overflow");
+	stringRep.add(rfsv::E_PSI_GEN_RANGE,		"numeric exception");
+	stringRep.add(rfsv::E_PSI_GEN_INUSE,		"in use");
+	stringRep.add(rfsv::E_PSI_GEN_NOMEMORY,		"out of memory");
+	stringRep.add(rfsv::E_PSI_GEN_NOSEGMENTS,	"out of segments");
+	stringRep.add(rfsv::E_PSI_GEN_NOSEM,		"out of semaphores");
+	stringRep.add(rfsv::E_PSI_GEN_NOPROC,		"out of processes");
+	stringRep.add(rfsv::E_PSI_GEN_OPEN,		"already open");
+	stringRep.add(rfsv::E_PSI_GEN_NOTOPEN,		"not open");
+	stringRep.add(rfsv::E_PSI_GEN_IMAGE,		"bad image");
+	stringRep.add(rfsv::E_PSI_GEN_RECEIVER,		"receiver error");
+	stringRep.add(rfsv::E_PSI_GEN_DEVICE,		"device error");
+	stringRep.add(rfsv::E_PSI_GEN_FSYS,		"no filesystem");
+	stringRep.add(rfsv::E_PSI_GEN_START,		"not ready");
+	stringRep.add(rfsv::E_PSI_GEN_NOFONT,		"no font");
+	stringRep.add(rfsv::E_PSI_GEN_TOOWIDE,		"too wide");
+	stringRep.add(rfsv::E_PSI_GEN_TOOMANY,		"too many");
+	stringRep.add(rfsv::E_PSI_FILE_EXIST,		"file already exists");
+	stringRep.add(rfsv::E_PSI_FILE_NXIST,		"no such file");
+	stringRep.add(rfsv::E_PSI_FILE_WRITE,		"write error");
+	stringRep.add(rfsv::E_PSI_FILE_READ,		"read error");
+	stringRep.add(rfsv::E_PSI_FILE_EOF,		"end of file");
+	stringRep.add(rfsv::E_PSI_FILE_FULL,		"disk/serial read buffer full");
+	stringRep.add(rfsv::E_PSI_FILE_NAME,		"invalid name");
+	stringRep.add(rfsv::E_PSI_FILE_ACCESS,		"access denied");
+	stringRep.add(rfsv::E_PSI_FILE_LOCKED,		"ressource locked");
+	stringRep.add(rfsv::E_PSI_FILE_DEVICE,		"no such device");
+	stringRep.add(rfsv::E_PSI_FILE_DIR,		"no such directory");
+	stringRep.add(rfsv::E_PSI_FILE_RECORD,		"no such record");
+	stringRep.add(rfsv::E_PSI_FILE_RDONLY,		"file is read-only");
+	stringRep.add(rfsv::E_PSI_FILE_INV,		"invalid I/O operation");
+	stringRep.add(rfsv::E_PSI_FILE_PENDING,		"I/O pending (not yet completed)");
+	stringRep.add(rfsv::E_PSI_FILE_VOLUME,		"invalid volume name");
+	stringRep.add(rfsv::E_PSI_FILE_CANCEL,		"cancelled");
+	stringRep.add(rfsv::E_PSI_FILE_ALLOC,		"no memory for control block");
+	stringRep.add(rfsv::E_PSI_FILE_DISC,		"unit disconnected");
+	stringRep.add(rfsv::E_PSI_FILE_CONNECT,		"already connected");
+	stringRep.add(rfsv::E_PSI_FILE_RETRAN,		"retransmission threshold exceeded");
+	stringRep.add(rfsv::E_PSI_FILE_LINE,		"physical link failure");
+	stringRep.add(rfsv::E_PSI_FILE_INACT,		"inactivity timer expired");
+	stringRep.add(rfsv::E_PSI_FILE_PARITY,		"serial parity error");
+	stringRep.add(rfsv::E_PSI_FILE_FRAME,		"serial framing error");
+	stringRep.add(rfsv::E_PSI_FILE_OVERRUN,		"serial overrun error");
+	stringRep.add(rfsv::E_PSI_MDM_CONFAIL,		"modem cannot connect to remote modem");
+	stringRep.add(rfsv::E_PSI_MDM_BUSY,		"remote modem busy");
+	stringRep.add(rfsv::E_PSI_MDM_NOANS,		"remote modem did not answer");
+	stringRep.add(rfsv::E_PSI_MDM_BLACKLIST,	"number blacklisted by the modem");
+	stringRep.add(rfsv::E_PSI_FILE_NOTREADY,	"drive not ready");
+	stringRep.add(rfsv::E_PSI_FILE_UNKNOWN,		"unknown media");
+	stringRep.add(rfsv::E_PSI_FILE_DIRFULL,		"directory full");
+	stringRep.add(rfsv::E_PSI_FILE_PROTECT,		"write-protected");
+	stringRep.add(rfsv::E_PSI_FILE_CORRUPT,		"media corrupt");
+	stringRep.add(rfsv::E_PSI_FILE_ABORT,		"aborted operation");
+	stringRep.add(rfsv::E_PSI_FILE_ERASE,		"failed to erase flash media");
+	stringRep.add(rfsv::E_PSI_FILE_INVALID,		"invalid file for DBF system");
+	stringRep.add(rfsv::E_PSI_GEN_POWER,		"power failure");
+	stringRep.add(rfsv::E_PSI_FILE_TOOBIG,		"too big");
+	stringRep.add(rfsv::E_PSI_GEN_DESCR,		"bad descriptor");
+	stringRep.add(rfsv::E_PSI_GEN_LIB,		"bad entry point");
+	stringRep.add(rfsv::E_PSI_FILE_NDISC,		"could not diconnect");
+	stringRep.add(rfsv::E_PSI_FILE_DRIVER,		"bad driver");
+	stringRep.add(rfsv::E_PSI_FILE_COMPLETION,	"operation not completed");
+	stringRep.add(rfsv::E_PSI_GEN_BUSY,		"server busy");
+	stringRep.add(rfsv::E_PSI_GEN_TERMINATED,	"terminated");
+	stringRep.add(rfsv::E_PSI_GEN_DIED,		"died");
+	stringRep.add(rfsv::E_PSI_FILE_HANDLE,		"bad handle");
+	stringRep.add(rfsv::E_PSI_NOT_SIBO,		"invalid operation for RFSV16");
+	stringRep.add(rfsv::E_PSI_INTERNAL,		"libplp internal error");
 }
 

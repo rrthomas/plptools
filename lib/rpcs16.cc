@@ -40,27 +40,25 @@ rpcs16::~rpcs16()
 {
 	bufferStore a;
 	a.addStringT("Close");
-	if (status == E_PSI_GEN_NONE)
+	if (status == rfsv::E_PSI_GEN_NONE)
 		skt->sendBufferStore(a);
 	skt->closeSocket();
 }
 
-int rpcs16::
+Enum<rfsv::errs> rpcs16::
 queryDrive(char drive, bufferArray &ret)
 {
 	bufferStore a;
 	a.addByte(drive);
 	if (!sendCommand(rpcs::QUERY_DRIVE, a))
-		return rpcs::E_PSI_FILE_DISC;
-	long res = getResponse(a);
+		return rfsv::E_PSI_FILE_DISC;
+	Enum<rfsv::errs> res = getResponse(a);
 cout << dec << "qd: " << res << " " << a.getLen() << " a="<< a << endl;
-	if (res)
-		return res;
 	return res;
 }
 
-int rpcs16::
+Enum<rfsv::errs> rpcs16::
 getCmdLine(const char *process, bufferStore &ret)
 {
-	return 0;
+	return rfsv::E_PSI_GEN_NONE;
 }

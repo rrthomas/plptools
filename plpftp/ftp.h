@@ -26,8 +26,9 @@
 #define _ftp_h_
 
 #include "bool.h"
+#include "rfsv.h"
+#include "Enum.h"
 
-class rfsv;
 class rpcs;
 class bufferStore;
 class bufferArray;
@@ -47,7 +48,6 @@ class ftp {
 	void getUnixDir(bufferArray & files);
 	void resetUnixPwd();
 	void usage();
-	void errprint(long errcode, rfsv & a);
 	void cd(const char *source, const char *cdto, char *dest);
 
 	// MJG: note, this isn't actually used anywhere

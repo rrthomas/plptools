@@ -1,6 +1,8 @@
 #ifndef _rfsv_h_
 #define _rfsv_h_
 
+#include "Enum.h"
+
 class ppsocket;
 class bufferStore;
 class bufferArray;
@@ -30,44 +32,6 @@ typedef int (*cpCallback_t)(long);
  */
 class rfsv {
 	public:
-		virtual ~rfsv() {}
-		virtual void reset() = 0;
-		virtual void reconnect() = 0;
-		virtual long getStatus() = 0;
-		virtual const char *getConnectName() = 0;
-		virtual long fopen(long, const char *, long &) = 0;
-		virtual long mktemp(long *, char *) = 0;
-		virtual long fcreatefile(long, const char *, long &) = 0;
-		virtual long freplacefile(long, const char *, long &) = 0;
-		virtual long fopendir(long, const char *, long &) = 0;
-		virtual long fclose(long) = 0;
-		virtual long dir(const char *, bufferArray *) = 0;
-		virtual long fgetmtime(const char *, long *) = 0;
-		virtual long fsetmtime(const char *, long) = 0;
-		virtual long fgetattr(const char *, long *) = 0;
-		virtual long fgeteattr(const char *, long *, long *, long *) =0; 
-		virtual long fsetattr(const char *, long, long) = 0;
-		virtual long dircount(const char *, long *) = 0;
-		virtual long devlist(long *) = 0;
-		virtual char *devinfo(int, long *, long *, long *, long *) = 0;
-		virtual char *opAttr(long) = 0;
-		virtual long opMode(long) = 0;
-		virtual long fread(long, unsigned char *, long) = 0;
-		virtual long fwrite(long, unsigned char *, long) = 0;
-		virtual long copyFromPsion(const char *, const char *, cpCallback_t) = 0;
-		virtual long copyToPsion(const char *, const char *, cpCallback_t) = 0;
-		virtual long fsetsize(long, long) = 0;
-		virtual long fseek(long, long, long) = 0;
-		virtual long mkdir(const char *) = 0;
-		virtual long rmdir(const char *) = 0;
-		virtual long rename(const char *, const char *) = 0;
-		virtual long remove(const char *) = 0;
-
-		virtual long attr2std(long) = 0;
-		virtual long std2attr(long) = 0;
-		
-		char *opErr(long);
-
 		/**
 		 * The kown modes for seek.
 		 */
@@ -175,7 +139,9 @@ class rfsv {
 			E_PSI_FILE_HANDLE = -110,
 
 			// Special error code for "Operation not permitted in RFSV16"
-			E_PSI_NOT_SIBO = -200
+			E_PSI_NOT_SIBO = -200,
+			// Special error code for "internal library error"
+			E_PSI_INTERNAL = -201
 		};
 
 		/**
@@ -207,6 +173,43 @@ class rfsv {
 			PSI_A_STREAM = 0x0800,
 			PSI_A_TEXT = 0x1000
 		};
+		virtual ~rfsv() {}
+		virtual void reset() = 0;
+		virtual void reconnect() = 0;
+		virtual Enum<errs> getStatus() = 0;
+		virtual const char *getConnectName() = 0;
+		virtual Enum<errs> fopen(long, const char *, long &) = 0;
+		virtual Enum<errs> mktemp(long *, char *) = 0;
+		virtual Enum<errs> fcreatefile(long, const char *, long &) = 0;
+		virtual Enum<errs> freplacefile(long, const char *, long &) = 0;
+		virtual Enum<errs> fopendir(long, const char *, long &) = 0;
+		virtual Enum<errs> fclose(long) = 0;
+		virtual Enum<errs> dir(const char *, bufferArray *) = 0;
+		virtual Enum<errs> fgetmtime(const char *, long *) = 0;
+		virtual Enum<errs> fsetmtime(const char *, long) = 0;
+		virtual Enum<errs> fgetattr(const char *, long *) = 0;
+		virtual Enum<errs> fgeteattr(const char *, long *, long *, long *) =0; 
+		virtual Enum<errs> fsetattr(const char *, long, long) = 0;
+		virtual Enum<errs> dircount(const char *, long *) = 0;
+		virtual Enum<errs> devlist(long *) = 0;
+		virtual char *devinfo(int, long *, long *, long *, long *) = 0;
+		virtual char *opAttr(long) = 0;
+		virtual long opMode(long) = 0;
+		virtual long fread(long, unsigned char *, long) = 0;
+		virtual long fwrite(long, unsigned char *, long) = 0;
+		virtual Enum<errs> copyFromPsion(const char *, const char *, cpCallback_t) = 0;
+		virtual Enum<errs> copyToPsion(const char *, const char *, cpCallback_t) = 0;
+		virtual Enum<errs> fsetsize(long, long) = 0;
+		virtual long fseek(long, long, long) = 0;
+		virtual Enum<errs> mkdir(const char *) = 0;
+		virtual Enum<errs> rmdir(const char *) = 0;
+		virtual Enum<errs> rename(const char *, const char *) = 0;
+		virtual Enum<errs> remove(const char *) = 0;
+
+		virtual long attr2std(long) = 0;
+		virtual long std2attr(long) = 0;
+		
+		char *opErr(long);
 };
 
 #endif

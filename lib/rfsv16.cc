@@ -32,7 +32,7 @@
 #include <fstream.h>
 #include <iomanip.h>
 #include <time.h>
-#include <string.h>
+#include <string>
 
 #include "bool.h"
 #include "rfsv16.h"
@@ -84,7 +84,7 @@ reset()
 }
 
 // move to base class?
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 getStatus()
 {
 	return status;
@@ -97,7 +97,7 @@ getConnectName()
 	return "SYS$RFSV";
 }
 
-int rfsv16::
+Enum<rfsv::errs> rfsv16::
 convertName(const char* orig, char *retVal)
 {
 	int len = strlen(orig);
@@ -130,16 +130,16 @@ convertName(const char* orig, char *retVal)
 
 	delete [] temp;
 	cout << retVal << endl;
-	return 0;
+	return E_PSI_GEN_NONE;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fopen(long attr, const char *name, long &handle)
 { 
 	bufferStore a;
 	char realName[200];
-	int rv = convertName(name, realName);
-	if (rv) return (long)rv;
+	Enum<rfsv::errs> rv = convertName(name, realName);
+	if (rv) return rv;
 
 	// FIXME: anything that calls fopen should NOT do the name
 	// conversion - it's just done here. 
@@ -150,16 +150,16 @@ fopen(long attr, const char *name, long &handle)
 	if (!sendCommand(FOPEN, a))
 		return E_PSI_FILE_DISC;
   
-	long res = getResponse(a);
+	Enum<rfsv::errs> res = getResponse(a);
 	if (res == 0) {
 		handle = (long)a.getWord(0);
-		return 0;
+		return E_PSI_GEN_NONE;
 	}
 	return res;
 }
 
 // internal
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 mktemp(long *handle, char *tmpname)
 {
 	bufferStore a;
@@ -173,38 +173,38 @@ mktemp(long *handle, char *tmpname)
 	if (!sendCommand(OPENUNIQUE, a))
 		return E_PSI_FILE_DISC;
   
-	long res = getResponse(a);
-	if (res == 0) {
+	Enum<rfsv::errs> res = getResponse(a);
+	if (res == E_PSI_GEN_NONE) {
 		*handle = a.getWord(0);
 		strcpy(tmpname, a.getString(2));
-		return 0;
+		return res;
 	}
 	return res;
 }
 
 // internal and external
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fcreatefile(long attr, const char *name, long &handle)
 {
 	return fopen(attr | P_FCREATE, name, handle);
 }
 
 // this is internal - not used by plpnfsd, unlike fcreatefile
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 freplacefile(long attr, const char *name, long &handle)
 {
 	return fopen(attr | P_FREPLACE, name, handle);
 }
 
 // internal
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fopendir(long attr, const char *name, long &handle)
 {
 cerr << "rfsv16::fopendir ***" << endl;
-	return 0;
+	return E_PSI_GEN_NONE;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fclose(long fileHandle)
 {
 	bufferStore a;
@@ -214,16 +214,14 @@ fclose(long fileHandle)
 	return getResponse(a);
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 dir(const char *dirName, bufferArray * files)
 {
 	long fileHandle;
-	long res;
+	Enum<rfsv::errs> res = fopen(P_FDIR, dirName, fileHandle);
 
-	long status = fopen(P_FDIR, dirName, fileHandle);
-	if (status != 0) {
-		return status;
-	}
+	if (res != E_PSI_GEN_NONE)
+		return res;
 
 	while (1) {
 		bufferStore a;
@@ -231,14 +229,15 @@ dir(const char *dirName, bufferArray * files)
 		if (!sendCommand(FDIRREAD, a))
 			return E_PSI_FILE_DISC;
 		res = getResponse(a);
-		if (res)
+		if (res != E_PSI_GEN_NONE)
 			break;
 		a.discardFirstBytes(2); // Don't know what these mean!
 		while (a.getLen() > 16) {
 			int version = a.getWord(0);
 			if (version != 2) {
 				cerr << "dir: not version 2" << endl;
-				return 1;
+				fclose(fileHandle);
+				return E_PSI_GEN_FAIL;
 			}
 			int status = a.getWord(2);
 			long size = a.getDWord(4);
@@ -254,8 +253,8 @@ dir(const char *dirName, bufferArray * files)
 			files->append(temp);
 		}
 	}
-	if ((short int)res == E_PSI_FILE_EOF)
-		res = 0;
+	if (res == E_PSI_FILE_EOF)
+		res = E_PSI_GEN_NONE;
 	fclose(fileHandle);
 	return res;
 }
@@ -293,14 +292,14 @@ opMode(long mode)
 	return ret;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fgetmtime(const char *name, long *mtime)
 {
 cerr << "rfsv16::fgetmtime" << endl;
 	// NB: fgetattr, fgeteattr is almost identical...
 	bufferStore a;
 	char realName[200];
-	int rv = convertName(name, realName);
+	Enum<rfsv::errs> rv = convertName(name, realName);
 	if (rv) return rv;
 	a.addString(realName);
 	a.addByte(0x00); 	// needs to be null-terminated, 
@@ -308,8 +307,8 @@ cerr << "rfsv16::fgetmtime" << endl;
 	if (!sendCommand(FINFO, a))
 		return E_PSI_FILE_DISC;
   
-	long res = getResponse(a);
-	if (res != 0) {
+	Enum<rfsv::errs> res = getResponse(a);
+	if (res != E_PSI_GEN_NONE) {
 		cerr << "fgetmtime: Error " << res << " on file " << name << endl;	    
 		return res;
 	}
@@ -318,10 +317,10 @@ cerr << "rfsv16::fgetmtime" << endl;
 		return res;
 	}
 	cerr << "fgetmtime: Unknown response (" << name << ") " << a <<endl;
-	return 1;
+	return E_PSI_GEN_FAIL;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fsetmtime(const char *name, long mtime)
 {
 cerr << "rfsv16::fsetmtime ***" << endl;
@@ -330,13 +329,13 @@ cerr << "rfsv16::fsetmtime ***" << endl;
 	return E_PSI_NOT_SIBO;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fgetattr(const char *name, long *attr)
 {
 	// NB: fgetmtime, fgeteattr are almost identical...
 	bufferStore a;
 	char realName[200];
-	int rv = convertName(name, realName);
+	Enum<rfsv::errs> rv = convertName(name, realName);
 	if (rv) return rv;
 	a.addString(realName);
 	a.addByte(0x00); 	// needs to be null-terminated, 
@@ -344,7 +343,7 @@ fgetattr(const char *name, long *attr)
 	if (!sendCommand(FINFO, a))
 		return E_PSI_FILE_DISC;
   
-	long res = getResponse(a);
+	Enum<rfsv::errs> res = getResponse(a);
 	if (res != 0) {
 		cerr << "fgetattr: Error " << res << " on file " << name << endl;	    
 		return res;
@@ -354,15 +353,15 @@ fgetattr(const char *name, long *attr)
 		return res;
 	}
 	cerr << "fgetattr: Unknown response (" << name << ") " << a <<endl;
-	return 1;
+	return E_PSI_GEN_FAIL;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fgeteattr(const char *name, long *attr, long *size, long *time)
 {
 	bufferStore a;
 	char realName[200];
-	int rv = convertName(name, realName);
+	Enum<rfsv::errs> rv = convertName(name, realName);
 	if (rv) return rv;
 	a.addString(realName);
 	a.addByte(0x00); 	// needs to be null-terminated, 
@@ -370,9 +369,9 @@ fgeteattr(const char *name, long *attr, long *size, long *time)
 	if (!sendCommand(FINFO, a))
 		return E_PSI_FILE_DISC;
   
-	long res = getResponse(a);
+	Enum<rfsv::errs> res = getResponse(a);
 	if (res != 0) {
-		cerr << "fgeteattr: Error " << a.getWord(0) << " on file " << name << endl;
+		cerr << "fgeteattr: Error " << res << " on file " << name << endl;
 		return res;
 	}
 	else if (a.getLen() == 16) {
@@ -382,10 +381,10 @@ fgeteattr(const char *name, long *attr, long *size, long *time)
 		return res;
 	}
 	cerr << "fgeteattr: Unknown response (" << name << ") " << a <<endl;
-	return 1;
+	return E_PSI_GEN_FAIL;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fsetattr(const char *name, long seta, long unseta)
 {
 cerr << "rfsv16::fsetattr" << endl;
@@ -412,17 +411,16 @@ cerr << "rfsv16::fsetattr" << endl;
 	return getResponse(a);
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 dircount(const char *name, long *count)
 {
 	long fileHandle;
-	long res;
+	Enum<rfsv::errs> res;
 	*count = 0;
 
-	long status = fopen(P_FDIR, name, fileHandle);
-	if (status != 0) {
-		return status;
-	}
+	res = fopen(P_FDIR, name, fileHandle);
+	if (res != E_PSI_GEN_NONE)
+		return res;
 
 	while (1) {
 		bufferStore a;
@@ -430,14 +428,15 @@ dircount(const char *name, long *count)
 		if (!sendCommand(FDIRREAD, a))
 			return E_PSI_FILE_DISC;
 		res = getResponse(a);
-		if (res)
+		if (res != E_PSI_GEN_NONE)
 			break;
 		a.discardFirstBytes(2); // Don't know what these mean!
 		while (a.getLen() > 16) {
 			int version = a.getWord(0);
 			if (version != 2) {
 				cerr << "dir: not version 2" << endl;
-				return 1;
+				fclose(fileHandle);
+				return E_PSI_GEN_FAIL;
 			}
 			// int status = a.getWord(2);
 			// long size = a.getDWord(4);
@@ -447,16 +446,16 @@ dircount(const char *name, long *count)
 			(*count)++;
 		}
 	}
-	if ((short int)res == E_PSI_FILE_EOF)
-		res = 0;
+	if (res == E_PSI_FILE_EOF)
+		res = E_PSI_GEN_NONE;
 	fclose(fileHandle);
 	return res;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 devlist(long *devbits)
 {
-	long res;
+	Enum<rfsv::errs> res;
 	long fileHandle;
 	*devbits = 0;
 
@@ -473,7 +472,7 @@ devlist(long *devbits)
 	if (!sendCommand(PARSE, a))
 		return E_PSI_FILE_DISC;
 	res = getResponse(a);
-	if (res)
+	if (res != E_PSI_GEN_NONE)
 		return res;
 
 	// Find the drive to FOPEN
@@ -481,10 +480,10 @@ devlist(long *devbits)
 	a.discardFirstBytes(6); // Result, fsys, dev, path, file, file, ending, flag
 	/* This leaves R E M : : M : \ */
 	name[0] = (char) a.getByte(5); // the M
-	long status = fopen(P_FDEVICE, name, fileHandle);
-	if (status != 0) {
+	res = fopen(P_FDEVICE, name, fileHandle);
+	if (res != E_PSI_GEN_NONE) 
 		return status;
-	}
+
 	while (1) {
 		bufferStore a;
 		a.init();
@@ -497,7 +496,8 @@ devlist(long *devbits)
 		int version = a.getWord(0);
 		if (version != 2) {
 			cerr << "devlist: not version 2" << endl;
-			return 1; // FIXME
+			fclose(fileHandle);
+			return E_PSI_GEN_FAIL; // FIXME
 		}
 		char drive = a.getByte(64);
 		if (drive >= 'A' && drive <= 'Z') {
@@ -509,8 +509,8 @@ devlist(long *devbits)
 				 << drive << ")" << endl;
 		}
 	}
-	if ((short int)res == E_PSI_FILE_EOF)
-		res = 0;
+	if (res == E_PSI_FILE_EOF)
+		res = E_PSI_GEN_NONE;
 	fclose(fileHandle);
 	return res;
 }
@@ -521,9 +521,9 @@ devinfo(int devnum, long *vfree, long *vtotal, long *vattr,
 {
 	bufferStore a;
 	long res;
-	long fileHandle;
+	// long fileHandle;
 
-	// Again, this is taken from an excahnge between PsiWin and a 3c.
+	// Again, this is taken from an exchange between PsiWin and a 3c.
 	// For each drive, we PARSE with its drive letter to get a response
 	// (which we ignore), then do a STATUSDEVICE to get the info.
 
@@ -554,12 +554,12 @@ devinfo(int devnum, long *vfree, long *vtotal, long *vattr,
 		return NULL;
 	}
 	int type = a.getWord(2);
-	int changeable = a.getWord(4);
+	// int changeable = a.getWord(4);
 	long size = a.getDWord(6);
 	long free = a.getDWord(10);
-	const char *volume = a.getString(14);
-	int battery = a.getWord(30);
-	const char *devicename = a.getString(62);
+	// const char *volume = a.getString(14);
+	// int battery = a.getWord(30);
+	// const char *devicename = a.getString(62);
 	*vfree = free;
 	*vtotal = size;
 	*vattr = type;
@@ -594,7 +594,7 @@ sendCommand(enum commands cc, bufferStore & data)
 }
 
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 getResponse(bufferStore & data)
 {
 	// getWord(2) is the size field
@@ -605,7 +605,7 @@ getResponse(bufferStore & data)
 			"getBufferStore failed." << endl;
 	} else if (data.getWord(0) == 0x2a &&
 	    data.getWord(2) == data.getLen()-4) {
-		long ret = (short)data.getWord(4);
+		Enum<errs> ret = (enum errs)data.getWord(4);
 		data.discardFirstBytes(6);
 		return ret;
 	} else {
@@ -614,17 +614,8 @@ getResponse(bufferStore & data)
 			data.getLen()-4 << " Result field:" <<
 			data.getWord(4) << endl;
 	}
-
 	status = E_PSI_FILE_DISC;
 	return status;
-}
-
-char * rfsv16::
-opErr(long status)
-{
-cerr << "rfsv16::opErr 0x" << hex << setfill('0') << setw(4)
-	<< status << " (" << dec << (signed short int)status << ")" << endl;
-	return rfsv::opErr(status);
 }
 
 long rfsv16::
@@ -696,69 +687,76 @@ fwrite(long handle, unsigned char *buf, long len)
 	return count;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 copyFromPsion(const char *from, const char *to, cpCallback_t cb)
 {
 	long handle;
-	long res;
+	Enum<rfsv::errs> res;
 	long len;
 
-	if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != 0)
+	if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != E_PSI_GEN_NONE)
 		return res;
 	ofstream op(to);
 	if (!op) {
 		fclose(handle);
-		return -1;
+		return E_PSI_GEN_FAIL;
 	}
 	do {
 		unsigned char buf[RFSV_SENDLEN];
 		if ((len = fread(handle, buf, sizeof(buf))) > 0)
 			op.write(buf, len);
+		else
+			res = (enum rfsv::errs)len;
 		if (cb) {
 			if (!cb(len)) {
-				len = E_PSI_FILE_CANCEL;
+				res = E_PSI_FILE_CANCEL;
 				break;
 			}
 		}
-	} while (len > 0);
+	} while (res > 0);
 
 	fclose(handle);
 	op.close();
-	return len == E_PSI_FILE_EOF ? 0 : len;
+	if (res == E_PSI_FILE_EOF)
+		res = E_PSI_GEN_NONE;
+	return res;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 copyToPsion(const char *from, const char *to, cpCallback_t cb)
 {
 	long handle;
-	long res;
+	long len = 0;
+	Enum<rfsv::errs> res;
 
 	ifstream ip(from);
 	if (!ip)
 		return E_PSI_FILE_NXIST;
 	res = fcreatefile(P_FSTREAM | P_FUPDATE, to, handle);
-	if (res != 0) {
+	if (res != E_PSI_GEN_NONE) {
 		res = freplacefile(P_FSTREAM | P_FUPDATE, to, handle);
-		if (res != 0)
+		if (res != E_PSI_GEN_NONE)
 			return res;
 	}
 	unsigned char *buff = new unsigned char[RFSV_SENDLEN];
 	while (res >= 0 && ip && !ip.eof()) {
 		ip.read(buff, RFSV_SENDLEN);
-		res = fwrite(handle, buff, ip.gcount());
+		len = fwrite(handle, buff, ip.gcount());
+		if (len <= 0)
+			res = (enum rfsv::errs)len;
 		if (cb)
-			if (!cb(res)) {
+			if (!cb(len)) {
 				res = E_PSI_FILE_CANCEL;
-		}
-		}
+			}
+	}
 
-				delete[]buff;
+	delete[]buff;
 	fclose(handle);
 	ip.close();
-	return 0;
+	return E_PSI_GEN_NONE;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 fsetsize(long handle, long size)
 {
 	bufferStore a;
@@ -865,27 +863,27 @@ fseek(long handle, long pos, long mode)
 	return realpos;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 mkdir(const char* dirName)
 {
 	char realName[200];
-	int rv = convertName(dirName, realName);
-	if (rv) return rv;
+	Enum<rfsv::errs> res = convertName(dirName, realName);
+	if (res != E_PSI_GEN_NONE) return res;
 	bufferStore a;
 	a.addString(realName);
 	a.addByte(0x00); 	// needs to be null-terminated, 
 				// and this needs sending in the length word.
 	sendCommand(MKDIR, a);
-	long res = getResponse(a);
-	if (!res) {
+	res = getResponse(a);
+	if (res == E_PSI_GEN_NONE) {
 		// Correct response
 		return res;
 	}
 	cerr << "Unknown response from mkdir "<< res <<endl;
-	return 1;
+	return E_PSI_GEN_FAIL;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 rmdir(const char *dirName)
 {
 	// There doesn't seem to be an RMDIR command, but DELETE works. We
@@ -893,16 +891,16 @@ rmdir(const char *dirName)
 	return remove(dirName);
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 rename(const char *oldName, const char *newName)
 {
 cerr << "rfsv16::rename ***" << endl;
 	char realOldName[200];
-	int rv = convertName(oldName, realOldName);
-	if (rv) return rv;
+	Enum<rfsv::errs> res = convertName(oldName, realOldName);
+	if (res != E_PSI_GEN_NONE) return res;
 	char realNewName[200];
-	rv = convertName(newName, realNewName);
-	if (rv) return rv;
+	res = convertName(newName, realNewName);
+	if (res != E_PSI_GEN_NONE) return res;
 	bufferStore a;
 	a.addString(realOldName);
 	a.addByte(0x00); 	// needs to be null-terminated, 
@@ -911,33 +909,33 @@ cerr << "rfsv16::rename ***" << endl;
 	a.addByte(0x00); 	// needs to be null-terminated, 
 				// and this needs sending in the length word.
 	sendCommand(RENAME, a);
-	long res = getResponse(a);
-	if (!res) {
+	res = getResponse(a);
+	if (res == E_PSI_GEN_NONE) {
 		// Correct response
 		return res;
 	}
 	cerr << "Unknown response from rename "<< res <<endl;
-	return 1;
+	return E_PSI_GEN_FAIL;
 }
 
-long rfsv16::
+Enum<rfsv::errs> rfsv16::
 remove(const char* psionName)
 {
 	char realName[200];
-	int rv = convertName(psionName, realName);
-	if (rv) return rv;
+	Enum<rfsv::errs> res = convertName(psionName, realName);
+	if (res != E_PSI_GEN_NONE) return res;
 	bufferStore a;
 	a.addString(realName);
 	a.addByte(0x00); 	// needs to be null-terminated, 
 				// and this needs sending in the length word.
 	sendCommand(DELETE, a);
-	long res = getResponse(a);
-	if (!res) {
+	res = getResponse(a);
+	if (res == E_PSI_GEN_NONE) {
 		// Correct response
 		return res;
 	}
 	cerr << "Unknown response from delete "<< res <<endl;
-	return 1;
+	return E_PSI_GEN_FAIL;
 }
 
 /*

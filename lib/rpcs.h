@@ -2,55 +2,12 @@
 #define _rpcs_h_
 
 #include "psitime.h"
+#include "rfsv.h"
+#include "Enum.h"
 
 class ppsocket;
 class bufferStore;
 class bufferArray;
-
-/**
- * This struct holds the data returned
- * by @ref rpcs::getMachineInfo.
- */
-typedef struct machineInfo_t {
-	unsigned long machineType;
-	char machineName[17];
-	unsigned long long machineUID;
-	unsigned long countryCode;
-	char uiLanguage[32];
-
-	unsigned short romMajor;
-	unsigned short romMinor;
-	unsigned short romBuild;
-	unsigned long romSize;
-	bool romProgrammable;
-
-	unsigned long ramSize;
-	unsigned long ramFree;
-	unsigned long ramMaxFree;
-	unsigned long ramDiskSize;
-
-	unsigned long registrySize;
-	unsigned long displayWidth;
-	unsigned long displayHeight;
-
-	psi_timeval time;
-	psi_timezone tz;
-
-	psi_timeval mainBatteryInsertionTime;
-	unsigned long mainBatteryStatus;
-	psi_timeval mainBatteryUsedTime;
-	unsigned long mainBatteryCurrent;
-	unsigned long mainBatteryUsedPower;
-	unsigned long mainBatteryVoltage;
-	unsigned long mainBatteryMaxVoltage;
-
-	unsigned long backupBatteryStatus;
-	unsigned long backupBatteryVoltage;
-	unsigned long backupBatteryMaxVoltage;
-	psi_timeval backupBatteryUsedTime;
-
-	bool externalPower;
-} machineInfo;
 
 /**
  * Remote procedure call services via PLP
@@ -67,6 +24,114 @@ typedef struct machineInfo_t {
  */
 class rpcs {
 	public:
+		/**
+		 * The known machine types.
+		 */
+		enum machs {
+			PSI_MACH_UNKNOWN = 0,
+			PSI_MACH_PC = 1,
+			PSI_MACH_MC = 2,
+			PSI_MACH_HC = 3,
+			PSI_MACH_S3 = 4,
+			PSI_MACH_S3A = 5,
+			PSI_MACH_WORKABOUT = 6,
+			PSI_MACH_SIENNA = 7,
+			PSI_MACH_S3C = 8,
+			PSI_MACH_S5 = 32,
+			PSI_MACH_WINC = 33,
+			// TODO: Code for 5mx
+		};
+
+		/**
+		 * The known interface languages.
+		 */
+		enum languages {
+			PSI_LANG_TEST	= 0,
+			PSI_LANG_en_GB	= 1,
+			PSI_LANG_fr_FR	= 2,
+			PSI_LANG_de_DE	= 3,
+			PSI_LANG_es_ES	= 4,
+			PSI_LANG_it_IT	= 5,
+			PSI_LANG_sv_SE	= 6,
+			PSI_LANG_da_DK	= 7,
+			PSI_LANG_no_NO	= 8,
+			PSI_LANG_fi_FI	= 9,
+			PSI_LANG_en_US	= 10,
+			PSI_LANG_fr_CH	= 11,
+			PSI_LANG_de_CH	= 12,
+			PSI_LANG_pt_PT	= 13,
+			PSI_LANG_tr_TR	= 14,
+			PSI_LANG_is_IS	= 15,
+			PSI_LANG_ru_RU	= 16,
+			PSI_LANG_hu_HU	= 17,
+			PSI_LANG_nl_NL	= 18,
+			PSI_LANG_nl_BE	= 19,
+			PSI_LANG_en_AU	= 20,
+			PSI_LANG_fr_BE	= 21,
+			PSI_LANG_de_AT	= 22,
+			PSI_LANG_en_NZ	= 23,
+			PSI_LANG_fr_CA	= 24,
+			PSI_LANG_cs_CZ	= 25,
+			PSI_LANG_sk_SK	= 26,
+			PSI_LANG_pl_PL	= 27,
+			PSI_LANG_sl_SI	= 28,
+		};
+
+		/**
+		 * The known battery states.
+		 */
+		enum batterystates {
+			PSI_BATT_DEAD = 0,
+			PSI_BATT_VERYLOW = 1,
+			PSI_BATT_LOW = 2,
+			PSI_BATT_GOOD = 3,
+		};
+
+		/**
+ 		* This struct holds the data returned
+ 		* by @ref rpcs::getMachineInfo.
+ 		*/
+		typedef struct machineInfo_t {
+			Enum<machs> machineType;
+			char machineName[17];
+			unsigned long long machineUID;
+			unsigned long countryCode;
+			Enum<languages> uiLanguage;
+
+			unsigned short romMajor;
+			unsigned short romMinor;
+			unsigned short romBuild;
+			unsigned long romSize;
+			bool romProgrammable;
+
+			unsigned long ramSize;
+			unsigned long ramFree;
+			unsigned long ramMaxFree;
+			unsigned long ramDiskSize;
+
+			unsigned long registrySize;
+			unsigned long displayWidth;
+			unsigned long displayHeight;
+
+			psi_timeval time;
+			psi_timezone tz;
+
+			psi_timeval mainBatteryInsertionTime;
+			Enum<batterystates> mainBatteryStatus;
+			psi_timeval mainBatteryUsedTime;
+			unsigned long mainBatteryCurrent;
+			unsigned long mainBatteryUsedPower;
+			unsigned long mainBatteryVoltage;
+			unsigned long mainBatteryMaxVoltage;
+
+			Enum<batterystates> backupBatteryStatus;
+			unsigned long backupBatteryVoltage;
+			unsigned long backupBatteryMaxVoltage;
+			psi_timeval backupBatteryUsedTime;
+
+			bool externalPower;
+		} machineInfo;
+
 		/**
 		 * Provides a virtual destructor.
 		 */
@@ -92,7 +157,7 @@ class rpcs {
 		 *
 		 * @returns The connection status.
 		 */
-		long getStatus();
+		Enum<rfsv::errs> getStatus();
 
 		/**
 		 * Retrieves the version of the NCP protocol
@@ -108,7 +173,7 @@ class rpcs {
 		 *
 		 * @returns A psion error code. 0 = Ok.
 		 */
-		int getNCPversion(int &major, int &minor);
+		Enum<rfsv::errs> getNCPversion(int &major, int &minor);
 
 		/**
 		 * Starts execution of a program on the remote machine.
@@ -123,7 +188,7 @@ class rpcs {
 		 *
 		 * @returns A psion error code. 0 = Ok.
 		 */
-		int execProgram(const char *program, const char *args);
+		Enum<rfsv::errs> execProgram(const char *program, const char *args);
 
 		/**
 		 * Requests termination of a program running on the
@@ -136,11 +201,11 @@ class rpcs {
 		 *
 		 * @returns A psion error code. 0 = Ok.
 		 */
-		int stopProgram(const char *);
-		int queryProgram(const char *);
-		int formatOpen(const char *, int &, int &);
-		int formatRead(int);
-		int getUniqueID(const char *, long &);
+		Enum<rfsv::errs> stopProgram(const char *);
+		Enum<rfsv::errs> queryProgram(const char *);
+		Enum<rfsv::errs> formatOpen(const char *, int &, int &);
+		Enum<rfsv::errs> formatRead(int);
+		Enum<rfsv::errs> getUniqueID(const char *, long &);
 
 		/**
 		 * Retrieve owner information of the remote machine.
@@ -153,7 +218,7 @@ class rpcs {
 		 *
 		 * @returns A psion error code. 0 = Ok.
 		 */
-		int getOwnerInfo(bufferArray &);
+		Enum<rfsv::errs> getOwnerInfo(bufferArray &);
 
 		/**
 		 * Retrieves the type of machine on the remote side
@@ -167,7 +232,7 @@ class rpcs {
 		 *
 		 * @returns A psion error code. 0 = Ok.
 		 */
-		int getMachineType(int &type);
+		Enum<rfsv::errs> getMachineType(Enum<machs> &type);
 
 		/**
 		 * Retrieves the name of a process, having a
@@ -182,7 +247,7 @@ class rpcs {
 		 * 	program's name.
 		 * @param maxlen The maximum capacity of the buffer.
 		 */
-		int fuser(const char *name, char *buf, int maxlen);
+		Enum<rfsv::errs> fuser(const char *name, char *buf, int maxlen);
 
 		/**
 		 * Requests the remote server to terminate.
@@ -194,33 +259,10 @@ class rpcs {
 		 *
 		 * @returns A psion error code. 0 = Ok.
 		 */
-		int quitServer(void);
-
-		/**
-		 * Maps a language code to a human readable language name.
-		 *
-		 * @param code The language code to map.
-		 *
-		 * @returns The name of the language, represented by code, or
-		 * 	"Unknown", if the code does not match one of the known
-		 * 	languages.
-		 */
-		const char *languageString(const int code);
-
-		/**
-		 * Maps a battery status code to a human readable description.
-		 *
-		 * @param code The battary status code to map.
-		 *
-		 * @returns A descriptive text for the battery status, or
-		 * 	"Unknown", if the code does not match a known
-		 * 	battery status.
-		 */
-		const char *batteryStatusString(const int code);
-
+		Enum<rfsv::errs> quitServer(void);
 
 		// API different on SIBO and EPOC
-		virtual int queryDrive(const char, bufferArray &) = 0;
+		virtual Enum<rfsv::errs> queryDrive(const char, bufferArray &) = 0;
 		/**
 		 * Retrieves the command line of a running process.
 		 *
@@ -232,7 +274,7 @@ class rpcs {
 		 *
 		 * @return Psion error code. 0 = Ok.
 		 */
-		virtual int getCmdLine(const char *process, bufferStore &ret) = 0; 
+		virtual Enum<rfsv::errs> getCmdLine(const char *process, bufferStore &ret) = 0; 
 
 		// API only existent on EPOC
 		// default-methods for SIBO here.
@@ -246,65 +288,19 @@ class rpcs {
 		 * @param machineInfo The struct holding all information on return.
 		 * @return Psion error code. 0 = Ok.
 		 */
-		virtual int getMachineInfo(machineInfo &) { return E_PSI_NOT_SIBO;}
-		virtual int closeHandle(int) { return E_PSI_NOT_SIBO;}
-		virtual int regOpenIter(void) { return E_PSI_NOT_SIBO;}
-		virtual int regReadIter(void) { return E_PSI_NOT_SIBO;}
-		virtual int regWrite(void) { return E_PSI_NOT_SIBO;}
-		virtual int regRead(void) { return E_PSI_NOT_SIBO;}
-		virtual int regDelete(void) { return E_PSI_NOT_SIBO;}
-		virtual int setTime(void) { return E_PSI_NOT_SIBO;}
-		virtual int configOpen(void) { return E_PSI_NOT_SIBO;}
-		virtual int configRead(void) { return E_PSI_NOT_SIBO;}
-		virtual int configWrite(void) { return E_PSI_NOT_SIBO;}
-		virtual int queryOpen(void) { return E_PSI_NOT_SIBO;}
-		virtual int queryRead(void) { return E_PSI_NOT_SIBO;}
-
-		enum errs {
-			E_PSI_GEN_NONE = 0,
-			E_PSI_GEN_FAIL = -1,
-			E_PSI_FILE_DISC = -50,
-			// Special error code for "Operation not permitted in RPCS16"
-			E_PSI_NOT_SIBO = -200
-		};
-
-		/**
-		 * The known machine types.
-		 */
-		enum machs {
-			PSI_MACH_UNKNOWN = 0,
-			PSI_MACH_PC = 1,
-			PSI_MACH_MC = 2,
-			PSI_MACH_HC = 3,
-			PSI_MACH_S3 = 4,
-			PSI_MACH_S3A = 5,
-			PSI_MACH_WORKABOUT = 6,
-			PSI_MACH_SIENNA = 7,
-			PSI_MACH_S3C = 8,
-			PSI_MACH_S5 = 32,
-			PSI_MACH_WINC = 33,
-			// TODO: Code for 5mx
-		};
-
-		/**
-		 * The known interface languages.
-		 */
-		enum languagecodes {
-			PSI_LANG_TEST = 0,
-			PSI_LANG_ENGLISH = 1,
-			PSI_LANG_FRENCH = 2,
-			PSI_LANG_GERMAN = 3,
-		};
-
-		/**
-		 * The known battery states.
-		 */
-		enum batterystates {
-			PSI_BATT_DEAD = 0,
-			PSI_BATT_VERYLOW = 1,
-			PSI_BATT_LOW = 2,
-			PSI_BATT_GOOD = 3,
-		};
+		virtual Enum<rfsv::errs> getMachineInfo(machineInfo &) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> closeHandle(int) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> regOpenIter(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> regReadIter(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> regWrite(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> regRead(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> regDelete(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> setTime(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> configOpen(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> configRead(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> configWrite(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> queryOpen(void) { return rfsv::E_PSI_NOT_SIBO;}
+		virtual Enum<rfsv::errs> queryRead(void) { return rfsv::E_PSI_NOT_SIBO;}
 
 	protected:
 		/**
@@ -316,7 +312,7 @@ class rpcs {
 		/**
 		 * The current status of the connection.
 		 */
-		long status;
+		Enum<rfsv::errs> status;
 
 		/**
 		 * The possible commands.
@@ -364,7 +360,7 @@ class rpcs {
 		 * @returns true on success, false on failure.
 		 */
 		bool sendCommand(enum commands cc, bufferStore &data);
-		int getResponse(bufferStore &);
+		Enum<rfsv::errs> getResponse(bufferStore &);
 		const char *getConnectName();
 };
 

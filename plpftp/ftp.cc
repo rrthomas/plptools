@@ -45,6 +45,7 @@
 #include "rpcs.h"
 #include "bufferarray.h"
 #include "bufferstore.h"
+#include "Enum.h"
 
 #if HAVE_LIBREADLINE
 extern "C"  {
@@ -196,7 +197,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	char *argv[10];
 	char f1[256];
 	char f2[256];
-	long res;
+	Enum<rfsv::errs> res;
 	bool prompt = true;
 	bool hash = false;
 	cpCallback_t cab = checkAbortNoHash;
@@ -211,48 +212,9 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	if (!once) {
 		bufferArray b;
 		if (!(res = r.getOwnerInfo(b))) {
-			int machType;
+			Enum<rpcs::machs> machType;
 			r.getMachineType(machType);
-			cout << "Connected to ";
-			switch (machType) {
-				case rpcs::PSI_MACH_UNKNOWN:
-					cout << "an unknown Device";
-					break;
-				case rpcs::PSI_MACH_PC:
-					cout << "a PC";
-					break;
-				case rpcs::PSI_MACH_MC:
-					cout << "a MC";
-					break;
-				case rpcs::PSI_MACH_HC:
-					cout << "a HC";
-					break;
-				case rpcs::PSI_MACH_S3:
-					cout << "a Serie 3";
-					break;
-				case rpcs::PSI_MACH_S3A:
-					cout << "a Series 3a, 3c or 3mx";
-					break;
-				case rpcs::PSI_MACH_WORKABOUT:
-					cout << "a Workabout";
-					break;
-				case rpcs::PSI_MACH_SIENNA:
-					cout << "a Sienna";
-					break;
-				case rpcs::PSI_MACH_S3C:
-					cout << "a Series 3c";
-					break;
-				case rpcs::PSI_MACH_S5:
-					cout << "a Series 5";
-					break;
-				case rpcs::PSI_MACH_WINC:
-					cout << "a WinC";
-					break;
-				default:
-					cout << "an undefined Device";
-					break;
-			}
-			cout << ", OwnerInfo:" << endl;
+			cout << "Connected to a " << machType << ", OwnerInfo:" << endl;
 			while (!b.empty())
 				cout << "  " << b.pop().getString() << endl;
 			cout << endl;
@@ -321,14 +283,14 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			strcpy(f2, psionDir);
 			strcat(f2, argv[2]);
 			if ((res = a.rename(f1, f2)) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "touch") && (argc == 2)) {
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
 			if ((res = a.fsetmtime(f1, time(0))) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "test") && (argc == 2)) {
@@ -336,7 +298,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
 			if ((res = a.fgeteattr(f1, &attr, &size, &time)) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			else {
 				// never used to do this
 				char dateBuff[100];
@@ -353,7 +315,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
 			if ((res = a.fgetattr(f1, &attr)) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			else {
 				cout << hex << setw(4) << setfill('0') << attr;
 				cout << " (" << a.opAttr(attr) << ")" << endl;
@@ -365,7 +327,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
 			if ((res = a.fgetmtime(f1, &mtime)) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			else {
 				char dateBuff[100];
                                	strftime(dateBuff, sizeof(dateBuff), datefmt, localtime(&mtime));
@@ -410,13 +372,13 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				p++;
 			}
 			if ((res = a.fsetattr(f1, attr[0], attr[1])) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "dircnt")) {
 			long cnt;
 			if ((res = a.dircount(psionDir, &cnt)) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			else
 				cout << cnt << " Entries" << endl;
 			continue;
@@ -443,13 +405,13 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 					devbits >>= 1;
 				}
 			} else
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "ls") || !strcmp(argv[0], "dir")) {
 			bufferArray files;
 			if ((res = a.dir(psionDir, &files)) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			else
 				while (!files.empty()) {
 					bufferStore s;
@@ -515,7 +477,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 					strcpy(psionDir, f1);
 				}
 				else {
-					errprint(res, a);
+					cerr << "Error: " << res << endl;
 					cerr << "Keeping original directory \"" << psionDir << "\"" << endl;
 				}
 			}
@@ -538,7 +500,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				if (hash)
 					cout << endl;
 				continueRunning = 1;
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			} else {
 				if (hash)
 					cout << endl;
@@ -564,7 +526,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			char *pattern = argv[1];
 			bufferArray files;
 			if ((res = a.dir(psionDir, &files)) != 0) {
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 				continue;
 			}
 			while (!files.empty()) {
@@ -602,7 +564,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 						if (hash)
 							cout << endl;
 						continueRunning = 1;
-						errprint(res, a);
+						cerr << "Error: " << res << endl;
 						break;
 					} else {
 						if (hash)
@@ -630,7 +592,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				if (hash)
 					cout << endl;
 				continueRunning = 1;
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			} else {
 				if (hash)
 					cout << endl;
@@ -691,7 +653,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 								if (hash)
 									cout << endl;
 								continueRunning = 1;
-								errprint(res, a);
+								cerr << "Error: " << res << endl;
 								break;
 							} else {
 								if (hash)
@@ -711,21 +673,21 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
 			if ((res = a.remove(f1)) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "mkdir") && (argc == 2)) {
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
 			if ((res = a.mkdir(f1)) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "rmdir") && (argc == 2)) {
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
 			if ((res = a.rmdir(f1)) != 0)
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 			continue;
 		}
 		if (argv[0][0] == '!') {
@@ -777,9 +739,9 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			continue;
 		}
 		if (!strcmp(argv[0], "machinfo")) {
-			machineInfo mi;
+			rpcs::machineInfo mi;
 			if ((res = r.getMachineInfo(mi))) {
-				errprint(res, a);
+				cerr << "Error: " << res << endl;
 				continue;
 			}
 
@@ -814,15 +776,13 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			pt.setPsiTime(&mi.mainBatteryInsertionTime);
 			cout << "  Changed at:   " << pt << endl;
 			cout << "  Used for:     " << mi.mainBatteryUsedTime << endl;
-			cout << "  Status:       " <<
-				r.batteryStatusString(mi.mainBatteryStatus) << endl;
+			cout << "  Status:       " << mi.mainBatteryStatus << endl;
 			cout << "  Current:      " << mi.mainBatteryCurrent << " mA" << endl;
 			cout << "  UsedPower:    " << mi.mainBatteryUsedPower << " mAs" << endl;
 			cout << "  Voltage:      " << mi.mainBatteryVoltage << " mV" << endl;
 			cout << "  Max. voltage: " << mi.mainBatteryMaxVoltage << " mV" << endl;
 			cout << "Backup battery:" << endl;
-			cout << "  Status:       " <<
-				r.batteryStatusString(mi.backupBatteryStatus) << endl;
+			cout << "  Status:       " << mi.backupBatteryStatus << endl;
 			cout << "  Voltage:      " << mi.backupBatteryVoltage << " mV" << endl;
 			cout << "  Max. voltage: " << mi.backupBatteryMaxVoltage << " mV" << endl;
 			cout << "  Used for:     " << mi.backupBatteryUsedTime << endl;
@@ -840,7 +800,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				ip >> cmd >> arg;
 				if ((res = r.execProgram(cmd, arg))) {
 					cerr << "Could not start " << cmd << " " << arg << endl;
-					errprint(res, a);
+					cerr << "Error: " << res << endl;
 				}
 			}
 			ip.close();
@@ -922,11 +882,6 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	return a.getStatus();
 }
 
-void ftp::
-errprint(long errcode, rfsv & a) {
-	cerr << "Error: " << a.opErr(errcode) << endl;
-}
-
 #if HAVE_LIBREADLINE
 static char *all_commands[] = {
 	"pwd", "ren", "touch", "gtime", "test", "gattr", "sattr", "devs",
@@ -959,7 +914,7 @@ filename_generator(char *text, int state)
 			delete comp_files;
 		comp_files = new bufferArray();
 		if ((res = comp_a->dir(psionDir, comp_files)) != 0) {
-			cerr << "Error: " << comp_a->opErr(res) << endl;
+			cerr << "Error: " << res << endl;
 			return NULL;
 		}
 	}

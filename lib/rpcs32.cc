@@ -42,21 +42,21 @@ rpcs32::~rpcs32()
 {
 	bufferStore a;
 	a.addStringT("Close");
-	if (status == E_PSI_GEN_NONE)
+	if (status == rfsv::E_PSI_GEN_NONE)
 		skt->sendBufferStore(a);
 	skt->closeSocket();
 }
 
-int rpcs32::
+Enum<rfsv::errs> rpcs32::
 queryDrive(char drive, bufferArray &ret)
 {
 	bufferStore a;
-	int res;
+	Enum<rfsv::errs> res;
 
 	a.addByte(drive);
 	if (!sendCommand(rpcs::QUERY_DRIVE, a))
-		return rpcs::E_PSI_FILE_DISC;
-	if ((res = getResponse(a)))
+		return rfsv::E_PSI_FILE_DISC;
+	if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	int l = a.getLen();
 	ret.clear();
@@ -89,40 +89,40 @@ queryDrive(char drive, bufferArray &ret)
 	return res;
 }
 
-int rpcs32::
+Enum<rfsv::errs> rpcs32::
 getCmdLine(const char *process, bufferStore &ret)
 {
 	bufferStore a;
-	int res;
+	Enum<rfsv::errs> res;
 
 	a.addStringT(process);
 	if (!sendCommand(rpcs::GET_CMDLINE, a))
-		return rpcs::E_PSI_FILE_DISC;
+		return rfsv::E_PSI_FILE_DISC;
 	res = getResponse(a);
 	ret = a;
 	return res;
 }
 
-int rpcs32::
+Enum<rfsv::errs> rpcs32::
 getMachineInfo(machineInfo &mi)
 {
 	bufferStore a;
-	int res;
+	Enum<rfsv::errs> res;
 
 	if (!sendCommand(rpcs::GET_MACHINE_INFO, a))
-		return rpcs::E_PSI_FILE_DISC;
-	if ((res = getResponse(a)))
+		return rfsv::E_PSI_FILE_DISC;
+	if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	if (a.getLen() != 256)
-		return E_PSI_GEN_FAIL;
-	mi.machineType = a.getDWord(0);
+		return rfsv::E_PSI_GEN_FAIL;
+	mi.machineType = (enum rpcs::machs)a.getDWord(0);
 	strncpy(mi.machineName, a.getString(16), 16);
 	mi.machineName[16] = '\0';
 	mi.machineUID = a.getDWord(44);
 	mi.machineUID <<= 32;
 	mi.machineUID |= a.getDWord(40);
 	mi.countryCode = a.getDWord(56);
-	strcpy(mi.uiLanguage, languageString(a.getDWord(164)));
+	mi.uiLanguage = (enum rpcs::languages)a.getDWord(164);
 
 	mi.romMajor = a.getByte(4);
 	mi.romMinor = a.getByte(5);
@@ -149,7 +149,7 @@ getMachineInfo(machineInfo &mi)
 
 	mi.mainBatteryInsertionTime.tv_low = a.getDWord(72);
 	mi.mainBatteryInsertionTime.tv_high = a.getDWord(76);
-	mi.mainBatteryStatus = a.getDWord(80);
+	mi.mainBatteryStatus = (enum rpcs::batterystates)a.getDWord(80);
 	mi.mainBatteryUsedTime.tv_low = a.getDWord(84);
 	mi.mainBatteryUsedTime.tv_high = a.getDWord(88);
 	mi.mainBatteryCurrent = a.getDWord(92);
@@ -157,7 +157,7 @@ getMachineInfo(machineInfo &mi)
 	mi.mainBatteryVoltage = a.getDWord(100);
 	mi.mainBatteryMaxVoltage = a.getDWord(104);
 
-	mi.backupBatteryStatus = a.getDWord(108);
+	mi.backupBatteryStatus = (enum rpcs::batterystates)a.getDWord(108);
 	mi.backupBatteryVoltage = a.getDWord(112);
 	mi.backupBatteryMaxVoltage = a.getDWord(116);
 	mi.backupBatteryUsedTime.tv_low = a.getDWord(124);
@@ -170,25 +170,25 @@ getMachineInfo(machineInfo &mi)
 
 static unsigned long hhh;
 
-int rpcs32::
+Enum<rfsv::errs> rpcs32::
 configOpen(void)
 {
 	bufferStore a;
-	int res;
+	Enum<rfsv::errs> res;
 
 	if (!sendCommand(rpcs::CONFIG_OPEN, a))
-		return rpcs::E_PSI_FILE_DISC;
+		return rfsv::E_PSI_FILE_DISC;
 	res = getResponse(a);
 cout << "co: r=" << res << " a=" << a << endl;
 	hhh = a.getDWord(0);
-	return 0;
+	return rfsv::E_PSI_GEN_NONE;
 }
 
-int rpcs32::
+Enum<rfsv::errs> rpcs32::
 configRead(void)
 {
 	bufferStore a;
-	int res;
+	Enum<rfsv::errs> res;
 	int l;
 	FILE *f;
 
@@ -197,8 +197,8 @@ configRead(void)
 		a.init();
 		a.addDWord(hhh);
 		if (!sendCommand(rpcs::CONFIG_READ, a))
-			return rpcs::E_PSI_FILE_DISC;
-		if ((res = getResponse(a)))
+			return rfsv::E_PSI_FILE_DISC;
+		if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 			return res;
 		l = a.getLen();
 		cout << "cr: " << l << endl;
@@ -206,5 +206,5 @@ configRead(void)
 	} while (l > 0);
 	fclose(f);
 //cout << "cr: r=" << res << " a=" << a << endl;
-	return 0;
+	return rfsv::E_PSI_GEN_NONE;
 }

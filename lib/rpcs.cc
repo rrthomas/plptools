@@ -30,16 +30,60 @@
 #include "bufferstore.h"
 #include "ppsocket.h"
 #include "bufferarray.h"
+#include "Enum.h"
 
-static const char * const langstrings[] = {
-	"Test", "English", "French", "German", "Spanish", "Italian", "Swedish",
-	"Danish", "Norwegian", "Finnish", "American", "Swiss French",
-	"Swiss German", "Portugese", "Turkish", "Icelandic", "Russian",
-	"Hungarian", "Dutch", "Belgian Flemish", "Australian",
-	"Belgish French", "Austrian", "New Zealand",
-	"International French", "Czech", "Slovak", "Polish", "Slovenian",
-	0L
-};
+ENUM_DEFINITION(rpcs::machs, rpcs::PSI_MACH_UNKNOWN) {
+	stringRep.add(rpcs::PSI_MACH_UNKNOWN,	"Unknown device");
+	stringRep.add(rpcs::PSI_MACH_PC,	"PC");
+	stringRep.add(rpcs::PSI_MACH_MC,	"MC");
+	stringRep.add(rpcs::PSI_MACH_HC,	"HC");
+	stringRep.add(rpcs::PSI_MACH_S3,	"Series 3");
+	stringRep.add(rpcs::PSI_MACH_S3A,	"Series 3a, 3c or 3mx");
+	stringRep.add(rpcs::PSI_MACH_WORKABOUT,	"Workabout");
+	stringRep.add(rpcs::PSI_MACH_SIENNA,	"Sienna");
+	stringRep.add(rpcs::PSI_MACH_S3C,	"Series 3c");
+	stringRep.add(rpcs::PSI_MACH_S5,	"Series 5");
+	stringRep.add(rpcs::PSI_MACH_WINC,	"WinC");
+}
+
+ENUM_DEFINITION(rpcs::batterystates, rpcs::PSI_BATT_DEAD) {
+	stringRep.add(rpcs::PSI_BATT_DEAD,	"Empty");
+	stringRep.add(rpcs::PSI_BATT_VERYLOW,	"Very Low");
+	stringRep.add(rpcs::PSI_BATT_LOW,	"Low");
+	stringRep.add(rpcs::PSI_BATT_GOOD,	"Good");
+}
+
+ENUM_DEFINITION(rpcs::languages, rpcs::PSI_LANG_TEST) {
+	stringRep.add(rpcs::PSI_LANG_TEST,	"Test");
+	stringRep.add(rpcs::PSI_LANG_en_GB,	"English");
+	stringRep.add(rpcs::PSI_LANG_de_DE,	"German");
+	stringRep.add(rpcs::PSI_LANG_fr_FR,	"French");
+	stringRep.add(rpcs::PSI_LANG_es_ES,	"Spanish");
+	stringRep.add(rpcs::PSI_LANG_it_IT,	"Italian");
+	stringRep.add(rpcs::PSI_LANG_sv_SE,	"Swedish");
+	stringRep.add(rpcs::PSI_LANG_da_DK,	"Danish");
+	stringRep.add(rpcs::PSI_LANG_no_NO,	"Norwegian");
+	stringRep.add(rpcs::PSI_LANG_fi_FI,	"Finnish");
+	stringRep.add(rpcs::PSI_LANG_en_US,	"American");
+	stringRep.add(rpcs::PSI_LANG_fr_CH,	"Swiss French");
+	stringRep.add(rpcs::PSI_LANG_de_CH,	"Swiss German");
+	stringRep.add(rpcs::PSI_LANG_pt_PT,	"Portugese");
+	stringRep.add(rpcs::PSI_LANG_tr_TR,	"Turkish");
+	stringRep.add(rpcs::PSI_LANG_is_IS,	"Icelandic");
+	stringRep.add(rpcs::PSI_LANG_ru_RU,	"Russian");
+	stringRep.add(rpcs::PSI_LANG_hu_HU,	"Hungarian");
+	stringRep.add(rpcs::PSI_LANG_nl_NL,	"Dutch");
+	stringRep.add(rpcs::PSI_LANG_nl_BE,	"Belgian Flemish");
+	stringRep.add(rpcs::PSI_LANG_en_AU,	"Australian");
+	stringRep.add(rpcs::PSI_LANG_fr_BE,	"Belgish French");
+	stringRep.add(rpcs::PSI_LANG_de_AT,	"Austrian");
+	stringRep.add(rpcs::PSI_LANG_en_NZ,	"New Zealand"); // FIXME: not shure about ISO code
+	stringRep.add(rpcs::PSI_LANG_fr_CA,	"International French"); // FIXME: not shure about ISO code
+	stringRep.add(rpcs::PSI_LANG_cs_CZ,	"Czech");
+	stringRep.add(rpcs::PSI_LANG_sk_SK,	"Slovak");
+	stringRep.add(rpcs::PSI_LANG_pl_PL,	"Polish");
+	stringRep.add(rpcs::PSI_LANG_sl_SI,	"Slovenian");
+}
 
 //
 // public common API
@@ -56,17 +100,17 @@ void rpcs::
 reset(void)
 {
 	bufferStore a;
-	status = E_PSI_FILE_DISC;
+	status = rfsv::E_PSI_FILE_DISC;
 	a.addStringT(getConnectName());
 	if (skt->sendBufferStore(a)) {
 		if (skt->getBufferStore(a) == 1) {
 			if (!strcmp(a.getString(0), "Ok"))
-				status = E_PSI_GEN_NONE;
+				status = rfsv::E_PSI_GEN_NONE;
 		}
 	}
 }
 
-long rpcs::
+Enum<rfsv::errs> rpcs::
 getStatus(void)
 {
 	return status;
@@ -84,9 +128,9 @@ getConnectName(void)
 bool rpcs::
 sendCommand(enum commands cc, bufferStore & data)
 {
-	if (status == E_PSI_FILE_DISC) {
+	if (status == rfsv::E_PSI_FILE_DISC) {
 		reconnect();
-		if (status == E_PSI_FILE_DISC)
+		if (status == rfsv::E_PSI_FILE_DISC)
 			return false;
 	}
 	bool result;
@@ -98,44 +142,44 @@ sendCommand(enum commands cc, bufferStore & data)
 		reconnect();
 		result = skt->sendBufferStore(a);
 		if (!result)
-			status = E_PSI_FILE_DISC;
+			status = rfsv::E_PSI_FILE_DISC;
 	}
 	return result;
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 getResponse(bufferStore & data)
 {
 	if (skt->getBufferStore(data) == 1) {
-		char ret = data.getByte(0);
+		Enum<rfsv::errs> ret = (enum rfsv::errs)data.getByte(0);
 		data.discardFirstBytes(1);
 		return ret;
 	} else
-		status = E_PSI_FILE_DISC;
+		status = rfsv::E_PSI_FILE_DISC;
 	return status;
 }
 
 //
 // APIs, identical on SIBO and EPOC
 //
-int rpcs::
+Enum<rfsv::errs> rpcs::
 getNCPversion(int &major, int &minor)
 {
-	int res;
+	Enum<rfsv::errs> res;
 	bufferStore a;
 
 	if (!sendCommand(QUERY_NCP, a))
-		return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)))
+		return rfsv::E_PSI_FILE_DISC;
+	if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	if (a.getLen() != 2)
-		return E_PSI_GEN_FAIL;
+		return rfsv::E_PSI_GEN_FAIL;
 	major = a.getByte(0);
 	minor = a.getByte(1);
 	return res;
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 execProgram(const char *program, const char *args)
 {
 	bufferStore a;
@@ -147,87 +191,87 @@ execProgram(const char *program, const char *args)
 	a.addByte(strlen(args));
 	a.addStringT(args);
 	if (!sendCommand(EXEC_PROG, a))
-		return E_PSI_FILE_DISC;
+		return rfsv::E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 stopProgram(const char *program)
 {
 	bufferStore a;
 
 	a.addStringT(program);
 	if (!sendCommand(STOP_PROG, a))
-		return E_PSI_FILE_DISC;
+		return rfsv::E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 queryProgram(const char *program)
 {
 	bufferStore a;
 
 	a.addStringT(program);
 	if (!sendCommand(QUERY_PROG, a))
-		return E_PSI_FILE_DISC;
+		return rfsv::E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 formatOpen(const char *drive, int &handle, int &count)
 {
-	int res;
+	Enum<rfsv::errs> res;
 	bufferStore a;
 
 	a.addStringT(drive);
 	if (!sendCommand(FORMAT_OPEN, a))
-		return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)))
+		return rfsv::E_PSI_FILE_DISC;
+	if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	if (a.getLen() != 4)
-		return E_PSI_GEN_FAIL;
+		return rfsv::E_PSI_GEN_FAIL;
 	handle = a.getWord(0);
 	count = a.getWord(2);
 	return res;
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 formatRead(int handle)
 {
 	bufferStore a;
 
 	a.addWord(handle);
 	if (!sendCommand(FORMAT_READ, a))
-		return E_PSI_FILE_DISC;
+		return rfsv::E_PSI_FILE_DISC;
 	return getResponse(a);
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 getUniqueID(const char *device, long &id)
 {
-	int res;
+	Enum<rfsv::errs> res;
 	bufferStore a;
 
 	a.addStringT(device);
 	if (!sendCommand(GET_UNIQUEID, a))
-		return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)))
+		return rfsv::E_PSI_FILE_DISC;
+	if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	if (a.getLen() != 4)
-		return E_PSI_GEN_FAIL;
+		return rfsv::E_PSI_GEN_FAIL;
 	id = a.getDWord(0);
 	return res;
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 getOwnerInfo(bufferArray &owner)
 {
-	int res;
+	Enum<rfsv::errs> res;
 	bufferStore a;
 
 	if (!sendCommand(GET_OWNERINFO, a))
-		return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)))
+		return rfsv::E_PSI_FILE_DISC;
+	if ((res = (enum rfsv::errs)getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	a.addByte(0);
 	int l = a.getLen();
@@ -251,33 +295,33 @@ getOwnerInfo(bufferArray &owner)
 	return res;
 }
 
-int rpcs::
-getMachineType(int &type)
+Enum<rfsv::errs> rpcs::
+getMachineType(Enum<machs> &type)
 {
-	int res;
+	Enum<rfsv::errs> res;
 	bufferStore a;
 
 	if (!sendCommand(GET_MACHINETYPE, a))
-		return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)))
+		return rfsv::E_PSI_FILE_DISC;
+	if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	if (a.getLen() != 2)
-		return E_PSI_GEN_FAIL;
-	type = a.getWord(0);
+		return rfsv::E_PSI_GEN_FAIL;
+	type = (enum machs)a.getWord(0);
 	return res;
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 fuser(const char *name, char *buf, int maxlen)
 {
-	int res;
+	Enum<rfsv::errs> res;
 	bufferStore a;
 	char *p;
 
 	a.addStringT(name);
 	if (!sendCommand(FUSER, a))
-		return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)))
+		return rfsv::E_PSI_FILE_DISC;
+	if ((res = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 		return res;
 	strncpy(buf, a.getString(0), maxlen - 1);
 	while ((p = strchr(buf, 6)))
@@ -285,34 +329,11 @@ fuser(const char *name, char *buf, int maxlen)
 	return res;
 }
 
-int rpcs::
+Enum<rfsv::errs> rpcs::
 quitServer(void)
 {
 	bufferStore a;
 	if (!sendCommand(QUIT_SERVER, a))
-		return E_PSI_FILE_DISC;
+		return rfsv::E_PSI_FILE_DISC;
 	return getResponse(a);
-}
-
-const char *rpcs::
-languageString(int code) {
-	for (int i = 0; i <= code; i++)
-		if (langstrings[i] == 0L)
-			return "Unknown";
-	return langstrings[code];
-}
-
-const char *rpcs::
-batteryStatusString(int code) {
-	switch (code) {
-		case PSI_BATT_DEAD:
-			return "Empty";
-		case PSI_BATT_VERYLOW:
-			return "Very low";
-		case PSI_BATT_LOW:
-			return "Low";
-		case PSI_BATT_GOOD:
-			return "Good";
-	}
-	return "Unknown";
 }

@@ -10,25 +10,25 @@ class rpcs32 : public rpcs {
 		rpcs32(ppsocket *);
 		~rpcs32();
 
-		int queryDrive(const char, bufferArray &);
-		int getCmdLine(const char *, bufferStore &); 
-		int getMachineInfo(machineInfo &);
-		int configOpen(void);
-		int configRead(void);
+		Enum<rfsv::errs> queryDrive(const char, bufferArray &);
+		Enum<rfsv::errs> getCmdLine(const char *, bufferStore &); 
+		Enum<rfsv::errs> getMachineInfo(machineInfo &);
+		Enum<rfsv::errs> configOpen(void);
+		Enum<rfsv::errs> configRead(void);
 #if 0
-		int closeHandle(int);
-		int regOpenIter(void);
-		int regReadIter(void);
-		int regWrite(void);
-		int regRead(void);
-		int regDelete(void);
-		int setTime(void);
-		int configOpen(void);
-		int configRead(void);
-		int configWrite(void);
-		int queryOpen(void);
-		int queryRead(void);
-		int quitServer(void);
+		Enum<rfsv::errs> closeHandle(int);
+		Enum<rfsv::errs> regOpenIter(void);
+		Enum<rfsv::errs> regReadIter(void);
+		Enum<rfsv::errs> regWrite(void);
+		Enum<rfsv::errs> regRead(void);
+		Enum<rfsv::errs> regDelete(void);
+		Enum<rfsv::errs> setTime(void);
+		Enum<rfsv::errs> configOpen(void);
+		Enum<rfsv::errs> configRead(void);
+		Enum<rfsv::errs> configWrite(void);
+		Enum<rfsv::errs> queryOpen(void);
+		Enum<rfsv::errs> queryRead(void);
+		Enum<rfsv::errs> quitServer(void);
 #endif
 
 };

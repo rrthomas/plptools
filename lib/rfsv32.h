@@ -14,33 +14,33 @@ class rfsv32 : public rfsv {
 	void reset();
 	void reconnect();
 
-	long dir(const char *, bufferArray *);
-	long dircount(const char *, long *);
-	long copyFromPsion(const char *, const char *, cpCallback_t);
-	long copyToPsion(const char *, const char *, cpCallback_t);
-	long mkdir(const char *);
-	long rmdir(const char *);
-	long remove(const char *);
-	long rename(const char *, const char *);
-	long mktemp(long *, char *);
-	long fgeteattr(const char *, long *, long *, long *);
-	long fgetattr(const char *, long *);
-	long fsetattr(const char *, long, long);
-	long fgetmtime(const char *, long *);
-	long fsetmtime(const char *, long);
-	long fopendir(long, const char *, long &);
-	long fopen(long, const char *, long &);
-	long fcreatefile(long, const char *, long &);
-	long freplacefile(long, const char *, long &);
+	Enum<rfsv::errs> dir(const char *, bufferArray *);
+	Enum<rfsv::errs> dircount(const char *, long *);
+	Enum<rfsv::errs> copyFromPsion(const char *, const char *, cpCallback_t);
+	Enum<rfsv::errs> copyToPsion(const char *, const char *, cpCallback_t);
+	Enum<rfsv::errs> mkdir(const char *);
+	Enum<rfsv::errs> rmdir(const char *);
+	Enum<rfsv::errs> remove(const char *);
+	Enum<rfsv::errs> rename(const char *, const char *);
+	Enum<rfsv::errs> mktemp(long *, char *);
+	Enum<rfsv::errs> fgeteattr(const char *, long *, long *, long *);
+	Enum<rfsv::errs> fgetattr(const char *, long *);
+	Enum<rfsv::errs> fsetattr(const char *, long, long);
+	Enum<rfsv::errs> fgetmtime(const char *, long *);
+	Enum<rfsv::errs> fsetmtime(const char *, long);
+	Enum<rfsv::errs> fopendir(long, const char *, long &);
+	Enum<rfsv::errs> fopen(long, const char *, long &);
+	Enum<rfsv::errs> fcreatefile(long, const char *, long &);
+	Enum<rfsv::errs> freplacefile(long, const char *, long &);
 	long fseek(long, long, long);
 	long fread(long, unsigned char *, long);
 	long fwrite(long, unsigned char *, long);
-	long fsetsize(long, long);
-	long fclose(long);
+	Enum<rfsv::errs> fsetsize(long, long);
+	Enum<rfsv::errs> fclose(long);
 
-	long devlist(long *);
+	Enum<rfsv::errs> devlist(long *);
 	char *devinfo(int, long *, long *, long *, long *);
-	long getStatus();
+	Enum<rfsv::errs> getStatus();
 	char *opAttr(long);
 	long opMode(long);
 
@@ -155,11 +155,11 @@ class rfsv32 : public rfsv {
 	};
 
 	const char *getConnectName();
-	long err2psierr(long);
+	Enum<rfsv::errs> err2psierr(long);
 
 	// Communication
 	bool sendCommand(enum commands, bufferStore &);
-	long getResponse(bufferStore &);
+	Enum<rfsv::errs> getResponse(bufferStore &);
 	char *convertSlash(const char *);
 
 	// time-conversion
@@ -169,8 +169,7 @@ class rfsv32 : public rfsv {
 	// Vars
 	ppsocket *skt;
 	int serNum;
-	long status;
-	int tDiff;
+	Enum<rfsv::errs> status;
 };
 
 #endif
