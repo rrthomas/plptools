@@ -23,7 +23,7 @@
 //  e-mail philip.proudman@btinternet.com
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <stream.h>
@@ -32,7 +32,6 @@
 #include <stdio.h>
 #include <signal.h>
 
-#include "bool.h"
 #include "ppsocket.h"
 #include "rfsv.h"
 #include "rfsvfactory.h"

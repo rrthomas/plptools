@@ -26,7 +26,6 @@
 #include <stream.h>
 #include <memory.h>
 
-#include "bool.h"
 #include "iowatch.h"
 
 IOWatch::IOWatch() {

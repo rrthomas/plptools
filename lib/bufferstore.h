@@ -1,7 +1,6 @@
 #ifndef _bufferstore_h
 #define _bufferstore_h
 
-#include "bool.h"
 class ostream;
 
 /**
@@ -210,7 +209,7 @@ private:
 };
 
 inline bool bufferStore::empty() const {
-	return (len-start) == 0;
+	return (len - start) == 0;
 }
 
 #endif

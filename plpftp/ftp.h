@@ -25,7 +25,9 @@
 #ifndef _ftp_h_
 #define _ftp_h_
 
-#include "bool.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include "rfsv.h"
 #include "Enum.h"
 

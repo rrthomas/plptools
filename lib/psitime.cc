@@ -43,6 +43,14 @@ PsiTime::PsiTime(struct timeval *_utv = 0L, struct timezone *_utz = 0L) {
 	unix2psi();
 }
 
+PsiTime::PsiTime(const PsiTime &t) {
+	utv = t.utv;
+	utz = t.utz;
+	ptv = t.ptv;
+	ptz = t.ptz;
+	ptzValid = t.ptzValid;
+}
+
 PsiTime::~PsiTime() {
 }
 
@@ -102,6 +110,15 @@ const unsigned long PsiTime::getPsiTimeLo(void) {
 
 const unsigned long PsiTime::getPsiTimeHi(void) {
 	return ptv.tv_high;
+}
+
+PsiTime &PsiTime::operator=(const PsiTime &t) {
+	utv = t.utv;
+	utz = t.utz;
+	ptv = t.ptv;
+	ptz = t.ptz;
+	ptzValid = t.ptzValid;
+	return *this;
 }
 
 ostream &operator<<(ostream &s, const PsiTime &t) {

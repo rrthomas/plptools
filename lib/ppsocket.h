@@ -26,7 +26,6 @@
 
 extern int errno;
 
-#include "bool.h"
 class bufferStore;
 
 class ppsocket

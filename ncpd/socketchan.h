@@ -25,7 +25,9 @@
 #ifndef _socketchan_h_
 #define _socketchan_h_
 
-#include "bool.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include "channel.h"
 class ppsocket;
 class IOWatch;

@@ -22,6 +22,8 @@ maintainer-clean-local:
 	conf/config.guess conf/config.sub conf/install-sh conf/ltconfig \
 	conf/ltmain.sh conf/missing conf/mkinstalldirs \
 	etc/*.spec
+	find . -name "*~" -exec rm -f {} \;
+	find . -name "\.\#*" -exec rm -f {} \;
 
 dist-hook:
 	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile

@@ -20,7 +20,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <sys/types.h>
@@ -36,8 +36,8 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <pwd.h>
+#include <getopt.h>
 
-#include "bool.h"
 #include "ppsocket.h"
 #include "rfsv.h"
 #include "rfsvfactory.h"
@@ -50,20 +50,24 @@
 void
 usage(ostream *hlp)
 {
-	*hlp << "Usage : plpbackup [-p <port>] [-v] [-f] [drive1:] [drive2:] ..." << endl;
-	*hlp << endl;
-	*hlp << "  Options:" << endl;
-	*hlp << "    -h         Print this message and exit." << endl;
-	*hlp << "    -V         Print version and exit." << endl;
-	*hlp << "    -p <port>  Connect to ncpd using given port." << endl;
-	*hlp << "    -v         Increase verbosity." << endl;
-	*hlp << "    -f         Do a full backup. (Incremental otherwise)" << endl;
-	*hlp << "    <drive>    A drive character. If none given, scan all drives" << endl;
+	*hlp
+		<< "Usage: plpbackup OPTIONS [<drive>:] [<drive>:] ..." << endl
+		<< endl
+		<< "  Options:" << endl
+		<< "    -h, --help        Print this message and exit." << endl
+		<< "    -V, --version     Print version and exit." << endl
+		<< "    -p, --port=<port> Connect to ncpd using given port." << endl
+		<< "    -v, --verbose     Increase verbosity." << endl
+		<< "    -q, --quiet       Decrease verbosity." << endl
+		<< "    -f, --full        Do a full backup (incremental otherwise)." << endl
+		<< endl
+		<< "  <drive> A drive character. If none given, scan all drives." << endl
+		<< endl;
 }
 
 bool full;
 int verbose = 0;
-bufferArray toBackup;
+PlpDir toBackup;
 unsigned long backupSize = 0;
 unsigned long totalBytes = 0;
 unsigned long fileSize = 0;
@@ -183,7 +187,7 @@ runrestore(rfsv *a, rpcs *r) {
 static void
 collectFiles(rfsv *a, char *dir) {
 	Enum<rfsv::errs> res;
-	bufferArray files;
+	PlpDir files;
 	char tmp[1024];
 
 	strcpy(tmp, dir);
@@ -191,22 +195,20 @@ collectFiles(rfsv *a, char *dir) {
 	if ((res = a->dir(tmp, files)) != rfsv::E_PSI_GEN_NONE)
 		cerr << "Error: " << res << endl;
 	else
-		while (!files.empty()) {
-			bufferStore s;
+		for (int i = 0; i < files.size(); i++) {
+			PlpDirent e = files[i];
 
-			s = files.pop();
-			long size = s.getDWord(4);
-			long attr = s.getDWord(8);
+			// long size = s.getDWord(4);
+			long attr = e.getAttr();
 			strcpy(tmp, dir);
 			strcat(tmp, "\\");
-			strcat(tmp, s.getString(12));
+			strcat(tmp, e.getName());
 			if (attr & rfsv::PSI_A_DIR) {
 				collectFiles(a, tmp);
 			} else {
 				if ((attr & rfsv::PSI_A_ARCHIVE) || full) {
-					s.truncate(12);
-					s.addStringT(tmp);
-					toBackup += s;
+					e.setName(tmp);
+					toBackup.push_back(e);
 				}
 			}
 		}
@@ -220,14 +222,15 @@ reportProgress(void *, long size)
 	char bstr[10];
 
 	switch (verbose) {
-	case 0:
-		return 1;
-	case 1:
-		percent = (totalBytes + size) * 100 / backupSize;
-		break;
-	case 2:
-		percent = size * 100 / fileSize;
-		break;
+		case -1:
+		case 0:
+			return 1;
+		case 1:
+			percent = (totalBytes + size) * 100 / backupSize;
+			break;
+		case 2:
+			percent = size * 100 / fileSize;
+			break;
 	}
 	sprintf(pstr, " %3d%%", percent);
 	memset(bstr, 8, sizeof(bstr));
@@ -245,7 +248,7 @@ mkdirp(char *path) {
 		*p = '\0';
 		switch (mkdir(path, S_IRWXU|S_IRWXG)) {
 			struct stat stbuf;
-
+			
 			case 0:
 				break;
 			default:
@@ -266,6 +269,16 @@ mkdirp(char *path) {
 	return 0;
 }
 
+static struct option opts[] = {
+	{ "full",    no_argument,       0, 'f' },
+	{ "help",    no_argument,       0, 'h' },
+	{ "port",    required_argument, 0, 'V' },
+	{ "verbose", no_argument,       0, 'v' },
+	{ "quiet",   no_argument,       0, 'q' },
+	{ "version", no_argument,       0, 'V' },
+	{ 0,         0,                 0, 0   },
+};
+
 int
 main(int argc, char **argv)
 {
@@ -276,6 +289,7 @@ main(int argc, char **argv)
 	cpCallback_t cab = reportProgress;
 	int status = 0;
 	int sockNum = DPORT;
+	int op;
 	char dstPath[1024];
 	struct passwd *pw;
 	sigset_t sigset;
@@ -287,42 +301,44 @@ main(int argc, char **argv)
 	struct servent *se = getservbyname("psion", "tcp");
 	endservent();
 	if (se != 0L)
-		sockNum = ntohs(se->s_port);
+	  sockNum = ntohs(se->s_port);
 
 	// Command line parameter processing
-	bool parmFound;
-	do {
-		parmFound = false;
-		if ((argc > 1) && !strcmp(argv[1], "-V")) {
-			cout << "plpbackup version " << VERSION << endl;
-			exit(0);
+	opterr = 1;
+	while ((op = getopt_long(argc, argv, "qfhp:vV", opts, NULL)) != EOF) {
+		switch (op) {
+			case 'V':
+				cout << "plpbackup version " << VERSION << endl;
+				exit(0);
+			case 'h':
+				usage(&cout);
+				exit(0);
+			case 'f':
+				full = true;
+				break;
+			case 'v':
+				verbose++;
+				break;
+			case 'q':
+				verbose--;
+				break;
+			case 'p':
+				sockNum = atoi(optarg);
+				break;
+			default:
+				usage(&cerr);
+				exit(1);
 		}
-		if ((argc > 1) && !strcmp(argv[1], "-h")) {
-			usage(&cout);
-			exit(0);
+	}
+	for (int i = optind; i < argc; i++) {
+		if ((strlen(argv[i]) != 2) ||
+		    (toupper(argv[i][0]) < 'A') ||
+		    (toupper(argv[i][0]) > 'Z') ||
+		    (argv[i][1] != ':')) {
+			usage(&cerr);
+			exit(1);
 		}
-		if ((argc > 2) && !strcmp(argv[1], "-p")) {
-			sockNum = atoi(argv[2]);
-			argc -= 2;
-			parmFound = true;
-			for (int i = 1; i < argc; i++)
-				argv[i] = argv[i + 2];
-		}
-		if ((argc > 1) && !strcmp(argv[1], "-v")) {
-			verbose++;
-			argc -= 1;
-			parmFound = true;
-			for (int i = 1; i < argc; i++)
-				argv[i] = argv[i + 1];
-		}
-		if ((argc > 1) && !strcmp(argv[1], "-f")) {
-			full = true;
-			argc -= 1;
-			parmFound = true;
-			for (int i = 1; i < argc; i++)
-				argv[i] = argv[i + 1];
-		}
-	} while (parmFound);
+	}
 
 	pw = getpwuid(getuid());
 	if (pw && pw->pw_dir && strlen(pw->pw_dir)) {
@@ -368,20 +384,33 @@ main(int argc, char **argv)
 					S5mx = true;
 			}
 		}
-		if (verbose) {
-			cout << "Performing " << (full ? "Full" : "Incremental") <<
-				" backup to " << dstPath << endl;
+		if (verbose >= 0) {
+			cout << "Performing " << (full ? "full" : "incremental") <<
+				" backup of ";
+			if (optind < argc) {
+				cout << "Drive ";
+				for (i = optind; i < argc; ) {
+					cout << argv[i++];
+					if (i > optind) {
+						if (i < (argc - 1))
+							cout << ", ";
+						else
+							if (i < argc)
+								cout << " and ";
+					}
+				}
+			} else
+				cout << "all drives";
+			
+			cout << " to " << dstPath << endl;
+		}
+		if (verbose > 0) {
 			cout << "Stopping programs ..." << endl;
 		}
 		killsave(r, S5mx);
-		if (argc > 1) {
-			for (i = 1; i < argc; i++) {
-				if ((strlen(argv[i]) != 2) || (argv[i][1] != ':')) {
-					usage(&cerr);
-					exit(1);
-					runrestore(a, r);
-				}
-				if (verbose)
+		if (optind < argc) {
+			for (i = optind; i < argc; i++) {
+				if (verbose > 0)
 					cout << "Scanning Drive " << argv[i] << " ..." << endl;
 				collectFiles(a, argv[i]);
 			}
@@ -395,7 +424,7 @@ main(int argc, char **argv)
 					if ((devbits & 1) && a->devinfo(i, vfree, vtotal, vattr, vuniqueid, NULL) == rfsv::E_PSI_GEN_NONE) {
 						if (vattr != 7) {
 							sprintf(drive, "%c:\0", 'A' + i);
-							if (verbose)
+							if (verbose > 0)
 								cout << "Scanning Drive " << drive << " ..." << endl;
 							collectFiles(a, drive);
 						}
@@ -405,46 +434,45 @@ main(int argc, char **argv)
 			} else
 				cerr << "Couldn't get Drive list" << endl;
 		}
-		for (i = 0; i < toBackup.length(); i++) {
-			bufferStore s = toBackup[i];
-			backupSize += s.getDWord(4);
+		for (i = 0; i < toBackup.size(); i++) {
+			backupSize += toBackup[i].getSize();
 			backupCount++;
 		}
-		if (verbose)
+		if (verbose > 0)
 			cout << "Size of backup: " << backupSize << " bytes in " <<
 				backupCount << " files." << endl;
 		if (backupCount == 0)
 			cerr << "Nothing to backup" << endl;
 		else {
-			for (i = 0; i < toBackup.length(); i++) {
-				bufferStore s = toBackup[i];
-				const char *fn = s.getString(12);
+			for (i = 0; i < toBackup.size(); i++) {
+				PlpDirent e = toBackup[i];
+				const char *fn = e.getName();
 				const char *p;
 				char *q;
 				char tmp[1024];
 
 				for (p = fn, q = tmp; *p; p++, q++)
 					switch (*p) {
-					case '%':
-						*q++ = '%';
-						*q++ = '2';
-						*q = '5';
-						break;
-					case '/':
-						*q++ = '%';
-						*q++ = '2';
-						*q= 'f';
-						break;
-					case '\\':
-						*q = '/';
-						break;
-					default:
-						*q = *p;
+						case '%':
+							*q++ = '%';
+							*q++ = '2';
+							*q = '5';
+							break;
+						case '/':
+							*q++ = '%';
+							*q++ = '2';
+							*q= 'f';
+							break;
+						case '\\':
+							*q = '/';
+							break;
+						default:
+							*q = *p;
 					}
 				*q = '\0';
 				strcpy(dest, dstPath);
 				strcat(dest, tmp);
-				fileSize = s.getDWord(4);
+				fileSize = e.getSize();
 				if (verbose > 1)
 					cout << "Backing up " << fn << flush;
 				if (mkdirp(dest) != 0) {
@@ -463,30 +491,29 @@ main(int argc, char **argv)
 				}
 			}
 			if (!bErr) {
-				if (verbose)
+				if (verbose > 0)
 					cout << "Writing index ..." << endl;
 				strcpy(dest, dstPath);
 				strcat(dest, ".index");
 				ofstream op(dest);
 				if (op) {
-					op << "#plpbackup index" << endl;
-					for (i = 0; i < toBackup.length(); i++) {
-						bufferStore s = toBackup[i];
-						PsiTime *t = (PsiTime *)s.getDWord(0);
-						long size = s.getDWord(4);
-						long attr = s.getDWord(8);
-						const char *fn = s.getString(12);
-						attr &= ~rfsv::PSI_A_ARCHIVE;
+					op << "#plpbackup index " <<
+						(full ? "F" : "I") << endl;
+					for (i = 0; i < toBackup.size(); i++) {
+						PlpDirent e = toBackup[i];
+						PsiTime t = e.getPsiTime();
+						long attr = e.getAttr() &
+							~rfsv::PSI_A_ARCHIVE;
 						op << hex
 						   << setw(8) << setfill('0') <<
-							t->getPsiTimeHi() << " "
+							t.getPsiTimeHi() << " "
 						   << setw(8) << setfill('0') <<
-							t->getPsiTimeLo() << " "
+							t.getPsiTimeLo() << " "
 						   << setw(8) << setfill('0') <<
-							size << " "
+							e.getSize() << " "
 						   << setw(8) << setfill('0') <<
 							attr << " "
-						   << setw(0) << fn << endl;
+						   << setw(0) << e.getName() << endl;
 					}
 					op.close();
 				} else {
@@ -495,26 +522,24 @@ main(int argc, char **argv)
 				}
 			}
 			if (!bErr) {
-				if (verbose)
+				if (verbose > 0)
 					cout << "Resetting archive attributes ..." << endl;
-					for (i = 0; i < toBackup.length(); i++) {
-						bufferStore s = toBackup[i];
-						long attr = s.getDWord(8);
-						const char *fn = s.getString(12);
-						if (attr & rfsv::PSI_A_ARCHIVE) {
-							res = a->fsetattr(fn, 0,
-									  rfsv::PSI_A_ARCHIVE);
-							if (res != rfsv::E_PSI_GEN_NONE) {
-								bErr = true;
-								break;
-							}
+				for (i = 0; i < toBackup.size(); i++) {
+					PlpDirent e = toBackup[i];
+					if (e.getAttr() & rfsv::PSI_A_ARCHIVE) {
+						res = a->fsetattr(e.getName(), 0,
+								  rfsv::PSI_A_ARCHIVE);
+						if (res != rfsv::E_PSI_GEN_NONE) {
+							bErr = true;
+							break;
 						}
 					}
+				}
 			}
 		}
 		if (bErr)
 			cerr << "Backup aborted due to error" << endl;
-		if (verbose)
+		if (verbose > 0)
 			cout << "Restarting programs ..." << endl;
 		runrestore(a, r);
 		delete r;

@@ -1,12 +1,14 @@
 #ifndef _rfsv_h_
 #define _rfsv_h_
 
+#include <deque>
 #include "Enum.h"
-#include "psitime.h"
+#include "plpdirent.h"
 #include "bufferstore.h"
 
+typedef deque<class PlpDirent> PlpDir;
+
 class ppsocket;
-class bufferArray;
 
 const long RFSV_SENDLEN = 2000;
 
@@ -190,8 +192,8 @@ class rfsv {
 		 * @param attr   The open mode. Use @ref opMode to convert a combination of @ref open_flags
 		 *               and @ref open_mode to the machine-specific representation.
 		 * @param name   The name of the file to open.
-		 * @param handle The handle for usage with @ref fread,
-		 *               @ref frwrite, @ref fseek @ref fclose is returned here.
+		 * @param handle The handle for usage with @ref fread ,
+		 *               @ref frwrite , @ref fseek or @ref fclose is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
@@ -201,8 +203,8 @@ class rfsv {
 		 * Creates a unique temporary file.
 		 * The file is opened for reading and writing.
 		 *
-		 * @param handle The handle for usage with @ref fread,
-		 *               @ref frwrite, @ref fseek @ref fclose is returned here.
+		 * @param handle The handle for usage with @ref fread ,
+		 *               @ref frwrite , @ref fseek or @ref fclose is returned here.
 		 * @param name   The name of the temporary file is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
@@ -215,8 +217,8 @@ class rfsv {
 		 * @param attr   The open mode. Use @ref opMode to convert a combination of @ref open_flags
 		 *               and @ref open_mode to the machine-specific representation.
 		 * @param name   The name of the file to create.
-		 * @param handle The handle for usage with @ref fread,
-		 *               @ref frwrite, @ref fseek @ref fclose is returned here.
+		 * @param handle The handle for usage with @ref fread ,
+		 *               @ref frwrite , @ref fseek or @ref fclose is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
@@ -228,8 +230,8 @@ class rfsv {
 		 * @param attr   The open mode. Use @ref opMode to convert a combination of @ref open_flags
 		 *               and @ref open_mode to the machine-specific representation.
 		 * @param name   The name of the file to create.
-		 * @param handle The handle for usage with @ref fread,
-		 *               @ref frwrite, @ref fseek @ref fclose is returned here.
+		 * @param handle The handle for usage with @ref fread ,
+		 *               @ref frwrite , @ref fseek or @ref fclose is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
@@ -237,7 +239,7 @@ class rfsv {
 
 		/**
 		 * Close a file on the Psion whih was previously opened/created by using
-		 * @ref fopen, @ref fcreatefile, @ref freplacefile or @ref mktemp.
+		 * @ref fopen , @ref fcreatefile , @ref freplacefile or @ref mktemp .
 		 *
 		 * @param handle A valid file handle.
 		 */
@@ -247,14 +249,14 @@ class rfsv {
 		 * Reads a directory on the Psion.
 		 * The returned array of @ref bufferArray contains one @ref bufferStore element
 		 * for each directory entry. For a description of the layout of the elements
-		 * in each directory entry, see @ref readdir.
+		 * in each directory entry, see @ref readdir .
 		 *
 		 * @param name The name of the directory
-		 * @param ret Array of @ref bufferStore containing information for directory entries.
+		 * @param ret  An STL deque of @ref PlpDirent entries.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> dir(const char * const name, bufferArray &ret) = 0;
+		virtual Enum<errs> dir(const char * const name, PlpDir &ret) = 0;
 
 		/**
 		 * Retrieves the modification time of a file on the Psion.
@@ -473,9 +475,9 @@ class rfsv {
 		 * Open a directory for reading with readdir.
 		 *
 		 * @param attr   A combination of PSI_A_.. flags, representing the desired types
-		 *               of entries to be returned when calling @ref readdir.
+		 *               of entries to be returned when calling @ref readdir .
 		 * @param name   The name of the directory
-		 * @param handle A handle to be used with @ref readdir and @ref closedir.
+		 * @param handle A handle to be used with @ref readdir and @ref closedir .
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
@@ -484,23 +486,14 @@ class rfsv {
 		/**
 		 * Read directory entries.
 		 * This method reads entries of a directory, previously
-		 * opened with @ref opendir.
+		 * opened with @ref opendir .
 		 *
-		 * The entry is returned in the buff parameter as follows:
-		 * <pre>
-		 * 	offset		size	value
-		 * 	0		4	Pointer to a PsiTime object, representing the file's modification.
-		 * 	4		4	Size in bytes.
-		 * 	8		4	Attributes.
-		 * 	12		?	Zero terminated file name.
-		 * </pre>
-		 *
-		 * @param handle A handle, obtained by calling @see opendir.
-		 * @param buff   The entry information is returned here.
+		 * @param handle A handle, obtained by calling @ref opendir .
+		 * @param entry  The entry information is returned here.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> readdir(rfsvDirhandle &handle, bufferStore &buff) = 0;
+		virtual Enum<errs> readdir(rfsvDirhandle &handle, PlpDirent &entry) = 0;
 
 		/**
 		 * Close a directory, previously opened with @ref opendir.

@@ -4,7 +4,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <stream.h>
@@ -14,7 +14,6 @@
 #include <signal.h>
 #include <syslog.h>
 
-#include "bool.h"
 #include "rfsv.h"
 #include "rpcs.h"
 #include "rfsvfactory.h"
@@ -210,24 +209,24 @@ long rfsv_isalive() {
 }
 
 long rfsv_dir(const char *file, dentry **e) {
-	bufferArray entries;
+	PlpDir entries;
 	dentry *tmp;
 	long ret;
 
 	if (!a)
 		return -1;
 	ret = a->dir(file, entries);
-	while (!entries.empty()) {
-		bufferStore s;
-		s = entries.pop();
+	
+	for (int i = 0; i < entries.size(); i++) {
+		PlpDirent pe = entries[i];
 		tmp = *e;
 		*e = (dentry *)malloc(sizeof(dentry));
 		if (!*e)
 			return -1;
-		(*e)->time = ((PsiTime *)s.getDWord(0))->getTime();
-		(*e)->size = s.getDWord(4);
-		(*e)->attr = s.getDWord(8);
-		(*e)->name = strdup(s.getString(12));
+		(*e)->time = pe.getPsiTime().getTime();
+		(*e)->size = pe.getSize();
+		(*e)->attr = pe.getAttr();
+		(*e)->name = strdup(pe.getName());
 		(*e)->next = tmp;
 	}
 	return ret;

@@ -260,27 +260,25 @@ listDir(const KURL& _url) {
 	convertName(path);
 	path += "\\";
 
-	bufferArray files;
+	PlpDir files;
 	Enum<rfsv::errs> res = plpRfsv->dir(path, files);
 	if (checkForError(res))
 		return;
-	totalSize(files.length());
+	totalSize(files.size());
 	UDSEntry entry;
-	while (!files.empty()) {
+	for (int i = 0; i < files.size(); i++) {
 		UDSAtom atom;
-		bufferStore s = files.pop();
-		PsiTime *date = (PsiTime *)s.getDWord(0);
-		long size = s.getDWord(4);
-		long attr = s.getDWord(8);
-		entry.clear();
+		PlpDirent e = files[i];
+		long attr = e.getAttr();
 
+		entry.clear();
 		atom.m_uds = KIO::UDS_NAME;
-		atom.m_str = s.getString(12);
+		atom.m_str = e.getName();
 		entry.append(atom);
 
 		if (rom)
 			attr |= rfsv::PSI_A_RDONLY;
-		completeUDSEntry(entry, attr, size, date);
+		completeUDSEntry(entry, attr, e.getSize(), e.getPsiTime().getTime());
 		listEntry(entry, false);
 	}
 	listEntry(entry, true); // ready
@@ -364,14 +362,14 @@ stat( const KURL & url) {
 	atom.m_uds = KIO::UDS_NAME;
 	atom.m_str = fileName;
 	entry.append(atom);
-	completeUDSEntry(entry, attr, size, &time);
+	completeUDSEntry(entry, attr, size, time.getTime());
 	statEntry(entry);
 
 	finished();
 }
 
 void PLPProtocol::
-completeUDSEntry(UDSEntry& entry, const long attr, const long size, PsiTime *date) {
+completeUDSEntry(UDSEntry& entry, const long attr, const long size, const time_t date) {
 	UDSAtom atom;
 
 	atom.m_uds = KIO::UDS_SIZE;
@@ -379,7 +377,7 @@ completeUDSEntry(UDSEntry& entry, const long attr, const long size, PsiTime *dat
 	entry.append(atom);
 
 	atom.m_uds = KIO::UDS_MODIFICATION_TIME;
-	atom.m_long = date->getTime();
+	atom.m_long = date;
 	entry.append(atom);
 
 	atom.m_uds = KIO::UDS_ACCESS;
@@ -661,8 +659,8 @@ put( const KURL& url, int _mode, bool _overwrite, bool /*_resume*/ ) {
 
 void PLPProtocol::
 rename(const KURL &src, const KURL &dest, bool _overwrite) {
-	QString from( QFile::encodeName(src.path()));
-	QString to( QFile::encodeName(dest.path()));
+	QString from(QFile::encodeName(src.path()));
+	QString to(QFile::encodeName(dest.path()));
 
 	if (checkConnection())
 		return;

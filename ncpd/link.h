@@ -25,7 +25,9 @@
 #ifndef _link_h_
 #define _link_h_
 
-#include "bool.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include "bufferstore.h"
 #include "bufferarray.h"
 

@@ -25,7 +25,9 @@
 #ifndef _ncp_h_
 #define _ncp_h_
 
-#include "bool.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include "bufferstore.h"
 #include "linkchan.h"
 class link;

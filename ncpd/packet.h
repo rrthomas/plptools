@@ -25,10 +25,11 @@
 #ifndef _packet_h
 #define _packet_h
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <stdio.h>
 
-#include "bool.h"
-class psiEmul;
 class bufferStore;
 class IOWatch;
 

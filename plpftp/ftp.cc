@@ -198,8 +198,6 @@ sigint_handler2(int i) {
 	signal(SIGINT, sigint_handler2);
 }
 
-const char *datefmt = "%c";
-
 int ftp::
 session(rfsv & a, rpcs & r, int xargc, char **xargv)
 {
@@ -441,19 +439,13 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			continue;
 		}
 		if (!strcmp(argv[0], "ls") || !strcmp(argv[0], "dir")) {
-			bufferArray files;
+			PlpDir files;
 			if ((res = a.dir(psionDir, files)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
 			else
 				while (!files.empty()) {
-					bufferStore s;
-					s = files.pop();
-					PsiTime *date = (PsiTime *)s.getDWord(0);
-					long size = s.getDWord(4);
-					long attr = s.getDWord(8);
-                                	cout << a.attr2String(attr);
-                                	cout << " " << dec << setw(10) << setfill(' ') << size;
-                                	cout << " " << *date << " " << s.getString(12) << endl;
+					cout << files[0] << endl;
+					files.pop_front();
 				}
 			continue;
 		}
@@ -553,23 +545,22 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			continue;
 		} else if ((!strcmp(argv[0], "mget")) && (argc == 2)) {
 			char *pattern = argv[1];
-			bufferArray files;
+			PlpDir files;
 			if ((res = a.dir(psionDir, files)) != rfsv::E_PSI_GEN_NONE) {
 				cerr << "Error: " << res << endl;
 				continue;
 			}
-			while (!files.empty()) {
-				bufferStore s;
-				s = files.pop();
+			for (int i = 0; i < files.size(); i++) {
+				PlpDirent e = files[i];
 				char temp[100];
-				long attr = s.getDWord(8);
+				long attr = e.getAttr();
 
-				if (attr & 0x10)
+				if (attr & (rfsv::PSI_A_DIR | rfsv::PSI_A_VOLUME))
 					continue;
-				if (!Wildmat(s.getString(12), pattern))
+				if (!Wildmat(e.getName(), pattern))
 					continue;
 				do {
-					cout << "Get \"" << s.getString(12) << "\" (y,n): ";
+					cout << "Get \"" << e.getName() << "\" (y,n): ";
 					if (prompt) {
 						cout.flush();
 						cin.getline(temp, 100);
@@ -582,9 +573,9 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				} while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
 				if (temp[0] != 'n') {
 					strcpy(f1, psionDir);
-					strcat(f1, s.getString(12));
+					strcat(f1, e.getName());
 					strcpy(f2, localDir);
-					strcat(f2, s.getString(12));
+					strcat(f2, e.getName());
 					if (temp[0] == 'l') {
 						for (char *p = f2; *p; p++)
 							*p = tolower(*p);
@@ -1000,7 +991,7 @@ static char *remote_dir_commands[] = {
 	"cd ", "rmdir ", NULL
 };
 
-static bufferArray *comp_files = NULL;
+static PlpDir comp_files;
 static long maskAttr;
 static char tmpPath[1024];
 static char cplPath[1024];
@@ -1015,29 +1006,25 @@ filename_generator(char *text, int state)
 		char *p;
 		Enum<rfsv::errs> res;
 		len = strlen(text);
-		if (comp_files)
-			delete comp_files;
-		comp_files = new bufferArray();
 		strcpy(tmpPath, psionDir);
 		strcat(tmpPath, cplPath);
 		for (p = tmpPath; *p; p++)
 			if (*p == '/')
 				*p = '\\';
-		if ((res = comp_a->dir(tmpPath, *comp_files)) != rfsv::E_PSI_GEN_NONE) {
+		if ((res = comp_a->dir(tmpPath, comp_files)) != rfsv::E_PSI_GEN_NONE) {
 			cerr << "Error: " << res << endl;
 			return NULL;
 		}
 	}
-	while (!comp_files->empty()) {
-		bufferStore s;
+	for (int i = 0; i < comp_files.size(); i++) {
+		PlpDirent e = comp_files[i];
+		long attr = e.getAttr();
 		char *p;
-		s = comp_files->pop();
-		long attr = s.getDWord(8);
 
 		if ((attr & maskAttr) == 0)
 			continue;
 		strcpy(tmpPath, cplPath);
-		strcat(tmpPath, s.getString(12));
+		strcat(tmpPath, e.getName());
 		for (p = tmpPath; *p; p++)
 			if (*p == '\\')
 				*p = '/';

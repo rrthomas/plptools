@@ -56,7 +56,7 @@ class PLPProtocol : public KIO::SlaveBase
       char driveChar(const QString& path);
 
       void createVirtualDirEntry(KIO::UDSEntry & entry, bool rdonly);
-      void completeUDSEntry(KIO::UDSEntry& entry, const long attr, const long size, PsiTime *date);
+      void completeUDSEntry(KIO::UDSEntry& entry, const long attr, const long size, const time_t date);
       bool checkForError(Enum<rfsv::errs> res);
       bool isRomDrive(const QString& path);
       bool isDrive(const QString& path);

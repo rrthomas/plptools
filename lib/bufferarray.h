@@ -1,7 +1,9 @@
 #ifndef _bufferarray_h
 #define _bufferarray_h
 
-#include "bool.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 class bufferStore;
 
 /**

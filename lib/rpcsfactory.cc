@@ -30,7 +30,6 @@
 #include <time.h>
 #include <string.h>
 
-#include "bool.h"
 #include "rpcs16.h"
 #include "rpcs32.h"
 #include "rpcsfactory.h"

@@ -12,7 +12,7 @@ public:
 	Enum<rfsv::errs> fcreatefile(const long, const char * const, long &);
 	Enum<rfsv::errs> freplacefile(const long, const char * const, long &);
 	Enum<rfsv::errs> fclose(const long);
-	Enum<rfsv::errs> dir(const char * const, bufferArray &);
+	Enum<rfsv::errs> dir(const char * const, PlpDir &);
 	Enum<rfsv::errs> fgetmtime(const char * const, PsiTime &);
 	Enum<rfsv::errs> fsetmtime(const char * const, const PsiTime);
 	Enum<rfsv::errs> fgetattr(const char * const, long &);
@@ -33,7 +33,7 @@ public:
 	Enum<rfsv::errs> rename(const char * const, const char * const);
 	Enum<rfsv::errs> remove(const char * const);
 	Enum<rfsv::errs> opendir(const long, const char * const, rfsvDirhandle &);
-	Enum<rfsv::errs> readdir(rfsvDirhandle &, bufferStore &);
+	Enum<rfsv::errs> readdir(rfsvDirhandle &, PlpDirent &);
 	Enum<rfsv::errs> closedir(rfsvDirhandle &);
 	Enum<rfsv::errs> setVolumeName(const char, const char * const);
 

@@ -29,7 +29,6 @@
 #include <time.h>
 #include <string.h>
 
-#include "bool.h"
 #include "rfsv.h"
 #include "rfsv16.h"
 #include "rfsv32.h"

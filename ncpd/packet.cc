@@ -23,6 +23,10 @@
 //  e-mail philip.proudman@btinternet.com
 
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <stdio.h>
 #include <malloc.h>
 #include <unistd.h>
@@ -38,7 +42,6 @@
 extern "C" {
 #include "mp_serial.h"
 }
-#include "bool.h"
 #include "bufferstore.h"
 #include "packet.h"
 #include "iowatch.h"

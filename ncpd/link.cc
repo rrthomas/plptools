@@ -30,7 +30,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "bool.h"
 #include "link.h"
 #include "packet.h"
 #include "bufferstore.h"

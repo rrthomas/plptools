@@ -34,7 +34,6 @@
 #include <time.h>
 #include <string>
 
-#include "bool.h"
 #include "rfsv16.h"
 #include "bufferstore.h"
 #include "ppsocket.h"
@@ -181,7 +180,7 @@ closedir(rfsvDirhandle &dH) {
 }
 
 Enum<rfsv::errs> rfsv16::
-readdir(rfsvDirhandle &dH, bufferStore &s) {
+readdir(rfsvDirhandle &dH, PlpDirent &e) {
 	Enum<rfsv::errs> res = E_PSI_GEN_NONE;
 
 	if (dH.b.getLen() < 17) {
@@ -198,32 +197,30 @@ readdir(rfsvDirhandle &dH, bufferStore &s) {
 			cerr << "dir: not version 2" << endl;
 			return E_PSI_GEN_FAIL;
 		}
-		long attr = attr2std((long)dH.b.getWord(2));
-		long size = dH.b.getDWord(4);
-		PsiTime *date = new PsiTime((time_t)dH.b.getDWord(8));
-		const char *name = dH.b.getString(16);
+		e.attr = attr2std((long)dH.b.getWord(2));
+		e.size = dH.b.getDWord(4);
+		e.time = PsiTime((time_t)dH.b.getDWord(8));
+		e.name = dH.b.getString(16);
+		e.uid[0] = e.uid[1] = e.uid[2] = 0;
+		e.attrstr = attr2String(e.attr);
 
-		dH.b.discardFirstBytes(17+strlen(name));
+		dH.b.discardFirstBytes(17 + e.name.length());
 
-		s.init();
-		s.addDWord((unsigned long)date);
-		s.addDWord(size);
-		s.addDWord(attr);
-		s.addStringT(name);
 	}
 	return res;
 }
 
 Enum<rfsv::errs> rfsv16::
-dir(const char *name, bufferArray &files)
+dir(const char *name, PlpDir &files)
 {
 	rfsvDirhandle h;
+	files.clear();
 	Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN | PSI_A_SYSTEM | PSI_A_DIR, name, h);
 	while (res == E_PSI_GEN_NONE) {
-		bufferStore b;
-		res = readdir(h, b);
+		PlpDirent e;
+		res = readdir(h, e);
 		if (res == E_PSI_GEN_NONE)
-			files += b;
+			files.push_back(e);
 	}
 	closedir(h);
 	if (res == E_PSI_FILE_EOF)

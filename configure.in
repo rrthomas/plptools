@@ -119,6 +119,9 @@ else
        AC_DEFINE_UNQUOTED(DONT_UPDATE_MTAB)
 fi
 
+dnl Check, if compiler knows about bool
+AC_CHECK_BOOL
+
 dnl Type of sighandlers
 AC_TYPE_SIGNAL
 

@@ -25,9 +25,10 @@
 #ifndef _channel_h_
 #define _channel_h_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <stdio.h>
-
-#include "bool.h"
 
 class ncp;
 class bufferStore;

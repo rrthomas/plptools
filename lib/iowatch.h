@@ -1,8 +1,6 @@
 #ifndef _iowatch_h
 #define _iowatch_h
 
-#include "bool.h"
-
 /**
  * A simple wrapper for select()
  *

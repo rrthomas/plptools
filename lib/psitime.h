@@ -133,6 +133,11 @@ public:
 	PsiTime(void);
 
 	/**
+	 * A copy-constructor
+	 */
+	PsiTime(const PsiTime &t);
+
+	/**
 	 * Destroys the instance.
 	 */
 	~PsiTime();
@@ -230,6 +235,11 @@ public:
 	 * @returns The stream.
 	 */
 	friend ostream &operator<<(ostream &s, const PsiTime &t);
+
+	/**
+	 * Assignment operator
+	 */
+	PsiTime &operator=(const PsiTime &t);
 
 	enum zone {
 		PSI_TZ_NONE = 0,

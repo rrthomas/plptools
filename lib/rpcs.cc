@@ -25,7 +25,6 @@
 #include <time.h>
 #include <string.h>
 
-#include "bool.h"
 #include "rpcs.h"
 #include "bufferstore.h"
 #include "ppsocket.h"

@@ -25,16 +25,16 @@
 
 #include <stream.h>
 #include <stdlib.h>
-#include <fstream.h>
-#include <iomanip.h>
+#include <fstream>
+#include <iomanip>
 #include <time.h>
-#include <string.h>
+#include <string>
 
-#include "bool.h"
 #include "rfsv32.h"
 #include "bufferstore.h"
 #include "ppsocket.h"
 #include "bufferarray.h"
+#include "plpdirent.h"
 
 rfsv32::rfsv32(ppsocket * _skt)
 {
@@ -126,7 +126,7 @@ fopendir(const long attr, const char * const name, long &handle)
 {
 	bufferStore a;
 	char *n = convertSlash(name);
-	a.addDWord(attr);
+	a.addDWord(attr | EPOC_ATTR_GETUID);
 	a.addWord(strlen(n));
 	a.addString(n);
 	free(n);
@@ -163,7 +163,7 @@ closedir(rfsvDirhandle &dH) {
 }
 
 Enum<rfsv::errs> rfsv32::
-readdir(rfsvDirhandle &dH, bufferStore &s) {
+readdir(rfsvDirhandle &dH, PlpDirent &e) {
 	Enum<rfsv::errs> res = E_PSI_GEN_NONE;
 
 	if (dH.b.getLen() < 17) {
@@ -174,23 +174,21 @@ readdir(rfsvDirhandle &dH, bufferStore &s) {
 		res = getResponse(dH.b);
 	} 
 	if ((res == E_PSI_GEN_NONE) && (dH.b.getLen() > 16)) {
-		long shortLen = dH.b.getDWord(0);
-		long attributes = attr2std(dH.b.getDWord(4));
-		long size = dH.b.getDWord(8);
-		// long uid1 = dH.b.getDWord(20);
-		// long uid2 = dH.b.getDWord(24);
-		// long uid3 = dH.b.getDWord(28);
-		long longLen = dH.b.getDWord(32);
-		PsiTime *date = new PsiTime(dH.b.getDWord(16), dH.b.getDWord(12));
+		long shortLen   = dH.b.getDWord(0);
+		long longLen    = dH.b.getDWord(32);
 
-		s.init();
-		s.addDWord((unsigned long)date);
-		s.addDWord(size);
-		s.addDWord(attributes);
+		e.attr = attr2std(dH.b.getDWord(4));
+		e.size = dH.b.getDWord(8);
+		e.uid[0]  = dH.b.getDWord(20);
+		e.uid[1]  = dH.b.getDWord(24);
+		e.uid[2]  = dH.b.getDWord(28);
+		e.time    = PsiTime(dH.b.getDWord(16), dH.b.getDWord(12));
+		e.name    = "";
+		e.attrstr = string(attr2String(e.attr));
+
 		int d = 36;
 		for (int i = 0; i < longLen; i++, d++)
-			s.addByte(dH.b.getByte(d));
-		s.addByte(0);
+			e.name += dH.b.getByte(d);
 		while (d % 4)
 			d++;
 		d += shortLen;
@@ -202,70 +200,21 @@ readdir(rfsvDirhandle &dH, bufferStore &s) {
 }
 
 Enum<rfsv::errs> rfsv32::
-dir(const char *name, bufferArray &files)
+dir(const char *name, PlpDir &files)
 {
 	rfsvDirhandle h;
+	files.clear();
 	Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN | PSI_A_SYSTEM | PSI_A_DIR, name, h);
 	while (res == E_PSI_GEN_NONE) {
-		bufferStore b;
-		res = readdir(h, b);
+		PlpDirent e;
+		res = readdir(h, e);
 		if (res == E_PSI_GEN_NONE)
-			files += b;
+			files.push_back(e);
 	}
 	closedir(h);
 	if (res == E_PSI_FILE_EOF)
 		res = E_PSI_GEN_NONE;
 	return res;
-#if 0
-	long handle;
-	Enum<rfsv::errs> res = fopendir(EPOC_ATTR_HIDDEN | EPOC_ATTR_SYSTEM | EPOC_ATTR_DIRECTORY, name, handle);
-	if (res != E_PSI_GEN_NONE)
-		return res;
-
-	while (1) {
-		bufferStore a;
-		a.addDWord(handle);
-		if (!sendCommand(READ_DIR, a))
-			return E_PSI_FILE_DISC;
-		res = getResponse(a);
-		if (res != E_PSI_GEN_NONE)
-			break;
-		while (a.getLen() > 16) {
-			long shortLen = a.getDWord(0);
-			long attributes = attr2std(a.getDWord(4));
-			long size = a.getDWord(8);
-			//unsigned long modLow = a.getDWord(12);
-			//unsigned long modHi = a.getDWord(16);
-			// long uid1 = a.getDWord(20);
-			// long uid2 = a.getDWord(24);
-			// long uid3 = a.getDWord(28);
-			long longLen = a.getDWord(32);
-
-			//long date = micro2time(modHi, modLow);
-			PsiTime *date = new PsiTime(a.getDWord(16), a.getDWord(12));
-
-			bufferStore s;
-			s.addDWord((unsigned long)date);
-			s.addDWord(size);
-			s.addDWord(attributes);
-			int d = 36;
-			for (int i = 0; i < longLen; i++, d++)
-				s.addByte(a.getByte(d));
-			s.addByte(0);
-			while (d % 4)
-				d++;
-			files += s;
-			d += shortLen;
-			while (d % 4)
-				d++;
-			a.discardFirstBytes(d);
-		}
-	}
-	if (res == E_PSI_FILE_EOF)
-		res = E_PSI_GEN_NONE;
-	fclose(handle);
-	return res;
-#endif
 }
 
 long rfsv32::

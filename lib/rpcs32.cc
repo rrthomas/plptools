@@ -26,7 +26,6 @@
 #include <time.h>
 #include <string.h>
 
-#include "bool.h"
 #include "rpcs32.h"
 #include "bufferstore.h"
 #include "bufferarray.h"
