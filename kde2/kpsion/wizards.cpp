@@ -49,7 +49,7 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
     QStringList sl;
     KPsionConfig pcfg;
 
-    setCaption(i18n("KPsion Setup"));
+    setCaption(i18n("KPsion Configuration"));
     QWhatsThis::add(nextButton(),
 		    i18n("Click this button to continue with the next page."));
     QWhatsThis::add(backButton(),
