@@ -43,7 +43,6 @@ dist-hook:
 	test -f CVS/Root && conf/cvs2cl -W 1800 -S --no-wrap --prune \
 		--gmt -f $(distdir)/ChangeLog || \
 		cp -f ChangeLog $(distdir)/ChangeLog
-	# remove CVS from debian/ and patches/ subdirs
 	rm -rf $(distdir)/debian/CVS $(distdir)/patches/CVS
 
 kdoc:
