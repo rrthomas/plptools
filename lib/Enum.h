@@ -32,6 +32,7 @@
 #include <string>
 
 #include <plpintl.h>
+#include <assert.h>
 
 /**
  * the Base for the Enum template.
