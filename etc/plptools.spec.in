@@ -304,8 +304,8 @@ perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 export PATH=%{_kdebindir}:$PATH
 perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 %else
-export PATH=%{_kdebindir}:$PATH
 %triggerin kde -- kdebase, kde-i18n-de
+export PATH=%{_kdebindir}:$PATH
 perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
 %endif
 %endif
