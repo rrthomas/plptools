@@ -35,6 +35,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <plpintl.h>
 
 #include "ncp.h"
 #include "bufferstore.h"
@@ -45,6 +46,9 @@
 #include "link.h"
 #include "packet.h"
 #include "log.h"
+
+#define _GNU_SOURCE
+#include <getopt.h>
 
 static bool verbose = false;
 static bool active = true;
@@ -125,11 +129,81 @@ pollSocketConnections(void *)
     return NULL;
 }
 
-void
-usage()
+static void
+help()
 {
-    cerr << "Usage : ncpd [-V] [-v logclass] [-d] [-e] [-p [<host>:]<port>] [-s <device>] [-b <baudrate>]\n";
-    exit(1);
+    cout << _(
+	"Usage: plpnfsd [OPTIONS]...\n"
+	"\n"
+	"Supported options:\n"
+	"\n"
+        " -d, --dontfork          Run in foreground don't fork\n"
+	" -h, --help              Display this text.\n"
+	" -V, --version           Print version and exit.\n"
+	" -e, --autoexit          Exit after device is disconnected.\n"
+	" -v, --verbose=LOGCLASS  Enable logging of LOGCLASS events\n"
+	"                         Valid log classes are:\n"
+	"                           m   - main program\n"
+	"                           nl  - NCP protocol log\n"
+	"                           nd  - NCP protocol data dump\n"
+	"                           ll  - PLP protocol log\n"
+	"                           ld  - PLP protocol data dump\n"
+	"                           pl  - physical I/O log\n"
+	"                           ph  - physical I/O handshake\n"
+	"                           pd  - physical I/O data dump\n"
+	"                           all - All of the above\n"
+	" -s, --serial=DEV        Use serial device DEV.\n"
+	" -b, --baudrate=RATE     Set serial speed to BAUD.\n"
+	" -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
+	"                         Default for HOST is 127.0.0.1\n"
+	"                         Default for PORT is "
+	) << DPORT << "\n\n";
+}
+
+static void
+usage() {
+    cerr << _("Try `ncpd --help' for more information") << endl;
+}
+
+static struct option opts[] = {
+    {"dontfork",   no_argument,       0, 'd'},
+    {"autoexit",   no_argument,       0, 'e'},
+    {"help",       no_argument,       0, 'h'},
+    {"version",    no_argument,       0, 'V'},
+    {"verbose",    required_argument, 0, 'v'},
+    {"port",       required_argument, 0, 'p'},
+    {"serial",     required_argument, 0, 's'},
+    {"baudrate",   required_argument, 0, 'b'},
+    {NULL,         0,                 0,  0 }
+};
+
+static void
+parse_destination(const char *arg, const char **host, int *port)
+{
+    if (!arg)
+	return;
+    // We don't want to modify argv, therefore copy it first ...
+    char *argcpy = strdup(arg);
+    char *pp = strchr(argcpy, ':');
+
+    if (pp) {
+	// host.domain:400
+	// 10.0.0.1:400
+	*pp ++= '\0';
+	*host = argcpy;
+    } else {
+	// 400
+	// host.domain
+	// host
+	// 10.0.0.1
+	if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
+	    *host = argcpy;
+	    pp = 0L;
+	} else
+	    pp = argcpy;
+    }
+    if (pp)
+	*port = atoi(pp);
 }
 
 static void *
@@ -169,67 +243,64 @@ main(int argc, char **argv)
     if (se != 0L)
 	sockNum = ntohs(se->s_port);
 
-    // Command line parameter processing
-    for (int i = 1; i < argc; i++) {
-	if (!strcmp(argv[i], "-p") && i + 1 < argc) {
-	    // parse port argument
-	    i++;
-	    char *pp = strchr(argv[i], ':');
-	    if (pp != NULL) {
-		// host.domain:400
-		// 10.0.0.1:400
-		*pp ++= '\0';
-		host = argv[i];
-	    } else {
-		// 400
-		// host.domain
-		// host
-		// 10.0.0.1
-		if (strchr(argv[i], '.') || !isdigit(argv[i][0])) {
-		    host = argv[i];
-		    pp = NULL;
-		} else
-		    pp = argv[i];
-	    }
-	    if (pp != NULL)
-		sockNum = atoi(pp);
-	} else if (!strcmp(argv[i], "-s") && i + 1 < argc) {
-	    serialDevice = argv[++i];
-	} else if (!strcmp(argv[i], "-v") && i + 1 < argc) {
-	    i++;
-	    if (!strcmp(argv[i], "nl"))
-		nverbose |= NCP_DEBUG_LOG;
-	    if (!strcmp(argv[i], "nd"))
-		nverbose |= NCP_DEBUG_DUMP;
-	    if (!strcmp(argv[i], "ll"))
-		nverbose |= LNK_DEBUG_LOG;
-	    if (!strcmp(argv[i], "ld"))
-		nverbose |= LNK_DEBUG_DUMP;
-	    if (!strcmp(argv[i], "pl"))
-		nverbose |= PKT_DEBUG_LOG;
-	    if (!strcmp(argv[i], "pd"))
-		nverbose |= PKT_DEBUG_DUMP;
-	    if (!strcmp(argv[i], "ph"))
-	        nverbose |= PKT_DEBUG_HANDSHAKE;
-	    if (!strcmp(argv[i], "m"))
-		verbose = true;
-	    if (!strcmp(argv[i], "all")) {
-		nverbose = NCP_DEBUG_LOG | NCP_DEBUG_DUMP |
-		    LNK_DEBUG_LOG | LNK_DEBUG_DUMP |
-		    PKT_DEBUG_LOG | PKT_DEBUG_DUMP | PKT_DEBUG_HANDSHAKE;
-		verbose = true;
-	    }
-	} else if (!strcmp(argv[i], "-b") && i + 1 < argc) {
-	    baudRate = atoi(argv[++i]);
-	} else if (!strcmp(argv[i], "-d")) {
-	    dofork = 0;
-	} else if (!strcmp(argv[i], "-e")) {
-	    autoexit = true;
-	} else if (!strcmp(argv[i], "-V")) {
-	    cout << "ncpd version " << VERSION << endl;
-	    exit(0);
-	} else
-	    usage();
+    while (1) {
+	int c = getopt_long(argc, argv, "hdeVb:s:p:v:", opts, NULL);
+	if (c == -1)
+	    break;
+	switch (c) {
+	    case '?':
+		usage();
+		return -1;
+	    case 'V':
+		cout << _("plpnfsd Version ") << VERSION << endl;
+		return 0;
+	    case 'h':
+		help();
+		return 0;
+	    case 'v':
+		if (!strcmp(optarg, "nl"))
+		    nverbose |= NCP_DEBUG_LOG;
+		if (!strcmp(optarg, "nd"))
+		    nverbose |= NCP_DEBUG_DUMP;
+		if (!strcmp(optarg, "ll"))
+		    nverbose |= LNK_DEBUG_LOG;
+		if (!strcmp(optarg, "ld"))
+		    nverbose |= LNK_DEBUG_DUMP;
+		if (!strcmp(optarg, "pl"))
+		    nverbose |= PKT_DEBUG_LOG;
+		if (!strcmp(optarg, "pd"))
+		    nverbose |= PKT_DEBUG_DUMP;
+		if (!strcmp(optarg, "ph"))
+		    nverbose |= PKT_DEBUG_HANDSHAKE;
+		if (!strcmp(optarg, "m"))
+		    verbose = true;
+		if (!strcmp(optarg, "all")) {
+		    nverbose = NCP_DEBUG_LOG | NCP_DEBUG_DUMP |
+			LNK_DEBUG_LOG | LNK_DEBUG_DUMP |
+			PKT_DEBUG_LOG | PKT_DEBUG_DUMP | PKT_DEBUG_HANDSHAKE;
+		    verbose = true;
+		}
+		break;
+	    case 'd':
+		dofork = 0;
+		break;
+	    case 'e':
+		autoexit = true;
+		break;
+	    case 'b':
+		baudRate = atoi(optarg);
+		break;
+	    case 's':
+		serialDevice = optarg;
+		break;
+	    case 'p':
+		parse_destination(optarg, &host, &sockNum);
+		break;
+	}
+    }
+    if (optind < argc) {
+	usage();
+	return -1;
     }
 
     if (serialDevice == NULL) {

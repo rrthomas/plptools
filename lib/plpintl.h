@@ -3,8 +3,7 @@
  *
  * This file is part of plptools.
  *
- *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,25 +31,24 @@
 #include <string.h>
 
 extern inline char * stpcpy(char *dest, const char *src) {
-	char c;
-	do {
-		c = *dest++ = *src++;
-	} while (c);
-	return dest;
+    char c;
+    do {
+	c = *dest++ = *src++;
+    } while (c);
+    return dest;
 }
 #endif
 
 #if defined(ENABLE_NLS) && defined(HAVE_GETTEXT)
 #  include <libintl.h>
-#  define X_(x) gettext(x)
-#  define N_(x) (x)
-#  define _(x) gettext(x)
+static inline const char *X_(const char *t) { return gettext(t); }
+static inline const char *_(const char *t) { return gettext(t); }
 #else
-#  define X_(x) (x)
-#  define N_(x) (x)
-#  define _(x) (x)
+static inline const char *X_(const char *t) { return t; }
+static inline const char *_(const char *t) { return t; }
 #  define textdomain(x)
 #endif
+static inline const char *N_(const char *t) { return t; } 
 
 /* Define this, if you have gettext */
 #define HAVE_GETTEXT 1

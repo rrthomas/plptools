@@ -4,7 +4,7 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,25 +40,83 @@
 
 #include "ftp.h"
 
-void
-usage()
+#define _GNU_SOURCE
+#include <getopt.h>
+
+static void
+help()
 {
-    cout << _("Version ") << VERSION << endl;
-    cout << _("Usage : plpftp -p <port> [ftpcommand parameters]") << endl;
+    cout << _(
+	"Usage: plpftp [OPTIONS]... [FTPCOMMAND]\n"
+	"\n"
+	"If FTPCOMMAND is given, connect; run FTPCOMMAND and\n"
+	"terminate afterwards. If no FTPCOMMAND is given, start up\n"
+	"in interactive mode. For help on supported FTPCOMMANDs,\n"
+	"use `?' or `help' as FTPCOMMAND.\n"
+	"\n"
+	"Supported options:\n"
+	"\n"
+	" -h, --help              Display this text.\n"
+	" -V, --version           Print version and exit.\n"
+	" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
+	"                         Default for HOST is 127.0.0.1\n"
+	"                         Default for PORT is "
+	) << DPORT << "\n\n";
 }
+
+static void
+usage() {
+    cerr << _("Try `plpftp --help' for more information") << endl;
+}
+
+static struct option opts[] = {
+    {"help",     no_argument,       0, 'h'},
+    {"version",  no_argument,       0, 'V'},
+    {"port",     required_argument, 0, 'p'},
+    {NULL,       0,                 0,  0 }
+};
 
 void
 ftpHeader()
 {
     cout << _("PLPFTP Version ") << VERSION;
     cout << _(" Copyright (C) 1999  Philip Proudman") << endl;
-    cout << _(" Additions Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>") << endl;
+    cout << _(" Additions Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>") << endl;
     cout << _("                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>") << endl;
     cout << _("PLPFTP comes with ABSOLUTELY NO WARRANTY.") << endl;
     cout << _("This is free software, and you are welcome to redistribute it") << endl;
     cout << _("under GPL conditions; see the COPYING file in the distribution.") << endl;
     cout << endl;
     cout << _("FTP like interface started. Type \"?\" for help.") << endl;
+}
+
+static void
+parse_destination(const char *arg, const char **host, int *port)
+{
+    if (!arg)
+	return;
+    // We don't want to modify argv, therefore copy it first ...
+    char *argcpy = strdup(arg);
+    char *pp = strchr(argcpy, ':');
+
+    if (pp) {
+	// host.domain:400
+	// 10.0.0.1:400
+	*pp ++= '\0';
+	*host = argcpy;
+    } else {
+	// 400
+	// host.domain
+	// host
+	// 10.0.0.1
+	if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
+	    *host = argcpy;
+	    pp = 0L;
+	} else
+	    pp = argcpy;
+    }
+    if (pp)
+	*port = atoi(pp);
 }
 
 int
@@ -69,6 +127,7 @@ main(int argc, char **argv)
     rfsv *a;
     rpcs *r;
     ftp f;
+    const char *host = "127.0.0.1";
     int status = 0;
     int sockNum = DPORT;
 
@@ -82,23 +141,35 @@ main(int argc, char **argv)
     if (se != 0L)
 	sockNum = ntohs(se->s_port);
 
-    // Command line parameter processing
-    if ((argc > 2) && !strcmp(argv[1], "-p")) {
-	sockNum = atoi(argv[2]);
-	argc -= 2;
-	for (int i = 1; i < argc; i++)
-	    argv[i] = argv[i + 2];
+    while (1) {
+	int c = getopt_long(argc, argv, "hVp:", opts, NULL);
+	if (c == -1)
+	    break;
+	switch (c) {
+	    case '?':
+		usage();
+		return -1;
+	    case 'V':
+		cout << _("plpftp Version ") << VERSION << endl;
+		return 0;
+	    case 'h':
+		help();
+		return 0;
+	    case 'p':
+		parse_destination(optarg, &host, &sockNum);
+		break;
+	}
     }
-
-    if (argc < 2)
+    if (optind == argc)
 	ftpHeader();
+
     skt = new ppsocket();
-    if (!skt->connect(NULL, sockNum)) {
+    if (!skt->connect(host, sockNum)) {
 	cout << _("plpftp: could not connect to ncpd") << endl;
 	return 1;
     }
     skt2 = new ppsocket();
-    if (!skt2->connect(NULL, sockNum)) {
+    if (!skt2->connect(host, sockNum)) {
 	cout << _("plpftp: could not connect to ncpd") << endl;
 	return 1;
     }
@@ -107,7 +178,7 @@ main(int argc, char **argv)
     a = rf->create(false);
     r = rp->create(false);
     if ((a != NULL) && (r != NULL)) {
-	status = f.session(*a, *r, argc, argv);
+	status = f.session(*a, *r, argc - optind, &argv[optind]);
 	delete r;
 	delete a;
 	delete skt;

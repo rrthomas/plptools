@@ -42,6 +42,9 @@ extern "C" {
 #include "rfsv_api.h"
 }
 
+#define _GNU_SOURCE
+#include <getopt.h>
+
 static rfsv *a;
 static rfsvfactory *rf;
 static char *a_filename = 0;
@@ -447,10 +450,10 @@ long rfsv_drivelist(int *cnt, device **dlist) {
     if (ret == 0)
 	for (i = 0; i<26; i++) {
 	    PlpDrive drive;
-	    
+
 	    if ((devbits & 1) &&
 		((a->devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE))) {
-		
+
 		device *next = *dlist;
 		*dlist = (device *)malloc(sizeof(device));
 		(*dlist)->next = next;
@@ -466,10 +469,69 @@ long rfsv_drivelist(int *cnt, device **dlist) {
     return ret;
 }
 
-void usage()
+static void
+help()
 {
-    cerr << "usage: plpnfsd [-v] [-V] [-p port] [-d mountdir] [-u user]\n";
-    exit(1);
+    cout << _(
+	"Usage: plpnfsd [OPTIONS]...\n"
+	"\n"
+	"Supported options:\n"
+	"\n"
+        " -d, --mountpoint=DIR    Specify DIR as mountpoint\n"
+	" -u, --user=USER         Specify USER who owns mounted dir.\n"
+	" -v, --verbose           Increase verbosity\n"
+	" -D, --debug             Increase debug level\n"
+	" -h, --help              Display this text.\n"
+	" -V, --version           Print version and exit.\n"
+	" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
+	"                         Default for HOST is 127.0.0.1\n"
+	"                         Default for PORT is "
+	) << DPORT << "\n\n";
+}
+
+static void
+usage() {
+    cerr << _("Try `plpnfsd --help' for more information") << endl;
+}
+
+static struct option opts[] = {
+    {"help",       no_argument,       0, 'h'},
+    {"verbose",    no_argument,       0, 'v'},
+    {"debug",      no_argument,       0, 'D'},
+    {"version",    no_argument,       0, 'V'},
+    {"port",       required_argument, 0, 'p'},
+    {"user",       required_argument, 0, 'u'},
+    {"mountpoint", required_argument, 0, 'd'},
+    {NULL,       0,                 0,  0 }
+};
+
+static void
+parse_destination(const char *arg, const char **host, int *port)
+{
+    if (!arg)
+	return;
+    // We don't want to modify argv, therefore copy it first ...
+    char *argcpy = strdup(arg);
+    char *pp = strchr(argcpy, ':');
+
+    if (pp) {
+	// host.domain:400
+	// 10.0.0.1:400
+	*pp ++= '\0';
+	*host = argcpy;
+    } else {
+	// 400
+	// host.domain
+	// host
+	// 10.0.0.1
+	if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
+	    *host = argcpy;
+	    pp = 0L;
+	} else
+	    pp = argcpy;
+    }
+    if (pp)
+	*port = atoi(pp);
 }
 
 int main(int argc, char**argv) {
@@ -477,6 +539,7 @@ int main(int argc, char**argv) {
     ppsocket *skt2;
     char *user = 0L;
     char *mdir = DMOUNTPOINT;
+    const char *host = "127.0.0.1";
     int sockNum = DPORT;
     int verbose = 0;
     int status = 0;
@@ -486,31 +549,49 @@ int main(int argc, char**argv) {
     if (se != 0L)
 	sockNum = ntohs(se->s_port);
 
-    for (int i = 1; i < argc; i++) {
-	if (!strcmp(argv[i], "-p") && i + 1 < argc) {
-	    sockNum = atoi(argv[++i]);
-	} else if (!strcmp(argv[i], "-d") && i + 1 < argc) {
-	    mdir = argv[++i];
-	} else if (!strcmp(argv[i], "-u") && i + 1 < argc) {
-	    user = argv[++i];
-	} else if (!strcmp(argv[i], "-v")) {
-	    verbose++;
-	} else if (!strcmp(argv[i], "-D")) {
-	    debug++;
-	} else if (!strcmp(argv[i], "-V")) {
-	    cout << "plpnfsd version " << VERSION << endl;
-	    exit(0);
-	} else
-	    usage();
+    while (1) {
+	int c = getopt_long(argc, argv, "hvDVp:u:d:", opts, NULL);
+	if (c == -1)
+	    break;
+	switch (c) {
+	    case '?':
+		usage();
+		return -1;
+	    case 'V':
+		cout << _("plpnfsd Version ") << VERSION << endl;
+		return 0;
+	    case 'h':
+		help();
+		return 0;
+	    case 'v':
+		verbose++;
+		break;
+	    case 'D':
+		debug++;
+		break;
+	    case 'd':
+		mdir = optarg;
+		break;
+	    case 'u':
+		user = optarg;
+		break;
+	    case 'p':
+		parse_destination(optarg, &host, &sockNum);
+		break;
+	}
+    }
+    if (optind < argc) {
+	usage();
+	return -1;
     }
 
     skt = new ppsocket();
-    if (!skt->connect(NULL, sockNum)) {
+    if (!skt->connect(host, sockNum)) {
 	cerr << "plpnfsd: could not connect to ncpd" << endl;
 	status = 1;
     }
     skt2 = new ppsocket();
-    if (!skt2->connect(NULL, sockNum)) {
+    if (!skt2->connect(host, sockNum)) {
 	cerr << "plpnfsd: could not connect to ncpd" << endl;
 	status = 1;
     }

@@ -212,11 +212,11 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
     cpCallback_t cab = checkAbortNoHash;
     bool once = false;
 
-    if (xargc > 1) {
+    if (xargc) {
 	once = true;
-	argc = (xargc<11)?xargc-1:10;
+	argc = (xargc<10)?xargc:10;
 	for (int i = 0; i < argc; i++)
-	    argv[i] = xargv[i+1];
+	    argv[i] = xargv[i];
     }
     {
 	Enum<rpcs::machs> machType;
@@ -439,7 +439,43 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	}
 	if (!strcmp(argv[0], "ls") || !strcmp(argv[0], "dir")) {
 	    PlpDir files;
-	    if ((res = a.dir(psionDir, files)) != rfsv::E_PSI_GEN_NONE)
+	    char dtmp[1024];
+	    char *dname = psionDir;
+
+	    if (argc > 1) {
+		u_int32_t tmp;
+		strcpy(dtmp, psionDir);
+		if (!strcmp(argv[1], "..")) {
+		    strcpy(f1, psionDir);
+		    char *p = f1 + strlen(f1);
+		    if (p > f1)
+			p--;
+		    *p = '\0';
+		    while ((p > f1) && (*p != '/') && (*p != '\\'))
+			p--;
+		    *(++p) = '\0';
+		    if (strlen(f1) < 3) {
+			strcpy(f1, psionDir);
+			f1[3] = '\0';
+		    }
+		} else {
+		    if ((argv[1][0] != '/') && (argv[1][0] != '\\') &&
+			(argv[1][1] != ':')) {
+			strcpy(f1, psionDir);
+			strcat(f1, argv[1]);
+		    } else
+			strcpy(f1, argv[1]);
+		}
+		if ((f1[strlen(f1) -1] != '/') && (f1[strlen(f1) -1] != '\\'))
+		    strcat(f1,"\\");
+		for (char *p = f1; *p; p++)
+		    if (*p == '/')
+			*p = '\\';
+		strcpy(dtmp, f1);
+		dname = dtmp;
+	    }
+		
+	    if ((res = a.dir(dname, files)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else
 		while (!files.empty()) {
