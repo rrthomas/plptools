@@ -105,7 +105,7 @@ main(int argc, char **argv)
 		delete r;
 		delete a;
 	} else {
-		cout << "plpftp: could not create rfsv object" << endl;
+		cerr << "plpftp: " << rf->getError() << endl;
 		status = 1;
 	}
 	return status;
