@@ -528,8 +528,6 @@ sub initialise ()
       if ($MakefileData =~ /($lookup)\n/) {
 	substituteLine ($lookup, "DEPDIR = .deps\n$1");
       }
-    } else {
-      print STDERR "$printname defines DEPDIR. This means you're using automake > 1.4 - this is not supported!\n";
     }
 
     my $localTag = 0;
