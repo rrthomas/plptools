@@ -88,7 +88,9 @@
  basic PLP/NCP services for the other two programs. It auto-
  connects to the psion, even after unplugging/switching off
  therefore it can run always in background (if you have a
- spare serial-device)
+ spare serial-device). If supplied, the -e option will cause ncpd to
+ automatically exit when the connection to the Psion is lost. This is useful
+ when used with a patch to mgetty (see the patches directory).
 
  plpftp is a FTP-like program for manipulating files on the Psion.
 

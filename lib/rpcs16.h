@@ -12,7 +12,7 @@ class rpcs16 : public rpcs {
 		~rpcs16();
 
 		int queryDrive(const char, bufferArray &);
-		int getCmdLine(const char *, char *, int); 
+		int getCmdLine(const char *, bufferStore &); 
 };
 
 #endif

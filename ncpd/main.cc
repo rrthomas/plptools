@@ -79,7 +79,7 @@ pollSocketConnections(int &numScp, socketChan ** scp)
 void
 usage()
 {
-	cerr << "Usage : ncpd [-V] [-v logclass] [-d] [-p <port>] [-s <device>] [-b <baudrate>]\n";
+	cerr << "Usage : ncpd [-V] [-v logclass] [-d] [-e] [-p <port>] [-s <device>] [-b <baudrate>]\n";
 	exit(1);
 }
 
@@ -90,6 +90,7 @@ main(int argc, char **argv)
 	IOWatch iow;
 	int pid;
 	bool dofork = true;
+	bool autoexit = false;
 
 	// Command line parameter processing
 	int sockNum = DPORT;
@@ -120,7 +121,7 @@ main(int argc, char **argv)
 			if (!strcmp(argv[i], "pd"))
 				pverbose |= PKT_DEBUG_DUMP;
 			if (!strcmp(argv[i], "ph"))
-				lverbose |= PKT_DEBUG_HANDSHAKE;
+				pverbose |= PKT_DEBUG_HANDSHAKE;
 			if (!strcmp(argv[i], "m"))
 				verbose = true;
 			if (!strcmp(argv[i], "all")) {
@@ -133,6 +134,8 @@ main(int argc, char **argv)
 			baudRate = atoi(argv[++i]);
 		} else if (!strcmp(argv[i], "-d")) {
 			dofork = 0;
+		} else if (!strcmp(argv[i], "-e")) {
+			autoexit = true;
 		} else if (!strcmp(argv[i], "-V")) {
 			cout << "ncpd version " << VERSION << endl;
 			exit(0);
@@ -180,6 +183,9 @@ main(int argc, char **argv)
 						iow.watch(1, 0);
 
 					if (a->hasFailed()) {
+						if (autoexit)
+							break;
+
 						iow.watch(5, 0);
 						if (verbose)
 							cout << "ncp: restarting\n";

@@ -90,7 +90,7 @@ send(const bufferStore & buff)
 	if (buff.getLen() > 300)
 		failed = true;
 	else
-		sendQueue.pushBuffer(buff);
+		sendQueue += buff;
 }
 
 bufferArray link::
@@ -116,7 +116,7 @@ poll()
 				// Send ack
 				if (idLastGot != seq) {
 					idLastGot = seq;
-					ret.pushBuffer(buff);
+					ret += buff;
 				} else {
 					if (verbose & LNK_DEBUG_LOG)
 						cout << "link: DUP\n";
@@ -177,7 +177,7 @@ poll()
 		} else {
 			if (!sendQueue.empty()) {
 				somethingToSend = true;
-				toSend = sendQueue.popBuffer();
+				toSend = sendQueue.pop();
 				idSent++;
 				if (idSent > 7)
 					idSent = 0;

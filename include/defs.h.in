@@ -17,10 +17,6 @@
 
 #define DUSER "root"
 
-#ifndef DDIR
-# define DDIR "/mnt/psion"
-#endif
-
 #ifndef PSIONHOSTNAME
 # define PSIONHOSTNAME "localhost"
 #endif
@@ -38,6 +34,8 @@
 #define DPORT		@DPORT@
 #define DDRIVE		"@DDRIVE@"
 #define DBASEDIR	"@DBASEDIR@"
+#define DDIR		"@DDIR@"
+
 
 /* Debugging */
 

@@ -57,7 +57,7 @@ cout << dec << "qd: " << res << " " << a.getLen() << " a="<< a << endl;
 }
 
 int rpcs16::
-getCmdLine(const char *process, char *buf, int bufsize)
+getCmdLine(const char *process, bufferStore &ret)
 {
 	return 0;
 }

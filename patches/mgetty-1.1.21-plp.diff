@@ -1,0 +1,40 @@
+diff -ur mgetty-1.1.21/logname.c mgetty-1.1.21.new/logname.c
+--- mgetty-1.1.21/logname.c	Tue Sep  1 11:56:19 1998
++++ mgetty-1.1.21.new/logname.c	Sat Jan  1 17:12:11 2000
+@@ -270,6 +270,9 @@
+     static int ppp_level = 0, ppp_escaped = 0;
+     char   ppp_ch;
+ #endif
++#if 1
++    static int plp_level = 0;
++#endif
+     
+     /* read character by character! */
+     tio_save = *tio;
+@@ -413,6 +416,26 @@
+             ppp_level = 0;
+ 	    ppp_escaped = 0;
+         }
++#endif
++#if 1
++	if (ch == '\026')
++	{
++	  plp_level = 1;
++	}
++	else if ((ch == '\020') && (plp_level == 1))
++	{
++	  plp_level = 2;
++	}
++	else if ((ch == '\002') && (plp_level == 2))
++	{
++	  strcpy (buf, "/PLP/");
++	  i=5;
++	  ch = '\r';
++	}
++	else
++	{
++	  plp_level = 0;
++	}
+ #endif
+         
+ #ifdef JANUS

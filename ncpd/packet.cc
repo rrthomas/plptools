@@ -54,6 +54,7 @@ iow(_iow)
 	inPtr = inBuffer = new unsigned char[BUFFERLEN + 1];
 	outPtr = outBuffer = new unsigned char[BUFFERLEN + 1];
 	inLen = outLen = termLen = 0;
+	foundSync = 0;
 	esc = false;
 	crcIn = crcOut = 0;
 
@@ -87,7 +88,7 @@ void packet::
 send(unsigned char type, const bufferStore & b)
 {
 	if (verbose & PKT_DEBUG_LOG) {
-		cout << "packet: >> ";
+		cout << "packet: type " << hex << (int) type << " >> ";
 		if (verbose & PKT_DEBUG_DUMP)
 			cout << b << endl;
 		else
@@ -185,7 +186,7 @@ get(unsigned char &type, bufferStore & ret)
 	if (verbose & PKT_DEBUG_LOG) {
 		cout << "packet: get ";
 		if (verbose & PKT_DEBUG_DUMP) {
-			for (int i = 0; i < termLen; i++)
+			for (int i = foundSync - 3; i < termLen; i++)
 				cout << hex << setw(2) << setfill('0') << (int) inBuffer[i] << " ";
 		} else
 			cout << "len=" << dec << termLen;
@@ -193,6 +194,7 @@ get(unsigned char &type, bufferStore & ret)
 	}
 	inLen -= termLen;
 	termLen = 0;
+	foundSync = 0;
 	bool crcOk = (endPtr[0] == ((crcIn >> 8) & 0xff) && endPtr[1] == (crcIn & 0xff));
 	if (inLen > 0)
 		memmove(inBuffer, &endPtr[2], inLen);
@@ -218,15 +220,29 @@ terminated()
 	if (inLen < 6)
 		return false;
 	p = inBuffer + termLen;
-	if (termLen == 0) {
+	if (!foundSync) {
+	  while (!foundSync && (inLen - termLen >= 6))
+	  {
+		termLen++;
 		if (*p++ != 0x16)
-			return false;
+			continue;
+		termLen++;
 		if (*p++ != 0x10)
-			return false;
+			continue;
+		termLen++;
 		if (*p++ != 0x02)
+			continue;
+		foundSync = termLen;
+	  }
+	  if (!foundSync)
 			return false;
+
+	if (verbose & PKT_DEBUG_LOG) {
+	  if (foundSync != 3)
+	    cout << "packet: terminated found sync at " << foundSync << endl;
+	}
 		esc = false;
-		termLen = 3;
+		// termLen = 3;
 		crcIn = 0;
 		rcv.init();
 	}

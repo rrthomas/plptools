@@ -11,9 +11,17 @@
 [ -f @prefix@/sbin/ncpd ] || exit 0
 [ -f @prefix@/sbin/plpnfsd ] || exit 0
 
+MGETTY_HASPLP=false
+if grep -qs ^/PLP/ /etc/mgetty+sendfax/login.config ; then
+	MGETTY_HASPLP=true
+fi
+
 # See how we were called.
 case "$1" in
   start)
+  	if $MGETTY_HASPLP ; then
+		echo "NOT Starting ncpd because mgetty configured for PLP"
+	fi
 	echo -n "Starting Psion support: "
 	daemon @prefix@/sbin/ncpd
 	daemon @prefix@/sbin/plpnfsd

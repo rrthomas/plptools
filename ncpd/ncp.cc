@@ -113,7 +113,7 @@ poll()
 	bufferArray res(l->poll());
 	if (!res.empty()) {
 		do {
-			bufferStore s = res.popBuffer();
+			bufferStore s = res.pop();
 			if (s.getLen() > 1) {
 				int channel = s.getByte(0);
 				s.discardFirstBytes(1);

@@ -4,48 +4,205 @@
 #include "bool.h"
 class ostream;
 
+/**
+ * A generic container for an array of bytes.
+ *
+ * bufferStore provides an array of bytes which
+ * can be accessed using various types.
+ */
 class bufferStore {
 public:
-  bufferStore();
-  bufferStore(const unsigned char *, long);
-  ~bufferStore();
-  bufferStore(const bufferStore &);
-  bufferStore &operator =(const bufferStore &);
+	/**
+	 * Constructs a new bufferStore.
+	 */
+	bufferStore();
 
-  // Reading Utils
-  unsigned long getLen() const;
-  unsigned char getByte(long pos) const;
-  unsigned int getWord(long pos) const;
-  unsigned int getDWord(long pos) const;
-  const char* getString(long pos=0) const;
-  void discardFirstBytes(int);
-  friend ostream &operator<<(ostream &, const bufferStore &);
-  bool empty() const;
+	/**
+	 * Constructs a new bufferStore and
+	 * initializes its content.
+	 *
+	 * @param buf Pointer to data for initialization.
+	 * @param len Length of data for initialization.
+	 */
+	bufferStore(const unsigned char *, long);
 
-  // Writing utils
-  void init();
-  void init(const unsigned char*, long);
-  void addByte(unsigned char);
-  void addWord(int);
-  void addDWord(long);
-  void addString(const char*);
-  void addStringT(const char*);
-  void addBytes(const unsigned char*, int);
-  void addBuff(const bufferStore &, long maxLen=-1);
+	/**
+	 * Destroys a bufferStore instance.
+	 */
+	~bufferStore();
+
+	/**
+	 * Constructs a new bufferStore and
+	 * initializes its content.
+	 *
+	 * @param b A bufferStore, whose content is
+	 * used for initialization.
+	 */
+	bufferStore(const bufferStore &);
+
+	/**
+	 * Copies a bufferStore.
+	 */
+	bufferStore &operator =(const bufferStore &);
+
+	/**
+	 * Retrieves the length of a bufferStore.
+	 *
+	 * @returns The current length of the contents
+	 * 	in bytes.
+	 */
+	unsigned long getLen() const;
+
+	/**
+	 * Retrieves the byte at index <em>pos</em>.
+	 *
+	 * @param pos The index of the byte to retrieve.
+	 *
+	 * @returns The value of the byte at index <em>pos</em>
+	 */
+	unsigned char getByte(long pos) const;
+
+	/**
+	 * Retrieves the word at index <em>pos</em>.
+	 *
+	 * @param pos The index of the word to retrieve.
+	 *
+	 * @returns The value of the word at index <em>pos</em>
+	 */
+	unsigned int getWord(long pos) const;
+
+	/**
+	 * Retrieves the dword at index <em>pos</em>.
+	 *
+	 * @param pos The index of the dword to retrieve.
+	 *
+	 * @returns The value of the dword at index <em>pos</em>
+	 */
+	unsigned int getDWord(long pos) const;
+
+	/**
+	 * Retrieves the characters at index <em>pos</em>.
+	 *
+	 * @param pos The index of the characters to retrieve.
+	 *
+	 * @returns A pointer to characters at index <em>pos</em>
+	 */
+	const char* getString(long pos=0) const;
+
+	/**
+	 * Removes bytes from the start of the buffer.
+	 *
+	 * @param len Number of bytes to remove.
+	 */
+	void discardFirstBytes(int);
+
+	/**
+	 * Prints a dump of the content.
+	 *
+	 * Mainly used for debugging purposes.
+	 *
+	 * @param s The stream to write to.
+	 * @param b The bufferStore do be dumped.
+	 *
+	 * @returns The stream.
+	 */
+	friend ostream &operator<<(ostream &, const bufferStore &);
+
+	/**
+	 * Tests if the bufferStore is empty.
+	 *
+	 * @returns true, if the bufferStore is empty.
+	 * 	false, if it contains data.
+	 */
+	bool empty() const;
+
+	/**
+	 * Initializes the bufferStore.
+	 *
+	 * All data is removed, the length is
+	 * reset to 0.
+	 */
+	void init();
+
+	/**
+	 * Initializes the bufferStore with
+	 * a given data.
+	 *
+	 * @param buf Pointer to data to initialize from.
+	 * @param len Length of data.
+	 */
+	void init(const unsigned char*, long);
+
+	/**
+	 * Appends a byte to the content of this instance.
+	 *
+	 * @param c The byte to append.
+	 */
+	void addByte(unsigned char);
+
+	/**
+	 * Appends a word to the content of this instance.
+	 *
+	 * @param w The word to append.
+	 */
+	void addWord(int);
+
+	/**
+	 * Appends a dword to the content of this instance.
+	 *
+	 * @param dw The dword to append.
+	 */
+	void addDWord(long);
+
+	/**
+	 * Appends a string to the content of this instance.
+	 *
+	 * The trailing zero byte is <em>not</em> copied
+	 * to the content.
+	 *
+	 * @param s The string to append.
+	 */
+	void addString(const char*);
+
+	/**
+	 * Appends a string to the content of this instance.
+	 *
+	 * The trailing zero byte <em>is</em> copied
+	 * to the content.
+	 *
+	 * @param s The string to append.
+	 */
+	void addStringT(const char*);
+
+	/**
+	 * Appends data to the content of this instance.
+	 *
+	 * @param buf The data to append.
+	 * @param len Length of data.
+	 */
+	void addBytes(const unsigned char*, int);
+
+	/**
+	 * Appends data to the content of this instance.
+	 *
+	 * @param b The bufferStore whose content to append.
+	 * @param maxLen Length of content.
+	 */
+	void addBuff(const bufferStore &, long maxLen=-1);
   
 private:
-  void checkAllocd(long newLen);
+	void checkAllocd(long newLen);
 
-  long len;
-  long lenAllocd;
-  long start;
-  unsigned char* buff;
+	long len;
+	long lenAllocd;
+	long start;
+	unsigned char* buff;
 
-  enum c { MIN_LEN = 300 };
+	enum c { MIN_LEN = 300 };
 };
 
 inline bool bufferStore::empty() const {
-  return (len-start) == 0;
+	return (len-start) == 0;
 }
 
 #endif

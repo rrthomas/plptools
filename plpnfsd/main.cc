@@ -46,14 +46,14 @@ long rfsv_dir(const char *file, dentry **e) {
 	ret = a->dir(&(*file), &entries);
 	while (!entries.empty()) {
 		bufferStore s;
-		s = entries.popBuffer();
+		s = entries.pop();
 		tmp = *e;
 		*e = (dentry *)malloc(sizeof(dentry));
 		if (!*e)
 			return -1;
 		(*e)->time = s.getDWord(0);
 		(*e)->size = s.getDWord(4);
-		(*e)->attr = s.getDWord(8);
+		(*e)->attr = a->attr2std(s.getDWord(8));
 		(*e)->name = strdup(s.getString(12));
 		(*e)->next = tmp;
 	}
@@ -138,7 +138,6 @@ static long rfsv_opencached(const char *name, long mode) {
 }
 
 long rfsv_read(char *buf, long offset, long len, char *name) {
-	// FIXME: this might break on RFSV16?
 	long ret = 0;
 
 	if (!a)
@@ -161,7 +160,6 @@ long rfsv_read(char *buf, long offset, long len, char *name) {
 }
 
 long rfsv_write(char *buf, long offset, long len, char *name) {
-	// FIXME: this might break on RFSV16?
 	long ret = 0;
 
 	if (!a)
@@ -196,7 +194,6 @@ long rfsv_setmtime(const char *name, long time) {
 long rfsv_setsize(const char *name, long size) {
 	long ph;
 	long ret;
-	// FIXME: this might break on RFSV16?
 
 	if (!a)
 		return -1;
@@ -215,14 +212,19 @@ long rfsv_setattr(const char *name, long sattr, long dattr) {
 		return -1;
 	if (a_filename && !strcmp(name, a_filename))
 		rfsv_closecached();
-	long ret = a->fsetattr(name, dattr, sattr);
-	return ret;
+	dattr = a->std2attr(dattr);
+	sattr = a->std2attr(sattr);
+	return a->fsetattr(name, dattr, sattr);
 }
 
 long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
+	long res, psiattr;
+	
 	if (!a)
 		return -1;
-	return a->fgeteattr(&(*name), &(*attr), &(*size), &(*time));
+	res = a->fgeteattr(&(*name), &psiattr, &(*size), &(*time));
+	*attr = a->attr2std(psiattr);
+	return res;
 }
 
 long rfsv_statdev(char letter) {

@@ -63,6 +63,7 @@ class packet {
 		int inLen;
 		int outLen;
 		int termLen;
+		int foundSync;
 		int fd;
 		short int verbose;
 		bool esc;

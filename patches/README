@@ -1,0 +1,16 @@
+The following patches may be applied to other programs to allow them to operate
+better with plptools.
+
+mgetty-1.1.21-plp.diff is from Christof Meerwald, and adds autodetection 
+support for the PLP-protocol to mgetty - thus mgetty can autodetect a
+Psion connected to the serial port and execute ncpd (with the autoexit
+option). Having mgetty watch the serial port makes it a lot more easy to
+switch between a PLP (file transfer) and a PPP (TCP/IP) connection. Christof
+used the following login.conf for mgetty:
+
+/AutoPPP/ -     -       /usr/sbin/pppd
+/PLP/   -       -       /usr/sbin/ncpd -d -e
+*       -       -       /bin/login @
+
+
+-- MJG

@@ -37,6 +37,8 @@
 #include "ppsocket.h"
 #include "bufferarray.h"
 
+#define	RFSV16_MAXDATALEN	852	// 640
+
 rfsv16::rfsv16(ppsocket *_skt) : serNum(0)
 {
 	skt = _skt;
@@ -57,7 +59,6 @@ rfsv16::~rfsv16()
 void rfsv16::
 reconnect()
 {
-cerr << "rfsv16::reconnect" << endl;
 	skt->closeSocket();
 	skt->reconnect();
 	serNum = 0;
@@ -68,7 +69,6 @@ cerr << "rfsv16::reconnect" << endl;
 void rfsv16::
 reset()
 {
-cerr << "rfsv16::reset" << endl;
 	bufferStore a;
 	status = E_PSI_FILE_DISC;
 	a.addStringT(getConnectName());
@@ -91,7 +91,7 @@ getStatus()
 const char *rfsv16::
 getConnectName()
 {
-	return "SYS$RFSV.*";
+	return "SYS$RFSV";
 }
 
 int rfsv16::
@@ -148,14 +148,10 @@ fopen(long attr, const char *name, long &handle)
 		return E_PSI_FILE_DISC;
   
 	long res = getResponse(a);
-	// cerr << "fopen, getword 0 is " << hex << setw(2) << a.getWord(0) << endl;
-	// cerr << "fopen, getlen is " << hex << setw(2) << a.getLen() << endl;
-	// cerr << "fopen, res is " << hex << setw(2) << res << endl;
-	if (!res && a.getLen() == 4 && a.getWord(0) == 0) {
-		handle = (long)a.getWord(2);
+	if (res == 0) {
+		handle = (long)a.getWord(0);
 		return 0;
 	}
-	// cerr << "fopen: Unknown response (" << attr << "," << name << ") " << a <<endl;
 	return res;
 }
 
@@ -163,24 +159,38 @@ fopen(long attr, const char *name, long &handle)
 long rfsv16::
 mktemp(long *handle, char *tmpname)
 {
-cerr << "rfsv16::mktemp ***" << endl;
-	return 0;
+	bufferStore a;
+
+	// FIXME: anything that calls fopen should NOT do the name
+	// conversion - it's just done here. 
+
+	a.addWord(P_FUNIQUE);
+	a.addString("TMP");
+	a.addByte(0x00); // Needs to be manually Null-Terminated.
+	if (!sendCommand(OPENUNIQUE, a))
+		return E_PSI_FILE_DISC;
+  
+	long res = getResponse(a);
+	if (res == 0) {
+		*handle = a.getWord(0);
+		strcpy(tmpname, a.getString(2));
+		return 0;
+	}
+	return res;
 }
 
 // internal and external
 long rfsv16::
 fcreatefile(long attr, const char *name, long &handle)
 {
-cerr << "rfsv16::fcreatefile ***" << endl;
-	return 0;
+	return fopen(attr | P_FCREATE, name, handle);
 }
 
 // this is internal - not used by plpnfsd, unlike fcreatefile
 long rfsv16::
 freplacefile(long attr, const char *name, long &handle)
 {
-cerr << "rfsv16::freplacefile ***" << endl;
-	return 0;
+	return fopen(attr | P_FREPLACE, name, handle);
 }
 
 // internal
@@ -198,11 +208,7 @@ fclose(long fileHandle)
 	a.addWord(fileHandle & 0xFFFF);
 	if (!sendCommand(FCLOSE, a))
 		return E_PSI_FILE_DISC;
-	long res = getResponse(a);
-	if (!res && a.getLen() == 2)
-		return (long)a.getWord(0);
-	cerr << "fclose: Unknown response "<< a <<endl;
-	return 1;
+	return getResponse(a);
 }
 
 long rfsv16::
@@ -224,7 +230,7 @@ dir(const char *dirName, bufferArray * files)
 		res = getResponse(a);
 		if (res)
 			break;
-		a.discardFirstBytes(4); // Don't know what these mean!
+		a.discardFirstBytes(2); // Don't know what these mean!
 		while (a.getLen() > 16) {
 			int version = a.getWord(0);
 			if (version != 2) {
@@ -242,7 +248,7 @@ dir(const char *dirName, bufferArray * files)
 			temp.addDWord(size);
 			temp.addDWord((long)status);
 			temp.addStringT(s);
-			files->pushBuffer(temp);
+			files->append(temp);
 		}
 	}
 	if ((short int)res == E_PSI_FILE_EOF)
@@ -300,15 +306,13 @@ cerr << "rfsv16::fgetmtime" << endl;
 		return E_PSI_FILE_DISC;
   
 	long res = getResponse(a);
-	if (res != 0)
+	if (res != 0) {
+		cerr << "fgetmtime: Error " << res << " on file " << name << endl;	    
 		return res;
-	if (a.getLen() == 2) {
-		cerr << "fgetmtime: Error " << a.getWord(0) << " on file " << name << endl;
-		return 1;
 	}
-	else if (a.getLen() == 18 && a.getWord(0) == 0) {
-		*mtime = a.getDWord(10);
-		return a.getWord(0);
+	else if (a.getLen() == 16) {
+		*mtime = a.getDWord(8);
+		return res;
 	}
 	cerr << "fgetmtime: Unknown response (" << name << ") " << a <<endl;
 	return 1;
@@ -338,15 +342,13 @@ fgetattr(const char *name, long *attr)
 		return E_PSI_FILE_DISC;
   
 	long res = getResponse(a);
-	if (res != 0)
+	if (res != 0) {
+		cerr << "fgetattr: Error " << res << " on file " << name << endl;	    
 		return res;
-	if (a.getLen() == 2) {
-		cerr << "fgetattr: Error " << a.getWord(0) << " on file " << name << endl;
-		return 1;
 	}
-	else if (a.getLen() == 18 && a.getWord(0) == 0) {
-		*attr = (long)(a.getWord(4));
-		return a.getWord(0);
+	else if (a.getLen() == 16) {
+		*attr = (long)(a.getWord(2));
+		return res;
 	}
 	cerr << "fgetattr: Unknown response (" << name << ") " << a <<endl;
 	return 1;
@@ -366,17 +368,15 @@ fgeteattr(const char *name, long *attr, long *size, long *time)
 		return E_PSI_FILE_DISC;
   
 	long res = getResponse(a);
-	if (res != 0)
-		return res;
-	if (a.getLen() == 2) {
+	if (res != 0) {
 		cerr << "fgeteattr: Error " << a.getWord(0) << " on file " << name << endl;
-		return 1;
+		return res;
 	}
-	else if (a.getLen() == 18 && a.getWord(0) == 0) {
-		*attr = (long)(a.getWord(4));
-		*size = a.getDWord(6);
-		*time = a.getDWord(10);
-		return a.getWord(0);
+	else if (a.getLen() == 16) {
+		*attr = (long)(a.getWord(2));
+		*size = a.getDWord(4);
+		*time = a.getDWord(8);
+		return res;
 	}
 	cerr << "fgeteattr: Unknown response (" << name << ") " << a <<endl;
 	return 1;
@@ -429,7 +429,7 @@ dircount(const char *name, long *count)
 		res = getResponse(a);
 		if (res)
 			break;
-		a.discardFirstBytes(4); // Don't know what these mean!
+		a.discardFirstBytes(2); // Don't know what these mean!
 		while (a.getLen() > 16) {
 			int version = a.getWord(0);
 			if (version != 2) {
@@ -475,7 +475,7 @@ devlist(long *devbits)
 
 	// Find the drive to FOPEN
 	char name[4] = { 'x', ':', '\\', '\0' } ;
-	a.discardFirstBytes(8); // Result, fsys, dev, path, file, file, ending, flag
+	a.discardFirstBytes(6); // Result, fsys, dev, path, file, file, ending, flag
 	/* This leaves R E M : : M : \ */
 	name[0] = (char) a.getByte(5); // the M
 	long status = fopen(P_FDEVICE, name, fileHandle);
@@ -491,7 +491,6 @@ devlist(long *devbits)
 		res = getResponse(a);
 		if (res)
 			break;
-		a.discardFirstBytes(2); // Result
 		int version = a.getWord(0);
 		if (version != 2) {
 			cerr << "devlist: not version 2" << endl;
@@ -551,7 +550,6 @@ devinfo(int devnum, long *vfree, long *vtotal, long *vattr,
 		// cerr << "devinfo STATUSDEVICE res is " << dec << (signed short int) res << endl;
 		return NULL;
 	}
-	a.discardFirstBytes(2); // Result
 	int type = a.getWord(2);
 	int changeable = a.getWord(4);
 	long size = a.getDWord(6);
@@ -571,14 +569,24 @@ devinfo(int devnum, long *vfree, long *vtotal, long *vattr,
 bool rfsv16::
 sendCommand(enum commands cc, bufferStore & data)
 {
+	if (status == E_PSI_FILE_DISC) {
+		reconnect();
+		if (status == E_PSI_FILE_DISC)
+			return FALSE;
+	}
+	
 	bool result;
 	bufferStore a;
 	a.addWord(cc);
 	a.addWord(data.getLen());
 	a.addBuff(data);
 	result = skt->sendBufferStore(a);
+	if (!result) {
+		reconnect();
+		result = skt->sendBufferStore(a);
 	if (!result)
 		status = E_PSI_FILE_DISC;
+	}
 	return result;
 }
 
@@ -589,17 +597,22 @@ getResponse(bufferStore & data)
 	// getWord(2) is the size field
 	// which is the body of the response not counting the command (002a) and
 	// the size word.
-	if (skt->getBufferStore(data) == 1 &&
-	    data.getWord(0) == 0x2a &&
+	if (skt->getBufferStore(data) != 1) {
+		cerr << "rfsv16::getResponse: duff response. "
+			"getBufferStore failed." << endl;
+	} else if (data.getWord(0) == 0x2a &&
 	    data.getWord(2) == data.getLen()-4) {
-		data.discardFirstBytes(4);
-		long ret = data.getWord(0);
+		long ret = (short)data.getWord(4);
+		data.discardFirstBytes(6);
 		return ret;
-	} else
-		status = E_PSI_FILE_DISC;
+	} else {
 	cerr << "rfsv16::getResponse: duff response. Size field:" <<
-data.getWord(2) << " Frame size:" << data.getLen()-4 << " Result field:" <<
-data.getWord(4) << endl;
+			data.getWord(2) << " Frame size:" <<
+			data.getLen()-4 << " Result field:" <<
+			data.getWord(4) << endl;
+	}
+
+	status = E_PSI_FILE_DISC;
 	return status;
 }
 
@@ -614,61 +627,88 @@ cerr << "rfsv16::opErr 0x" << hex << setfill('0') << setw(4)
 long rfsv16::
 fread(long handle, unsigned char *buf, long len)
 {
-cerr << "rfsv16::fread ***" << endl;
-	bufferStore a;
-	long remaining = len;
-	// Read in blocks of 291 bytes; the maximum payload for an RFSV frame.
-	// ( As seen in traces ) - this isn't optimal: RFSV can handle
-	// fragmentation of frames, where only the first FREAD RESPONSE frame
-	// has a RESPONSE (00 2A), SIZE and RESULT field. Every subsequent frame
-	// just has data, 297 bytes (or less) of it.
-	const int maxblock = 291;
-	long readsofar = 0;
-	while (remaining) {
-		long thisblock = (remaining > maxblock) ? maxblock : remaining;
-cerr << "fread: " << dec << remaining << " bytes remain. This block is " << thisblock
-<< " bytes." << endl;
-		a.init();
-		a.addWord(handle);
-		a.addWord(thisblock);
-		sendCommand(FREAD, a);
-		long res = getResponse(a);
-		remaining -= a.getLen();
-// copy the data to buf
+	long res;
+	long count = 0;
 
-cerr << "fread getResponse returned " << dec<< (signed short int) res << " data: " << a << dec <<endl;
-		if (res) {
+	while (count < len) {
+	bufferStore a;
+
+		// Read in blocks of 291 bytes; the maximum payload for
+		// an RFSV frame. ( As seen in traces ) - this isn't optimal:
+		// RFSV can handle fragmentation of frames, where only the
+		// first FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
+		// and RESULT field. Every subsequent frame
+	// just has data, 297 bytes (or less) of it.
+		a.addWord(handle);
+		a.addWord((len - count) > RFSV16_MAXDATALEN
+			  ? RFSV16_MAXDATALEN
+			  : (len - count));
+		sendCommand(FREAD, a);
+		res = getResponse(a);
+
+		// The rest of the code treats a 0 return from here
+		// as meaning EOF, so we'll arrange for that to happen.
+		if (res == E_PSI_FILE_EOF)
+			return count;
+		else if (res < 0)
 			return res;
+
+		res = a.getLen();
+		memcpy(buf, a.getString(), res);
+		count += res;
+		buf += res;
 		}
-	}
-	return len;
+	return count;
 }
 
 long rfsv16::
 fwrite(long handle, unsigned char *buf, long len)
 {
-cerr << "rfsv16::fwrite ***" << endl;
-	return 0;
+	long res;
+	long count = 0;
+
+	while (count < len) {
+		bufferStore a;
+		int nbytes;
+
+		// Write in blocks of 291 bytes; the maximum payload for
+		// an RFSV frame. ( As seen in traces ) - this isn't optimal:
+		// RFSV can handle fragmentation of frames, where only the
+		// first FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
+		// and RESULT field. Every subsequent frame
+		// just has data, 297 bytes (or less) of it.
+		nbytes = (len - count) > RFSV16_MAXDATALEN
+		    ? RFSV16_MAXDATALEN
+		    : (len - count);
+		a.addWord(handle);
+		a.addBytes(buf, nbytes);
+		sendCommand(FWRITE, a);
+		res = getResponse(a);
+		if (res != 0)
+			return res;
+		
+		count += nbytes;
+		buf += nbytes;
+	}
+	return count;
 }
 
 long rfsv16::
 copyFromPsion(const char *from, const char *to, cpCallback_t cb)
 {
-cerr << "rfsv16::copyFromPsion" << endl;
 	long handle;
 	long res;
 	long len;
 
 	if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != 0)
 		return res;
-cerr << "fopen response is " << dec << (signed short int)res << endl;
 	ofstream op(to);
 	if (!op) {
 		fclose(handle);
 		return -1;
 	}
 	do {
-		unsigned char buf[2000];
+		unsigned char buf[RFSV_SENDLEN];
 		if ((len = fread(handle, buf, sizeof(buf))) > 0)
 			op.write(buf, len);
 		if (cb) {
@@ -681,13 +721,12 @@ cerr << "fopen response is " << dec << (signed short int)res << endl;
 
 	fclose(handle);
 	op.close();
-	return len;
+	return len == E_PSI_FILE_EOF ? 0 : len;
 }
 
 long rfsv16::
 copyToPsion(const char *from, const char *to, cpCallback_t cb)
 {
-cerr << "rfsv16::copyToPsion" << endl;
 	long handle;
 	long res;
 
@@ -701,50 +740,30 @@ cerr << "rfsv16::copyToPsion" << endl;
 			return res;
 	}
 	unsigned char *buff = new unsigned char[RFSV_SENDLEN];
-	int total = 0;
-	while (ip && !ip.eof()) {
+	while (res >= 0 && ip && !ip.eof()) {
 		ip.read(buff, RFSV_SENDLEN);
-		bufferStore tmp(buff, ip.gcount());
-		int len = tmp.getLen();
-		total += len;
-		if (len == 0)
-			break;
-		bufferStore a;
-		a.addDWord(handle);
-		a.addBuff(tmp);
-		if (!sendCommand(FWRITE, a)) { // FIXME: need to check params
-			fclose(handle);
-			ip.close();
-			delete[]buff;
-			return E_PSI_FILE_DISC;
+		res = fwrite(handle, buff, ip.gcount());
+		if (cb)
+			if (!cb(res)) {
+				res = E_PSI_FILE_CANCEL;
 		}
-		res = getResponse(a);
-		if (res) {
-			fclose(handle);
-			ip.close();
-			delete[]buff;
-			return res;
 		}
-		if (cb) {
-			if (!cb(len)) {
-				fclose(handle);
-				ip.close();
+
 				delete[]buff;
-				return E_PSI_FILE_CANCEL;
-			}
-		}
-	}
 	fclose(handle);
 	ip.close();
-	delete[]buff;
 	return 0;
 }
 
 long rfsv16::
 fsetsize(long handle, long size)
 {
-cerr << "rfsv16::fsetsize ***" << endl;
-	return 0;
+	bufferStore a;
+	a.addWord(handle);
+	a.addDWord(size);
+	if (!sendCommand(FSETEOF, a))
+		return E_PSI_FILE_DISC;
+	return getResponse(a);
 }
 
 /*
@@ -755,8 +774,92 @@ cerr << "rfsv16::fsetsize ***" << endl;
 long rfsv16::
 fseek(long handle, long pos, long mode)
 {
-cerr << "rfsv16::fseek ***" << endl;
-	return 0;
+	bufferStore a;
+	long res;
+	long savpos = 0;
+	long realpos;
+	long calcpos = 0;
+
+/*
+   seek-parameter for psion:
+   dword position
+   dword handle
+   dword mode
+   1 = from start
+   2 = from current pos
+   3 = from end
+   ??no more?? 4 = sense recpos
+   ??no more?? 5 = set recpos
+   ??no more?? 6 = text-rewind
+ */
+
+	if ((mode < PSI_SEEK_SET) || (mode > PSI_SEEK_END))
+		return E_PSI_GEN_ARG;
+
+	if ((mode == PSI_SEEK_CUR) && (pos >= 0)) {
+		/* get and save current position */
+		a.init();
+		a.addWord(handle);
+		a.addDWord(0);
+		a.addWord(PSI_SEEK_CUR);
+		if (!sendCommand(FSEEK, a))
+			return E_PSI_FILE_DISC;
+		if ((res = getResponse(a)) != 0)
+			return res;
+		savpos = a.getDWord(0);
+		if (pos == 0)
+			return savpos;
+	}
+	if ((mode == PSI_SEEK_END) && (pos >= 0)) {
+		/* get and save end position */
+		a.init();
+		a.addWord(handle);
+		a.addDWord(0);
+		a.addWord(PSI_SEEK_END);
+		if (!sendCommand(FSEEK, a))
+			return E_PSI_FILE_DISC;
+		if ((res = getResponse(a)) != 0)
+			return res;
+		savpos = a.getDWord(0);
+		if (pos == 0)
+			return savpos;
+	}
+	/* Now the real seek */
+	a.addWord(handle);
+	a.addDWord(pos);
+	a.addWord(mode);
+	if (!sendCommand(FSEEK, a))
+		return E_PSI_FILE_DISC;
+	if ((res = getResponse(a)) != 0)
+		return res;
+	realpos = a.getDWord(0);
+	switch (mode) {
+		case PSI_SEEK_SET:
+			calcpos = pos;
+			break;
+		case PSI_SEEK_CUR:
+			calcpos = savpos + pos;
+			break;
+		case PSI_SEEK_END:
+			return realpos;
+			break;
+	}
+	if (calcpos > realpos) {
+		/* Beyond end of file */
+		res = fsetsize(handle, calcpos);
+		if (res != 0)
+			return res;
+		a.init();
+		a.addWord(handle);
+		a.addDWord(calcpos);
+		a.addWord(PSI_SEEK_SET);
+		if (!sendCommand(FSEEK, a))
+			return E_PSI_FILE_DISC;
+		if ((res = getResponse(a)) != 0)
+			return res;
+		realpos = a.getDWord(0);
+	}
+	return realpos;
 }
 
 long rfsv16::
@@ -771,11 +874,11 @@ mkdir(const char* dirName)
 				// and this needs sending in the length word.
 	sendCommand(MKDIR, a);
 	long res = getResponse(a);
-	if (!res && a.getLen() == 2) {
+	if (!res) {
 		// Correct response
-		return a.getWord(0);
+		return res;
 	}
-	cerr << "Unknown response from mkdir "<< a <<endl;
+	cerr << "Unknown response from mkdir "<< res <<endl;
 	return 1;
 }
 
@@ -806,11 +909,11 @@ cerr << "rfsv16::rename ***" << endl;
 				// and this needs sending in the length word.
 	sendCommand(RENAME, a);
 	long res = getResponse(a);
-	if (!res && a.getLen() == 2) {
+	if (!res) {
 		// Correct response
-		return a.getWord(0);
+		return res;
 	}
-	cerr << "Unknown response from rename "<< a <<endl;
+	cerr << "Unknown response from rename "<< res <<endl;
 	return 1;
 }
 
@@ -826,12 +929,85 @@ remove(const char* psionName)
 				// and this needs sending in the length word.
 	sendCommand(DELETE, a);
 	long res = getResponse(a);
-	if (!res && a.getLen() == 2) {
+	if (!res) {
 		// Correct response
-		return a.getWord(0);
+		return res;
 	}
-	cerr << "Unknown response from delete "<< a <<endl;
+	cerr << "Unknown response from delete "<< res <<endl;
 	return 1;
+}
+
+/*
+ * Translate SIBO attributes to standard attributes.
+ */
+long rfsv16::
+attr2std(long attr)
+{
+	long res = 0;
+
+	// Common attributes
+	if (!(attr & P_FAWRITE))
+		res |= PSI_A_RDONLY;
+	if (attr & P_FAHIDDEN)
+		res |= PSI_A_HIDDEN;
+	if (attr & P_FASYSTEM)
+		res |= PSI_A_SYSTEM;
+	if (attr & P_FADIR)
+		res |= PSI_A_DIR;
+	if (attr & P_FAMOD)
+		res |= PSI_A_ARCHIVE;
+	if (attr & P_FAVOLUME)
+		res |= PSI_A_VOLUME;
+
+	// SIBO-specific
+	if (attr & P_FAREAD)
+		res |= PSI_A_READ;
+	if (attr & P_FAEXEC)
+		res |= PSI_A_EXEC;
+	if (attr & P_FASTREAM)
+		res |= PSI_A_STREAM;
+	if (attr & P_FATEXT)
+		res |= PSI_A_TEXT;
+
+	// Do what we can for EPOC
+	res |= PSI_A_NORMAL;
+
+	return res;
+}
+
+/*
+ * Translate standard attributes to SIBO attributes.
+ */
+long rfsv16::
+std2attr(long attr)
+{
+	long res = 0;
+
+	// Common attributes
+	if (!(attr & PSI_A_RDONLY))
+		res |= P_FAWRITE;
+	if (attr & PSI_A_HIDDEN)
+		res |= P_FAHIDDEN;
+	if (attr & PSI_A_SYSTEM)
+		res |= P_FASYSTEM;
+	if (attr & PSI_A_DIR)
+		res |= P_FADIR;
+	if (attr & PSI_A_ARCHIVE)
+		res |= P_FAMOD;
+	if (attr & PSI_A_VOLUME)
+		res |= P_FAVOLUME;
+
+	// SIBO-specific
+	if (attr & PSI_A_READ)
+		res |= P_FAREAD;
+	if (attr & PSI_A_EXEC)
+		res |= P_FAEXEC;
+	if (attr & PSI_A_STREAM)
+		res |= P_FASTREAM;
+	if (attr & PSI_A_TEXT)
+		res |= P_FATEXT;
+
+	return res;
 }
 
 

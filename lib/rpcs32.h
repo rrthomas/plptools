@@ -11,9 +11,11 @@ class rpcs32 : public rpcs {
 		~rpcs32();
 
 		int queryDrive(const char, bufferArray &);
-		int getCmdLine(const char *, char *, int); 
+		int getCmdLine(const char *, bufferStore &); 
+		int getMachineInfo(machineInfo &);
+		int configOpen(void);
+		int configRead(void);
 #if 0
-		int getMachineInfo(void);
 		int closeHandle(int);
 		int regOpenIter(void);
 		int regReadIter(void);
@@ -21,10 +23,8 @@ class rpcs32 : public rpcs {
 		int regRead(void);
 		int regDelete(void);
 		int setTime(void);
-#endif
 		int configOpen(void);
 		int configRead(void);
-#if 0
 		int configWrite(void);
 		int queryOpen(void);
 		int queryRead(void);

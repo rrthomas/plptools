@@ -203,8 +203,17 @@ micro2time(unsigned long microHi, unsigned long microLo)
 	micro /= 1000000;
 	micro -= pes;
 	micro += EPOCH_DIFF_SECS;
-	micro -= EPOCH_2H;
-	micro += 3600; /* 1 hour PJC */
+
+        /* Adjust for timezone and daylight saving time */
+        { 
+          struct tm *t;
+          long date=micro;
+
+          t = localtime(&date);
+          micro += timezone;                 /* Adjust for timezone */
+          if (t->tm_isdst) micro -= (60*60); /* Adjust for DST */
+        }
+
 	return (long) micro;
 }
 
@@ -216,8 +225,17 @@ time2micro(unsigned long time, unsigned long &microHi, unsigned long &microLo)
 	pes <<= 8;
 	micro += pes;
 	micro -= EPOCH_DIFF_SECS;
-	micro += EPOCH_2H;
-	micro -= 3600; /* 1 hour PJC */
+
+        /* Adjust for timezone and daylight saving time */
+        { 
+          struct tm *t;
+          long date=time;
+
+          t = localtime(&date);
+          micro -= timezone;                 /* Adjust for timezone */
+          if (t->tm_isdst) micro += (60*60); /* Adjust for DST */
+        }
+
 	micro *= (unsigned long long)1000000;
 	microLo = (micro & (unsigned long long)0x0FFFFFFFF);
 	micro >>= 32;
@@ -263,7 +281,7 @@ dir(const char *name, bufferArray * files)
 			s.addByte(0);
 			while (d % 4)
 				d++;
-			files->pushBuffer(s);
+			files->append(s);
 			d += shortLen;
 			while (d % 4)
 				d++;
@@ -495,8 +513,12 @@ sendCommand(enum commands cc, bufferStore & data)
 		serNum = 0;
 	a.addBuff(data);
 	result = skt->sendBufferStore(a);
+	if (!result) {
+		reconnect();
+		result = skt->sendBufferStore(a);
 	if (!result)
 		status = E_PSI_FILE_DISC;
+	}
 	return result;
 }
 
@@ -887,4 +909,74 @@ err2psierr(long status)
 		return -999;
 	}
 	return e2psi[status - E_EPOC_DIR_FULL];
+}
+
+
+/*
+ * Translate EPOC attributes to standard attributes.
+ */
+long rfsv32::
+attr2std(long attr)
+{
+	long res = 0;
+
+	// Common attributes
+	if (attr & EPOC_ATTR_RONLY)
+		res |= PSI_A_RDONLY;
+	if (attr & EPOC_ATTR_HIDDEN)
+		res |= PSI_A_HIDDEN;
+	if (attr & EPOC_ATTR_SYSTEM)
+		res |= PSI_A_SYSTEM;
+	if (attr & EPOC_ATTR_DIRECTORY)
+		res |= PSI_A_DIR;
+	if (attr & EPOC_ATTR_ARCHIVE)
+		res |= PSI_A_ARCHIVE;
+	if (attr & EPOC_ATTR_VOLUME)
+		res |= PSI_A_VOLUME;
+
+	// EPOC-specific
+	if (attr & EPOC_ATTR_NORMAL)
+		res |= PSI_A_NORMAL;
+	if (attr & EPOC_ATTR_TEMPORARY)
+		res |= PSI_A_TEMP;
+	if (attr & EPOC_ATTR_COMPRESSED)
+		res |= PSI_A_COMPRESSED;
+	
+	// Do what we can for SIBO
+	res |= PSI_A_READ;
+
+	return res;
+}
+
+/*
+ * Translate standard attributes to EPOC attributes.
+ */
+long rfsv32::
+std2attr(long attr)
+{
+	long res = 0;
+
+	// Common attributes
+	if (!(attr & PSI_A_RDONLY))
+		res |= EPOC_ATTR_RONLY;
+	if (attr & PSI_A_HIDDEN)
+		res |= EPOC_ATTR_HIDDEN;
+	if (attr & PSI_A_SYSTEM)
+		res |= EPOC_ATTR_SYSTEM;
+	if (attr & PSI_A_DIR)
+		res |= EPOC_ATTR_DIRECTORY;
+	if (attr & PSI_A_ARCHIVE)
+		res |= EPOC_ATTR_ARCHIVE;
+	if (attr & PSI_A_VOLUME)
+		res |= EPOC_ATTR_VOLUME;
+
+	// EPOC-specific
+	if (attr & PSI_A_NORMAL)
+		res |= EPOC_ATTR_NORMAL;
+	if (attr & PSI_A_TEMP)
+		res |= EPOC_ATTR_TEMPORARY;
+	if (attr & PSI_A_COMPRESSED)
+		res |= EPOC_ATTR_COMPRESSED;
+
+	return res;
 }

@@ -153,7 +153,7 @@ init_serial(const char *dev, int speed, int debug)
 #endif
 #if defined(sun) || defined(linux) || defined(__sgi) || defined(__NetBSD__)
 	ti.c_cflag = CS8 | HUPCL | clocal | CRTSCTS | CREAD;
-	ti.c_iflag = IGNBRK | IGNPAR;
+	ti.c_iflag = IGNBRK | IGNPAR | IXON | IXOFF;
 	ti.c_cc[VMIN] = 1;
 	ti.c_cc[VTIME] = 0;
 #endif

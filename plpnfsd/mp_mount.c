@@ -66,7 +66,7 @@ static char nfshost[128];
 #ifndef __GLIBC__
 #include <linux/fs.h>		/* struct nfs_mount_data */
 #endif
-#include <linux/nfs_mount.h>	/* struct nfs_mount_data */
+#include "linux-misc.h"		/* struct nfs_mount_data */
 #include <arpa/inet.h>		/* inet_addr() */
 #endif
 #ifdef _IBMR2
@@ -74,7 +74,6 @@ static char nfshost[128];
 #include "misc-aix3.h"
 #include <sys/vmount.h>
 #endif
-
 
 #ifndef DONT_UPDATE_MTAB
 #if defined(sun) && defined(__SVR4)

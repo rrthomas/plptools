@@ -44,6 +44,9 @@ class rfsv32 : public rfsv {
 	char *opAttr(long);
 	long opMode(long);
 
+	long attr2std(long);
+	long std2attr(long);
+
 	private:
 	
 	enum file_attrib {

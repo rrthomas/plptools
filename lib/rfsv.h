@@ -5,12 +5,29 @@ class ppsocket;
 class bufferStore;
 class bufferArray;
 
-#define RFSV_SENDLEN 2000
+const unsigned long RFSV_SENDLEN = 2000;
 
+/**
+ * Defines the callback procedure for
+ * progress indication of copy operations.
+ */
 typedef int (*cpCallback_t)(long);
 
 // Abstract base class of RFSV ; 16-bit and 32-bit variants implement this
 // interface
+/**
+ * Access remote file services of a Psion.
+ *
+ * rfsv provides an API for accessing file services
+ * of a Psion connected via ncpd. This class defines the
+ * interface and a small amount of common constants and
+ * methods. The majority of implementation is provided
+ * by @ref rfsv32 and @ref rfsv16, which implement the
+ * variations of the protocol for EPOC and SIBO respectively.
+ * Usually, the class @ref rfsvfactory is used to instantiate
+ * the correct variant depending on the remote machine,
+ * currently connected.
+ */
 class rfsv {
 	public:
 		virtual ~rfsv() {}
@@ -46,20 +63,32 @@ class rfsv {
 		virtual long rename(const char *, const char *) = 0;
 		virtual long remove(const char *) = 0;
 
+		virtual long attr2std(long) = 0;
+		virtual long std2attr(long) = 0;
+		
 		char *opErr(long);
 
+		/**
+		 * The kown modes for seek.
+		 */
 		enum seek_mode {
 			PSI_SEEK_SET = 1,
 			PSI_SEEK_CUR = 2,
 			PSI_SEEK_END = 3
 		};
 
+		/**
+		 * The known modes for file open.
+		 */
 		enum open_flags {
 			PSI_O_RDONLY = 00,
 			PSI_O_WRONLY = 01,
 			PSI_O_RDWR = 02,
 		};
 
+		/**
+		 * The known modes for file creation.
+		 */
 		enum open_mode {
 			PSI_O_CREAT = 0100,
 			PSI_O_EXCL = 0200,
@@ -67,6 +96,9 @@ class rfsv {
 			PSI_O_APPEND = 02000,
 		};
 
+		/**
+		 * The known error codes.
+		 */
 		enum errs {
 			E_PSI_GEN_NONE	= 0,
 			E_PSI_GEN_FAIL = -1,
@@ -144,6 +176,36 @@ class rfsv {
 
 			// Special error code for "Operation not permitted in RFSV16"
 			E_PSI_NOT_SIBO = -200
+		};
+
+		/**
+		 * The known file attributes
+		 */
+		enum file_attribs {
+			/**
+			 * Attributes, valid on both EPOC and SIBO.
+			 */
+			PSI_A_RDONLY = 0x0001,
+			PSI_A_HIDDEN = 0x0002,
+			PSI_A_SYSTEM = 0x0004,
+			PSI_A_DIR = 0x0008,
+			PSI_A_ARCHIVE = 0x0010,
+			PSI_A_VOLUME = 0x0020,
+
+			/**
+			 * Attributes, valid on EPOC only.
+			 */
+			PSI_A_NORMAL = 0x0040,
+			PSI_A_TEMP = 0x0080,
+			PSI_A_COMPRESSED = 0x0100,
+
+			/**
+			 * Attributes, valid on SIBO only.
+			 */
+			PSI_A_READ = 0x0200,
+			PSI_A_EXEC = 0x0400,
+			PSI_A_STREAM = 0x0800,
+			PSI_A_TEXT = 0x1000
 		};
 };
 

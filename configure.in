@@ -61,7 +61,7 @@ AC_ARG_WITH(serial,
       AC_MSG_RESULT(Overriding serial line: $DDEV)
     ],
     [ AC_MSG_CHECKING(for default serial line)
-      AC_FIND_CDEV(/dev/tty0p0 /dev/tty00 /dev/ttyS0 /dev/term/a /dev/ttyfa /dev/ttya /dev/tty0 /dev/ttyf1 /dev/cuaa1, DDEV)
+      AC_FIND_CDEV(/dev/psion /dev/tty0p0 /dev/tty00 /dev/ttyS0 /dev/term/a /dev/ttyfa /dev/ttya /dev/tty0 /dev/ttyf1 /dev/cuaa1, DDEV)
       AC_MSG_RESULT($DDEV)
       test "$DDEV" = "NO" && AC_MSG_ERROR(NO serial lines. Use --with-serial.)
     ]
@@ -107,6 +107,17 @@ AC_ARG_WITH(basedir,
     ]
 )
 AC_SUBST(DBASEDIR)
+
+AC_ARG_WITH(mountdir,
+    [  --with-mountdir=DDIR    override default mount point [/mnt/psion]],
+    [ DDIR="$withval"
+      AC_MSG_RESULT(Overriding mount point: $DDIR) ],
+    [ DDIR="/mnt/psion"
+      AC_MSG_RESULT(Using default mount point: $DDIR)
+    ]
+)
+AC_SUBST(DDIR)
+
 
 AC_OUTPUT(
 	Makefile

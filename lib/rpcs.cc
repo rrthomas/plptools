@@ -28,11 +28,21 @@
 #include "ppsocket.h"
 #include "bufferarray.h"
 
+static const char * const langstrings[] = {
+	"Test", "English", "French", "German", "Spanish", "Italian", "Swedish",
+	"Danish", "Norwegian", "Finnish", "American", "Swiss French",
+	"Swiss German", "Portugese", "Turkish", "Icelandic", "Russian",
+	"Hungarian", "Dutch", "Belgian Flemish", "Australian",
+	"Belgish French", "Austrian", "New Zealand",
+	"International French", "Czech", "Slovak", "Polish", "Slovenian",
+	0L
+};
+
 //
 // public common API
 //
 void rpcs::
-reconnect()
+reconnect(void)
 {
 	skt->closeSocket();
 	skt->reconnect();
@@ -40,7 +50,7 @@ reconnect()
 }
 
 void rpcs::
-reset()
+reset(void)
 {
 	bufferStore a;
 	status = E_PSI_FILE_DISC;
@@ -54,13 +64,13 @@ reset()
 }
 
 long rpcs::
-getStatus()
+getStatus(void)
 {
 	return status;
 }
 
 const char *rpcs::
-getConnectName()
+getConnectName(void)
 {
 	return "SYS$RPCS";
 }
@@ -68,16 +78,6 @@ getConnectName()
 //
 // protected internals
 //
-char *rpcs::
-convertSlash(const char *name)
-{
-	char *n = strdup(name);
-	for (char *p = n; *p; p++)
-		if (*p == '/')
-			*p = '\\';
-	return n;
-}
-
 bool rpcs::
 sendCommand(enum commands cc, bufferStore & data)
 {
@@ -91,16 +91,21 @@ sendCommand(enum commands cc, bufferStore & data)
 	a.addByte(cc);
 	a.addBuff(data);
 	result = skt->sendBufferStore(a);
-	if (!result)
-		status = E_PSI_FILE_DISC;
+	if (!result) {
+		reconnect();
+		result = skt->sendBufferStore(a);
+		if (!result)
+			status = E_PSI_FILE_DISC;
+	}
 	return result;
 }
 
-long rpcs::
+int rpcs::
 getResponse(bufferStore & data)
 {
 	if (skt->getBufferStore(data) == 1) {
-		long ret = data.getByte(0);
+		char ret = data.getByte(0);
+		data.discardFirstBytes(1);
 		return ret;
 	} else
 		status = E_PSI_FILE_DISC;
@@ -113,12 +118,12 @@ getResponse(bufferStore & data)
 int rpcs::
 getNCPversion(int &major, int &minor)
 {
+	int res;
 	bufferStore a;
+
 	if (!sendCommand(QUERY_NCP, a))
 		return E_PSI_FILE_DISC;
-	long res = getResponse(a);
-	a.discardFirstBytes(1);
-	if (res)
+	if ((res = getResponse(a)))
 		return res;
 	if (a.getLen() != 2)
 		return E_PSI_GEN_FAIL;
@@ -131,6 +136,7 @@ int rpcs::
 execProgram(const char *program, const char *args)
 {
 	bufferStore a;
+
 	a.addStringT(program);
 	int l = strlen(program);
 	for (int i = 127; i > l; i--)
@@ -139,15 +145,14 @@ execProgram(const char *program, const char *args)
 	a.addStringT(args);
 	if (!sendCommand(EXEC_PROG, a))
 		return E_PSI_FILE_DISC;
-	long res = getResponse(a);
-cout << res << " " << a << endl;
-	return res;
+	return getResponse(a);
 }
 
 int rpcs::
 stopProgram(const char *program)
 {
 	bufferStore a;
+
 	a.addStringT(program);
 	if (!sendCommand(STOP_PROG, a))
 		return E_PSI_FILE_DISC;
@@ -158,6 +163,7 @@ int rpcs::
 queryProgram(const char *program)
 {
 	bufferStore a;
+
 	a.addStringT(program);
 	if (!sendCommand(QUERY_PROG, a))
 		return E_PSI_FILE_DISC;
@@ -167,13 +173,13 @@ queryProgram(const char *program)
 int rpcs::
 formatOpen(const char *drive, int &handle, int &count)
 {
+	int res;
 	bufferStore a;
+
 	a.addStringT(drive);
 	if (!sendCommand(FORMAT_OPEN, a))
 		return E_PSI_FILE_DISC;
-	long res = getResponse(a);
-	a.discardFirstBytes(1);
-	if (res)
+	if ((res = getResponse(a)))
 		return res;
 	if (a.getLen() != 4)
 		return E_PSI_GEN_FAIL;
@@ -186,6 +192,7 @@ int rpcs::
 formatRead(int handle)
 {
 	bufferStore a;
+
 	a.addWord(handle);
 	if (!sendCommand(FORMAT_READ, a))
 		return E_PSI_FILE_DISC;
@@ -195,13 +202,13 @@ formatRead(int handle)
 int rpcs::
 getUniqueID(const char *device, long &id)
 {
+	int res;
 	bufferStore a;
+
 	a.addStringT(device);
 	if (!sendCommand(GET_UNIQUEID, a))
 		return E_PSI_FILE_DISC;
-	long res = getResponse(a);
-	a.discardFirstBytes(1);
-	if (res)
+	if ((res = getResponse(a)))
 		return res;
 	if (a.getLen() != 4)
 		return E_PSI_GEN_FAIL;
@@ -210,14 +217,14 @@ getUniqueID(const char *device, long &id)
 }
 
 int rpcs::
-getOwnerInfo(bufferArray &ret)
+getOwnerInfo(bufferArray &owner)
 {
+	int res;
 	bufferStore a;
+
 	if (!sendCommand(GET_OWNERINFO, a))
 		return E_PSI_FILE_DISC;
-	long res = getResponse(a);
-	a.discardFirstBytes(1);
-	if (res)
+	if ((res = getResponse(a)))
 		return res;
 	a.addByte(0);
 	int l = a.getLen();
@@ -225,13 +232,18 @@ getOwnerInfo(bufferArray &ret)
 	for (int i = 0; i < l; i++)
 		if (s[i] == 6)
 			s[i] = 0;
-	ret.clear();
+	owner.clear();
 	while (l > 0) {
-		bufferStore b;
-		b.addStringT(s);
-		ret += b;
-		l -= (strlen(s) + 1);
-		s += (strlen(s) + 1);
+		if (*s != '\0') {
+			bufferStore b;
+			b.addStringT(s);
+			owner += b;
+			l -= (strlen(s) + 1);
+			s += (strlen(s) + 1);
+		} else {
+			l--;
+			s++;
+		}
 	}
 	return res;
 }
@@ -239,12 +251,12 @@ getOwnerInfo(bufferArray &ret)
 int rpcs::
 getMachineType(int &type)
 {
+	int res;
 	bufferStore a;
+
 	if (!sendCommand(GET_MACHINETYPE, a))
 		return E_PSI_FILE_DISC;
-	long res = getResponse(a);
-	a.discardFirstBytes(1);
-	if (res)
+	if ((res = getResponse(a)))
 		return res;
 	if (a.getLen() != 2)
 		return E_PSI_GEN_FAIL;
@@ -253,27 +265,25 @@ getMachineType(int &type)
 }
 
 int rpcs::
-fuser(const char *name, char *buf, int bufsize)
+fuser(const char *name, char *buf, int maxlen)
 {
+	int res;
 	bufferStore a;
+	char *p;
+
 	a.addStringT(name);
 	if (!sendCommand(FUSER, a))
 		return E_PSI_FILE_DISC;
-	long res = getResponse(a);
-	a.discardFirstBytes(1);
-	if (res)
+	if ((res = getResponse(a)))
 		return res;
-	int len = ((int)a.getLen() > bufsize) ? bufsize - 1 : a.getLen();
-	strncpy(buf, a.getString(0), len);
-	buf[len] = '\0';
-	char *p;
+	strncpy(buf, a.getString(0), maxlen - 1);
 	while ((p = strchr(buf, 6)))
-		*p = '\n';
+		*p = '\0';
 	return res;
 }
 
 int rpcs::
-quitServer()
+quitServer(void)
 {
 	bufferStore a;
 	if (!sendCommand(QUIT_SERVER, a))
@@ -281,3 +291,25 @@ quitServer()
 	return getResponse(a);
 }
 
+const char *rpcs::
+languageString(int code) {
+	for (int i = 0; i <= code; i++)
+		if (langstrings[i] == 0L)
+			return "Unknown";
+	return langstrings[code];
+}
+
+const char *rpcs::
+batteryStatusString(int code) {
+	switch (code) {
+		case PSI_BATT_DEAD:
+			return "Empty";
+		case PSI_BATT_VERYLOW:
+			return "Very low";
+		case PSI_BATT_LOW:
+			return "Low";
+		case PSI_BATT_GOOD:
+			return "Good";
+	}
+	return "Unknown";
+}

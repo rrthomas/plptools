@@ -60,7 +60,7 @@ ncpDataCallback(bufferStore & a)
 				<< srvName << "\"" << endl;
 
 		while (!registerStack.empty()) {
-			se = registerStack.popBuffer();
+			se = registerStack.pop();
 			if (se.getWord(0) == ser) {
 				if (verbose & LINKCHAN_DEBUG_LOG)
 					cout << "linkchan: found ser=0x" << hex << setw(4) <<
@@ -68,7 +68,7 @@ ncpDataCallback(bufferStore & a)
 						" on stack -> callBack to waiting chan" << endl;
 				ncpDoRegisterAck((int)se.getWord(2));
 			} else
-				newStack.pushBuffer(se);
+				newStack += se;
 		}
 		registerStack = newStack;
 		return;
@@ -111,7 +111,7 @@ Register(channel *ch)
 
 	stack.addWord(registerSer);
 	stack.addWord(ch->getNcpChannel());
-	registerStack.pushBuffer(stack);
+	registerStack += stack;
 	a.addByte(0);
 	a.addWord(registerSer++);
 	a.addString(ch->getNcpConnectName());

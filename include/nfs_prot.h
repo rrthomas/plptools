@@ -9,7 +9,6 @@
 #endif
 #ifdef linux
 # include <sys/time.h>
-# include <linux/nfs.h>
 #endif
 #ifdef __sgi
 # include <rpc/types.h>
@@ -42,7 +41,7 @@
 #define NFSMODE_SOCK 0140000
 #define NFSMODE_FIFO 0010000
 
-#if !defined(hpux) && !defined(linux) && !defined(__sgi)
+#if !defined(hpux) && !defined(__sgi)
 enum nfsstat {
 	NFS_OK = 0,
 	NFSERR_PERM = 1,
@@ -63,16 +62,12 @@ enum nfsstat {
 	NFSERR_STALE = 70,
 	NFSERR_WFLUSH = 99
 };
-#endif /* !hpux, linux */
+#endif /* !hpux, sgi */
 
-#ifdef linux
-typedef enum nfs_stat nfsstat;
-#else
 typedef enum nfsstat nfsstat;
-#endif
 bool_t xdr_nfsstat();
 
-#if !defined(hpux) && !defined(linux) && !defined(__sgi)
+#if !defined(hpux) && !defined(__sgi)
 enum ftype {
 	NFNON = 0,
 	NFREG = 1,
@@ -85,7 +80,7 @@ enum ftype {
 	NFFIFO = 8
 };
 typedef enum ftype ftype;
-#endif /* !linux, hpux */
+#endif /* !hpux, sgi */
 
 #ifdef __sgi
 typedef enum nfsftype ftype;
@@ -94,17 +89,12 @@ typedef enum nfsftype ftype;
 #ifdef hpux
 typedef enum nfsftype ftype;
 #endif
-#ifdef linux
-typedef enum nfs_ftype ftype;
-#endif
 
 bool_t xdr_ftype();
 
-#ifndef linux
 struct nfs_fh {
 	char data[NFS_FHSIZE];
 };
-#endif
 typedef struct nfs_fh nfs_fh;
 bool_t xdr_nfs_fh();
 

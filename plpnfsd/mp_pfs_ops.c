@@ -106,29 +106,35 @@ attr2pattr(long oattr, long nattr, long *psisattr, long *psidattr)
 	 * work properly
 	 */
 	*psisattr = *psidattr = 0;
+	if ((oattr & 0400) != (nattr & 0400)) {
+		if (nattr & 0400)		/* readable */
+			*psidattr |= PSI_A_READ;
+		else
+			*psisattr |= PSI_A_READ;
+	}
 	if ((oattr & 0200) != (nattr & 0200)) {
 		if (nattr & 0200)		/* readonly */
-			*psidattr |= 0x01;
+			*psidattr |= PSI_A_RDONLY;
 		else
-			*psisattr |= 0x01;
+			*psisattr |= PSI_A_RDONLY;
 	}
 	if ((oattr & 0020) != (nattr & 0020)) {
 		if (nattr & 0020)	/* group-write    -> archive */
-			*psisattr |= 0x20;
+			*psisattr |= PSI_A_ARCHIVE;
 		else
-			*psidattr |= 0x20;
+			*psidattr |= PSI_A_ARCHIVE;
 	}
 	if ((oattr & 0004) != (nattr & 0004)) {
 		if (nattr & 0004)		/* Not world-read -> hidden  */
-			*psidattr |= 0x02;
+			*psidattr |= PSI_A_HIDDEN;
 		else
-			*psisattr |= 0x02;
+			*psisattr |= PSI_A_HIDDEN;
 	}
 	if ((oattr & 0002) != (nattr & 0002)) {
 		if (nattr & 0002)		/* world-write    -> system */
-			*psisattr |= 0x04;
+			*psisattr |= PSI_A_SYSTEM;
 		else
-			*psidattr |= 0x04;
+			*psidattr |= PSI_A_SYSTEM;
 	}
 }
 
@@ -137,7 +143,7 @@ dpattr2attr(long psiattr, long size, long ftime, fattr *fp, int inode)
 {
 	bzero((char *) fp, sizeof(*fp));
 
-	if (psiattr & 0x10) {
+	if (psiattr & PSI_A_DIR) {
 		fp->type = NFDIR;
 		fp->mode = NFSMODE_DIR | 0700;
 		/*
@@ -159,17 +165,18 @@ dpattr2attr(long psiattr, long size, long ftime, fattr *fp, int inode)
 		 * Following flags have to be set in order to let backups
 		 * work properly
 		 */
+		if (psiattr & PSI_A_READ)
 		fp->mode |= 0400;		/* File readable (?) */
-		if (!(psiattr & 0x01))
+		if (!(psiattr & PSI_A_RDONLY))
 			fp->mode |= 0200;	/* File writeable  */
 		/* fp->mode |= 0100;		   File executable */
-		if (!(psiattr & 0x02))
+		if (!(psiattr & PSI_A_HIDDEN))
 			fp->mode |= 0004;	/* Not Hidden  <-> world read */
-		if (psiattr & 0x04)
+		if (psiattr & PSI_A_SYSTEM)
 			fp->mode |= 0002;	/* System      <-> world write */
-		if (psiattr & 0x40)
+		if (psiattr & PSI_A_VOLUME)
 			fp->mode |= 0001;	/* Volume      <-> world exec */
-		if (psiattr & 0x20)
+		if (psiattr & PSI_A_ARCHIVE)
 			fp->mode |= 0020;	/* Modified    <-> group write */
 	/*		fp->mode |= 0040;	 Byte        <-> group read */
 	/*		fp->mode |= 0010;	 Text        <-> group exec */
@@ -189,7 +196,7 @@ pattr2attr(long psiattr, long size, long ftime, fattr *fp, unsigned char *fh)
 {
 	bzero((char *) fp, sizeof(*fp));
 
-	if (psiattr & 0x10) {
+	if (psiattr & PSI_A_DIR) {
 		fp->type = NFDIR;
 		fp->mode = NFSMODE_DIR | 0700;
 		/*
@@ -211,17 +218,18 @@ pattr2attr(long psiattr, long size, long ftime, fattr *fp, unsigned char *fh)
 		 * Following flags have to be set in order to let backups
 		 * work properly
 		 */
+		if (psiattr & PSI_A_READ)
 		fp->mode |= 0400;		/* File readable (?) */
-		if (!(psiattr & 0x01))
+		if (!(psiattr & PSI_A_RDONLY))
 			fp->mode |= 0200;	/* File writeable  */
 		/* fp->mode |= 0100;		   File executable */
-		if (!(psiattr & 0x02))
+		if (!(psiattr & PSI_A_HIDDEN))
 			fp->mode |= 0004;	/* Not Hidden  <-> world read */
-		if (psiattr & 0x04)
+		if (psiattr & PSI_A_SYSTEM)
 			fp->mode |= 0002;	/* System      <-> world write */
-		if (psiattr & 0x40)
+		if (psiattr & PSI_A_VOLUME)
 			fp->mode |= 0001;	/* Volume      <-> world exec */
-		if (psiattr & 0x20)
+		if (psiattr & PSI_A_ARCHIVE)
 			fp->mode |= 0020;	/* Modified    <-> group write */
 	/*		fp->mode |= 0040;	 Byte        <-> group read */
 	/*		fp->mode |= 0010;	 Text        <-> group exec */

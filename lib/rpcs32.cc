@@ -48,14 +48,16 @@ int rpcs32::
 queryDrive(char drive, bufferArray &ret)
 {
 	bufferStore a;
+	int res;
+
 	a.addByte(drive);
 	if (!sendCommand(rpcs::QUERY_DRIVE, a))
 		return rpcs::E_PSI_FILE_DISC;
-	getResponse(a);
+	if ((res = getResponse(a)))
+		return res;
 	int l = a.getLen();
 	ret.clear();
-//cout << dec << "qd: " << a.getLen() << " a="<< a << endl;
-	while (l > 1) {
+	while (l > 0) {
 		bufferStore b, c;
 		const char *s;
 		char *p;
@@ -66,8 +68,7 @@ queryDrive(char drive, bufferArray &ret)
 		sl = strlen(s) + 1;
 		l -= sl;
 		a.discardFirstBytes(sl);
-		p = strstr(s, ".$");
-		if (p) {
+		if ((p = strstr(s, ".$"))) {
 			*p = '\0'; p += 2;
 			sscanf(p, "%d", &pid);
 		} else
@@ -82,33 +83,125 @@ queryDrive(char drive, bufferArray &ret)
 		ret.push(c);
 		ret.push(b);
 	}
-	return 0;
+	return res;
 }
 
 int rpcs32::
-getCmdLine(const char *process, char *buf, int bufsize)
+getCmdLine(const char *process, bufferStore &ret)
 {
-	return 0;
+	bufferStore a;
+	int res;
+
+	a.addStringT(process);
+	if (!sendCommand(rpcs::GET_CMDLINE, a))
+		return rpcs::E_PSI_FILE_DISC;
+	res = getResponse(a);
+	ret = a;
+	return res;
 }
+
+int rpcs32::
+getMachineInfo(machineInfo &mi)
+{
+	bufferStore a;
+	int res;
+
+	if (!sendCommand(rpcs::GET_MACHINE_INFO, a))
+		return rpcs::E_PSI_FILE_DISC;
+	if ((res = getResponse(a)))
+		return res;
+	if (a.getLen() != 256)
+		return E_PSI_GEN_FAIL;
+	mi.machineType = a.getDWord(0);
+	strncpy(mi.machineName, a.getString(16), 16);
+	mi.machineName[16] = '\0';
+	mi.machineUID = a.getDWord(44);
+	mi.machineUID <<= 32;
+	mi.machineUID |= a.getDWord(40);
+	mi.countryCode = a.getDWord(56);
+	strcpy(mi.uiLanguage, languageString(a.getDWord(164)));
+
+	mi.romMajor = a.getByte(4);
+	mi.romMinor = a.getByte(5);
+	mi.romBuild = a.getWord(6);
+	mi.romSize = a.getDWord(140);
+
+	mi.ramSize = a.getDWord(136);
+	mi.ramMaxFree = a.getDWord(144);
+	mi.ramFree = a.getDWord(148);
+	mi.ramDiskSize = a.getDWord(152);
+
+	mi.registrySize = a.getDWord(156);
+	mi.romProgrammable = (a.getDWord(160) != 0);
+
+	mi.displayWidth = a.getDWord(32);
+	mi.displayHeight = a.getDWord(36);
+
+	mi.time.tv_low = a.getDWord(48);
+	mi.time.tv_high = a.getDWord(52);
+
+	mi.tz.utc_offset = a.getDWord(60);
+	mi.tz.dst_zones = a.getDWord(64);
+	mi.tz.home_zone = a.getDWord(68);
+
+	mi.mainBatteryInsertionTime.tv_low = a.getDWord(72);
+	mi.mainBatteryInsertionTime.tv_high = a.getDWord(76);
+	mi.mainBatteryStatus = a.getDWord(80);
+	mi.mainBatteryUsedTime.tv_low = a.getDWord(84);
+	mi.mainBatteryUsedTime.tv_high = a.getDWord(88);
+	mi.mainBatteryCurrent = a.getDWord(92);
+	mi.mainBatteryUsedPower = a.getDWord(96);
+	mi.mainBatteryVoltage = a.getDWord(100);
+	mi.mainBatteryMaxVoltage = a.getDWord(104);
+
+	mi.backupBatteryStatus = a.getDWord(108);
+	mi.backupBatteryVoltage = a.getDWord(112);
+	mi.backupBatteryMaxVoltage = a.getDWord(116);
+	mi.backupBatteryUsedTime.tv_low = a.getDWord(124);
+	mi.backupBatteryUsedTime.tv_high = a.getDWord(128);
+
+	mi.externalPower = (a.getDWord(120) != 0);
+
+	return res;
+}
+
+static unsigned long hhh;
 
 int rpcs32::
 configOpen(void)
 {
 	bufferStore a;
-cout << "configOpen:" << endl;
+	int res;
+
 	if (!sendCommand(rpcs::CONFIG_OPEN, a))
 		return rpcs::E_PSI_FILE_DISC;
-	getResponse(a);
-cout << a << endl;
+	res = getResponse(a);
+cout << "co: r=" << res << " a=" << a << endl;
+	hhh = a.getDWord(0);
+	return 0;
 }
 
 int rpcs32::
 configRead(void)
 {
 	bufferStore a;
-cout << "configRead:" << endl;
-	if (!sendCommand(rpcs::CONFIG_READ, a))
-		return rpcs::E_PSI_FILE_DISC;
-	getResponse(a);
-cout << a << endl;
+	int res;
+	int l;
+	FILE *f;
+
+	f = fopen("blah", "w");
+	do {
+		a.init();
+		a.addDWord(hhh);
+		if (!sendCommand(rpcs::CONFIG_READ, a))
+			return rpcs::E_PSI_FILE_DISC;
+		if ((res = getResponse(a)))
+			return res;
+		l = a.getLen();
+		cout << "cr: " << l << endl;
+		fwrite(a.getString(0), 1, l, f);
+	} while (l > 0);
+	fclose(f);
+//cout << "cr: r=" << res << " a=" << a << endl;
+	return 0;
 }

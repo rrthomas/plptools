@@ -4,35 +4,120 @@
 #include "bool.h"
 class bufferStore;
 
+/**
+ * An array of bufferStores
+ */
 class bufferArray {
-	public:
-		bufferArray();
-		bufferArray(const bufferArray &a);
-		~bufferArray();
-		bufferArray &operator =(const bufferArray &a);
-		bool empty() const;
+public:
+	/**
+	 * constructs a new bufferArray.
+	 * A minimum of @ref ALLOC_MIN
+	 * elements is allocated.
+	 */
+	bufferArray();
 
-		// this is NOT a real push as with a FIFO but
-		// appends the bufferStore.
-		void pushBuffer(const bufferStore& b);
-		bufferStore popBuffer(void);
+	/**
+	 * Constructs a new bufferArray.
+	 *
+	 * @param a The initial contents for this array.
+	 */
+	bufferArray(const bufferArray &a);
 
-		// new API (push() now behaves like a FIFO, more operators
-		bufferStore &operator [](const unsigned long index);
-		bufferArray &operator +(const bufferStore &);  // append
-		bufferArray &operator +(const bufferArray &);  // append
-		bufferArray &operator +=(const bufferStore &b); // append
-		bufferStore pop(void);
-		void push(const bufferStore& b);
-		void append(const bufferStore& b);
-		long length(void);
-		void clear(void);
+	/**
+	 * Destroys the bufferArray.
+	 */
+	~bufferArray();
+
+	/**
+	 * Copys the bufferArray.
+	 */
+	bufferArray &operator =(const bufferArray &a);
+
+	/**
+	 * Checks if this bufferArray is empty.
+	 *
+	 * @return true if the bufferArray is empty.
+	 */
+	bool empty() const;
+
+	/**
+	 * Retrieves the bufferStore at given index.
+	 *
+	 * @return The bufferStore at index.
+	 */
+	bufferStore &operator [](const unsigned long index);
+
+	/**
+	 * Appends a bufferStore.
+	 */
+	bufferArray &operator +(const bufferStore &);
+
+	/**
+	 * Concatenates two bufferArrays.
+	 */
+	bufferArray &operator +(const bufferArray &);
+
+	/**
+	 * Appends a bufferStore.
+	 */
+	bufferArray &operator +=(const bufferStore &b);
+
+	/**
+	 * Removes the first bufferStore.
+	 *
+	 * @return The removed bufferStore.
+	 */
+	bufferStore pop(void);
+
+	/**
+	 * Inserts a bufferStore at index 0.
+	 *
+	 * @param b The bufferStore to be inserted.
+	 */
+	void push(const bufferStore& b);
+
+	/**
+	 * Appends a bufferStore.
+	 *
+	 * @param b The bufferStore to be appended.
+	 */
+	void append(const bufferStore& b);
+
+	/**
+	 * Evaluates the current length.
+	 *
+	 * @return The current number of bufferStores
+	 */
+	long length(void);
+
+	/**
+	 * Empties the bufferArray.
+	 */
+	void clear(void);
 
 private:
-		static const long ALLOC_MIN = 5;
-		long len;
-		long lenAllocd;
-		bufferStore* buff;
+	/**
+	 * Minimum number of bufferStores to
+	 * allocate.
+	 */
+	static const long ALLOC_MIN = 5;
+
+	/**
+	 * The current number of bufferStores in
+	 * this bufferArray.
+	 */
+	long len;
+
+	/**
+	 * The current number of bufferStores
+	 * allocated.
+	 */
+	long lenAllocd;
+
+	/**
+	 * The content.
+	 */
+	bufferStore* buff;
 };
 
 inline bool bufferArray::empty() const { return len == 0; }

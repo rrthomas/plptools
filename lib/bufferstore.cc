@@ -22,28 +22,30 @@
 #include <stream.h> 
 // That should be iostream.h, but it won't build on Sun WorkShop C++ 5.0
 #include <iomanip.h>
+#include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "bufferstore.h"
 
 bufferStore::bufferStore() {
 	lenAllocd = 0;
-	buff = NULL;
+	buff = 0L;
 	len = 0;
 	start = 0;
 }
 
 bufferStore::bufferStore(const bufferStore &a) {
 	lenAllocd = (a.getLen() > MIN_LEN) ? a.getLen() : MIN_LEN;
-	buff = new unsigned char [lenAllocd];
+	buff = (unsigned char *)malloc(lenAllocd);
 	len = a.getLen();
 	memcpy(buff, a.getString(0), len);
 	start = 0;
 }
 
-bufferStore::bufferStore(const unsigned char*_buff, long _len) {
+bufferStore::bufferStore(const unsigned char *_buff, long _len) {
 	lenAllocd = (_len > MIN_LEN) ? _len : MIN_LEN;
-	buff = new unsigned char [lenAllocd];
+	buff = (unsigned char *)malloc(lenAllocd);
 	len = _len;
 	memcpy(buff, _buff, len);
 	start = 0;
@@ -54,6 +56,7 @@ bufferStore &bufferStore::operator =(const bufferStore &a) {
 	len = a.getLen();
 	memcpy(buff, a.getString(0), len);
 	start = 0;
+	return *this;
 }
 
 void bufferStore::init() {
@@ -69,7 +72,8 @@ void bufferStore::init(const unsigned char*_buff, long _len) {
 }
 
 bufferStore::~bufferStore() {
-	delete [] buff;
+	if (buff != 0L)
+		free(buff);
 }
 
 unsigned long bufferStore::getLen() const {
@@ -92,23 +96,26 @@ unsigned int bufferStore::getDWord(long pos) const {
 }
 
 const char* bufferStore::getString(long pos) const {
-	return (const char*)buff+pos+start;
+	return (const char*)buff + pos + start;
 }
 
 ostream &operator<<(ostream &s, const bufferStore &m) {
-	{
-		for (int i = m.start; i < m.len; i++)
+	// save stream flags
+	ostream::fmtflags old = s.flags();
+
+	for (int i = m.start; i < m.len; i++)
 		s << hex << setw(2) << setfill('0') << (int)m.buff[i] << " ";
-	}
+
+	// restore stream flags
+	s.flags(old);
 	s << "(";
-	{
-		for (int i = m.start; i < m.len; i++) {
-			unsigned char c = m.buff[i];
-			if (c>=' ' && c <= 'z') s << c;
-		}
+
+	for (int i = m.start; i < m.len; i++) {
+		unsigned char c = m.buff[i];
+		s << (unsigned char)(isprint(c) ? c : '.');
 	}
-	s<< ")" << dec << setw(0);
-	return s;
+
+	return s << ")";
 }
 
 void bufferStore::discardFirstBytes(int n) {
@@ -119,12 +126,9 @@ void bufferStore::discardFirstBytes(int n) {
 void bufferStore::checkAllocd(long newLen) {
 	if (newLen >= lenAllocd) {
 		do {
-			lenAllocd = (lenAllocd < MIN_LEN)?MIN_LEN:(lenAllocd*2);
+			lenAllocd = (lenAllocd < MIN_LEN) ? MIN_LEN : (lenAllocd * 2);
 		} while (newLen >= lenAllocd);
-		unsigned char* newBuff = new unsigned char [lenAllocd];
-		memcpy(&newBuff[start], &buff[start], len - start);
-		delete [] buff;
-		buff = newBuff;
+		buff = (unsigned char *)realloc(buff, lenAllocd);
 	}
 }
 

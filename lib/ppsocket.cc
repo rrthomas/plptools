@@ -181,7 +181,11 @@ listen(char *Host, int Port)
 ppsocket *ppsocket::
 accept(char *Peer, int MaxLen)
 {
+#ifdef sun
+	int len;
+#else
 	socklen_t len;
+#endif
 	ppsocket *accepted;
 	char *peer;
 

@@ -45,11 +45,11 @@ bufferArray::bufferArray(const bufferArray & a)
 
 bufferArray::~bufferArray()
 {
-	delete[]buff;
+	delete []buff;
 }
 
 bufferStore bufferArray::
-popBuffer()
+pop()
 {
 	bufferStore ret;
 	if (len > 0) {
@@ -63,7 +63,7 @@ popBuffer()
 }
 
 void bufferArray::
-pushBuffer(const bufferStore & b)
+append(const bufferStore & b)
 {
 	if (len == lenAllocd) {
 		lenAllocd += ALLOC_MIN;
@@ -71,7 +71,7 @@ pushBuffer(const bufferStore & b)
 		for (long i = 0; i < len; i++) {
 			nb[i] = buff[i];
 		}
-		delete[]buff;
+		delete []buff;
 		buff = nb;
 	}
 	buff[len++] = b;
@@ -84,24 +84,12 @@ push(const bufferStore & b)
 		lenAllocd += ALLOC_MIN;
 	bufferStore *nb = new bufferStore[lenAllocd];
 	for (long i = len; i > 0; i--) {
-		nb[i] = buff[i-1];
+		nb[i] = buff[i - 1];
 	}
 	nb[0] = b;
 	delete[]buff;
 	buff = nb;
 	len++;
-}
-
-bufferStore bufferArray::
-pop()
-{
-	return popBuffer();
-}
-
-void bufferArray::
-append(const bufferStore & b)
-{
-	pushBuffer(b);
 }
 
 long bufferArray::

@@ -25,9 +25,11 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <stream.h>
+#include <fstream.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <iomanip.h>
 #include <unistd.h>
 #include <sys/time.h>
@@ -43,7 +45,6 @@
 
 #if HAVE_LIBREADLINE
 extern "C"  {
-#include <stdio.h>
 #include <readline/readline.h>
 #if HAVE_LIBHISTORY
 #include <readline/history.h>
@@ -53,7 +54,6 @@ extern "C"  {
 
 static char psionDir[1024];
 static rfsv *comp_a;
-static rpcs *comp_r;
 static int continueRunning;
 
 
@@ -184,6 +184,8 @@ sigint_handler2(int i) {
 	signal(SIGINT, sigint_handler2);
 }
 
+const char *datefmt = "%c";
+
 int ftp::
 session(rfsv & a, rpcs & r, int xargc, char **xargv)
 {
@@ -205,7 +207,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	}
 	if (!once) {
 		bufferArray b;
-		if (!r.getOwnerInfo(b)) {
+		if (!(res = r.getOwnerInfo(b))) {
 			int machType;
 			r.getMachineType(machType);
 			cout << "Connected to ";
@@ -251,7 +253,8 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			while (!b.empty())
 				cout << "  " << b.pop().getString() << endl;
 			cout << endl;
-		}
+		} else
+			cerr << "OwnerInfo returned error " << res << endl;
 	}
 
 	if (!strcmp(DDRIVE, "AUTO")) {
@@ -334,9 +337,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			else {
 				// never used to do this
 				char dateBuff[100];
-                               	struct tm *t;
-                               	t = localtime(&time);
-                               	strftime(dateBuff, 100, "%c", t);
+                               	strftime(dateBuff, sizeof(dateBuff), datefmt, localtime(&time));
                                	cout << a.opAttr(attr);
                                	cout << " " << dec << setw(10) << setfill(' ') << size;
                                	cout << " " << dateBuff;
@@ -364,9 +365,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 				errprint(res, a);
 			else {
 				char dateBuff[100];
-				struct tm *t;
-				t = localtime(&mtime);
-				strftime(dateBuff, 100, "%c %Z", t);
+                               	strftime(dateBuff, sizeof(dateBuff), datefmt, localtime(&mtime));
 				cout << dateBuff << endl;
 			}
 			continue;
@@ -456,9 +455,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 					long size = s.getDWord(4);
 					long attr = s.getDWord(8);
 					char dateBuff[100];
-                                	struct tm *t;
-                                	t = localtime(&date);
-                                	strftime(dateBuff, 100, "%c", t);
+                                	strftime(dateBuff, sizeof(dateBuff), datefmt, localtime(&date));
                                 	cout << a.opAttr(attr);
                                 	cout << " " << dec << setw(10) << setfill(' ') << size;
                                 	cout << " " << dateBuff;
@@ -748,10 +745,14 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			continue;
 		}
 		// RPCS commands
-		// if (!strcmp(argv[0], "xxx")) {
-		// 	r.configOpen();
-		// 	continue;
-		// }
+		if (!strcmp(argv[0], "x")) {
+			r.configOpen();
+			continue;
+		}
+		if (!strcmp(argv[0], "y")) {
+			r.configRead();
+			continue;
+		}
 		if (!strcmp(argv[0], "run") && (argc >= 2)) {
 			char argbuf[1024];
 			char cmdbuf[1024];
@@ -770,6 +771,99 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			} else
 				strcpy(cmdbuf, argv[1]);
 			r.execProgram(cmdbuf, argbuf);
+			continue;
+		}
+		if (!strcmp(argv[0], "machinfo")) {
+			machineInfo mi;
+			if ((res = r.getMachineInfo(mi))) {
+				errprint(res, a);
+				continue;
+			}
+
+			cout << "General:" << endl;
+			cout << "  Machine Type: " << mi.machineType << endl;
+			cout << "  Machine Name: " << mi.machineName << endl;
+			cout << "  Machine UID:  " << hex << mi.machineUID << dec << endl;
+			cout << "  UI Language:  " << mi.uiLanguage << endl;
+			cout << "ROM:" << endl;
+			cout << "  Version:      " << mi.romMajor << "." << setw(2) << setfill('0') <<
+				mi.romMinor << "(" << mi.romBuild << ")" << endl;
+			cout << "  Size:         " << mi.romSize / 1024 << "k" << endl;
+			cout << "  Programmable: " <<
+				(mi.romProgrammable ? "yes" : "no") << endl;
+			cout << "RAM:" << endl;
+			cout << "  Size:         " << mi.ramSize / 1024 << "k" << endl;
+			cout << "  Free:         " << mi.ramFree / 1024 << "k" << endl;
+			cout << "  Free max:     " << mi.ramMaxFree / 1024 << "k" << endl;
+			cout << "RAM disk size:  " << mi.ramDiskSize / 1024 << "k" << endl;
+			cout << "Registry size:  " << mi.registrySize << endl;
+			cout << "Display size:   " << mi.displayWidth << "x" <<
+				mi.displayHeight << endl;
+			cout << "Time:" << endl;
+			PsiTime pt(&mi.time, &mi.tz);
+			cout << "  Current time: " << pt << endl;
+			cout << "  UTC offset:   " << mi.tz.utc_offset << " seconds" << endl;
+			cout << "  DST:          " <<
+				(mi.tz.dst_zones & PsiTime::PSI_TZ_HOME ? "yes" : "no") << endl;
+			cout << "  Timezone:     " << mi.tz.home_zone << endl;
+			cout << "  Country Code: " << mi.countryCode << endl;
+			cout << "Main battery:" << endl;
+			pt.setPsiTime(&mi.mainBatteryInsertionTime);
+			cout << "  Changed at:   " << pt << endl;
+			cout << "  Used for:     " << mi.mainBatteryUsedTime << endl;
+			cout << "  Status:       " <<
+				r.batteryStatusString(mi.mainBatteryStatus) << endl;
+			cout << "  Current:      " << mi.mainBatteryCurrent << " mA" << endl;
+			cout << "  UsedPower:    " << mi.mainBatteryUsedPower << " mAs" << endl;
+			cout << "  Voltage:      " << mi.mainBatteryVoltage << " mV" << endl;
+			cout << "  Max. voltage: " << mi.mainBatteryMaxVoltage << " mV" << endl;
+			cout << "Backup battery:" << endl;
+			cout << "  Status:       " <<
+				r.batteryStatusString(mi.backupBatteryStatus) << endl;
+			cout << "  Voltage:      " << mi.backupBatteryVoltage << " mV" << endl;
+			cout << "  Max. voltage: " << mi.backupBatteryMaxVoltage << " mV" << endl;
+			cout << "  Used for:     " << mi.backupBatteryUsedTime << endl;
+			continue;
+		}
+		if (!strcmp(argv[0], "runrestore") && (argc == 2)) {
+			ifstream ip(argv[1]);
+			if (!ip) {
+				cerr << "Could not read processlist " << argv[1] << endl;
+				continue;
+			}
+			while (!ip.eof()) {
+				char cmd[256];
+				char arg[256];
+				ip >> cmd >> arg;
+				if ((res = r.execProgram(cmd, arg))) {
+					cerr << "Could not start " << cmd << " " << arg << endl;
+					errprint(res, a);
+				}
+			}
+			ip.close();
+			continue;
+		}
+		if (!strcmp(argv[0], "killsave") && (argc == 2)) {
+			bufferArray tmp;
+			ofstream op(argv[1]);
+			if (!op) {
+				cerr << "Could not write processlist " << argv[1] << endl;
+				continue;
+			}
+			r.queryDrive('C', tmp);
+			while (!tmp.empty()) {
+				char pbuf[128];
+				bufferStore cmdargs;
+				bufferStore bs = tmp.pop();
+				int pid = bs.getWord(0);
+				const char *proc = bs.getString(2);
+				sprintf(pbuf, "%s.$%d", proc, pid);
+				bs = tmp.pop();
+				if (r.getCmdLine(pbuf, cmdargs) == 0)
+					op << cmdargs.getString(0) << " " << bs.getString(0) << endl;
+				r.stopProgram(pbuf);
+			}
+			op.close();
 			continue;
 		}
 		if (!strcmp(argv[0], "kill") && (argc >= 2)) {
@@ -834,7 +928,8 @@ errprint(long errcode, rfsv & a) {
 static char *all_commands[] = {
 	"pwd", "ren", "touch", "gtime", "test", "gattr", "sattr", "devs",
 	"dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
-	"del", "rm", "mkdir", "rmdir", "prompt", "bye", "ps", "kill", "run", NULL
+	"del", "rm", "mkdir", "rmdir", "prompt", "bye",
+	"ps", "kill", "killsave", "runrestore", "run", "machinfo", NULL
 };
 
 static char *localfile_commands[] = {
