@@ -6,3 +6,4 @@ libtool
 config.status
 config.cache
 config.log
+plptools-*.tar.gz
