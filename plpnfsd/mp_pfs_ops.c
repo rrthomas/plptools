@@ -885,6 +885,7 @@ nfsproc_readdir_2(readdirargs *ra)
 		if (query_devices()) {
 			res.readdirres_u.reply.eof = ra->count == RA_MAXCOUNT ? 0 : 1;
 			res.status = NFS_OK;
+			debuglog("readdir: eof=%d\n", res.readdirres_u.reply.eof);
 			return &res;
 		}
 		for (dp = devices; dp; dp = dp->next) {
@@ -936,6 +937,7 @@ nfsproc_readdir_2(readdirargs *ra)
 
 	res.readdirres_u.reply.eof = ra->count == RA_MAXCOUNT ? 0 : 1;
 	res.status = NFS_OK;
+	debuglog("readdir: eof=%d\n", res.readdirres_u.reply.eof);
 	return &res;
 }
 
