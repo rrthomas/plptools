@@ -90,7 +90,7 @@ AC_OUTPUT(
 	lib/Makefile
 	ncpd/Makefile
 	plpftp/Makefile
-	nfsd/Makefile
+	plpnfsd/Makefile
 	include/config.h
 	include/defs.h
 )
