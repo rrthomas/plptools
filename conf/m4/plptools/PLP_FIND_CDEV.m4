@@ -6,7 +6,7 @@ dnl
 dnl On return, variable FOUND is set to one of the devices or to NO, if none
 dnl was found.
 dnl
-AC_DEFUN(PLP_FIND_CDEV,[
+AC_DEFUN([PLP_FIND_CDEV],[
 	$2=NO
 	for i in $1; do
 		if test -c "$i" ; then

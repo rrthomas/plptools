@@ -1,4 +1,4 @@
-AC_DEFUN(PLP_CHECK_COMPILERS,
+AC_DEFUN([PLP_CHECK_COMPILERS],
 [
   AC_ARG_ENABLE(debug,[  --enable-debug          enables debug symbols [default=no]],
   [

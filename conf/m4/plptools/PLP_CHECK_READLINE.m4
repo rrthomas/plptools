@@ -7,7 +7,7 @@ dnl On RedHat 7.0 however, libtermcap is broken: It contains no
 dnl symbols at all. Fortunately, libcurses provides the same
 dnl and therefore we have to check for that special case.)
 dnl
-AC_DEFUN(PLP_CHECK_READLINE,
+AC_DEFUN([PLP_CHECK_READLINE],
 [
 	AC_MSG_CHECKING(for readline in -lreadline)
 	ac_cv_readline_libs=""
@@ -62,7 +62,7 @@ dnl Check for readline version.
 dnl Those readline developers change their API too frequently
 dnl and don't provide a version number in the headers :-(
 dnl
-AC_DEFUN(PLP_READLINE_VERSION,
+AC_DEFUN([PLP_READLINE_VERSION],
 [
 	AC_MSG_CHECKING(for readline version)
 	saved_libs=$LIBS

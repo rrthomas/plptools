@@ -6,7 +6,7 @@ dnl
 dnl On return, variable FOUND is set to one of fileX or to NO, if none
 dnl was found.
 dnl
-AC_DEFUN(PLP_FIND_FILE,[
+AC_DEFUN([PLP_FIND_FILE],[
 	$2=NO
 	for i in $1; do
 		if test -r "$i" ; then
