@@ -93,6 +93,8 @@ typedef struct psi_timezone_t {
  * fallback uses the local machine's setup, which assumes
  * that both Psion and local machine have the same
  * time zone and daylight settings.
+ *
+ * @author Fritz Elfert <felfert@to.com>
  */
 class PsiTime {
 public:
@@ -261,12 +263,34 @@ private:
 	bool ptzValid;
 };
 
+/**
+ * A singleton wrapper for a @ref psi_timezone . This class is used
+ * by @ref PsiTime to initialize it's psi_timezone variable.
+ * PsiZone itself is initialized from within @ref rpcs::getMachineInfo .
+ * In an application, you typically call this at the very beginning, just
+ * after connection setup. From then on, a single PsiZone instance is
+ * held in memory and used by the various constructors of PsiTime.
+ *
+ * @author Fritz Elfert <felfert@to.com>
+ */
 class PsiZone {
 	friend class rpcs32;
 
 public:
+	/**
+	 * Retrieve the singleton object.
+	 * If it does not exist, it is created.
+	 */
 	static PsiZone &getInstance();
 
+	/**
+	 * Retrieve the Psion's time zone.
+	 *
+	 * @param ptz The time zone is returned here.
+	 *
+	 * @returns false, if the time zone is not
+	 *          known (yet).
+	 */
 	bool getZone(psi_timezone &ptz);
 
 private:

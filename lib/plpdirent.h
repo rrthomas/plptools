@@ -2,8 +2,8 @@
 #define _PLP_DIRENT_H_
 
 #include <string>
-#include <psitime.h>
-#include <rfsv.h>
+#include "psitime.h"
+#include "rfsv.h"
 
 class PlpUID
 {

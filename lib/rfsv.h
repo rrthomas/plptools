@@ -496,7 +496,7 @@ class rfsv {
 		/**
 		 * Close a directory, previously opened with @ref opendir.
 		 *
-		 * @param handle A handle, obtained by calling @see opendir.
+		 * @param handle A handle, obtained by calling @ref opendir .
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
