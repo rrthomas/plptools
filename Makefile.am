@@ -1,7 +1,7 @@
 #
 # $Id$
 #
-SUBDIRS = lib nfsd
+SUBDIRS = lib ncpd nfsd plpftp
 EXTRA_DIST = COPYING README TODO INSTALL
 AUTOMAKE_OPTIONS = foreign
 

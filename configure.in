@@ -1,0 +1,96 @@
+AC_REVISION($ Revision: 0.1 $)dnl revision of this configure.in script
+
+AC_INIT(acinclude.m4)
+AM_CONFIG_HEADER(include/config.h)
+AM_INIT_AUTOMAKE(plpnfsd, 0.1)
+
+dnl Enable Mainatiner stuff
+AM_MAINTAINER_MODE
+
+dnl checks for programs
+AC_PROG_MAKE_SET
+AC_CHECK_COMPILERS
+AC_PROG_RANLIB
+
+CFLAGS="-O"
+test "$GCC" = yes && CFLAGS="-O2 -Wall"
+AC_PATH_PROG(CC_PATH, $CC)
+test "$CC_PATH" = /opt/SUNWspro/bin/cc && CFLAGS="-xO2 -v"
+
+dnl checking for aix
+AC_MSG_CHECKING(for AIX)
+if test "`uname -s 2>/dev/null`" = AIX ; then
+  AC_MSG_RESULT(yes)
+  AC_CHECK_LIB(bsd, hostname)
+  EXTRA_OBJS=mount_aix.o
+else
+  AC_MSG_RESULT(no)
+fi
+AC_SUBST(EXTRA_OBJS)
+
+dnl checks for libraries
+
+dnl readline and history for plpftp
+AC_CHECK_LIB(readline, readline)
+AC_CHECK_LIB(history, add_history)
+
+dnl these three are for solaris
+AC_CHECK_LIB(socket, socket)
+AC_CHECK_LIB(nsl, gethostbyname)
+ac_save_LDFLAGS=$LDFLAGS; LDFLAGS="-L/usr/ucblib -R/usr/ucblib $LDFLAGS"
+AC_CHECK_LIB(rpcsoc, svcudp_create,,LDFLAGS=$ac_save_LDFLAGS)
+
+dnl checks for mount table
+AC_MSG_CHECKING(for mount table)
+AC_FIND_FILE(/etc/mnttab /etc/mtab, MTAB)
+AC_MSG_RESULT($MTAB)
+test "$MTAB" = "NO" && CFLAGS="${CFLAGS} -DDONT_UPDATE_MTAB";
+AC_SUBST(MTAB)
+
+dnl checks for header files
+AC_CHECK_HEADERS(sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h)
+
+dnl special options for customization
+
+AC_ARG_WITH(serial,
+    [  --with-serial=DEV       override default serial line ],
+    [  DDEV="$withval"
+      AC_MSG_RESULT(Overriding serial line: $DDEV)
+    ],
+    [ AC_MSG_CHECKING(for default serial line)
+      AC_FIND_CDEV(/dev/tty0p0 /dev/tty00 /dev/ttyS0 /dev/term/a /dev/ttyfa /dev/ttya /dev/tty0 /dev/ttyf1 /dev/cuaa1, DDEV)
+      AC_MSG_RESULT($DDEV)
+      test "$DDEV" = "NO" && AC_MSG_ERROR(NO serial lines. Use --with-serial.)
+    ]
+)
+AC_SUBST(DDEV)
+
+AC_ARG_WITH(speed,
+    [  --with-speed=SPEED      override default serial speed [115200]],
+    [ DSPEED="$withval"
+      AC_MSG_RESULT(Overriding serial speed: $DSPEED) ],
+    [ DSPEED=115200
+      AC_MSG_RESULT(Using default serial speed: $DSPEED)
+    ]
+)
+AC_SUBST(DSPEED)
+
+AC_ARG_WITH(port,
+    [  --with-port=PORT        override default port [7501]],
+    [ DPORT="$withval"
+      AC_MSG_RESULT(Overriding port: $DPORT) ],
+    [ DPORT=7501
+      AC_MSG_RESULT(Using default port: $DPORT)
+    ]
+)
+AC_SUBST(DPORT)
+
+AC_OUTPUT(
+	Makefile
+	lib/Makefile
+	ncpd/Makefile
+	plpftp/Makefile
+	nfsd/Makefile
+	include/config.h
+	include/defs.h
+)

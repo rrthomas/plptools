@@ -24,8 +24,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "defs.h"
 #include "bool.h"
-#include "../defaults.h"
 #include "rfsv32.h"
 #include "bufferstore.h"
 #include "bufferarray.h"
@@ -223,7 +223,7 @@ void rfsv_startup()
 	}
 	skt = new ppsocket();
 	skt->startup();
-	res = skt->connect(NULL, DEFAULT_SOCKET);
+	res = skt->connect(NULL, DPORT);
 	a = new rfsv32(skt);
 }
 

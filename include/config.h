@@ -20,8 +20,14 @@
 /* Define if you have the bsd library (-lbsd).  */
 /* #undef HAVE_LIBBSD */
 
+/* Define if you have the history library (-lhistory).  */
+#define HAVE_LIBHISTORY 1
+
 /* Define if you have the nsl library (-lnsl).  */
 #define HAVE_LIBNSL 1
+
+/* Define if you have the readline library (-lreadline).  */
+#define HAVE_LIBREADLINE 1
 
 /* Define if you have the rpcsoc library (-lrpcsoc).  */
 /* #undef HAVE_LIBRPCSOC */

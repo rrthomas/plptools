@@ -26,13 +26,14 @@
 #include <time.h>
 #include <string.h>
 
-#include "bool.h"
+#include "defs.h"
 #include "bool.h"
 #include "rfsv32.h"
 #include "bufferstore.h"
 #include "ppsocket.h"
-#include "../defaults.h"
 #include "bufferarray.h"
+
+#define RFSV_SENDLEN 230
 
 rfsv32::rfsv32(ppsocket * _skt) : serNum(0)
 {

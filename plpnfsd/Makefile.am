@@ -1,5 +1,6 @@
 INCLUDES=-I../lib
-LIBS=../lib/libutils.a
+
+LIBS = -L../lib -lutils
 
 sbin_PROGRAMS = plpnfsd
 

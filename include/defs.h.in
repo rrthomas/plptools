@@ -1,14 +1,15 @@
 #ifndef _defs_h_
 #define _defs_h_
 
+/*
+ * NFS related stuff
+ */
 #define MTAB_PATH	"@MTAB@"
 #ifdef linux
 # define MTAB_TMP	"@MTAB@~"
 #else
 # define MTAB_TMP	"@MTAB@.p3nfsd"
 #endif
-
-#define DDEV		"@DDEV@"
 
 #ifdef _IBMR2
 # define DONT_UPDATE_MTAB /* The mount table is obtained from the kernel (!?) */
@@ -29,5 +30,19 @@
 #define NO_WRITE_SELECT
 #endif
 
+/*
+ * defaults for ncpd
+ */
+#define DDEV		"@DDEV@"
+#define DSPEED		@DSPEED@
+#define DPORT		@DPORT@
+
+/* Debugging */
+
+#define PACKET_LAYER_DIAGNOSTICS false
+#define LINK_LAYER_DIAGNOSTICS false
+// #define SOCKET_DIAGNOSTICS
+
 #include "config.h"
 #endif
+

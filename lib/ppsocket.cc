@@ -31,7 +31,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
-#include "../defaults.h"
+#include "defs.h"
 #include "bool.h"
 #include "bufferstore.h"
 #include "ppsocket.h"
