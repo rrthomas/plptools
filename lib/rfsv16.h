@@ -56,7 +56,7 @@ public:
     Enum<rfsv::errs> fsetattr(const char * const, const u_int32_t seta, const u_int32_t unseta);
     Enum<rfsv::errs> dircount(const char * const, u_int32_t &);
     Enum<rfsv::errs> devlist(u_int32_t &);
-    Enum<rfsv::errs> devinfo(const u_int32_t, PlpDrive &);
+    Enum<rfsv::errs> devinfo(const char, PlpDrive &);
     Enum<rfsv::errs> fread(const u_int32_t, unsigned char * const, const u_int32_t, u_int32_t &);
     Enum<rfsv::errs> fwrite(const u_int32_t, const unsigned char * const, const u_int32_t, u_int32_t &);
     Enum<rfsv::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
@@ -100,7 +100,7 @@ private:
 	SFDATE = 40,
 	RESPONSE = 42
     };
-  
+
     enum fopen_attrib {
 	P_FOPEN = 0x0000, /* Open file */
 	P_FCREATE = 0x0001, /* Create file */
@@ -120,19 +120,19 @@ private:
     };
 
     enum status_enum {
-	P_FAWRITE  = 0x0001, /* can the file be written to? */    
-	P_FAHIDDEN = 0x0002, /* set if file is hidden */    
+	P_FAWRITE  = 0x0001, /* can the file be written to? */
+	P_FAHIDDEN = 0x0002, /* set if file is hidden */
 	P_FASYSTEM = 0x0004, /* set if file is a system file */
-	P_FAVOLUME = 0x0008, /* set if the name is a volume name */    
-	P_FADIR    = 0x0010, /* set if file is a directory file */    
-	P_FAMOD    = 0x0020, /* has the file been modified? */    
-	P_FAREAD   = 0x0100, /* can the file be read? */    
+	P_FAVOLUME = 0x0008, /* set if the name is a volume name */
+	P_FADIR    = 0x0010, /* set if file is a directory file */
+	P_FAMOD    = 0x0020, /* has the file been modified? */
+	P_FAREAD   = 0x0100, /* can the file be read? */
 	P_FAEXEC   = 0x0200, /* is the file executable? */
-	P_FASTREAM = 0x0400, /* is the file a byte stream file? */    
+	P_FASTREAM = 0x0400, /* is the file a byte stream file? */
 	P_FATEXT   = 0x0800, /* is it a text file? */
 	P_FAMASK   = 0x0f3f  /* All of the above */
     };
-  
+
     /**
     * Private constructor. Shall be called by
     * rfsvfactory only.

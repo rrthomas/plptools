@@ -70,7 +70,7 @@ public:
     Enum<rfsv::errs> fclose(const u_int32_t);
 
     Enum<rfsv::errs> devlist(u_int32_t &);
-    Enum<rfsv::errs> devinfo(const u_int32_t, PlpDrive&);
+    Enum<rfsv::errs> devinfo(const char, PlpDrive&);
     Enum<rfsv::errs> opendir(const u_int32_t, const char * const, rfsvDirhandle &);
     Enum<rfsv::errs> readdir(rfsvDirhandle &, PlpDirent &);
     Enum<rfsv::errs> closedir(rfsvDirhandle &);
@@ -78,7 +78,7 @@ public:
     u_int32_t opMode(const u_int32_t);
 
 private:
-	
+
     enum file_attrib {
 	EPOC_ATTR_RONLY      = 0x0001,
 	EPOC_ATTR_HIDDEN     = 0x0002,

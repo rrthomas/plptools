@@ -360,24 +360,24 @@ devlist(u_int32_t &devbits)
 }
 
 Enum<rfsv::errs> rfsv32::
-devinfo(const u_int32_t dev, PlpDrive &drive)
+devinfo(const char drive, PlpDrive &dinfo)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
 
-    a.addDWord(dev);
+    a.addDWord(toupper(drive) - 'A');
     if (!sendCommand(DRIVE_INFO, a))
 	return E_PSI_FILE_DISC;
     res = getResponse(a);
     if (res == E_PSI_GEN_NONE) {
-	drive.setMediaType(a.getDWord(0));
-	drive.setDriveAttribute(a.getDWord(8));
-	drive.setMediaAttribute(a.getDWord(12));
-	drive.setUID(a.getDWord(16));
-	drive.setSize(a.getDWord(20), a.getDWord(24));
-	drive.setSpace(a.getDWord(28), a.getDWord(32));
+	dinfo.setMediaType(a.getDWord(0));
+	dinfo.setDriveAttribute(a.getDWord(8));
+	dinfo.setMediaAttribute(a.getDWord(12));
+	dinfo.setUID(a.getDWord(16));
+	dinfo.setSize(a.getDWord(20), a.getDWord(24));
+	dinfo.setSpace(a.getDWord(28), a.getDWord(32));
 	a.addByte(0);
-	drive.setName('A' + dev, a.getString(40));
+	dinfo.setName(toupper(drive), a.getString(40));
     }
     return res;
 }
@@ -771,7 +771,7 @@ Enum<rfsv::errs> rfsv32::
 setVolumeName(const char drive , const char * const name)
 {
     bufferStore a;
-    a.addDWord(drive - 'A');
+    a.addDWord(toupper(drive) - 'A');
     a.addWord(strlen(name));
     a.addStringT(name);
     if (!sendCommand(SET_VOLUME_LABEL, a))

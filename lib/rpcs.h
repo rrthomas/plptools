@@ -228,8 +228,34 @@ public:
     Enum<rfsv::errs> stopProgram(const char *);
 
     Enum<rfsv::errs> queryProgram(const char *);
-    Enum<rfsv::errs> formatOpen(const char *, int &, int &);
-    Enum<rfsv::errs> formatRead(int);
+
+    /**
+    * Starts formatting a drive.
+    *
+    * This function is working with both SIBO and EPOC
+    * devices. After calling formatOpen, formatRead should
+    * be called n times with the returned handle where n is
+    * the value of the returned parameter count.
+    *
+    * @param drive The drive character to format (e.g: 'C', 'D' etc).
+    * @param handle The handle for calling formatRead is returned here.
+    * @param count The number of required calls to formatRead is returned
+    *   here.
+    *
+    * @returns A psion error code. 0 = Ok.
+    */
+    Enum<rfsv::errs> formatOpen(const char drive, int &handle, int &count);
+
+    /**
+    * Continues a running format.
+    *
+    * This function is working with both SIBO and EPOC
+    * devices. Call this function with the handle, returned by formatOpen.
+    *
+    * @returns A psion error code. 0 = Ok.
+    */
+    Enum<rfsv::errs> formatRead(int handle);
+
     Enum<rfsv::errs> getUniqueID(const char *, long &);
 
     /**

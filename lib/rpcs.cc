@@ -247,12 +247,14 @@ queryProgram(const char *program)
 }
 
 Enum<rfsv::errs> rpcs::
-formatOpen(const char *drive, int &handle, int &count)
+formatOpen(const char drive, int &handle, int &count)
 {
     Enum<rfsv::errs> res;
     bufferStore a;
 
-    a.addStringT(drive);
+    a.addByte(toupper(drive));
+    a.addByte(':');
+    a.addByte(0);
     if (!sendCommand(FORMAT_OPEN, a))
 	return rfsv::E_PSI_FILE_DISC;
     if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)

@@ -423,7 +423,7 @@ static int sibo_dattr[] = {
 };
 
 Enum<rfsv::errs> rfsv16::
-devinfo(const u_int32_t devnum, PlpDrive &drive)
+devinfo(const char drive, PlpDrive &dinfo)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
@@ -434,9 +434,10 @@ devinfo(const u_int32_t devnum, PlpDrive &drive)
     // (which we ignore), then do a STATUSDEVICE to get the info.
 
     a.init();
-    a.addByte((char) (devnum + 'A')); // Name 1
+    a.addByte(toupper(drive)); // Name 1
     a.addByte(':');
     a.addByte(0x00);
+
     a.addByte(0x00); // No name 2
     a.addByte(0x00); // No name 3
     if (!sendCommand(PARSE, a))
@@ -447,7 +448,7 @@ devinfo(const u_int32_t devnum, PlpDrive &drive)
     }
 
     a.init();
-    a.addByte((char) (devnum + 'A')); // Name 1
+    a.addByte(toupper(drive)); // Name 1
     a.addByte(':');
     a.addByte('\\');
     a.addByte(0x00);
@@ -460,26 +461,26 @@ devinfo(const u_int32_t devnum, PlpDrive &drive)
 
     int attr = a.getWord(2);
     attr = sibo_dattr[a.getWord(2) & 0xff];
-    drive.setMediaType(attr);
+    dinfo.setMediaType(attr);
 
     attr = a.getWord(2);
     int changeable = a.getWord(4) ? 32 : 0;
     int internal = (attr & 0x2000) ? 16 : 0;
 
-    drive.setDriveAttribute(changeable | internal);
+    dinfo.setDriveAttribute(changeable | internal);
 
     int variable = (attr & 0x4000) ? 1 : 0;
     int dualdens = (attr & 0x1000) ? 2 : 0;
     int formattable = (attr & 0x0800) ? 4 : 0;
     int protect = ((attr & 0xff) == 6) ? 8 : 0;
 
-    drive.setMediaAttribute(variable|dualdens|formattable|protect);
+    dinfo.setMediaAttribute(variable|dualdens|formattable|protect);
 
-    drive.setUID(0);
-    drive.setSize(a.getDWord(6), 0);
-    drive.setSpace(a.getDWord(10), 0);
+    dinfo.setUID(0);
+    dinfo.setSize(a.getDWord(6), 0);
+    dinfo.setSpace(a.getDWord(10), 0);
 
-    drive.setName('A' + devnum, a.getString(14));
+    dinfo.setName(toupper(drive), a.getString(14));
 
 
     return res;
