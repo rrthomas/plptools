@@ -15,7 +15,7 @@ noinst_HEADERS = plpprops.h plppropsFactory.h pie3dpiece.h pie3dwidget.h
 
 services_DATA = plpprops.desktop
 servicesdir = $(kde_servicesdir)
-
+EXTRA_DIST += $(services_DATA)
 
 messages:
 	$(XGETTEXT) -C -ki18n -kI18N_NOOP -ktranslate -kaliasLocale *.cc *.cpp *.h && mv messages.po ../po/libplpprops.pot

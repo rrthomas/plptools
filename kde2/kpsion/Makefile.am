@@ -21,9 +21,11 @@ kpsion_LDADD	= libkpsion.la $(top_srcdir)/lib/libplp.la
 
 applnk_DATA = kpsion.desktop
 applnkdir = $(kde_appsdir)/Utilities
+EXTRA_DIST += kpsion.desktop
 
 rcdir = $(kde_datadir)/kpsion
 rc_DATA = kpsionui.rc
+EXTRA_DIST += kpsionui.rc
 
 noinst_HEADERS = kpsion.h setupdialog.h wizards.h
 

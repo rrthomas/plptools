@@ -27,6 +27,7 @@ maintainer-clean-local:
 
 dist-hook:
 	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile
+	$(MAKE) -C $(distdir)/kde2 -f Makefile.am am_edit
 
 kdoc:
 	kdoc -d $(TMPDEST)doc/api -n libplp $(TMPDEST)lib/*.h

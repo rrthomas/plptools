@@ -21,7 +21,7 @@ Requires: %{name} = %{version}
 %package kde
 Summary: Psion support for KDE 2.1.
 Group: User Interface/Desktops
-Requires: %{name} = %{version}
+Requires: %{name} = %{version} kdelibs >= 2.1 qt >= 2.2.4
 
 %description
 This package contains the programs (client and server), necessary to
@@ -64,6 +64,19 @@ damit auf die Dateien eines Psion zugreifen. Weiterhin, liefert ein Plugin
 für Konqueror's Datei-Eigenschaften-Dialog Informationen über proprietäre
 Psion-Dateiattribute und stellt Informationen zum Gerät sowie seiner
 Laufwerke zur Verfügung.
+
+%package -n kpsion
+Summary: Psion utility for KDE 2.1.
+Group: User Interface/Desktops
+Requires: %{name} = %{version} kdelibs >= 2.1 qt >= 2.2.4
+
+%description -n kpsion
+This package contains a KDE utility program for backup, restore and formatting
+Psion drives.
+
+%description -l de -n kpsion
+Dieses Packet enthält ein KDE werkzeug zum Backup, Restore und Farmatieren
+von Psion Laufwerken.
 
 %changelog
 * Thu Mar  1 2001 Fritz Elfert <fritz.elfert@to.com>
@@ -110,11 +123,13 @@ fi
 
 %files
 %doc COPYING INSTALL CHANGES README* TODO etc/*magic patches
-%{_bindir}/*
+%{_bindir}/plpftp
+%{_bindir}/plpbackup
 %{_sbindir}/*
 %{_mandir}/*/*
 %{_libdir}/libplp.so*
 %{_libdir}/libplp.la
+%{_datadir}/locale/*/LC_MESSAGES/plptools.mo
 %config /etc/rc.d/init.d/psion
 
 %files devel
@@ -127,3 +142,14 @@ fi
 %{_libdir}/kio_plp.la
 %{_libdir}/libplpprops.so*
 %{_libdir}/libplpprops.la
+%{_datadir}/services/*
+%{_datadir}/locale/*/LC_MESSAGES/libplpprops.mo
+%{_datadir}/mimelnk/*/*
+
+%files -n kpsion
+%{_bindir}/kpsion
+%{_libdir}/libkpsion.*
+%{_datadir}/applnk/*/*
+%{_datadir}/apps/*/*
+%{_datadir}/icons/*/*/*/*
+%{_datadir}/locale/*/LC_MESSAGES/kpsion.mo
