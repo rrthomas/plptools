@@ -38,6 +38,7 @@
 #include <qtabwidget.h>
 #include <qcheckbox.h>
 #include <qwhatsthis.h>
+#include <qpushbutton.h>
 
 #include <strstream>
 #include <iomanip>
