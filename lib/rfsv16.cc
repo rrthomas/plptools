@@ -522,7 +522,7 @@ getResponse(bufferStore & data)
 	    "getBufferStore failed." << endl;
     } else if (data.getWord(0) == 0x2a &&
 	       data.getWord(2) == data.getLen()-4) {
-	Enum<errs> ret = (enum errs)data.getWord(4);
+	Enum<rfsv::errs> ret = (enum errs)(int16_t)data.getWord(4);
 	data.discardFirstBytes(6);
 	return ret;
     } else {
