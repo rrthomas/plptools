@@ -75,13 +75,25 @@ public:
     */
     Enum<rfsv::errs> initPrinter();
 
+    /**
+    * Cancels a running job.
+    */
+    Enum<rfsv::errs> cancelJob();
+
+    /**
+    * Stops the WPRT server.
+    */
+    bool stop();
+
 protected:
     /**
     * The possible commands.
     */
     enum commands {
-	WPRT_INIT = 0x0100,
-	WPRT_GET  = 0xf0f0,
+	WPRT_INIT    = 0x00,
+	WPRT_GET     = 0xf0,
+	WPRT_CANCEL  = 0xf1,
+	WPRT_STOP    = 0xff,
     };
 
     /**
@@ -110,6 +122,7 @@ protected:
     * @returns true on success, false on failure.
     */
     bool sendCommand(enum commands cc, bufferStore &data);
+
     Enum<rfsv::errs> getResponse(bufferStore &data);
     const char *getConnectName();
 

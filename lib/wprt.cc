@@ -98,7 +98,7 @@ sendCommand(enum commands cc, bufferStore & data)
     }
     bool result;
     bufferStore a;
-    a.addWord(cc);
+    a.addByte(cc);
     a.addBuff(data);
     result = skt->sendBufferStore(a);
     if (!result) {
@@ -115,7 +115,8 @@ initPrinter() {
     Enum<rfsv::errs> ret;
 
     bufferStore a;
-    a.addWord(0);
+    a.addByte(2); // Major printer version
+    a.addByte(0); // Minor printer version
     sendCommand(WPRT_INIT, a);
     if ((ret = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 	cerr << "WPRT ERR:" << a << endl;
@@ -131,12 +132,28 @@ initPrinter() {
 Enum<rfsv::errs> wprt::
 getData(bufferStore &buf) {
     Enum<rfsv::errs> ret;
-    bufferStore a;
 
     sendCommand(WPRT_GET, buf);
     if ((ret = getResponse(buf)) != rfsv::E_PSI_GEN_NONE)
+	cerr << "WPRT ERR:" << buf << endl;
+    return ret;
+}
+
+Enum<rfsv::errs> wprt::
+cancelJob() {
+    Enum<rfsv::errs> ret;
+    bufferStore a;
+
+    sendCommand(WPRT_CANCEL, a);
+    if ((ret = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
 	cerr << "WPRT ERR:" << a << endl;
     return ret;
+}
+
+bool wprt::
+stop() {
+    bufferStore a;
+    return sendCommand(WPRT_STOP, a);
 }
 
 Enum<rfsv::errs> wprt::
