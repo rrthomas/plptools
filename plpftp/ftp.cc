@@ -815,71 +815,80 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		}
 		if (!strcmp(argv[0], "killsave") && (argc == 2)) {
 			bufferArray tmp;
-			ofstream op(argv[1]);
-			if (!op) {
-				cerr << "Could not write processlist " << argv[1] << endl;
-				continue;
+			if ((res = r.queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE)
+				cerr << "Error: " << res << endl;
+			else {
+				ofstream op(argv[1]);
+				if (!op) {
+					cerr << "Could not write processlist " << argv[1] << endl;
+					continue;
+				}
+				op << "#plpftp processlist" << endl;
+				while (!tmp.empty()) {
+					char pbuf[128];
+					bufferStore cmdargs;
+					bufferStore bs = tmp.pop();
+					int pid = bs.getWord(0);
+					const char *proc = bs.getString(2);
+					sprintf(pbuf, "%s.$%d", proc, pid);
+					bs = tmp.pop();
+					if (r.getCmdLine(pbuf, cmdargs) == 0)
+						op << cmdargs.getString(0) << " " << bs.getString(0) << endl;
+					r.stopProgram(pbuf);
+				}
+				op.close();
 			}
-			r.queryDrive('C', tmp);
-			op << "#plpftp processlist" << endl;
-			while (!tmp.empty()) {
-				char pbuf[128];
-				bufferStore cmdargs;
-				bufferStore bs = tmp.pop();
-				int pid = bs.getWord(0);
-				const char *proc = bs.getString(2);
-				sprintf(pbuf, "%s.$%d", proc, pid);
-				bs = tmp.pop();
-				if (r.getCmdLine(pbuf, cmdargs) == 0)
-					op << cmdargs.getString(0) << " " << bs.getString(0) << endl;
-				r.stopProgram(pbuf);
-			}
-			op.close();
 			continue;
 		}
 		if (!strcmp(argv[0], "kill") && (argc >= 2)) {
 			bufferArray tmp, tmp2;
 			bool anykilled = false;
-			r.queryDrive('C', tmp);
-			tmp2 = tmp;
-			for (int i = 1; i < argc; i++) {
-				int kpid;
-				tmp = tmp2;
-				if (!strcmp(argv[i], "all"))
-					kpid = -1;
-				else
-					sscanf(argv[i], "%d", &kpid);
-				while (!tmp.empty()) {
-					bufferStore bs = tmp.pop();
-					tmp.pop();
-					int pid = bs.getWord(0);
-					const char *proc = bs.getString(2);
-					if (kpid == -1 || kpid == pid) {
-						char pbuf[128];
-						sprintf(pbuf, "%s.$%d", proc, pid);
-						r.stopProgram(pbuf);
-						anykilled = true;
+			if ((res = r.queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE)
+				cerr << "Error: " << res << endl;
+			else {
+				tmp2 = tmp;
+				for (int i = 1; i < argc; i++) {
+					int kpid;
+					tmp = tmp2;
+					if (!strcmp(argv[i], "all"))
+						kpid = -1;
+					else
+						sscanf(argv[i], "%d", &kpid);
+					while (!tmp.empty()) {
+						bufferStore bs = tmp.pop();
+						tmp.pop();
+						int pid = bs.getWord(0);
+						const char *proc = bs.getString(2);
+						if (kpid == -1 || kpid == pid) {
+							char pbuf[128];
+							sprintf(pbuf, "%s.$%d", proc, pid);
+							r.stopProgram(pbuf);
+							anykilled = true;
+						}
 					}
+					if (kpid == -1)
+						break;
 				}
-				if (kpid == -1)
-					break;
+				if (!anykilled)
+					cerr << "no such process" << endl;
 			}
-			if (!anykilled)
-				cerr << "no such process" << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "ps")) {
 			bufferArray tmp;
-			r.queryDrive('C', tmp);
-			cout << "PID   CMD          ARGS" << endl;
-			while (!tmp.empty()) {
-				bufferStore bs = tmp.pop();
-				bufferStore bs2 = tmp.pop();
-				int pid = bs.getWord(0);
-				const char *proc = bs.getString(2);
-				const char *arg = bs2.getString();
+			if ((res = r.queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE)
+				cerr << "Error: " << res << endl;
+			else {
+				cout << "PID   CMD          ARGS" << endl;
+				while (!tmp.empty()) {
+					bufferStore bs = tmp.pop();
+					bufferStore bs2 = tmp.pop();
+					int pid = bs.getWord(0);
+					const char *proc = bs.getString(2);
+					const char *arg = bs2.getString();
 
-				printf("%5d %-12s %s\n", pid, proc, arg);
+					printf("%5d %-12s %s\n", pid, proc, arg);
+				}
 			}
 			continue;
 		}
