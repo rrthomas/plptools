@@ -890,10 +890,10 @@ doBackup() {
     if (badBackup)
 	::unlink(archiveName.latin1());
     else {
+	QString newName = archiveName;
+	newName.replace(QRegExp("\\.tmp\\.gz$"), ".tar.gz");
 	// Rename Tarfile to its final name;
-	::rename(archiveName.latin1(),
-		 archiveName.replace(QRegExp("\\.tmp\\.gz$"), ".tar.gz").latin1());
-
+	::rename(archiveName.latin1(), newName.latin1());
     }
 
     backupRunning = false;

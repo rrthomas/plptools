@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-03-28 13:43+0200\n"
+"POT-Creation-Date: 2001-03-28 14:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -650,7 +650,7 @@ msgid "KPsionStatusBarProgress"
 msgstr ""
 
 #: wizards.cpp:52
-msgid "KPsion Setup"
+msgid "KPsion Configuration"
 msgstr ""
 
 #: wizards.cpp:54 wizards.cpp:429

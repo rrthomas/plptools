@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.7\n"
-"POT-Creation-Date: 2001-03-28 13:43+0200\n"
-"PO-Revision-Date: 2001-03-28 13:45CET\n"
+"POT-Creation-Date: 2001-03-28 14:41+0200\n"
+"PO-Revision-Date: 2001-03-28 14:44CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -746,8 +746,8 @@ msgid "KPsionStatusBarProgress"
 msgstr "KPsionStatusBarProgress"
 
 #: wizards.cpp:52
-msgid "KPsion Setup"
-msgstr "KPsion Einstellungen"
+msgid "KPsion Configuration"
+msgstr "KPsion Einrichtung"
 
 #: wizards.cpp:54 wizards.cpp:429
 msgid "Click this button to continue with the next page."
