@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-11 06:17+0200\n"
+"POT-Creation-Date: 2002-07-14 07:56+0200\n"
 "PO-Revision-Date: 2002-07-08 00:06CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -14,477 +14,477 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.6\n"
 
-#: lib/rfsv.cc:31 lib/rfsvfactory.cc:43 lib/rpcsfactory.cc:43
+#: lib/rfsv.cc:33 lib/rfsvfactory.cc:45 lib/rpcsfactory.cc:43
 msgid "no error"
 msgstr "kein Fehler"
 
-#: lib/rfsv.cc:32
+#: lib/rfsv.cc:34
 msgid "general"
 msgstr "allgemein"
 
-#: lib/rfsv.cc:33
+#: lib/rfsv.cc:35
 msgid "bad argument"
 msgstr "fehlerhaftes Argument"
 
-#: lib/rfsv.cc:34
+#: lib/rfsv.cc:36
 msgid "OS error"
 msgstr "BS Fehler"
 
-#: lib/rfsv.cc:35
+#: lib/rfsv.cc:37
 msgid "not supported"
 msgstr "nicht unterstützt"
 
-#: lib/rfsv.cc:36
+#: lib/rfsv.cc:38
 msgid "numeric underflow"
 msgstr "numerischer Unterlauf"
 
-#: lib/rfsv.cc:37
+#: lib/rfsv.cc:39
 msgid "numeric overflow"
 msgstr "numerischer Überlauf"
 
-#: lib/rfsv.cc:38
+#: lib/rfsv.cc:40
 msgid "numeric exception"
 msgstr "numerische Ausnahme"
 
-#: lib/rfsv.cc:39
+#: lib/rfsv.cc:41
 msgid "in use"
 msgstr "in Verwendung"
 
-#: lib/rfsv.cc:40
+#: lib/rfsv.cc:42
 msgid "out of memory"
 msgstr "kein Speicher"
 
-#: lib/rfsv.cc:41
+#: lib/rfsv.cc:43
 msgid "out of segments"
 msgstr "keine Segmente"
 
-#: lib/rfsv.cc:42
+#: lib/rfsv.cc:44
 msgid "out of semaphores"
 msgstr "keine Semaphoren"
 
-#: lib/rfsv.cc:43
+#: lib/rfsv.cc:45
 msgid "out of processes"
 msgstr "keine Prozesse"
 
-#: lib/rfsv.cc:44
+#: lib/rfsv.cc:46
 msgid "already open"
 msgstr "bereits geöffnet"
 
-#: lib/rfsv.cc:45
+#: lib/rfsv.cc:47
 msgid "not open"
 msgstr "nicht geöffnet"
 
-#: lib/rfsv.cc:46
+#: lib/rfsv.cc:48
 msgid "bad image"
 msgstr "fehlerhaftes Abbild"
 
-#: lib/rfsv.cc:47
+#: lib/rfsv.cc:49
 msgid "receiver error"
 msgstr "Empfangsfehler"
 
-#: lib/rfsv.cc:48
+#: lib/rfsv.cc:50
 msgid "device error"
 msgstr "Gerätefehler"
 
-#: lib/rfsv.cc:49
+#: lib/rfsv.cc:51
 msgid "no filesystem"
 msgstr "kein Dateisystem"
 
-#: lib/rfsv.cc:50
+#: lib/rfsv.cc:52
 msgid "not ready"
 msgstr "nicht bereit"
 
-#: lib/rfsv.cc:51
+#: lib/rfsv.cc:53
 msgid "no font"
 msgstr "kein Zeichensatz"
 
-#: lib/rfsv.cc:52
+#: lib/rfsv.cc:54
 msgid "too wide"
 msgstr "zu breit"
 
-#: lib/rfsv.cc:53
+#: lib/rfsv.cc:55
 msgid "too many"
 msgstr "zu viele"
 
-#: lib/rfsv.cc:54
+#: lib/rfsv.cc:56
 msgid "file already exists"
 msgstr "Datei existiert bereits"
 
-#: lib/rfsv.cc:55
+#: lib/rfsv.cc:57
 msgid "no such file"
 msgstr "keine solche Datei"
 
-#: lib/rfsv.cc:56
+#: lib/rfsv.cc:58
 msgid "write error"
 msgstr "Schreibfehler"
 
-#: lib/rfsv.cc:57
+#: lib/rfsv.cc:59
 msgid "read error"
 msgstr "Lesefehler"
 
-#: lib/rfsv.cc:58
+#: lib/rfsv.cc:60
 msgid "end of file"
 msgstr "Ende der Datei"
 
-#: lib/rfsv.cc:59
+#: lib/rfsv.cc:61
 msgid "disk/serial read buffer full"
 msgstr "Platte/serieller Lesepuffer voll"
 
-#: lib/rfsv.cc:60
+#: lib/rfsv.cc:62
 msgid "invalid name"
 msgstr "ungültiger Name"
 
-#: lib/rfsv.cc:61
+#: lib/rfsv.cc:63
 msgid "access denied"
 msgstr "Zugriff verweigert"
 
-#: lib/rfsv.cc:62
+#: lib/rfsv.cc:64
 msgid "ressource locked"
 msgstr "Ressource gesperrt"
 
-#: lib/rfsv.cc:63
+#: lib/rfsv.cc:65
 msgid "no such device"
 msgstr "Kein solches Gerät"
 
-#: lib/rfsv.cc:64
+#: lib/rfsv.cc:66
 msgid "no such directory"
 msgstr "Kein solcher Ordner"
 
-#: lib/rfsv.cc:65
+#: lib/rfsv.cc:67
 msgid "no such record"
 msgstr "Kein solcher Datensatz"
 
-#: lib/rfsv.cc:66
+#: lib/rfsv.cc:68
 msgid "file is read-only"
 msgstr "Datei ist nur lesbar"
 
-#: lib/rfsv.cc:67
+#: lib/rfsv.cc:69
 msgid "invalid I/O operation"
 msgstr "ungültige E/A-Operation"
 
-#: lib/rfsv.cc:68
+#: lib/rfsv.cc:70
 msgid "I/O pending (not yet completed)"
 msgstr "E/A anstehend (noch nicht beendet)"
 
-#: lib/rfsv.cc:69
+#: lib/rfsv.cc:71
 msgid "invalid volume name"
 msgstr "ungültiger Einheitenname"
 
-#: lib/rfsv.cc:70
+#: lib/rfsv.cc:72
 msgid "cancelled"
 msgstr "abgebrochen"
 
-#: lib/rfsv.cc:71
+#: lib/rfsv.cc:73
 msgid "no memory for control block"
 msgstr "kein Speicher für Kontrollblock"
 
-#: lib/rfsv.cc:72
+#: lib/rfsv.cc:74
 msgid "unit disconnected"
 msgstr "Einheit nicht verbunden"
 
-#: lib/rfsv.cc:73
+#: lib/rfsv.cc:75
 msgid "already connected"
 msgstr "bereits verbunden"
 
-#: lib/rfsv.cc:74
+#: lib/rfsv.cc:76
 msgid "retransmission threshold exceeded"
 msgstr "Anzahl der Übertragungsversuche überschritten"
 
-#: lib/rfsv.cc:75
+#: lib/rfsv.cc:77
 msgid "physical link failure"
 msgstr "physikalischer Verbindungsfehler"
 
-#: lib/rfsv.cc:76
+#: lib/rfsv.cc:78
 msgid "inactivity timer expired"
 msgstr "Zeitlimit für Inaktivität abgelaufen"
 
-#: lib/rfsv.cc:77
+#: lib/rfsv.cc:79
 msgid "serial parity error"
 msgstr "Serieller Paritätsfehler"
 
-#: lib/rfsv.cc:78
+#: lib/rfsv.cc:80
 msgid "serial framing error"
 msgstr "Serieller Rahmenfehler"
 
-#: lib/rfsv.cc:79
+#: lib/rfsv.cc:81
 msgid "serial overrun error"
 msgstr "Serieller Überlauf"
 
-#: lib/rfsv.cc:80
+#: lib/rfsv.cc:82
 msgid "modem cannot connect to remote modem"
 msgstr "Modem kann nicht zu entferntem Modem verbinden"
 
-#: lib/rfsv.cc:81
+#: lib/rfsv.cc:83
 msgid "remote modem busy"
 msgstr "Entferntes Modem besetzt"
 
-#: lib/rfsv.cc:82
+#: lib/rfsv.cc:84
 msgid "remote modem did not answer"
 msgstr "Entferntes Modem antwortet nicht"
 
-#: lib/rfsv.cc:83
+#: lib/rfsv.cc:85
 msgid "number blacklisted by the modem"
 msgstr "Rufnummer durch Modem gesperrt"
 
-#: lib/rfsv.cc:84
+#: lib/rfsv.cc:86
 msgid "drive not ready"
 msgstr "Laufwerk nicht bereit"
 
-#: lib/rfsv.cc:85
+#: lib/rfsv.cc:87
 msgid "unknown media"
 msgstr "Unbekanntes Medium"
 
-#: lib/rfsv.cc:86
+#: lib/rfsv.cc:88
 msgid "directory full"
 msgstr "Ordner voll"
 
-#: lib/rfsv.cc:87
+#: lib/rfsv.cc:89
 msgid "write-protected"
 msgstr "Schreibgeschützt"
 
-#: lib/rfsv.cc:88
+#: lib/rfsv.cc:90
 msgid "media corrupt"
 msgstr "Medium beschädigt"
 
-#: lib/rfsv.cc:89
+#: lib/rfsv.cc:91
 msgid "aborted operation"
 msgstr "abgebrochene Operation"
 
-#: lib/rfsv.cc:90
+#: lib/rfsv.cc:92
 msgid "failed to erase flash media"
 msgstr "Löschen des Flash-Mediums gescheitert"
 
-#: lib/rfsv.cc:91
+#: lib/rfsv.cc:93
 msgid "invalid file for DBF system"
 msgstr "Ungültige Datei für DBF-System"
 
-#: lib/rfsv.cc:92
+#: lib/rfsv.cc:94
 msgid "power failure"
 msgstr "Stromversorgung ausgefallen"
 
-#: lib/rfsv.cc:93
+#: lib/rfsv.cc:95
 msgid "too big"
 msgstr "zu groß"
 
-#: lib/rfsv.cc:94
+#: lib/rfsv.cc:96
 msgid "bad descriptor"
 msgstr "fehlerhafter Deskriptor"
 
-#: lib/rfsv.cc:95
+#: lib/rfsv.cc:97
 msgid "bad entry point"
 msgstr "fehlerhafter Einstiegspunkt"
 
-#: lib/rfsv.cc:96
+#: lib/rfsv.cc:98
 msgid "could not diconnect"
 msgstr "Konnte Verbindung nicht beenden"
 
-#: lib/rfsv.cc:97
+#: lib/rfsv.cc:99
 msgid "bad driver"
 msgstr "fehlerhafter Treiber"
 
-#: lib/rfsv.cc:98
+#: lib/rfsv.cc:100
 msgid "operation not completed"
 msgstr "Operation nicht abgeschlossen"
 
-#: lib/rfsv.cc:99
+#: lib/rfsv.cc:101
 msgid "server busy"
 msgstr "Server beschäftigt"
 
-#: lib/rfsv.cc:100
+#: lib/rfsv.cc:102
 msgid "terminated"
 msgstr "beendet"
 
-#: lib/rfsv.cc:101
+#: lib/rfsv.cc:103
 msgid "died"
 msgstr "abgestürzt"
 
-#: lib/rfsv.cc:102
+#: lib/rfsv.cc:104
 msgid "bad handle"
 msgstr "fehlerhafte Referenz"
 
-#: lib/rfsv.cc:103
+#: lib/rfsv.cc:105
 msgid "invalid operation for RFSV16"
 msgstr "Ungültige Operation für RFSV16"
 
-#: lib/rfsv.cc:104
+#: lib/rfsv.cc:106
 msgid "libplp internal error"
 msgstr "Interner libplp Fehler"
 
-#: lib/rpcs.cc:43
+#: lib/rpcs.cc:45
 msgid "Unknown device"
 msgstr "Unbekanntes Gerät"
 
-#: lib/rpcs.cc:44
+#: lib/rpcs.cc:46
 msgid "PC"
 msgstr "PC"
 
-#: lib/rpcs.cc:45
+#: lib/rpcs.cc:47
 msgid "MC"
 msgstr "MC"
 
-#: lib/rpcs.cc:46
+#: lib/rpcs.cc:48
 msgid "HC"
 msgstr "HC"
 
-#: lib/rpcs.cc:47
+#: lib/rpcs.cc:49
 msgid "Series 3"
 msgstr "Serie 3"
 
-#: lib/rpcs.cc:48
+#: lib/rpcs.cc:50
 msgid "Series 3a, 3c or 3mx"
 msgstr "Serie 3a; 3c oder 3mx"
 
-#: lib/rpcs.cc:49
+#: lib/rpcs.cc:51
 msgid "Workabout"
 msgstr "Workabout"
 
-#: lib/rpcs.cc:50
+#: lib/rpcs.cc:52
 msgid "Sienna"
 msgstr "Sienna"
 
-#: lib/rpcs.cc:51
+#: lib/rpcs.cc:53
 msgid "Series 3c"
 msgstr "Serie 3c"
 
-#: lib/rpcs.cc:52
+#: lib/rpcs.cc:54
 msgid "Series 5"
 msgstr "Serie 5"
 
-#: lib/rpcs.cc:53
+#: lib/rpcs.cc:55
 msgid "WinC"
 msgstr "WinC"
 
-#: lib/rpcs.cc:57
+#: lib/rpcs.cc:59
 msgid "Empty"
 msgstr "Leer"
 
-#: lib/rpcs.cc:58
+#: lib/rpcs.cc:60
 msgid "Very Low"
 msgstr "Sehr verbraucht"
 
-#: lib/rpcs.cc:59
+#: lib/rpcs.cc:61
 msgid "Low"
 msgstr "Verbraucht"
 
-#: lib/rpcs.cc:60
+#: lib/rpcs.cc:62
 msgid "Good"
 msgstr "Gut"
 
-#: lib/rpcs.cc:64
+#: lib/rpcs.cc:66
 msgid "Test"
 msgstr "Test"
 
-#: lib/rpcs.cc:65
+#: lib/rpcs.cc:67
 msgid "English"
 msgstr "Englisch"
 
-#: lib/rpcs.cc:66
+#: lib/rpcs.cc:68
 msgid "German"
 msgstr "Deutsch"
 
-#: lib/rpcs.cc:67
+#: lib/rpcs.cc:69
 msgid "French"
 msgstr "Französisch"
 
-#: lib/rpcs.cc:68
+#: lib/rpcs.cc:70
 msgid "Spanish"
 msgstr "Spanisch"
 
-#: lib/rpcs.cc:69
+#: lib/rpcs.cc:71
 msgid "Italian"
 msgstr "Italienisch"
 
-#: lib/rpcs.cc:70
+#: lib/rpcs.cc:72
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: lib/rpcs.cc:71
+#: lib/rpcs.cc:73
 msgid "Danish"
 msgstr "Dänisch"
 
-#: lib/rpcs.cc:72
+#: lib/rpcs.cc:74
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: lib/rpcs.cc:73
+#: lib/rpcs.cc:75
 msgid "Finnish"
 msgstr "Finnisch"
 
-#: lib/rpcs.cc:74
+#: lib/rpcs.cc:76
 msgid "American"
 msgstr "Amerikanisch"
 
-#: lib/rpcs.cc:75
+#: lib/rpcs.cc:77
 msgid "Swiss French"
 msgstr "Schweizer Französisch"
 
-#: lib/rpcs.cc:76
+#: lib/rpcs.cc:78
 msgid "Swiss German"
 msgstr "Schweizer Deutsch"
 
-#: lib/rpcs.cc:77
+#: lib/rpcs.cc:79
 msgid "Portugese"
 msgstr "Portugiesisch"
 
-#: lib/rpcs.cc:78
+#: lib/rpcs.cc:80
 msgid "Turkish"
 msgstr "Türkisch"
 
-#: lib/rpcs.cc:79
+#: lib/rpcs.cc:81
 msgid "Icelandic"
 msgstr "Isländisch"
 
-#: lib/rpcs.cc:80
+#: lib/rpcs.cc:82
 msgid "Russian"
 msgstr "Russisch"
 
-#: lib/rpcs.cc:81
+#: lib/rpcs.cc:83
 msgid "Hungarian"
 msgstr "Ungarisch"
 
-#: lib/rpcs.cc:82
+#: lib/rpcs.cc:84
 msgid "Dutch"
 msgstr "Holländisch"
 
-#: lib/rpcs.cc:83
+#: lib/rpcs.cc:85
 msgid "Belgian Flemish"
 msgstr "Belgisch Flämisch"
 
-#: lib/rpcs.cc:84
+#: lib/rpcs.cc:86
 msgid "Australian"
 msgstr "Australisch"
 
-#: lib/rpcs.cc:85
+#: lib/rpcs.cc:87
 msgid "Belgish French"
 msgstr "Belgisch Französisch"
 
-#: lib/rpcs.cc:86
+#: lib/rpcs.cc:88
 msgid "Austrian"
 msgstr "Österreichisch"
 
-#: lib/rpcs.cc:87
+#: lib/rpcs.cc:89
 msgid "New Zealand"
 msgstr "Neuseeländisch"
 
 #. FIXME: not shure about ISO code
-#: lib/rpcs.cc:88
+#: lib/rpcs.cc:90
 msgid "International French"
 msgstr "Internationales Französisch"
 
 #. FIXME: not shure about ISO code
-#: lib/rpcs.cc:89
+#: lib/rpcs.cc:91
 msgid "Czech"
 msgstr "Tschechisch"
 
-#: lib/rpcs.cc:90
+#: lib/rpcs.cc:92
 msgid "Slovak"
 msgstr "Slowakisch"
 
-#: lib/rpcs.cc:91
+#: lib/rpcs.cc:93
 msgid "Polish"
 msgstr "Polnisch"
 
-#: lib/rpcs.cc:92
+#: lib/rpcs.cc:94
 msgid "Slovenian"
 msgstr "Slowenisch"
 
@@ -520,7 +520,7 @@ msgstr " Minuten "
 msgid " minute "
 msgstr " Minute "
 
-#: lib/psitime.h:80 plpftp/ftp.cc:818 plpftp/ftp.cc:820 plpftp/ftp.cc:903
+#: lib/psitime.h:80 plpftp/ftp.cc:820 plpftp/ftp.cc:822 plpftp/ftp.cc:905
 msgid " seconds"
 msgstr " Sekunden"
 
@@ -528,95 +528,95 @@ msgstr " Sekunden"
 msgid " second"
 msgstr " Sekunde"
 
-#: lib/rfsvfactory.cc:44 lib/rpcsfactory.cc:44
+#: lib/rfsvfactory.cc:46 lib/rpcsfactory.cc:44
 msgid "could not send version request"
 msgstr "Konnte Versions-Anforderung nicht versenden"
 
-#: lib/rfsvfactory.cc:45 lib/rpcsfactory.cc:45
+#: lib/rfsvfactory.cc:47 lib/rpcsfactory.cc:45
 msgid "try again"
 msgstr "Erneut versuchen"
 
-#: lib/rfsvfactory.cc:46 lib/rpcsfactory.cc:46
+#: lib/rfsvfactory.cc:48 lib/rpcsfactory.cc:46
 msgid "no psion connected"
 msgstr "Kein Psion angeschlossen"
 
-#: lib/rfsvfactory.cc:47 lib/rpcsfactory.cc:47
+#: lib/rfsvfactory.cc:49 lib/rpcsfactory.cc:47
 msgid "wrong protocol version"
 msgstr "Falsche Protokoll-Version"
 
-#: lib/rfsvfactory.cc:48 lib/rpcsfactory.cc:48
+#: lib/rfsvfactory.cc:50 lib/rpcsfactory.cc:48
 msgid "no response from ncpd"
 msgstr "Keine Antwort vom ncpd"
 
-#: lib/plpdirent.cc:173
+#: lib/plpdirent.cc:175
 msgid "Not present"
 msgstr "Nicht vorhanden"
 
-#: lib/plpdirent.cc:174 ncpd/link.cc:54
+#: lib/plpdirent.cc:176 ncpd/link.cc:54
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: lib/plpdirent.cc:175
+#: lib/plpdirent.cc:177
 msgid "Floppy"
 msgstr "Diskette"
 
-#: lib/plpdirent.cc:176
+#: lib/plpdirent.cc:178
 msgid "Disk"
 msgstr "Platte"
 
-#: lib/plpdirent.cc:177
+#: lib/plpdirent.cc:179
 msgid "CD-ROM"
 msgstr "CD-ROM"
 
-#: lib/plpdirent.cc:178
+#: lib/plpdirent.cc:180
 msgid "RAM"
 msgstr "RAM"
 
-#: lib/plpdirent.cc:179
+#: lib/plpdirent.cc:181
 msgid "Flash Disk"
 msgstr "Flash Disk"
 
-#: lib/plpdirent.cc:180 lib/plpdirent.cc:207
+#: lib/plpdirent.cc:182 lib/plpdirent.cc:209
 msgid "ROM"
 msgstr "ROM"
 
-#: lib/plpdirent.cc:181
+#: lib/plpdirent.cc:183
 msgid "Remote"
 msgstr "Netzlaufwerk"
 
-#: lib/plpdirent.cc:205
+#: lib/plpdirent.cc:207
 msgid "local"
 msgstr "Lokal"
 
-#: lib/plpdirent.cc:209
+#: lib/plpdirent.cc:211
 msgid "redirected"
 msgstr "Umgeleitet"
 
-#: lib/plpdirent.cc:211
+#: lib/plpdirent.cc:213
 msgid "substituted"
 msgstr "Ersetzt"
 
-#: lib/plpdirent.cc:213
+#: lib/plpdirent.cc:215
 msgid "internal"
 msgstr "Intern"
 
-#: lib/plpdirent.cc:215
+#: lib/plpdirent.cc:217
 msgid "removable"
 msgstr "Wechselmedium"
 
-#: lib/plpdirent.cc:228
+#: lib/plpdirent.cc:230
 msgid "variable size"
 msgstr "Variable Größe"
 
-#: lib/plpdirent.cc:230
+#: lib/plpdirent.cc:232
 msgid "dual density"
 msgstr "Doppelte Dichte"
 
-#: lib/plpdirent.cc:232
+#: lib/plpdirent.cc:234
 msgid "formattable"
 msgstr "Formatierbar"
 
-#: lib/plpdirent.cc:234
+#: lib/plpdirent.cc:236
 msgid "write protected"
 msgstr "Schreibgeschützt"
 
@@ -946,361 +946,361 @@ msgstr "plpftp Version "
 msgid "plpftp: could not connect to ncpd"
 msgstr "plpftp: Konnte ncpd nicht kontaktieren."
 
-#: plpftp/ftp.cc:84
+#: plpftp/ftp.cc:86
 msgid "Known FTP commands:"
 msgstr "Bekannte FTP Kommandos:"
 
-#: plpftp/ftp.cc:110
+#: plpftp/ftp.cc:112
 msgid "Known RPC commands:"
 msgstr "Bekannte RPC Kommandos:"
 
-#: plpftp/ftp.cc:228
+#: plpftp/ftp.cc:230
 msgid "Connected to a "
 msgstr "Verbunden mit einem "
 
-#: plpftp/ftp.cc:228
+#: plpftp/ftp.cc:230
 msgid " at "
 msgstr " bei "
 
-#: plpftp/ftp.cc:229
+#: plpftp/ftp.cc:231
 msgid " baud, OwnerInfo:"
 msgstr " baud, Benutzerinfo:"
 
-#: plpftp/ftp.cc:235
+#: plpftp/ftp.cc:237
 msgid "OwnerInfo returned error "
 msgstr "OwnerInfo lieferte Fehler "
 
-#: plpftp/ftp.cc:255
+#: plpftp/ftp.cc:257
 msgid "FATAL: Couldn't find default Drive"
 msgstr "FATAL: Konnte Standard-Laufwerk nicht ermitteln"
 
-#: plpftp/ftp.cc:264
+#: plpftp/ftp.cc:266
 msgid "Psion dir is: \""
 msgstr "Psion Ordner ist: \""
 
-#: plpftp/ftp.cc:279
+#: plpftp/ftp.cc:281
 msgid "Prompting now "
 msgstr "Prompt ist nun "
 
-#: plpftp/ftp.cc:279 plpftp/ftp.cc:284
+#: plpftp/ftp.cc:281 plpftp/ftp.cc:286
 msgid "on"
 msgstr "an"
 
-#: plpftp/ftp.cc:279 plpftp/ftp.cc:284 plpftp/ftp.cc:796 plpftp/ftp.cc:799
-#: plpftp/ftp.cc:802
+#: plpftp/ftp.cc:281 plpftp/ftp.cc:286 plpftp/ftp.cc:798 plpftp/ftp.cc:801
+#: plpftp/ftp.cc:804
 msgid "off"
 msgstr "aus"
 
-#: plpftp/ftp.cc:284
+#: plpftp/ftp.cc:286
 msgid "Hash printing now "
 msgstr "Fortschrittsanzeige ist nun "
 
-#: plpftp/ftp.cc:289
+#: plpftp/ftp.cc:291
 msgid "Local dir: \""
 msgstr "Lokaler Ordner: \""
 
-#: plpftp/ftp.cc:290
+#: plpftp/ftp.cc:292
 msgid "Psion dir: \""
 msgstr "Psion Ordner: \""
 
-#: plpftp/ftp.cc:295 plpftp/ftp.cc:305 plpftp/ftp.cc:314 plpftp/ftp.cc:322
-#: plpftp/ftp.cc:330 plpftp/ftp.cc:340 plpftp/ftp.cc:352 plpftp/ftp.cc:402
-#: plpftp/ftp.cc:408 plpftp/ftp.cc:436 plpftp/ftp.cc:478 plpftp/ftp.cc:535
-#: plpftp/ftp.cc:558 plpftp/ftp.cc:584 plpftp/ftp.cc:621 plpftp/ftp.cc:649
-#: plpftp/ftp.cc:710 plpftp/ftp.cc:730 plpftp/ftp.cc:737 plpftp/ftp.cc:744
-#: plpftp/ftp.cc:784 plpftp/ftp.cc:867 plpftp/ftp.cc:877 plpftp/ftp.cc:940
-#: plpftp/ftp.cc:982 plpftp/ftp.cc:992 plpftp/ftp.cc:1013 plpftp/ftp.cc:1039
-#: plpftp/ftp.cc:1104
+#: plpftp/ftp.cc:297 plpftp/ftp.cc:307 plpftp/ftp.cc:316 plpftp/ftp.cc:324
+#: plpftp/ftp.cc:332 plpftp/ftp.cc:342 plpftp/ftp.cc:354 plpftp/ftp.cc:404
+#: plpftp/ftp.cc:410 plpftp/ftp.cc:438 plpftp/ftp.cc:480 plpftp/ftp.cc:537
+#: plpftp/ftp.cc:560 plpftp/ftp.cc:586 plpftp/ftp.cc:623 plpftp/ftp.cc:651
+#: plpftp/ftp.cc:712 plpftp/ftp.cc:732 plpftp/ftp.cc:739 plpftp/ftp.cc:746
+#: plpftp/ftp.cc:786 plpftp/ftp.cc:869 plpftp/ftp.cc:879 plpftp/ftp.cc:942
+#: plpftp/ftp.cc:984 plpftp/ftp.cc:994 plpftp/ftp.cc:1015 plpftp/ftp.cc:1041
+#: plpftp/ftp.cc:1106
 msgid "Error: "
 msgstr "Fehler: "
 
-#: plpftp/ftp.cc:410
+#: plpftp/ftp.cc:412
 msgid " Entries"
 msgstr " Einträge"
 
-#: plpftp/ftp.cc:416
+#: plpftp/ftp.cc:418
 msgid "Drive Type Volname     Total     Free      UniqueID"
 msgstr "LW    Typ  Vol.Name    Total     Frei      Eind.ID"
 
-#: plpftp/ftp.cc:494
+#: plpftp/ftp.cc:496
 msgid "No such directory"
 msgstr "Kein solcher Ordner"
 
-#: plpftp/ftp.cc:495 plpftp/ftp.cc:536
+#: plpftp/ftp.cc:497 plpftp/ftp.cc:538
 msgid "Keeping original directory \""
 msgstr "Behalte ursprünglichen Ordner \""
 
-#: plpftp/ftp.cc:575 plpftp/ftp.cc:666
+#: plpftp/ftp.cc:577 plpftp/ftp.cc:668
 msgid "Transfer complete, ("
 msgstr "Übertragung abgeschlossen, ("
 
-#: plpbackup/plpbackup.cc:1200 plpftp/ftp.cc:576 plpftp/ftp.cc:667
+#: plpbackup/plpbackup.cc:1200 plpftp/ftp.cc:578 plpftp/ftp.cc:669
 msgid " bytes in "
 msgstr " Bytes in "
 
-#: plpftp/ftp.cc:577 plpftp/ftp.cc:668
+#: plpftp/ftp.cc:579 plpftp/ftp.cc:670
 msgid " secs = "
 msgstr " sek. = "
 
-#: plpftp/ftp.cc:597
+#: plpftp/ftp.cc:599
 msgid "Get \""
 msgstr "Hole \""
 
-#: plpftp/ftp.cc:626 plpftp/ftp.cc:715
+#: plpftp/ftp.cc:628 plpftp/ftp.cc:717
 msgid "Transfer complete\n"
 msgstr "Übertragung abgeschlossen\n"
 
-#: plpftp/ftp.cc:692
+#: plpftp/ftp.cc:694
 msgid "Put \""
 msgstr "Sende \""
 
-#: plpftp/ftp.cc:722
+#: plpftp/ftp.cc:724
 msgid "Error in directory name \""
 msgstr "Fehler in Ordner-Namen \""
 
-#: plpftp/ftp.cc:758
+#: plpftp/ftp.cc:760
 msgid "Starting subshell ...\n"
 msgstr "Starte Sub-Shell ...\n"
 
-#: plpftp/ftp.cc:788
+#: plpftp/ftp.cc:790
 msgid "Unknown setup info received"
 msgstr "Unbekannte Einstellungen empfangen"
 
-#: plpftp/ftp.cc:791
+#: plpftp/ftp.cc:793
 msgid "Setup information:"
 msgstr "Einstellungen:"
 
-#: plpftp/ftp.cc:792
+#: plpftp/ftp.cc:794
 msgid "  Screen contrast:                  "
 msgstr "  Anzeige Kontrast:                        "
 
-#: plpftp/ftp.cc:794
+#: plpftp/ftp.cc:796
 msgid "  Keyboard click:                   "
 msgstr "  Tastatur Klick:                          "
 
-#: plpftp/ftp.cc:796 plpftp/ftp.cc:799 plpftp/ftp.cc:802
+#: plpftp/ftp.cc:798 plpftp/ftp.cc:801 plpftp/ftp.cc:804
 msgid "high"
 msgstr "laut"
 
-#: plpftp/ftp.cc:796 plpftp/ftp.cc:799 plpftp/ftp.cc:802
+#: plpftp/ftp.cc:798 plpftp/ftp.cc:801 plpftp/ftp.cc:804
 msgid "low"
 msgstr "leise"
 
-#: plpftp/ftp.cc:797
+#: plpftp/ftp.cc:799
 msgid "  Screen click:                     "
 msgstr "  Bildschirm Klick:                        "
 
-#: plpftp/ftp.cc:800
+#: plpftp/ftp.cc:802
 msgid "  Error sound:                      "
 msgstr "  Fehlerton:                               "
 
-#: plpftp/ftp.cc:803
+#: plpftp/ftp.cc:805
 msgid "  Auto-switch off:                  "
 msgstr "  Automatisches Ausschalten:               "
 
-#: plpftp/ftp.cc:806 plpftp/ftp.cc:832
+#: plpftp/ftp.cc:808 plpftp/ftp.cc:834
 msgid "never"
 msgstr "nie"
 
-#: plpftp/ftp.cc:809
+#: plpftp/ftp.cc:811
 msgid "if running on battery power"
 msgstr "bei Batteriebetrieb"
 
-#: plpftp/ftp.cc:812 plpftp/ftp.cc:838
+#: plpftp/ftp.cc:814 plpftp/ftp.cc:840
 msgid "always"
 msgstr "immer"
 
-#: plpftp/ftp.cc:817
+#: plpftp/ftp.cc:819
 msgid "  Switch off after:                 "
 msgstr "  Ausschalten nach:                        "
 
-#: plpftp/ftp.cc:819
+#: plpftp/ftp.cc:821
 msgid "  Backlight off after:              "
 msgstr "  Hintergrundbeleuchtung ausschalten nach: "
 
-#: plpftp/ftp.cc:821
+#: plpftp/ftp.cc:823
 msgid "  Switch on when tapping on screen: "
 msgstr "  Einschalten beim Tippen auf die Anzeige: "
 
-#: plpftp/ftp.cc:822 plpftp/ftp.cc:824 plpftp/ftp.cc:826 plpftp/ftp.cc:828
-#: plpftp/ftp.cc:891 plpftp/ftp.cc:905 plpftp/ftp.cc:923
+#: plpftp/ftp.cc:824 plpftp/ftp.cc:826 plpftp/ftp.cc:828 plpftp/ftp.cc:830
+#: plpftp/ftp.cc:893 plpftp/ftp.cc:907 plpftp/ftp.cc:925
 msgid "yes"
 msgstr "ja"
 
-#: plpftp/ftp.cc:822 plpftp/ftp.cc:824 plpftp/ftp.cc:826 plpftp/ftp.cc:828
-#: plpftp/ftp.cc:891 plpftp/ftp.cc:905 plpftp/ftp.cc:923
+#: plpftp/ftp.cc:824 plpftp/ftp.cc:826 plpftp/ftp.cc:828 plpftp/ftp.cc:830
+#: plpftp/ftp.cc:893 plpftp/ftp.cc:907 plpftp/ftp.cc:925
 msgid "no"
 msgstr "nein"
 
-#: plpftp/ftp.cc:823
+#: plpftp/ftp.cc:825
 msgid "  Switch on when opening:           "
 msgstr "  Einschalten beim Öffnen:                 "
 
-#: plpftp/ftp.cc:825
+#: plpftp/ftp.cc:827
 msgid "  Switch off when closing:          "
 msgstr "  Ausschalten beim Schließen:              "
 
-#: plpftp/ftp.cc:827
+#: plpftp/ftp.cc:829
 msgid "  Ask for password on startup:      "
 msgstr "  Beim Einschalten nach Passwort fragen:   "
 
-#: plpftp/ftp.cc:829
+#: plpftp/ftp.cc:831
 msgid "  Show Owner info on startup:       "
 msgstr "  Beim Einschalten Eigentümer anzeigen:    "
 
-#: plpftp/ftp.cc:835
+#: plpftp/ftp.cc:837
 msgid "once a day"
 msgstr "einmal täglich"
 
-#: plpftp/ftp.cc:881
+#: plpftp/ftp.cc:883
 msgid "General:"
 msgstr "Allgemein:"
 
-#: plpftp/ftp.cc:882
+#: plpftp/ftp.cc:884
 msgid "  Machine Type: "
 msgstr "  Geräte Typ:     "
 
-#: plpftp/ftp.cc:883
+#: plpftp/ftp.cc:885
 msgid "  Machine Name: "
 msgstr "  Modell Name:    "
 
-#: plpftp/ftp.cc:884
+#: plpftp/ftp.cc:886
 msgid "  Machine UID:  "
 msgstr "  Geräte-ID:      "
 
-#: plpftp/ftp.cc:885
+#: plpftp/ftp.cc:887
 msgid "  UI Language:  "
 msgstr "  UI-Sprache:     "
 
-#: plpftp/ftp.cc:886
+#: plpftp/ftp.cc:888
 msgid "ROM:"
 msgstr "ROM:"
 
-#: plpftp/ftp.cc:887
+#: plpftp/ftp.cc:889
 msgid "  Version:      "
 msgstr "  Version:        "
 
-#: plpftp/ftp.cc:889 plpftp/ftp.cc:893
+#: plpftp/ftp.cc:891 plpftp/ftp.cc:895
 msgid "  Size:         "
 msgstr "  Größe:          "
 
-#: plpftp/ftp.cc:890
+#: plpftp/ftp.cc:892
 msgid "  Programmable: "
 msgstr "  Programmierbar: "
 
-#: plpftp/ftp.cc:892
+#: plpftp/ftp.cc:894
 msgid "RAM:"
 msgstr "RAM:"
 
-#: plpftp/ftp.cc:894
+#: plpftp/ftp.cc:896
 msgid "  Free:         "
 msgstr "  Frei:           "
 
-#: plpftp/ftp.cc:895
+#: plpftp/ftp.cc:897
 msgid "  Free max:     "
 msgstr "  Max frei:       "
 
-#: plpftp/ftp.cc:896
+#: plpftp/ftp.cc:898
 msgid "RAM disk size:  "
 msgstr "RAM Disk Größe:   "
 
-#: plpftp/ftp.cc:897
+#: plpftp/ftp.cc:899
 msgid "Registry size:  "
 msgstr "Registry-Größe:   "
 
-#: plpftp/ftp.cc:898
+#: plpftp/ftp.cc:900
 msgid "Display size:   "
 msgstr "Anzeige-Größe:    "
 
-#: plpftp/ftp.cc:900
+#: plpftp/ftp.cc:902
 msgid "Time:"
 msgstr "Zeit:"
 
-#: plpftp/ftp.cc:902
+#: plpftp/ftp.cc:904
 msgid "  Current time: "
 msgstr "  Aktuelle Zeit:  "
 
-#: plpftp/ftp.cc:903
+#: plpftp/ftp.cc:905
 msgid "  UTC offset:   "
 msgstr "  UTC-Abweichung: "
 
-#: plpftp/ftp.cc:904
+#: plpftp/ftp.cc:906
 msgid "  DST:          "
 msgstr "  Sommerzeit:     "
 
-#: plpftp/ftp.cc:906
+#: plpftp/ftp.cc:908
 msgid "  Timezone:     "
 msgstr "  Zeitzone:       "
 
-#: plpftp/ftp.cc:907
+#: plpftp/ftp.cc:909
 msgid "  Country Code: "
 msgstr "  Länder-Code:    "
 
-#: plpftp/ftp.cc:908
+#: plpftp/ftp.cc:910
 msgid "Main battery:"
 msgstr "Hauptbatterie:"
 
-#: plpftp/ftp.cc:910
+#: plpftp/ftp.cc:912
 msgid "  Changed at:   "
 msgstr "  Gewechselt am:  "
 
-#: plpftp/ftp.cc:911 plpftp/ftp.cc:924
+#: plpftp/ftp.cc:913 plpftp/ftp.cc:926
 msgid "  Used for:     "
 msgstr "  Benutzt:        "
 
-#: plpftp/ftp.cc:912 plpftp/ftp.cc:918
+#: plpftp/ftp.cc:914 plpftp/ftp.cc:920
 msgid "  Status:       "
 msgstr "  Status:         "
 
-#: plpftp/ftp.cc:913
+#: plpftp/ftp.cc:915
 msgid "  Current:      "
 msgstr "  Strom:          "
 
-#: plpftp/ftp.cc:914
+#: plpftp/ftp.cc:916
 msgid "  UsedPower:    "
 msgstr "  Verbrauch:      "
 
-#: plpftp/ftp.cc:915 plpftp/ftp.cc:919
+#: plpftp/ftp.cc:917 plpftp/ftp.cc:921
 msgid "  Voltage:      "
 msgstr "  Spannung:       "
 
-#: plpftp/ftp.cc:916 plpftp/ftp.cc:920
+#: plpftp/ftp.cc:918 plpftp/ftp.cc:922
 msgid "  Max. voltage: "
 msgstr "  Max. Spannung:  "
 
-#: plpftp/ftp.cc:917
+#: plpftp/ftp.cc:919
 msgid "Backup battery:"
 msgstr "Sicherungs-Batterie:"
 
-#: plpftp/ftp.cc:921
+#: plpftp/ftp.cc:923
 msgid "External power:"
 msgstr "Externe Stromversorgung:"
 
-#: plpftp/ftp.cc:922
+#: plpftp/ftp.cc:924
 msgid "  Supplied:     "
 msgstr "  Angeschlossen:  "
 
-#: plpftp/ftp.cc:933
+#: plpftp/ftp.cc:935
 msgid "Could not read processlist "
 msgstr "Konnte Prozessliste nicht lesen "
 
-#: plpftp/ftp.cc:941
+#: plpftp/ftp.cc:943
 msgid " is not a process list saved with killsave"
 msgstr " ist keine mit killsave gespeicherte Prozessliste"
 
-#: plpftp/ftp.cc:981
+#: plpftp/ftp.cc:983
 msgid "Could not start "
 msgstr "Konnte nicht starten: "
 
-#: plpftp/ftp.cc:996
+#: plpftp/ftp.cc:998
 msgid "Could not write processlist "
 msgstr "Konnte Prozessliste nicht schreiben "
 
-#: plpftp/ftp.cc:1032
+#: plpftp/ftp.cc:1034
 msgid "no such process"
 msgstr "Kein solcher Prozess"
 
-#: plpftp/ftp.cc:1048
+#: plpftp/ftp.cc:1050
 msgid "syntax error. Try \"help\""
 msgstr "Syntaxfehler. Probieren Sie \"help\""
 
@@ -1710,7 +1710,7 @@ msgstr "Konnte SIS-Datei nicht parsen.\n"
 msgid "Installation complete. Press any key to exit."
 msgstr "Installation beendet. Beenden mit beliebiger Taste."
 
-#: ncpd/main.cc:136
+#: ncpd/main.cc:138
 msgid ""
 "Usage: ncpd [OPTIONS]...\n"
 "\n"
@@ -1756,17 +1756,17 @@ msgstr ""
 " -s, --serial=DEV        Benutze serielle Schnittstelle DEV.\n"
 " -b, --baudrate=RATE     Setze Schnittstellengeschwindigkeit auf BAUD.\n"
 
-#: ncpd/main.cc:161
+#: ncpd/main.cc:163
 msgid "                         Default: "
 msgstr "                         Vorgabe: "
 
-#: ncpd/main.cc:163
+#: ncpd/main.cc:165
 msgid ""
 "                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n"
 msgstr ""
 "                         Vorgabe: Automatisch 115.2k, 57.6k 38.4k, 19.2k\n"
 
-#: ncpd/main.cc:166
+#: ncpd/main.cc:168
 msgid ""
 " -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
 "                         Default for HOST: 127.0.0.1\n"
@@ -1776,11 +1776,11 @@ msgstr ""
 "                         Vorgabe für HOST: 127.0.0.1\n"
 "                         Vorgabe für PORT: "
 
-#: ncpd/main.cc:174
+#: ncpd/main.cc:176
 msgid "Try `ncpd --help' for more information"
 msgstr "Versuchen Sie `ncpd --help' für weitere Informationen."
 
-#: ncpd/main.cc:264
+#: ncpd/main.cc:266
 msgid "ncpd Version "
 msgstr "ncpd Version "
 

@@ -35,6 +35,8 @@
 
 #include "bufferstore.h"
 
+using namespace std;
+
 bufferStore::bufferStore()
     : len(0)
     , lenAllocd(0)

@@ -42,7 +42,7 @@ class rfsv32 : public rfsv {
     /**
      * rfsvfactory may call our constructor.
      */
-    friend rfsvfactory;
+    friend class rfsvfactory;
 
 public:
     Enum<rfsv::errs> dir(const char * const, PlpDir &);
@@ -55,7 +55,7 @@ public:
     Enum<rfsv::errs> rmdir(const char * const);
     Enum<rfsv::errs> remove(const char * const);
     Enum<rfsv::errs> rename(const char * const, const char * const);
-    Enum<rfsv::errs> mktemp(u_int32_t &, string &);
+    Enum<rfsv::errs> mktemp(u_int32_t &, std::string &);
     Enum<rfsv::errs> fgeteattr(const char * const, PlpDirent &);
     Enum<rfsv::errs> fgetattr(const char * const, u_int32_t &);
     Enum<rfsv::errs> fsetattr(const char * const, const u_int32_t, const u_int32_t);

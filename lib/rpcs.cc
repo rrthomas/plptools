@@ -39,6 +39,8 @@
 #include "psiprocess.h"
 #include "Enum.h"
 
+using namespace std;
+
 ENUM_DEFINITION(rpcs::machs, rpcs::PSI_MACH_UNKNOWN) {
     stringRep.add(rpcs::PSI_MACH_UNKNOWN,   N_("Unknown device"));
     stringRep.add(rpcs::PSI_MACH_PC,        N_("PC"));

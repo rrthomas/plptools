@@ -68,7 +68,7 @@ typedef struct psi_timeval_t {
 	int d = micro % 365;
 	micro /= 365;
 	int y = micro;
-	o << dec;
+	o << std::dec;
 	if (y > 0)
 	    o << y << ((y > 1) ? _(" years ") : _(" year "));
 	if (d > 0)
@@ -99,7 +99,7 @@ typedef struct psi_timezone_t {
 	ostream::fmtflags old = s.flags();
 	int h = ptz.utc_offset / 3600;
 	int m = ptz.utc_offset % 3600;
-	s << "offs: " << dec << h << "h";
+	s << "offs: " << std::dec << h << "h";
 	if (m != 0)
 	    s << ", " << m << "m";
 	s.flags(old);

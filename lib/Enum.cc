@@ -22,6 +22,8 @@
  */
 #include "Enum.h"
 
+using namespace std;
+
 void EnumBase::i2sMapper::add(long i, const char* s) {
     stringMap.insert(pair<long, const char* const>(i, s));
 }

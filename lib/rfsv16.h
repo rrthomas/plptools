@@ -40,11 +40,11 @@ class rfsv16 : public rfsv {
     /**
      * rfsvfactory may call our constructor.
      */
-    friend rfsvfactory;
+    friend class rfsvfactory;
 
 public:
     Enum<rfsv::errs> fopen(const u_int32_t, const char * const, u_int32_t &);
-    Enum<rfsv::errs> mktemp(u_int32_t &, string &);
+    Enum<rfsv::errs> mktemp(u_int32_t &, std::string &);
     Enum<rfsv::errs> fcreatefile(const u_int32_t, const char * const, u_int32_t &);
     Enum<rfsv::errs> freplacefile(const u_int32_t, const char * const, u_int32_t &);
     Enum<rfsv::errs> fclose(const u_int32_t);

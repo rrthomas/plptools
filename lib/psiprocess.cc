@@ -25,6 +25,8 @@
 #include <strstream>
 #include <iomanip>
 
+using namespace std;
+
 PsiProcess::PsiProcess()
     : pid(0), name(""), args(""), s5mx(false) {
 }

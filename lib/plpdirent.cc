@@ -24,6 +24,8 @@
 #include <stream.h>
 #include <iomanip>
 
+using namespace std;
+
 PlpUID::PlpUID() {
     memset(uid, 0, sizeof(uid));
 }

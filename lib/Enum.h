@@ -59,7 +59,7 @@ protected:
 	* there can be one value, mapping to multiple
 	* strings. Therefore, we need a multimap.
 	*/
-	typedef multimap<long, const char*> i2s_map_t;
+	typedef std::multimap<long, const char*> i2s_map_t;
 
 	/**
 	* just for the record. Mapping back a string to the
@@ -89,7 +89,7 @@ protected:
 	* If there are multiple strings for this integer,
 	* return a comma delimited list.
 	*/
-	string lookup(long) const;
+	std::string lookup(long) const;
 
 	/**
 	* returns the integer associated with the
@@ -152,9 +152,9 @@ private:
 	 * properly before the program starts.
 	 */
 	sdata();
-	i2sMapper stringRep;
-	string    name;
-	E         defaultValue;
+	i2sMapper    stringRep;
+	std::string name;
+	E           defaultValue;
     };
     static sdata staticData;
 
@@ -184,7 +184,7 @@ public:
     * initialize with the string representation
     * XXX: throw Exception if not found ?
     */
-    Enum(const string& s) : value(getValueFor(s)) {
+    Enum(const std::string& s) : value(getValueFor(s)) {
 	assert(inRange(value));
     }
 
@@ -215,7 +215,7 @@ public:
     * returns the String representation for the value
     * represented by this instance.
     */
-    string toString() const { return getStringFor(value); }
+    std::string toString() const { return getStringFor(value); }
 
     /**
     * returns the C string representation for the value
@@ -242,13 +242,13 @@ public:
     * returns the Name for this enumeration. Useful for
     * error reporting.
     */
-    static string getEnumName() { return staticData.name; }
+    static std::string getEnumName() { return staticData.name; }
 
     /**
     * gives the String represenatation of a specific
     * value of this Enumeration.
     */
-    static string getStringFor(E e) {
+    static std::string getStringFor(E e) {
 	return staticData.stringRep.lookup((long) e);
     }
 
@@ -256,7 +256,7 @@ public:
     * returns the Value for a specific String.
     * XXX: throw OutOfRangeException ?
     */
-    static E getValueFor(const string &s) {
+    static E getValueFor(const std::string &s) {
 	return (E) staticData.stringRep.lookup(s.getCStr());
     }
 };
@@ -312,7 +312,7 @@ name(#EnumName),defaultValue(initWith)
  * Writes enumeration's string representation.
  */
 template <typename E>
-inline ostream& operator << (ostream& out, const Enum<E> &e) {
+inline std::ostream& operator << (ostream& out, const Enum<E> &e) {
     return out << _(e.toString().c_str());
 }
 

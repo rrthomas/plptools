@@ -39,6 +39,8 @@
 #include "ppsocket.h"
 #include "Enum.h"
 
+using namespace std;
+
 ENUM_DEFINITION(rfsvfactory::errs, rfsvfactory::FACERR_NONE) {
     stringRep.add(rfsvfactory::FACERR_NONE,           N_("no error"));
     stringRep.add(rfsvfactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));

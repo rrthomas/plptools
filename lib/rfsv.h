@@ -30,7 +30,7 @@
 #include <plpdirent.h>
 #include <bufferstore.h>
 
-typedef deque<class PlpDirent> PlpDir;
+typedef std::deque<class PlpDirent> PlpDir;
 
 class ppsocket;
 class PlpDrive;
@@ -53,8 +53,8 @@ class rfsv32;
  * @internal
  */
 class rfsvDirhandle {
-    friend rfsv16;
-    friend rfsv32;
+    friend class rfsv16;
+    friend class rfsv32;
 
 private:
     u_int32_t h;
@@ -247,7 +247,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> mktemp(u_int32_t &handle, string &name) = 0;
+    virtual Enum<errs> mktemp(u_int32_t &handle, std::string &name) = 0;
 
     /**
     * Creates a named file.
@@ -582,7 +582,7 @@ public:
     * @returns Pointer to static textual representation of file attributes.
     *
     */
-    string attr2String(const u_int32_t attr);
+    std::string attr2String(const u_int32_t attr);
 
     /**
     * Converts an open-mode (A combination of the PSI_O_ constants.)
@@ -598,7 +598,7 @@ public:
     /**
     * Utility method, converts '/' to '\'.
     */
-    static string convertSlash(const string &name);
+    static std::string convertSlash(const std::string &name);
 
     /**
      * Retrieve speed of serial link.

@@ -50,6 +50,8 @@
 #define _GNU_SOURCE
 #include <getopt.h>
 
+using namespace std;
+
 static bool verbose = false;
 static bool active = true;
 static bool autoexit = false;

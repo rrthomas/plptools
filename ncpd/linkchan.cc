@@ -30,6 +30,8 @@
 #include "bufferstore.h"
 #include "bufferarray.h"
 
+using namespace std;
+
 linkChan::linkChan(ncp * _ncpController, int _ncpChannel):channel(_ncpController)
 {
     registerSer = 0x1234;

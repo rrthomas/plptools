@@ -27,6 +27,8 @@
 #include "bufferstore.h"
 #include "Enum.h"
 
+using namespace std;
+
 ENUM_DEFINITION(rfsv::errs, rfsv::E_PSI_GEN_NONE) {
     stringRep.add(rfsv::E_PSI_GEN_NONE,        N_("no error"));
     stringRep.add(rfsv::E_PSI_GEN_FAIL,        N_("general"));

@@ -81,7 +81,7 @@ public:
     *          where elements not known, are replaced by "???" and none-existing
     *          elements are represented by the word "none".
     */
-    virtual string toString();
+    virtual std::string toString();
 
     /**
     * Starts listening.
@@ -101,7 +101,7 @@ public:
     * @returns A pointer to a new instance for the accepted connection or NULL
     *          if an error happened.
     */
-    ppsocket *accept(string *Peer, IOWatch *);
+    ppsocket *accept(std::string *Peer, IOWatch *);
 
     /**
     * Check and optionally wait for incoming data.
@@ -183,7 +183,7 @@ public:
     *
     * @returns true on success, false otherwise.
     */
-    bool getPeer(string *Peer, int *Port);
+    bool getPeer(std::string *Peer, int *Port);
 
     /**
     * Retrieves local information.
@@ -193,7 +193,7 @@ public:
     *
     * @returns true on success, false otherwise.
     */
-    bool getHost(string *Host, int *Port);
+    bool getHost(std::string *Host, int *Port);
 
     /**
     * Registers an @ref IOWatch for this socket.

@@ -182,8 +182,8 @@ private:
     u_int32_t attr;
     PlpUID  UID;
     PsiTime time;
-    string  attrstr;
-    string  name;
+    std::string  attrstr;
+    std::string  name;
 };
 
 /**
@@ -195,8 +195,8 @@ private:
  * @author Fritz Elfert <felfert@to.com>
  */
 class PlpDrive {
-    friend rfsv32;
-    friend rfsv16;
+    friend class rfsv32;
+    friend class rfsv16;
 
 public:
     /**
@@ -238,7 +238,7 @@ public:
     *
     * @param ret The string is returned here.
     */
-    void getMediaType(string &ret);
+    void getMediaType(std::string &ret);
 
     /**
     * Retrieve the attributes of the drive.
@@ -292,7 +292,7 @@ public:
     *
     * @param ret The string is returned here.
     */
-    void getMediaAttribute(string &ret);
+    void getMediaAttribute(std::string &ret);
 
     /**
     * Retrieve the UID of the drive.
@@ -322,7 +322,7 @@ public:
     *
     * returns The volume name of the drive.
     */
-    string getName();
+    std::string getName();
 
     /**
     * Retrieve the drive letter of the drive.
@@ -347,7 +347,7 @@ private:
     u_int64_t size;
     u_int64_t space;
     char drivechar;
-    string name;
+    std::string name;
 };
 
 #endif

@@ -37,7 +37,7 @@ class rpcsfactory;
  * @ref rpcs . For a complete documentation, see @ref rpcs .
  */
 class rpcs32 : public rpcs {
-    friend rpcsfactory;
+    friend class rpcsfactory;
 
  public:
     Enum<rfsv::errs> getCmdLine(const char *, string &);

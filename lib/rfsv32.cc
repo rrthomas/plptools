@@ -38,6 +38,8 @@
 #include "bufferarray.h"
 #include "plpdirent.h"
 
+using namespace std;
+
 rfsv32::rfsv32(ppsocket * _skt)
 {
     skt = _skt;
@@ -494,7 +496,7 @@ copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
     unsigned char *buff = new unsigned char[RFSV_SENDLEN];
     do {
 	if ((res = fread(handle, buff, RFSV_SENDLEN, len)) == E_PSI_GEN_NONE) {
-	    op.write(buff, len);
+	    op.write((char *)buff, len);
 	    total += len;
 	    if (cb && !cb(ptr, total))
 		res = E_PSI_FILE_CANCEL;
@@ -549,7 +551,7 @@ copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
     u_int32_t total = 0;
     while (ip && !ip.eof() && (res == E_PSI_GEN_NONE)) {
 	u_int32_t len;
-	ip.read(buff, RFSV_SENDLEN);
+	ip.read((char *)buff, RFSV_SENDLEN);
 	if ((res = fwrite(handle, buff, ip.gcount(), len)) == E_PSI_GEN_NONE) {
 	    total += len;
 	    if (cb && !cb(ptr, total))

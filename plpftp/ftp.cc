@@ -21,7 +21,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#define EXPERIMENTAL
+#undef EXPERIMENTAL
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -58,6 +58,8 @@ extern "C"  {
 #include "rlcrap.h"
 }
 #endif
+
+using namespace std;
 
 static char psionDir[1024];
 static rfsv *comp_a;
