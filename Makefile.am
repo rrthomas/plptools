@@ -9,7 +9,7 @@ endif
 
 SUBDIRS = intl po lib ncpd plpnfsd plpftp plpbackup plpprint sisinstall \
 	$(KDESUB) doc .
-EXTRA_DIST = CHANGES COPYING README TODO INSTALL ABOUT-NLS include/*.h* etc/*magic etc/*.in patches conf/m4/kde/*.m4 conf/m4/plptools/*.m4 conf/[a-l]* conf/missing conf/mkinstalldirs
+EXTRA_DIST = CHANGES COPYING README TODO INSTALL ABOUT-NLS include/*.h* etc/*magic etc/*.in patches conf/m4/kde/*.m4 conf/m4/plptools/*.m4 conf/[a-l]* conf/missing conf/mkinstalldirs debian
 DISTCLEANFILES = etc/psion
 AUTOMAKE_OPTIONS = foreign
 
@@ -27,9 +27,9 @@ maintainer-clean-local:
 	find . -name "\.\#*" -exec rm -f {} \;
 	sh conf/intlclean
 
-# Suse doesn't have chkconfig, so we need to create the symlinks here.
 install-data-local:
-	install -m 755 etc/psion $(DESTDIR)$(initdir)/psion
+	test "$(initdir)" != "none" && \
+		install -m 755 etc/psion $(DESTDIR)$(initdir)/psion
 
 dist-hook:
 	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile

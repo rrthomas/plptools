@@ -1,0 +1,4 @@
+etc/psidump*
+etc/*magic*
+etc/ttytap.c
+doc/api

@@ -1,0 +1,31 @@
+plptools (0.11-1) unstable; urgency=low
+
+  * New upstream version
+  * Made separate binaries for KDE dependant programs
+  * Made separate dev package
+
+ -- Fritz Elfert <felfert@users.sf.net>  Sun, 14 Jul 2002 04:22:58 +0100
+
+plptools (0.10-1) unstable; urgency=low
+
+  * New upstream version Closes: #102107
+  * Depend on libreadline4, Closes: #89415
+  * Add Build-Depends (might fix autobuilder problems on hppa and m68k
+
+ -- John Lines <john@paladin.demon.co.uk>  Tue,  6 Nov 2001 21:24:21 +0000
+
+plptools (0.7-2) unstable; urgency=low
+
+  * rebuild for libreadline4 Closes: #89415
+
+ -- John Lines <john@paladin.demon.co.uk>  Sun, 13 May 2001 18:55:40 +0100
+
+plptools (0.7-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- John Lines <john@paladin.demon.co.uk>  Wed, 13 Dec 2000 11:35:52 +0000
+
+Local variables:
+mode: debian-changelog
+End:

@@ -1,0 +1,5 @@
+?package(plptools):needs=text section=Apps/Tools\
+  title="plpftp" command="/usr/bin/plpftp"
+
+?package(plptools):needs=text section=Apps/Tools\
+  title="plpbackup" command="/usr/bin/plpbackup"

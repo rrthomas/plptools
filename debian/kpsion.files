@@ -1,0 +1,9 @@
+usr/bin/kpsion
+usr/lib/libkpsion.*
+usr/share/applnk/*/kpsion*
+usr/share/apps/kpsion/*
+usr/share/apps/konqueror/*
+usr/share/icons/*/*/apps/kpsion*
+usr/share/icons/*/*/actions/psion*
+usr/share/locale/*/LC_MESSAGES/kpsion.mo
+usr/share/doc/HTML/*/kpsion

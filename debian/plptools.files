@@ -1,0 +1,9 @@
+usr/sbin/*
+usr/bin/plpbackup
+usr/bin/plpftp
+usr/bin/sisinstall
+usr/lib/libplp.la
+usr/lib/libplp.so.*
+usr/share/locale/*/LC_MESSAGES/plptools.mo
+usr/share/man
+usr/share/plptools
