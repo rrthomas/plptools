@@ -60,7 +60,7 @@ public:
 	 *
 	 * @returns The value of the byte at index <em>pos</em>
 	 */
-	unsigned char getByte(long pos) const;
+	unsigned char getByte(long pos = 0) const;
 
 	/**
 	 * Retrieves the word at index <em>pos</em>.
@@ -69,7 +69,7 @@ public:
 	 *
 	 * @returns The value of the word at index <em>pos</em>
 	 */
-	unsigned int getWord(long pos) const;
+	unsigned int getWord(long pos = 0) const;
 
 	/**
 	 * Retrieves the dword at index <em>pos</em>.
@@ -78,7 +78,7 @@ public:
 	 *
 	 * @returns The value of the dword at index <em>pos</em>
 	 */
-	unsigned int getDWord(long pos) const;
+	unsigned int getDWord(long pos = 0) const;
 
 	/**
 	 * Retrieves the characters at index <em>pos</em>.
@@ -87,14 +87,14 @@ public:
 	 *
 	 * @returns A pointer to characters at index <em>pos</em>
 	 */
-	const char* getString(long pos=0) const;
+	const char * getString(long pos = 0) const;
 
 	/**
 	 * Removes bytes from the start of the buffer.
 	 *
 	 * @param len Number of bytes to remove.
 	 */
-	void discardFirstBytes(int);
+	void discardFirstBytes(int len = 0);
 
 	/**
 	 * Prints a dump of the content.
@@ -131,14 +131,14 @@ public:
 	 * @param buf Pointer to data to initialize from.
 	 * @param len Length of data.
 	 */
-	void init(const unsigned char*, long);
+	void init(const unsigned char * buf, long len);
 
 	/**
 	 * Appends a byte to the content of this instance.
 	 *
 	 * @param c The byte to append.
 	 */
-	void addByte(unsigned char);
+	void addByte(unsigned char c);
 
 	/**
 	 * Appends a word to the content of this instance.
@@ -152,7 +152,7 @@ public:
 	 *
 	 * @param dw The dword to append.
 	 */
-	void addDWord(long);
+	void addDWord(long dw);
 
 	/**
 	 * Appends a string to the content of this instance.
@@ -162,7 +162,7 @@ public:
 	 *
 	 * @param s The string to append.
 	 */
-	void addString(const char*);
+	void addString(const char *s);
 
 	/**
 	 * Appends a string to the content of this instance.
@@ -172,7 +172,7 @@ public:
 	 *
 	 * @param s The string to append.
 	 */
-	void addStringT(const char*);
+	void addStringT(const char *s);
 
 	/**
 	 * Appends data to the content of this instance.
@@ -180,7 +180,7 @@ public:
 	 * @param buf The data to append.
 	 * @param len Length of data.
 	 */
-	void addBytes(const unsigned char*, int);
+	void addBytes(const unsigned char *buf, int len);
 
 	/**
 	 * Appends data to the content of this instance.
@@ -188,7 +188,7 @@ public:
 	 * @param b The bufferStore whose content to append.
 	 * @param maxLen Length of content.
 	 */
-	void addBuff(const bufferStore &, long maxLen=-1);
+	void addBuff(const bufferStore &b, long maxLen = -1);
   
 private:
 	void checkAllocd(long newLen);
@@ -196,7 +196,7 @@ private:
 	long len;
 	long lenAllocd;
 	long start;
-	unsigned char* buff;
+	unsigned char * buff;
 
 	enum c { MIN_LEN = 300 };
 };
