@@ -1040,9 +1040,11 @@ main(int argc, char **argv)
 		    ret = wPrt->initPrinter();
 		    if (ret == rfsv::E_PSI_GEN_NONE)
 			service_loop();
-		    else
-			debuglog("plpprintd: could not connect: %s",
-				 ret.toString().c_str());
+		    else {
+			if (debug)
+			    debuglog("plpprintd: could not connect: %s",
+				     ret.toString().c_str());
+		    }
 		    delete wPrt;
 		    sleep(1);
 		} else {
