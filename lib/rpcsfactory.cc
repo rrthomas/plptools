@@ -19,6 +19,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stream.h>
 #include <stdlib.h>
 #include <fstream.h>
@@ -26,7 +30,6 @@
 #include <time.h>
 #include <string.h>
 
-#include "defs.h"
 #include "bool.h"
 #include "rpcs16.h"
 #include "rpcs32.h"

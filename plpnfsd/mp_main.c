@@ -6,6 +6,11 @@
  * Modifications for plputils by Fritz Elfert <felfert@to.com>
  *
  */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <OSdefs.h>
 #include <stdio.h>
 #include <signal.h>
@@ -16,7 +21,6 @@
 #include <errno.h>
 #include "nfs_prot.h"
 #include "mp.h"
-#include "defs.h"
 #if defined (__SVR4) || defined(__sgi)
 #include <stdlib.h>		/* getenv */
 #include <string.h>		/* strcmp */

@@ -6,6 +6,11 @@
  * Modifications for plputils by Fritz Elfert <felfert@to.com>
  *
  */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #if defined(__SVR4) || defined(__sgi) || defined(linux)
 #include <stdlib.h>
 #include <unistd.h>
@@ -38,7 +43,6 @@ extern int inet_addr(char *);
 #define umount(dir) unmount(dir)
 #endif
 
-#include "defs.h"
 
 static char nfshost[128];
 

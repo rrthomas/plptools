@@ -5,7 +5,7 @@ class ppsocket;
 class bufferStore;
 class bufferArray;
 
-const unsigned long RFSV_SENDLEN = 2000;
+const long RFSV_SENDLEN = 2000;
 
 /**
  * Defines the callback procedure for

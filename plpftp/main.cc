@@ -22,13 +22,16 @@
 //
 //  e-mail philip.proudman@btinternet.com
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stream.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
 
-#include "defs.h"
 #include "bool.h"
 #include "ppsocket.h"
 #include "rfsv.h"

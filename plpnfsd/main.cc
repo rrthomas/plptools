@@ -3,6 +3,10 @@
 //  Copyright (C) 1999 Fritz Elfert <felfert@to.com>
 //
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stream.h>
 #include <string.h>
 #include <stdlib.h>
@@ -10,7 +14,6 @@
 #include <signal.h>
 #include <syslog.h>
 
-#include "defs.h"
 #include "bool.h"
 #include "rfsv.h"
 #include "rfsvfactory.h"
@@ -284,7 +287,7 @@ void usage()
 int main(int argc, char**argv) {
 	ppsocket *skt;
 	char *user = 0L;
-	char *mdir = DDIR;
+	char *mdir = DMOUNTPOINT;
 	int sockNum = DPORT;
 	int verbose = 0;
 	int status = 0;

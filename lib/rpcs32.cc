@@ -14,6 +14,10 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stream.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +26,6 @@
 #include <time.h>
 #include <string.h>
 
-#include "defs.h"
 #include "bool.h"
 #include "rpcs32.h"
 #include "bufferstore.h"

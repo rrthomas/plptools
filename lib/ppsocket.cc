@@ -19,6 +19,9 @@
 //
 //  e-mail philip.proudman@btinternet.com
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -32,7 +35,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "defs.h"
 #include "bool.h"
 #include "bufferstore.h"
 #include "ppsocket.h"

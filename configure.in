@@ -1,16 +1,16 @@
-AC_REVISION($ Revision: 0.1 $)dnl revision of this configure.in script
+AC_REVISION($Revision$)dnl revision of this configure.in script
 
 AC_INIT(acinclude.m4)
+AC_CANONICAL_SYSTEM
 AM_CONFIG_HEADER(include/config.h)
 AM_INIT_AUTOMAKE(plptools, 0.6)
 AM_PROG_LIBTOOL
 
-dnl Enable Mainatiner stuff
-dnl **** NOTE **** Matt had to comment the following line out to get it to
-dnl ************** build, and doesn't know why - YMMV.
+dnl Enable Maintainer stuff
 AM_MAINTAINER_MODE
 
 dnl checks for programs
+AC_AIX
 AC_PROG_MAKE_SET
 AC_CHECK_COMPILERS
 
@@ -56,8 +56,16 @@ dnl checks for mount table
 AC_MSG_CHECKING(for mount table)
 AC_FIND_FILE(/etc/mnttab /etc/mtab, MTAB)
 AC_MSG_RESULT($MTAB)
-test "$MTAB" = "NO" && CFLAGS="${CFLAGS} -DDONT_UPDATE_MTAB";
-AC_SUBST(MTAB)
+test "$MTAB" = "NO" && AC_DEFINE_UNQUOTED(DONT_UPDATE_MTAB)
+AC_DEFINE_UNQUOTED(MTAB_PATH,"$MTAB")
+case "$target_alias" in
+	*linux*)
+		AC_DEFINE_UNQUOTED(MTAB_TMP,"${MTAB}~")
+		;;
+	*)
+		AC_DEFINE_UNQUOTED(MTAB_TMP,"${MTAB}.plpnfsd")
+		;;
+esac
 
 dnl checks for header files
 AC_CHECK_HEADERS(sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h)
@@ -65,7 +73,7 @@ AC_CHECK_HEADERS(sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h)
 dnl special options for customization
 
 AC_ARG_WITH(serial,
-    [  --with-serial=DEV       override default serial line ],
+    [  --with-serial=DEV       override default serial line],
     [  DDEV="$withval"
       AC_MSG_RESULT(Overriding serial line: $DDEV)
     ],
@@ -75,7 +83,7 @@ AC_ARG_WITH(serial,
       test "$DDEV" = "NO" && AC_MSG_ERROR(NO serial lines. Use --with-serial.)
     ]
 )
-AC_SUBST(DDEV)
+AC_DEFINE_UNQUOTED(DDEV,"$DDEV")
 
 AC_ARG_WITH(speed,
     [  --with-speed=SPEED      override default serial speed [115200]],
@@ -85,7 +93,7 @@ AC_ARG_WITH(speed,
       AC_MSG_RESULT(Using default serial speed: $DSPEED)
     ]
 )
-AC_SUBST(DSPEED)
+AC_DEFINE_UNQUOTED(DSPEED,$DSPEED)
 
 AC_ARG_WITH(port,
     [  --with-port=PORT        override default port [7501]],
@@ -95,7 +103,7 @@ AC_ARG_WITH(port,
       AC_MSG_RESULT(Using default port: $DPORT)
     ]
 )
-AC_SUBST(DPORT)
+AC_DEFINE_UNQUOTED(DPORT,$DPORT)
 
 AC_ARG_WITH(drive,
     [  --with-drive=DRIVE      override default Psion drive [AUTO]],
@@ -105,7 +113,7 @@ AC_ARG_WITH(drive,
       AC_MSG_RESULT(Using default Psion drive: $DDRIVE)
     ]
 )
-AC_SUBST(DDRIVE)
+AC_DEFINE_UNQUOTED(DDRIVE,"$DDRIVE")
 
 AC_ARG_WITH(basedir,
     [  --with-basedir=DIR      override default Psion directory [\\\\]],
@@ -115,17 +123,17 @@ AC_ARG_WITH(basedir,
       AC_MSG_RESULT(Using default Psion directory: $DBASEDIR)
     ]
 )
-AC_SUBST(DBASEDIR)
+AC_DEFINE_UNQUOTED(DBASEDIR,"$DBASEDIR")
 
 AC_ARG_WITH(mountdir,
-    [  --with-mountdir=DDIR    override default mount point [/mnt/psion]],
-    [ DDIR="$withval"
-      AC_MSG_RESULT(Overriding mount point: $DDIR) ],
-    [ DDIR="/mnt/psion"
-      AC_MSG_RESULT(Using default mount point: $DDIR)
+    [  --with-mountdir=DIR     override default mount point [/mnt/psion]],
+    [ DMOUNTPOINT="$withval"
+      AC_MSG_RESULT(Overriding mount point: $DMOUNTPOINT) ],
+    [ DMOUNTPOINT="/mnt/psion"
+      AC_MSG_RESULT(Using default mount point: $DMOUNTPOINT)
     ]
 )
-AC_SUBST(DDIR)
+AC_DEFINE_UNQUOTED(DMOUNTPOINT,"$DMOUNTPOINT")
 
 
 AC_OUTPUT(
@@ -135,6 +143,5 @@ AC_OUTPUT(
 	plpftp/Makefile
 	plpnfsd/Makefile
 	include/config.h
-	include/defs.h
 	etc/psion
 )

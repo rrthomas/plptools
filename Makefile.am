@@ -12,3 +12,6 @@ AUTOMAKE_OPTIONS = foreign
 maintainer-clean-local:
 	rm -f configure aclocal.m4 config.guess config.sub Makefile.in \
 		install-sh ltconfig ltmain.sh missing mkinstalldirs
+
+kdoc:
+	kdoc -d doc/api -n libplp -P lib/*.h
