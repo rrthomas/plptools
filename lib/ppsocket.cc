@@ -287,12 +287,12 @@ getBufferStore(bufferStore & a, bool wait)
 		return 0;
 	a.init();
 
-	if (readTimeout((char *) &l, sizeof(l), 0) != sizeof(l))
+	if (readTimeout(&l, sizeof(l), 0) != sizeof(l))
 		return -1;
 	l = ntohl(l);
 	bp = buff = new unsigned char[l];
 	while (l > 0) {
-		int j = readTimeout((char *) bp, l, 0);
+		int j = readTimeout(bp, l, 0);
 		if (j == SOCKET_ERROR || j == 0) {
 			delete[]buff;
 			return -1;
@@ -319,7 +319,7 @@ sendBufferStore(const bufferStore & a)
 	if (i != sizeof(hl))
 		return false;
 	while (l > 0) {
-		i = writeTimeout(a.getString(sent), l, 0);
+		i = writeTimeout((const char *)a.getString(sent), l, 0);
 		if (i == SOCKET_ERROR || i == 0)
 			return (false);
 		sent += i;
@@ -333,7 +333,7 @@ sendBufferStore(const bufferStore & a)
 }
 
 int ppsocket::
-readEx(char *Data, int cTerm, int MaxLen)
+readEx(unsigned char *Data, int cTerm, int MaxLen)
 {
 	int i, j;
 
@@ -405,7 +405,7 @@ sputc(char c)
 int ppsocket::
 read(void *Data, size_t Size, size_t NumObj)
 {
-	int i = readTimeout((char *) Data, Size * NumObj, 0);
+	int i = readTimeout(Data, Size * NumObj, 0);
 
 	return (i);
 }
@@ -441,7 +441,7 @@ send(const char *buf, int len, int flags)
 }
 
 int ppsocket::
-readTimeout(char *buf, int len, int flags)
+readTimeout(void *buf, int len, int flags)
 {
 	int i;
 
@@ -450,7 +450,7 @@ readTimeout(char *buf, int len, int flags)
 	//*********************************************************
 
 	if (m_Timeout == INFINITE) {
-		i =::recv(m_Socket, buf, len, flags);
+		i = ::recv(m_Socket, buf, len, flags);
 
 		if (i == SOCKET_ERROR) {
 			m_LastError = lastErrorCode();
