@@ -114,7 +114,7 @@ SISFileHeader::fillFrom(uint8_t* buf, int* base, off_t len)
 		printf(_("Got options: %04x\n"), m_options);
 	m_type = read16(start + 38);
 	if (logLevel >= 2)
-		printf(_("Got type: %0x\n"), m_type);
+		printf(_("Got type: %04x\n"), m_type);
 	m_major = read16(start + 40);
 	if (logLevel >= 2)
 		printf(_("Got major: %d\n"), m_major);

@@ -298,6 +298,13 @@ public:
     */
     PsiTime &operator=(const PsiTime &t);
 
+    /**
+     * Comparison operators
+     */
+    bool operator==(const PsiTime &t);
+    bool operator<(const PsiTime &t);
+    bool operator>(const PsiTime &t);
+
     enum zone {
 	PSI_TZ_NONE = 0,
 	PSI_TZ_EUROPEAN = 1,

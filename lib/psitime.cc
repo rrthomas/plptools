@@ -153,6 +153,28 @@ PsiTime &PsiTime::operator=(const PsiTime &t) {
     return *this;
 }
 
+bool PsiTime::operator==(const PsiTime &t) {
+    psi2unix();
+    return ((utv.tv_sec == t.utv.tv_sec) &&
+	    (utv.tv_usec == t.utv.tv_usec));
+}
+
+bool PsiTime::operator<(const PsiTime &t) {
+    psi2unix();
+    if (utv.tv_sec == t.utv.tv_sec)
+	return (utv.tv_usec < t.utv.tv_usec);
+    else
+	return (utv.tv_sec < t.utv.tv_sec);
+}
+
+bool PsiTime::operator>(const PsiTime &t) {
+    psi2unix();
+    if (utv.tv_sec == t.utv.tv_sec)
+	return (utv.tv_usec > t.utv.tv_usec);
+    else
+	return (utv.tv_sec > t.utv.tv_sec);
+}
+
 ostream &operator<<(ostream &s, const PsiTime &t) {
     const char *fmt = "%c";
     char buf[100];
