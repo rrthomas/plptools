@@ -1,7 +1,9 @@
+%define myrelease 1
 %define srel /etc/SuSE-release
 %define rrel /etc/redhat-release
 %define isSUSE %(test -f %{srel} && echo 1 || echo 0)
 %define isRH %(test -f %{rrel} && echo 1 || echo 0)
+%define distro ""
 
 %if "%{isSUSE}" > "0"
 %define REL %(grep VERSION %{srel} | sed -e 's/VERSION = //')
@@ -11,16 +13,19 @@
 %else
 %define _initrddir %{_sysconfdir}/init.d
 %endif
+%define distro SuSE%{REL}
 %endif
 %if "%{isRH}" > "0"
 %define REL %(rpm -q --queryformat '%%{version}' redhat-release)
+%define distro RH%{REL}
 %endif
+%define realrelease %{myrelease}%{distro}
 
 Summary: Connectivity for psion series 5.
 Name: plptools
 %define version @VERSION@
 Version: %{version}
-Release: 1
+Release: %{realrelease}
 Vendor: The plptools project
 Packager: Fritz Elfert <fritz.elfert@to.com>
 URL: http://plptools.sourceforge.net/
@@ -200,9 +205,24 @@ test ! -d /mnt/psion && mkdir -p /mnt/psion
 /sbin/chkconfig --add psion
 %else
 (
-	grep -v START_PSION /etc/rc.config
-	echo '# Set START_PSION to yes to start Psion support'
-	echo 'START_PSION=yes'
+	grep -v START_PSION /etc/rc.config | \
+		grep -v NCPD_ARGS | grep -v START_PLPNFSD | \
+		grep -v PLPNFSD_ARGS | grep -v START_PLPPRINTD | \
+		grep -v PLPPRINTD_ARGS
+	cat<<-EOF
+	# Set START_PSION to yes to start Psion support
+	START_PSION=yes
+	# Specify parameters for ncpd in NCPD_ARGS (if any)
+	NCPD_ARGS=
+	# Set START_PLPNFSD to yes to start plpnfsd
+	START_PLPNFSD=yes
+	# Specify parameters for plpnfsd in PLPNFSD_ARGS (if any)
+	PLPNFSD_ARGS=
+	# Set START_PLPPRINTD to yes to start plpprintd
+	START_PLPPRINTD=yes
+	# Specify parameters for plpprintd in PLPPRINTD_ARGS (if any)
+	PLPPRINTD_ARGS=
+	EOF
 ) > /etc/rc.config.$$
 cp /etc/rc.config /etc/rc.config.old && mv /etc/rc.config.$$ /etc/rc.config
 /sbin/insserv -d psion
@@ -229,6 +249,9 @@ fi
 if [ "$1" = 0 ]
 then
 	%{_initrddir}/psion stop >/dev/null 2>&1
+	KONQRC=`kde-config --expandvars --install config`/konquerorrc
+	grep -v 'askSaveinode/x-psion-drive=' $KONQRC > /tmp/$$
+	mv /tmp/$$ $KONQRC
 %if "%{isSUSE}" > "0"
 %if "%{REL}" >= "8.0"
 	/sbin/chkconfig --del psion
@@ -242,7 +265,7 @@ then
 fi
 
 %files
-%doc COPYING INSTALL CHANGES README* TODO etc/*magic patches
+%doc COPYING INSTALL CHANGES ChangeLog README TODO etc/*magic patches
 %{_bindir}/plpftp
 %{_bindir}/plpbackup
 %{_bindir}/sisinstall
@@ -275,6 +298,7 @@ fi
 %{_datadir}/services/*
 %{_datadir}/icons/*/*/mimetypes/*
 %{_datadir}/icons/*/*/devices/*
+%{_datadir}/icons/*/*/apps/psion*
 %{_datadir}/locale/*/LC_MESSAGES/libplpprops.mo
 %{_datadir}/mimelnk/*/*
 
