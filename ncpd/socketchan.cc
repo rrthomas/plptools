@@ -113,7 +113,6 @@ ncpCommand(bufferStore & a)
 	ok = true;
     } else if (!strncmp(str, "GSPD", 4)) {
 	// Get Speed of serial device
-	cerr << "socketChan:: GETSPEED" << endl;
 	a.init();
 	a.addByte(rfsv::E_PSI_GEN_NONE);
 	a.addDWord(ncpGetSpeed());

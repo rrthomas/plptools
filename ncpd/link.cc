@@ -343,12 +343,6 @@ receive(bufferStore buff)
 		// Transmit waiting packets
 		transmitWaitQueue();
 	    } else {
-		if (verbose & LNK_DEBUG_LOG) {
-		    cout << "Link: << UNMATCHED ack seq=" << seq;
-		    if (verbose & LNK_DEBUG_DUMP)
-			cout << " " << buff;
-		    cout << endl;
-		}
 		// If packet with seq+1 is in ackWaitQueue, resend it immediately
 		// (Receiving an ack for a packet not on our wait queue is a
 		// hint by the Psion about which was the last packet it
@@ -356,8 +350,10 @@ receive(bufferStore buff)
 		pthread_mutex_lock(&queueMutex);
 		struct timeval now;
 		gettimeofday(&now, NULL);
+		bool nextFound = false;
 		for (i = ackWaitQueue.begin(); i != ackWaitQueue.end(); i++)
 		    if (i->seq == seq+1) {
+			nextFound = true;
 			if (i->txcount-- == 0) {
 			    // timeout, remove packet
 			    if (verbose & LNK_DEBUG_LOG)
@@ -376,6 +372,12 @@ receive(bufferStore buff)
 			break;
 		    }
 		pthread_mutex_unlock(&queueMutex);
+		if ((verbose & LNK_DEBUG_LOG) && (!nextFound)) {
+		    cout << "Link: << UNMATCHED ack seq=" << seq;
+		    if (verbose & LNK_DEBUG_DUMP)
+			cout << " " << buff;
+		    cout << endl;
+		}
 	    }
 	    break;
 
@@ -386,7 +388,7 @@ receive(bufferStore buff)
 		// May be a link confirm packet (EPOC)
 		pthread_mutex_lock(&queueMutex);
 		for (i = ackWaitQueue.begin(); i != ackWaitQueue.end(); i++)
-		    if ((i->seq == 0) && (i->data.getByte(0) & 0xf0) == 0x20) {
+		    if ((i->seq == 0) && (i->data.getByte(0) == 0x21)) {
 			ackWaitQueue.erase(i);
 			linkType = LINK_TYPE_EPOC;
 			if (verbose & LNK_DEBUG_LOG)
@@ -411,7 +413,6 @@ receive(bufferStore buff)
 	    if (conFound) {
 		rxSequence = 0;
 		txSequence = 1;
-		purgeAllQueues();
 		sendAck(rxSequence);
 	    } else {
 		if (verbose & LNK_DEBUG_LOG) {
@@ -430,7 +431,6 @@ receive(bufferStore buff)
 		    // EPOC can handle up to 8 unacknowledged packets
 		    maxOutstanding = 8;
 		    p->setEpoc(true);
-		    purgeAllQueues();
 		    failed = false;
 		    sendReqCon();
 		} else {

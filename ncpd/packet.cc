@@ -372,9 +372,13 @@ findSync()
 		continue;
 	    lastSYN = p - 1;
 	    normalize(p);
+	    if (p == inw)
+		break;
 	    if (inBuffer[p++] != 0x10)
 		continue;
 	    normalize(p);
+	    if (p == inw)
+		break;
 	    if (inBuffer[p++] != 0x02)
 		continue;
 	    normalize(p);
