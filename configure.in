@@ -103,6 +103,9 @@ case "$target_alias" in
 		;;
 esac
 
+dnl Type of sighandlers
+AC_TYPE_SIGNAL
+
 dnl checks for header files
 AC_CHECK_HEADERS(sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h)
 

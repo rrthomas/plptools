@@ -124,14 +124,14 @@ static char *mntdir;		/* where we mounted the psion */
 static void doexit(void);
 #endif
 
-static void
+static RETSIGTYPE
 usr1_handler SIGARG
 {
 	debug = (debug + 1) & 3;
 	infolog("Set debug level to %d\n", debug);
 };
 
-static void
+static RETSIGTYPE
 hup_handler SIGARG
 {
 	if (debug > 1)
@@ -139,7 +139,7 @@ hup_handler SIGARG
 	exiting = 5;
 };
 
-static void
+static RETSIGTYPE
 term_handler SIGARG
 {
 	if (debug > 1)
