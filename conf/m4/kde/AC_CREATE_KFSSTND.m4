@@ -6,46 +6,46 @@ kde_result=""
 AC_CACHE_VAL(kde_cv_all_paths,
 [
   if test -z "$kde_htmldir"; then
-    kde_htmldir='\$(prefix)/share/doc/HTML'
+    kde_htmldir='\$(kde_prefix)/share/doc/HTML'
   fi
   if test -z "$kde_appsdir"; then
-    kde_appsdir='\$(prefix)/share/applnk'
+    kde_appsdir='\$(kde_prefix)/share/applnk'
   fi
   if test -z "$kde_icondir"; then
-    kde_icondir='\$(prefix)/share/icons'
+    kde_icondir='\$(kde_prefix)/share/icons'
   fi
   if test -z "$kde_sounddir"; then
-    kde_sounddir='\$(prefix)/share/sounds'
+    kde_sounddir='\$(kde_prefix)/share/sounds'
   fi
   if test -z "$kde_datadir"; then
-    kde_datadir='\$(prefix)/share/apps'
+    kde_datadir='\$(kde_prefix)/share/apps'
   fi
   if test -z "$kde_locale"; then
-    kde_locale='\$(prefix)/share/locale'
+    kde_locale='\$(kde_prefix)/share/locale'
   fi
   if test -z "$kde_cgidir"; then
-    kde_cgidir='\$(exec_prefix)/cgi-bin'
+    kde_cgidir='\$(kde_exec_prefix)/cgi-bin'
   fi
   if test -z "$kde_confdir"; then
-    kde_confdir='\$(prefix)/share/config'
+    kde_confdir='\$(kde_prefix)/share/config'
   fi
   if test -z "$kde_mimedir"; then
-    kde_mimedir='\$(prefix)/share/mimelnk'
+    kde_mimedir='\$(kde_prefix)/share/mimelnk'
   fi
   if test -z "$kde_toolbardir"; then
-    kde_toolbardir='\$(prefix)/share/toolbar'
+    kde_toolbardir='\$(kde_prefix)/share/toolbar'
   fi
   if test -z "$kde_wallpaperdir"; then
-    kde_wallpaperdir='\$(prefix)/share/wallpapers'
+    kde_wallpaperdir='\$(kde_prefix)/share/wallpapers'
   fi
   if test -z "$kde_bindir"; then
-    kde_bindir='\$(exec_prefix)/bin'
+    kde_bindir='\$(kde_exec_prefix)/bin'
   fi
   if test -z "$kde_servicesdir"; then
-    kde_servicesdir='\$(prefix)/share/services'
+    kde_servicesdir='\$(kde_prefix)/share/services'
   fi
   if test -z "$kde_servicetypesdir"; then
-    kde_servicetypesdir='\$(prefix)/share/servicetypes'
+    kde_servicetypesdir='\$(kde_prefix)/share/servicetypes'
   fi
 
   kde_cv_all_paths="kde_have_all_paths=\"yes\" \
@@ -89,8 +89,9 @@ else
   AC_MSG_RESULT($kde_result)
 fi
 
+save_BINDIR=$bindir
 bindir=$kde_bindir
-
 KDE_SUBST_PROGRAMS
+bindir=$save_BINDIR
 
 ])

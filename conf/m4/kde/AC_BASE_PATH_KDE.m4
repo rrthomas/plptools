@@ -12,16 +12,16 @@ AC_REQUIRE([AC_PATH_QT])dnl
 AC_CHECK_RPATH
 AC_MSG_CHECKING([for KDE])
 
-if test "${prefix}" != NONE; then
-  kde_includes=${prefix}/include
-  ac_kde_includes=$prefix/include
+if test "${kde_prefix}" != NONE; then
+  kde_includes=${kde_prefix}/include
+  ac_kde_includes=$kde_prefix/include
 
-  if test "${exec_prefix}" != NONE; then
-    kde_libraries=${exec_prefix}/lib
-    ac_kde_libraries=$exec_prefix/lib
+  if test "${kde_exec_prefix}" != NONE; then
+    kde_libraries=${kde_exec_prefix}/lib
+    ac_kde_libraries=$kde_exec_prefix/lib
   else
-    kde_libraries=${prefix}/lib
-    ac_kde_libraries=$prefix/lib
+    kde_libraries=${kde_prefix}/lib
+    ac_kde_libraries=$kde_prefix/lib
   fi
 else
   ac_kde_includes=
@@ -35,7 +35,7 @@ AC_CACHE_VAL(ac_cv_have_kde,
 
 if test -z "$1"; then
 
-kde_incdirs="/usr/lib/kde/include /usr/local/kde/include /usr/kde/include /usr/include/kde /usr/include /opt/kde/include $x_includes $qt_includes"
+kde_incdirs="$kde_prefix/include /opt/kde2/include /usr/kde2/include /usr/lib/kde/include /usr/local/kde/include /usr/kde/include /usr/include/kde /usr/include /opt/kde/include $x_includes $qt_includes"
 test -n "$KDEDIR" && kde_incdirs="$KDEDIR/include $KDEDIR $kde_incdirs"
 kde_incdirs="$ac_kde_includes $kde_incdirs"
 AC_FIND_FILE(ksock.h, $kde_incdirs, kde_incdir)
@@ -47,7 +47,7 @@ in the prefix, you've chosen, are no KDE headers installed. This will fail.
 So, check this please and use another prefix!])
 fi
 
-kde_libdirs="/usr/lib/kde/lib /usr/local/kde/lib /usr/kde/lib /usr/lib/kde /usr/lib /usr/X11R6/lib /opt/kde/lib /usr/X11R6/kde/lib"
+kde_libdirs="$kde_prefix/lib /opt/kde2/lib /usr/kde2/lib /usr/lib/kde/lib /usr/local/kde/lib /usr/kde/lib /usr/lib/kde /usr/lib /usr/X11R6/lib /opt/kde/lib /usr/X11R6/kde/lib"
 test -n "$KDEDIR" && kde_libdirs="$KDEDIR/lib $KDEDIR $kde_libdirs"
 kde_libdirs="$ac_kde_libraries $kde_libdirs"
 AC_FIND_FILE(libkdecore.la, $kde_libdirs, kde_libdir)
@@ -77,12 +77,12 @@ fi
 eval "$ac_cv_have_kde"
 
 if test "$have_kde" != "yes"; then
- if test "${prefix}" = NONE; then
+ if test "${kde_prefix}" = NONE; then
   ac_kde_prefix="$ac_default_prefix"
  else
-  ac_kde_prefix="$prefix"
+  ac_kde_prefix="$kde_prefix"
  fi
- if test "$exec_prefix" = NONE; then
+ if test "$kde_exec_prefix" = NONE; then
   ac_kde_exec_prefix="$ac_kde_prefix"
   AC_MSG_RESULT([will be installed in $ac_kde_prefix])
  else

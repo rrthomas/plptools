@@ -90,6 +90,23 @@
        KDE 2.1 headers/development-libraries as well as QT 2.2.4
        headers/development-libraries.
 
+  --with-kdedir=/path/to/your/kde
+
+       Specify the KDE directory. I got several reports from SuSE users,
+       who have KDE1 and KDE2 in those weird pathes /opt/kde and /opt/kde2
+       installed and the automatic detection does get confused by that.
+       So be shure to use this switch. RedHat users can safely use
+       --prefix=/usr instead.
+
+  --with-qt-dir=/path/to/your/qtdir
+
+   or 
+
+  --with-qt-includes=/path/to/your/qt-headers
+  --with-qt-libraries=/path/to/your/qt-lib
+
+      Same as above. Use these, when automatic detection fails.
+
  You will get 3 programs and a shared and static library (in
  case you enabled KDE: 4 Programs 4 shared libraries).
  By default, the install-prefix is /usr/local, so you probably

@@ -10,7 +10,7 @@ AC_DEFUN(KDE_SUBST_PROGRAMS,
            done
            IFS=$kde_save_IFS
         fi
-        kde_default_bindirs="$exec_prefix/bin $prefix/bin $kde_default_bindirs"
+        kde_default_bindirs="$kde_exec_prefix/bin $kde_prefix/bin $kde_default_bindirs"
         KDE_FIND_PATH(dcopidl, DCOPIDL, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(dcopidl)])
         KDE_FIND_PATH(dcopidl2cpp, DCOPIDL2CPP, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(dcopidl2cpp)])
         KDE_FIND_PATH(mcopidl, MCOPIDL, [$kde_default_bindirs], [KDE_MISSING_PROG_ERROR(mcopidl)])
@@ -37,7 +37,7 @@ AC_DEFUN(KDE_SUBST_PROGRAMS,
            fi
            kde_libs_htmldir=`$KDECONFIG --install html --expandvars`
         else
-           kde_libs_prefix='$(prefix)'
+           kde_libs_prefix='$(kde_prefix)'
            kde_libs_htmldir='$(kde_htmldir)'
         fi
         AC_SUBST(kde_libs_prefix)
