@@ -50,6 +50,7 @@ sub add_doc($) {
 			"$_[0].docbook" . '">';
 		my $er = '&kio-' . $id . ';';
 		$idx =~ s/$_[0]\.docbook/index\.docbook/;
+		next if (!(-e $idx));
 		my @lines = from("$idx");
 		my $state = 0;
 		my @out = ();
