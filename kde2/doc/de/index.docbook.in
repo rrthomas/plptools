@@ -531,13 +531,13 @@ modifizieren. Der Dialog Einstellungen besteht aus drei Seiten:
 </chapter>
 
 <chapter id="Interna">
-<title>Internals</title>
+<title>Interna</title>
 
 <sect1 id="backupformat">
 <title>Die Backup-Dateien</title>
 
 <para>Bei den Backup-Dateien die von &kpsion; angelegt werden, handelt es
-sich um simple, mit gzip koprimierte tar-Archive.
+sich um simple, mit gzip komprimierte tar-Archive.
 Die Dateien sind nach folgendem Schema benannt:
 <variablelist>
 <varlistentry>
