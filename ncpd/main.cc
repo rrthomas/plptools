@@ -71,17 +71,19 @@ checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp 
 		// New connect
 		if (verbose)
 			cout << "New socket connection from " << peer << endl;
-		if ((numScp == 7) || (!a->gotLinkChannel())) {
+		if ((numScp >= a->maxLinks()) || (!a->gotLinkChannel())) {
 			bufferStore a;
 
 			// Give the client time to send it's version request.
-			next->dataToGet(1,0);
+			next->dataToGet(1, 0);
 			next->getBufferStore(a, false);
 
 			a.init();
 			a.addStringT("No Psion Connected\n");
 			next->sendBufferStore(a);
 			next->closeSocket();
+			if (verbose)
+			    cout << "rejected" << endl;
 		} else
 			scp[numScp++] = new socketChan(next, a);
 	}
@@ -183,7 +185,7 @@ main(int argc, char **argv)
 		else
 			serialDevice = DDEV;
 	}
-			
+
 	if (dofork)
 		pid = fork();
 	else
@@ -210,7 +212,7 @@ main(int argc, char **argv)
 				}
 				ncp *a = new ncp(serialDevice, baudRate, iow);
 				int numScp = 0;
-				socketChan *scp[MAX_CHANNEL+1];
+				socketChan *scp[a->maxLinks() + 1];
 
 				a->setVerbose(nverbose);
 				a->setLinkVerbose(lverbose);

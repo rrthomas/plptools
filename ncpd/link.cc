@@ -44,6 +44,8 @@ link::link(const char *fname, int baud, IOWatch & iow, unsigned short _verbose)
     somethingToSend = false;
     timesSent = 0;
     failed = false;
+    for (int i; i < 256; i++)
+	xoff[i] = false;
 }
 
 link::~link()
@@ -60,7 +62,8 @@ reset() {
     somethingToSend = false;
     timesSent = 0;
     failed = false;
-    // p->reset();
+    for (int i; i < 256; i++)
+	xoff[i] = false;
 }
 
 short int link::
@@ -96,6 +99,20 @@ send(const bufferStore & buff)
 	sendQueue += buff;
 }
 
+void link::
+purgeQueue(int channel)
+{
+    bufferArray hsendQueue;
+    bufferStore b;
+
+    while (!sendQueue.empty()) {
+	b = sendQueue.pop();
+	if (b.getByte(0) != channel)
+	    hsendQueue += b;
+    }
+    sendQueue = hsendQueue;
+}
+
 bufferArray link::
 poll()
 {
@@ -129,7 +146,26 @@ poll()
 		// Send ack
 		if (idLastGot != seq) {
 		    idLastGot = seq;
-		    ret += buff;
+		    // Must check for XOFF/XON ncp frames HERE!
+		    if ((buff.getLen() == 3) && (buff.getByte(0) == 0)) {
+			switch (buff.getByte(2)) {
+			    case 1:
+				// XOFF
+				xoff[buff.getByte(1)] = true;
+				if (verbose & LNK_DEBUG_LOG)
+				    cout << "link: got XOFF for channel " << buff.getByte(1) << endl;
+				break;
+			    case 2:
+				// XON
+				xoff[buff.getByte(1)] = false;
+				if (verbose & LNK_DEBUG_LOG)
+				    cout << "link: got XON for channel " << buff.getByte(1) << endl;
+				break;
+			    default:
+				ret += buff;
+			}
+		    } else
+			ret += buff;
 		} else {
 		    if (verbose & LNK_DEBUG_LOG)
 			cout << "link: DUP\n";
@@ -147,6 +183,7 @@ poll()
 
 		p->send(seq, blank);
 		break;
+
 	    case 0x00:
 		// Incoming ack
 		if (seq == idSent) {
@@ -160,6 +197,7 @@ poll()
 		    timesSent = 0;
 		}
 		break;
+
 	    case 0x20:
 		// New link
 		if (verbose & LNK_DEBUG_LOG) {
@@ -175,6 +213,7 @@ poll()
 		blank.init();
 		p->send(idLastGot, blank);
 		break;
+
 	    case 0x10:
 		// Disconnect
 		if (verbose & LNK_DEBUG_LOG)
@@ -197,15 +236,25 @@ poll()
 	    newLink = false;
 	    idSent = 0;
 	} else {
-	    if (!sendQueue.empty()) {
-		somethingToSend = true;
+	    bufferArray hsendQueue;
+
+	    while (!sendQueue.empty()) {
 		toSend = sendQueue.pop();
-		idSent++;
-		if (idSent > 7)
-		    idSent = 0;
+		int remoteChan = toSend.getByte(0);
+		if (xoff[remoteChan])
+		    hsendQueue += toSend;
+		else {
+		    somethingToSend = true;
+		    idSent++;
+		    if (idSent > 7)
+			idSent = 0;
+		    break;
+		}
 	    }
+	    sendQueue = hsendQueue + sendQueue;
 	}
     }
+
     if (somethingToSend) {
 	if (countToResend == 0) {
 	    timesSent++;
@@ -231,6 +280,7 @@ poll()
 	} else
 	    countToResend--;
     }
+
     return ret;
 }
 

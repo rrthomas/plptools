@@ -35,7 +35,6 @@ class IOWatch;
 
 #define NCP_DEBUG_LOG  1
 #define NCP_DEBUG_DUMP 2
-#define MAX_CHANNEL 8
 
 class ncp {
 public:
@@ -49,9 +48,11 @@ public:
     void send(int channel, bufferStore &a);
     void poll();
     void reset();
+    int  maxLinks();
     bool stuffToSend();
     bool hasFailed();
     bool gotLinkChannel();
+
     void setVerbose(short int);
     short int getVerbose();
     void setLinkVerbose(short int);
@@ -59,7 +60,7 @@ public:
     void setPktVerbose(short int);
     short int getPktVerbose();
     short int getProtocolVersion();
-  
+
 private:
     enum c { MAX_LEN = 200, LAST_MESS = 1, NOT_LAST_MESS = 2 };
     enum interControllerMessageType {
@@ -78,15 +79,16 @@ private:
     void decodeControlMessage(bufferStore &buff);
     void controlChannel(int chan, enum interControllerMessageType t, bufferStore &command);
     char * ctrlMsgName(unsigned char);
-  
+
     link *l;
     unsigned short verbose;
-    channel *channelPtr[MAX_CHANNEL+1];
-    bufferStore messageList[MAX_CHANNEL+1];
-    int remoteChanList[MAX_CHANNEL+1];
+    channel **channelPtr;
+    bufferStore *messageList;
+    int *remoteChanList;
     bool failed;
     short int protocolVersion;
     linkChan *lChan;
+    int maxChannels;
 };
 
 #endif

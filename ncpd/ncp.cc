@@ -35,40 +35,59 @@
 #include "link.h"
 #include <bufferarray.h>
 
+#define MAX_CHANNELS_PSION 256
+#define MAX_CHANNELS_SIBO  8
 #define NCP_SENDLEN 250
 
 ncp::ncp(const char *fname, int baud, IOWatch & iow)
 {
+    channelPtr = new channel*[MAX_CHANNELS_PSION + 1];
+    messageList = new bufferStore[MAX_CHANNELS_PSION + 1];
+    remoteChanList = new int[MAX_CHANNELS_PSION + 1];
+
     l = new link(fname, baud, iow);
     failed = false;
     verbose = 0;
-    protocolVersion = PV_SERIES_5; // until detected on receipt of INFO
+
+    // until detected on receipt of INFO we use these.
+    maxChannels = MAX_CHANNELS_SIBO;
+    protocolVersion = PV_SERIES_5;
 
     // init channels
-    for (int i = 0; i < MAX_CHANNEL; i++)
+    for (int i = 0; i < maxLinks(); i++)
 	channelPtr[i] = NULL;
 }
 
 ncp::~ncp()
 {
     bufferStore b;
-    for (int i = 0; i < MAX_CHANNEL; i++) {
+    for (int i = 0; i < maxLinks(); i++) {
 	if (channelPtr[i]) {
 	    bufferStore b2;
 	    b2.addByte(remoteChanList[i]);
 	    controlChannel(i, NCON_MSG_CHANNEL_DISCONNECT, b2);
 	}
+	delete channelPtr[i];
 	channelPtr[i] = NULL;
     }
     controlChannel(0, NCON_MSG_NCP_END, b);
     delete l;
+    delete channelPtr;
+    delete messageList;
+    delete remoteChanList;
+}
+
+int ncp::
+maxLinks() {
+    return maxChannels;
 }
 
 void ncp::
 reset() {
-    for (int i = 0; i < MAX_CHANNEL; i++) {
+    for (int i = 0; i < maxLinks(); i++) {
 	if (channelPtr[i])
 	    channelPtr[i]->terminateWhenAsked();
+	delete channelPtr[i];
 	channelPtr[i] = NULL;
     }
     failed = false;
@@ -123,34 +142,30 @@ void ncp::
 poll()
 {
     bufferArray res(l->poll());
-    if (!res.empty()) {
-	do {
-	    bufferStore s = res.pop();
-	    if (s.getLen() > 1) {
-		int channel = s.getByte(0);
-		s.discardFirstBytes(1);
-		if (channel == 0) {
-		    decodeControlMessage(s);
+    while (!res.empty()) {
+	bufferStore s = res.pop();
+	if (s.getLen() > 1) {
+	    int channel = s.getByte(0);
+	    s.discardFirstBytes(1);
+	    if (channel == 0) {
+		decodeControlMessage(s);
+	    } else {
+		int allData = s.getByte(1);
+		s.discardFirstBytes(2);
+		if (channelPtr[channel] == NULL) {
+		    cerr << "ncp: Got message for unknown channel\n";
 		} else {
-		    /* int remChan = */ s.getByte(0);
-		    int allData = s.getByte(1);
-		    s.discardFirstBytes(2);
-		    if (channelPtr[channel] == NULL) {
-			cerr << "ncp: Got message for unknown channel\n";
-		    } else {
-			messageList[channel].addBuff(s);
-			if (allData == LAST_MESS) {
-			    channelPtr[channel]->ncpDataCallback(messageList[channel]);
-			    messageList[channel].init();
-			} else if (allData != NOT_LAST_MESS) {
-			    cerr << "ncp: bizarre third byte!\n";
-			}
+		    messageList[channel].addBuff(s);
+		    if (allData == LAST_MESS) {
+			channelPtr[channel]->ncpDataCallback(messageList[channel]);
+			messageList[channel].init();
+		    } else if (allData != NOT_LAST_MESS) {
+			cerr << "ncp: bizarre third byte!\n";
 		    }
 		}
-	    } else {
-		cerr << "Got null message\n";
 	    }
-	} while (!res.empty());
+	} else
+	    cerr << "Got null message\n";
     }
 }
 
@@ -172,21 +187,23 @@ void ncp::
 decodeControlMessage(bufferStore & buff)
 {
     int remoteChan = buff.getByte(0);
-    short int ver;
-    interControllerMessageType imt = (interControllerMessageType) buff.getByte(1);
+
+    interControllerMessageType imt = (interControllerMessageType)buff.getByte(1);
     buff.discardFirstBytes(2);
     if (verbose & NCP_DEBUG_LOG)
 	cout << "ncp: << " << ctrlMsgName(imt) << " " << remoteChan;
+
+    bufferStore b;
+
     switch (imt) {
 	case NCON_MSG_CONNECT_TO_SERVER:
-	{
 	    if (verbose & NCP_DEBUG_LOG) {
 		if (verbose & NCP_DEBUG_DUMP)
 		    cout << " [" << buff << "]";
 		cout << endl;
 	    }
+
 	    int localChan;
-	    bufferStore b;
 
 	    // Ack with connect response
 	    localChan = getFirstUnusedChan();
@@ -215,11 +232,13 @@ decodeControlMessage(bufferStore & buff)
 		b.addByte(remoteChan);
 		controlChannel(localChan, NCON_MSG_CHANNEL_DISCONNECT, b);
 	    }
-	}
-	break;
+	    break;
+
 	case NCON_MSG_CONNECT_RESPONSE:
-	{
-	    int forChan = buff.getByte(0);
+
+	    int forChan;
+
+	    forChan = buff.getByte(0);
 	    if (verbose & NCP_DEBUG_LOG)
 		cout << " ch=" << forChan << " stat=";
 	    if (buff.getByte(1) == 0) {
@@ -237,9 +256,12 @@ decodeControlMessage(bufferStore & buff)
 		    cout << "Unknown " << (int) buff.getByte(1) << endl;
 		channelPtr[forChan]->ncpConnectNak();
 	    }
-	}
-	break;
+	    break;
+
 	case NCON_MSG_NCP_INFO:
+
+	    int ver;
+
 	    ver = buff.getByte(0);
 	    // Series 3c returns '3', as does mclink. PsiWin 1.1
 	    // returns version 2. We return whatever version we're
@@ -256,8 +278,12 @@ decodeControlMessage(bufferStore & buff)
 		    cout << endl;
 		}
 		// Fake NCP version 2 for a Series 3 (behave like PsiWin 1.1)
-		if (ver == PV_SERIES_3)
+		if (ver == PV_SERIES_3) {
 		    ver = 2;
+		} else {
+		    // Series 5 supports more channels
+		    maxChannels = MAX_CHANNELS_PSION;
+		}
 		b.addByte(ver);
 		// Do we send a time of 0 or a real time?
 		// The Psion uses this to determine whether to
@@ -268,11 +294,14 @@ decodeControlMessage(bufferStore & buff)
 	    } else
 		cout << "ALERT!!!! Unexpected Protocol Version!! (No Series 5/3?)!" << endl;
 	    break;
+
 	case NCON_MSG_CHANNEL_DISCONNECT:
 	    if (verbose & NCP_DEBUG_LOG)
 		cout << " ch=" << (int) buff.getByte(0) << endl;
 	    disconnect(buff.getByte(0));
+	    l->purgeQueue(remoteChan);
 	    break;
+
 	case NCON_MSG_DATA_XOFF:
 	case NCON_MSG_DATA_XON:
 	case NCON_MSG_CHANNEL_CLOSED:
@@ -283,13 +312,14 @@ decodeControlMessage(bufferStore & buff)
 		    cout << " [" << buff << "]";
 		cout << endl;
 	    }
+
     }
 }
 
 int ncp::
 getFirstUnusedChan()
 {
-    for (int cNum = 1; cNum < MAX_CHANNEL; cNum++) {
+    for (int cNum = 1; cNum < maxLinks(); cNum++) {
 	if (channelPtr[cNum] == NULL) {
 	    if (verbose & NCP_DEBUG_LOG)
 		cout << "ncp: getFirstUnusedChan=" << cNum << endl;
@@ -304,9 +334,9 @@ RegisterAck(int chan, const char *name)
 {
     if (verbose & NCP_DEBUG_LOG)
 	cout << "ncp: RegisterAck: chan=" << chan << endl;
-    for (int cNum = 1; cNum < MAX_CHANNEL; cNum++) {
+    for (int cNum = 1; cNum < maxLinks(); cNum++) {
 	channel *ch = channelPtr[cNum];
-	if (ch->getNcpChannel() == chan) {
+	if (ch && ch->getNcpChannel() == chan) {
 	    ch->setNcpConnectName(name);
 	    ch->ncpRegisterAck();
 	    return;
@@ -393,6 +423,7 @@ disconnect(int channel)
     channelPtr[channel]->terminateWhenAsked();
     if (verbose & NCP_DEBUG_LOG)
 	cout << "ncp: disconnect: channel=" << channel << endl;
+    delete channelPtr[channel];
     channelPtr[channel] = NULL;
     bufferStore b;
     b.addByte(remoteChanList[channel]);

@@ -47,6 +47,7 @@ class link {
   		bool hasFailed();
 		void reset();
 		void flush();
+		void purgeQueue(int);
 		void setVerbose(short int);
 		short int getVerbose();
 		void setPktVerbose(short int);
@@ -64,6 +65,7 @@ class link {
   		unsigned short verbose;
   		bool somethingToSend;
   		bool failed;
+		bool xoff[256];
 };
 
 #endif
