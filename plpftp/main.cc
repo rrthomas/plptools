@@ -71,19 +71,24 @@ main(int argc, char **argv)
 	rpcs *r;
 	ftp f;
 	int status = 0;
+	int sockNum = DPORT;
 	sigset_t sigset;
 
-	// Command line parameter processing
-	int sockNum = DPORT;
 	sigemptyset(&sigset);
 	sigaddset(&sigset, SIGPIPE);
 	sigprocmask(SIG_BLOCK, &sigset, 0L);
 
+	struct servent *se = getservbyname("psion", "tcp");
+	endservent();
+	if (se != 0L)
+		sockNum = ntohs(se->s_port);
+
+	// Command line parameter processing
 	if ((argc > 2) && !strcmp(argv[1], "-p")) {
 		sockNum = atoi(argv[2]);
 		argc -= 2;
-		for (int i=1; i<argc; i++)
-			argv[i] = argv[i+2];
+		for (int i = 1; i < argc; i++)
+			argv[i] = argv[i + 2];
 	}
 
 	if (argc < 2)

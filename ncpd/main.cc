@@ -95,7 +95,6 @@ main(int argc, char **argv)
 	bool dofork = true;
 	bool autoexit = false;
 
-	// Command line parameter processing
 	int sockNum = DPORT;
 	int baudRate = DSPEED;
 	const char *serialDevice = DDEV;
@@ -103,6 +102,12 @@ main(int argc, char **argv)
 	short int pverbose = 0;
 	short int lverbose = 0;
 
+	struct servent *se = getservbyname("psion", "tcp");
+	endservent();
+	if (se != 0L)
+		sockNum = ntohs(se->s_port);
+
+	// Command line parameter processing
 	signal(SIGPIPE, SIG_IGN);
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-p") && i + 1 < argc) {
