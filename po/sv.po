@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-03-13 11:43+0100\n"
+"POT-Creation-Date: 2004-05-27 13:04+0200\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -676,6 +676,7 @@ msgid "Got uid1 = %08x\n"
 msgstr ""
 
 #: lib/sisfileheader.cpp:61
+#, c-format
 msgid "Got bad uid2.\n"
 msgstr ""
 
@@ -685,6 +686,7 @@ msgid "Got uid2 = %08x\n"
 msgstr ""
 
 #: lib/sisfileheader.cpp:69
+#, c-format
 msgid "Got bad uid3.\n"
 msgstr ""
 
@@ -699,6 +701,7 @@ msgid "Got first crc = %08x, wanted %08x\n"
 msgstr ""
 
 #: lib/sisfileheader.cpp:87
+#, c-format
 msgid "Got bad crc.\n"
 msgstr ""
 
@@ -1662,6 +1665,7 @@ msgid "Error %d on line %d: %s\n"
 msgstr "Fel %d på rad %d: %s\n"
 
 #: sisinstall/sismain.cpp:57
+#, c-format
 msgid ""
 "Usage: sisinstall [OPTIONS]... SISFILE\n"
 "\n"
@@ -1684,6 +1688,7 @@ msgstr ""
 " -w, --newt              Använd Newt-gränssnittet.\n"
 
 #: sisinstall/sismain.cpp:111
+#, c-format
 msgid "sisinstall version 0.1\n"
 msgstr ""
 
@@ -1697,6 +1702,7 @@ msgid ", not really"
 msgstr ", inte egentligen"
 
 #: sisinstall/sismain.cpp:147
+#, c-format
 msgid "Missing SIS filename\n"
 msgstr "Saknar SIS-filnamn\n"
 
@@ -1706,10 +1712,12 @@ msgid "File is %d bytes long\n"
 msgstr "Filen är %d bytes lång\n"
 
 #: sisinstall/sismain.cpp:170
+#, c-format
 msgid "Couldn't connect with the Psion\n"
 msgstr "Kunde inte få kontakt med Psionen\n"
 
 #: sisinstall/sismain.cpp:191
+#, c-format
 msgid "Could not parse the sis file.\n"
 msgstr "Kunde inte parsa sisfilen.\n"
 

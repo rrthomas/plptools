@@ -1,7 +1,7 @@
 Makefile.in
 Makefile
 Makevars
-stamp-cat-id
+stamp-po
 POTFILES
 *.c
 *.gmo
