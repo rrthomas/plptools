@@ -1012,7 +1012,7 @@ main(int argc, char **argv)
     }
 
     skt = new ppsocket();
-    if (!skt->connect(NULL, sockNum)) {
+    if (!skt->connect(host, sockNum)) {
 	cout << _("plpprintd: could not connect to ncpd") << endl;
 	return 1;
     }
