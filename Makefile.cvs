@@ -49,7 +49,7 @@ $(GETTEXT): $(GETTEXTDEP)
 	mkdir -p intl
 ifeq ($(GV),11)
 	echo n | gettextize --force --intl --no-changelog
-#	cp po/Makevars.template po/Makevars
+	test -e po/Makevars || cp po/Makevars.template po/Makevars
 	rm -f ChangeLog *~
 else
 	echo n | gettextize -f
