@@ -103,6 +103,7 @@ private:
     void updateBackupStamps();
     void startupNcpd();
     void removeOldBackups(QStringList &drives);
+    void syncTime(QString uid);
 
     rfsv *plpRfsv;
     rpcs *plpRpcs;

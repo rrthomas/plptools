@@ -48,6 +48,7 @@ public:
 	OPT_LASTFULL = 11,
 	OPT_LASTINC = 12,
 	OPT_NCPDPATH = 13,
+	OPT_SYNCTIME = 14,
     };
 
     enum cfgDefaults {
@@ -58,7 +59,8 @@ public:
 	DEF_SERIALDEV = 4,
 	DEF_SERIALSPEED = 5,
 	DEF_BACKUPGEN = 6,
-	DEF_NCPDPATH = 13,
+	DEF_NCPDPATH = 7,
+	DEF_SYNCTIME = 8,
     };
 
     KPsionConfig();
@@ -70,7 +72,8 @@ public:
     const QString getSectionName(int);
     const QString getStrDefault(int);
     int getIntDefault(int);
-    int getIntervalDays(KConfig *config, int optIdx);
+    int getIntervalDays(KConfig *, int);
+    bool getBoolDefault(int);
 
 private:
     cfgMap optionNames;

@@ -43,6 +43,7 @@ KPsionConfig::KPsionConfig() {
     optionNames.insert(OPT_DRIVES, QString("Psion/Drives_%1"));
     optionNames.insert(OPT_LASTFULL, QString("Psion/LastFull_%1_%1"));
     optionNames.insert(OPT_LASTINC, QString("Psion/LastInc_%1_%1"));
+    optionNames.insert(OPT_SYNCTIME, QString("Psion/SyncTime_%1"));
 
     defaults.insert(DEF_INCINTERVAL, QString("1"));
     defaults.insert(DEF_FULLINTERVAL, QString("7"));
@@ -51,6 +52,7 @@ KPsionConfig::KPsionConfig() {
     defaults.insert(DEF_SERIALSPEED, QString("4"));
     defaults.insert(DEF_BACKUPGEN, QString("3"));
     defaults.insert(DEF_NCPDPATH, QString("ncpd"));
+    defaults.insert(DEF_SYNCTIME, QString("false"));
 }
 
 const QString KPsionConfig::
@@ -66,6 +68,14 @@ getIntDefault(int optIdx) {
     if (it == defaults.end())
 	return 0;
     return (*it).toInt();
+}
+
+bool KPsionConfig::
+getBoolDefault(int optIdx) {
+    cfgMap::Iterator it = defaults.find(optIdx);
+    if (it == defaults.end())
+	return false;
+    return ((*it).compare("true") == 0);
 }
 
 const QString KPsionConfig::

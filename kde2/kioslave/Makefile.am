@@ -1,5 +1,7 @@
 # $Id$
 
+libdir=$(kde_libraries)
+
 maintainer-clean-local:
 	rm -f Makefile.in
 

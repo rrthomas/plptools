@@ -35,13 +35,11 @@
 
 namespace LIBPLP {
 extern "C" {
-#include <intl.h>
-	void init_libplp_i18n() {
-#ifdef HAVE_BINDTEXTDOMAIN_CODESET
-		bind_textdomain_codeset(PACKAGE, "latin1");
-#endif
-		textdomain(PACKAGE);
-	}
+#include <plpintl.h>
+    void init_libplp_i18n() {
+	setlocale(LC_ALL, "");
+	textdomain(PACKAGE);
+    }
 };
 };
 

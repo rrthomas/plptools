@@ -1,4 +1,6 @@
 
+libdir=$(kde_libraries)
+
 INCLUDES = $(all_includes) -I$(top_srcdir)/lib
 LDFLAGS  = $(all_libraries)
 

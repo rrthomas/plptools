@@ -282,6 +282,10 @@ shouldQuit() {
 }
 
 void KPsionMainWindow::
+syncTime(QString uid) {
+}
+
+void KPsionMainWindow::
 queryPsion() {
     u_int32_t devbits;
     Enum <rfsv::errs> res;
@@ -352,6 +356,8 @@ queryPsion() {
     }
     statusBar()->changeItem(i18n("Connected to %1").arg(machineName),
 			    STID_CONNECTION);
+
+    syncTime(uid);
 
     if (args->isSet("autobackup")) {
 	// Check, if scheduled backups to perform
@@ -957,6 +963,9 @@ typedef QValueList<Barchive>ArchList;
 
 void KPsionMainWindow::
 removeOldBackups(QStringList &drives) {
+
+    if (!fullBackup)
+	return;
 
     KConfig *config = kapp->config();
     KPsionConfig pcfg;

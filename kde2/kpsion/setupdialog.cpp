@@ -34,6 +34,7 @@
 #include <klocale.h>
 #include <kfiledialog.h>
 #include <kmessagebox.h>
+#include <kstddirs.h>
 
 #include <qlayout.h>
 #include <qgroupbox.h>
@@ -360,20 +361,58 @@ slotDeleteMachine() {
 	).arg(mach).arg(nameEdit->text()));
     if (res != KMessageBox::Yes)
 	return;
+
+    QString bdir = bdirLabel->text() + "/" + mach;
+    QDir d(bdir);
+    if (d.exists()) {
+	d.setFilter(QDir::Files);
+	QStringList entries = d.entryList();
+	QStringList::Iterator ei;
+	for (ei = entries.begin(); ei != entries.end(); ++ei) {
+	    if (!d.remove(*ei)) {
+		KMessageBox::error(this,
+				   i18n("Could not remove backup file %1.").arg(*ei));
+		return;
+	    }
+	}
+	d.rmdir(bdir);
+    }
+
     machCombo->removeItem(machCombo->currentItem());
 
-    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_MACHNAME));
-    config->writeEntry(
-	pcfg.getOptionName(KPsionConfig::OPT_MACHNAME).arg(mach),
-	QString::null);
-    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_DRIVES));
-    config->writeEntry(
-	pcfg.getOptionName(KPsionConfig::OPT_DRIVES).arg(mach),
-	QString::null);
-    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_BACKUPDRIVES));
-    config->writeEntry(
-	pcfg.getOptionName(KPsionConfig::OPT_BACKUPDRIVES).arg(mach),
-	QString::null);
+    QStringList sl = config->readListEntry(
+	pcfg.getOptionName(KPsionConfig::OPT_DRIVES).arg(mach));
+    config->sync();
+
+    QString dcfgName =
+	KGlobal::dirs()->saveLocation("config", QString::null, false);
+    dcfgName += "kpsionrc";
+    KSimpleConfig dcfg(dcfgName);
+    dcfg.setGroup(pcfg.getSectionName(KPsionConfig::OPT_MACHNAME));
+    dcfg.deleteEntry(pcfg.getOptionName(
+	KPsionConfig::OPT_MACHNAME).arg(mach), false);
+    dcfg.setGroup(pcfg.getSectionName(KPsionConfig::OPT_DRIVES));
+    dcfg.deleteEntry(pcfg.getOptionName(
+	KPsionConfig::OPT_DRIVES).arg(mach), false);
+    dcfg.setGroup(pcfg.getSectionName(KPsionConfig::OPT_BACKUPDRIVES));
+    dcfg.deleteEntry(pcfg.getOptionName(
+	KPsionConfig::OPT_BACKUPDRIVES).arg(mach), false);
+    QStringList::Iterator it;
+    for (it = sl.begin(); it != sl.end(); it++) {
+	dcfg.setGroup(pcfg.getSectionName(KPsionConfig::OPT_LASTFULL));
+	dcfg.deleteEntry(pcfg.getOptionName(
+	    KPsionConfig::OPT_LASTFULL).arg(mach).arg(*it), false);
+	dcfg.setGroup(pcfg.getSectionName(KPsionConfig::OPT_LASTINC));
+	dcfg.deleteEntry(pcfg.getOptionName(
+	    KPsionConfig::OPT_LASTINC).arg(mach).arg(*it), false);
+    }
+    dcfg.sync();
+    config->reparseConfiguration();
+    config->setGroup(pcfg.getSectionName(KPsionConfig::OPT_UIDS));
+    sl = config->readListEntry(pcfg.getOptionName(KPsionConfig::OPT_UIDS));
+    sl.remove(mach);
+    config->writeEntry(pcfg.getOptionName(KPsionConfig::OPT_UIDS), sl);
+
     slotMachineChanged(-1);
 }
 
