@@ -36,6 +36,19 @@ public:
 	 */
 	uchar* getName();
 
+	/**
+	 * Set the installed drive.
+	 */
+	void setDrive(char drive);
+
+	/**
+	 * Set the number of installed files.
+	 */
+	void setFiles(int nFiles);
+
+	/**
+	 * Set the selected installation language.
+	 */
 	void setLanguage(int lang);
 
 	SISFileHeader m_header;

@@ -1005,7 +1005,13 @@ static long maskAttr;
 static char cplPath[1024];
 
 static char*
-filename_generator(const char *text, int state)
+filename_generator(
+#if (READLINE_VERSION >= 402)
+				   const char *text,
+#else
+				   char *text,
+#endif
+				   int state)
 {
     static int len;
     string tmp;
@@ -1042,7 +1048,13 @@ filename_generator(const char *text, int state)
 }
 
 static char *
-command_generator(const char *text, int state)
+command_generator(
+#if (READLINE_VERSION >= 402)
+		  const char *text,
+#else
+		  char *text,
+#endif
+		  int state)
 {
     static int idx, len;
     char *name;
@@ -1077,7 +1089,16 @@ do_completion(const char *text, int start, int end)
     rl_completion_entry_function = FUNCAST(null_completion);
     rl_completion_append_character = ' ';
     if (start == 0)
+	{
+#if HAVE_LIBREADLINE
+# if (READLINE_VERSION >= 402)
 	matches = MATCHFUNCTION(text, command_generator);
+# else
+	char* txt = (char*)text;
+	matches = MATCHFUNCTION(txt, (CPFunction*)command_generator);
+# endif
+#endif
+	}
     else {
 	int idx = 0;
 	char *name;
@@ -1105,7 +1126,16 @@ do_completion(const char *text, int start, int end)
 		maskAttr = rfsv::PSI_A_DIR;
 	}
 
+#if HAVE_LIBREADLINE
+# if (READLINE_VERSION >= 402)
 	matches = MATCHFUNCTION(text, filename_generator);
+# else
+	{
+	char* txt = (char*)text;
+	matches = MATCHFUNCTION(txt, (CPFunction*)filename_generator);
+	}
+# endif
+#endif
     }
     return matches;
 }

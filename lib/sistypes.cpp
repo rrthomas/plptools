@@ -35,18 +35,20 @@ uint16 calcCRC(uchar* data, int len)
 	return crc;
 }
 
-uint16 read16(uchar* buf, int* ix)
+uint16 read16(uchar* p)
 {
-	uchar* p = buf + *ix;
-	*ix += 2;
 	return p[0] | (p[1] << 8);
 }
 
-uint32 read32(uchar* buf, int* ix)
+uint32 read32(uchar* p)
 {
-	uchar* p = buf + *ix;
-	*ix += 4;
 	return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}
+
+void write16(uchar* p, int val)
+{
+	p[0] = val & 255;
+	p[1] = (val >> 8) & 255;
 }
 
 LangTableEntry langTable[] =

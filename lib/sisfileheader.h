@@ -15,6 +15,16 @@ public:
 	 */
 	void fillFrom(uchar* buf, int* base);
 
+	/**
+	 * Update the drive letter, and patch the parsed buffer.
+	 */
+	void setDrive(char drive);
+
+	/**
+	 * Update the number of installed files, and patch the parsed buffer.
+	 */
+	void setFiles(int nFiles);
+
 	enum FileOptions {
 		op_isUnicode = 1,
 		op_isDistributable = 2,
@@ -57,6 +67,11 @@ public:
 	uint32 m_reqPtr;
 	uint32 m_unknown;
 	uint32 m_componentPtr;
+
+private:
+
+	uchar* m_buf;
+
 };
 
 #endif

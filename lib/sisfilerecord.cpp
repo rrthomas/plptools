@@ -7,36 +7,39 @@
 void
 SISFileRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
 {
-	int ix = *base;
-	m_flags = read32(buf, &ix);
+	uchar* p = buf + *base;
+	int size = 0;
+	m_flags = read32(p);
 	if (logLevel >= 2)
 		printf("Got flags %d\n", m_flags);
-	m_fileType = read32(buf, &ix);
+	m_fileType = read32(p + 4);
 	if (logLevel >= 2)
 		printf("Got file type %d\n", m_fileType);
-	m_fileDetails = read32(buf, &ix);
+	m_fileDetails = read32(p + 8);
 	if (logLevel >= 2)
 		printf("Got file details %d\n", m_fileDetails);
-	m_sourceLength = read32(buf, &ix);
-	m_sourcePtr = read32(buf, &ix);
+	m_sourceLength = read32(p + 12);
+	m_sourcePtr = read32(p + 16);
 //	printf("Got source length = %d, source name ptr = %d\n",
 //		   m_sourceLength, m_sourcePtr);
 	if (logLevel >= 2)
 		if (m_sourceLength > 0)
 			printf("Got source name %.*s\n", m_sourceLength, buf + m_sourcePtr);
-	m_destLength = read32(buf, &ix);
-	m_destPtr = read32(buf, &ix);
+	m_destLength = read32(p + 20);
+	m_destPtr = read32(p + 24);
 //	printf("Got dest length = %d, dest name ptr = %d\n",
 //		   m_destLength, m_destPtr);
 	if (logLevel >= 2)
 		printf("Got destination name %.*s\n", m_destLength, buf + m_destPtr);
+	size = 28;
 	switch (m_flags)
 		{
 		case 0: // Only one file.
 			m_fileLengths = new uint32[1];
 			m_filePtrs = new uint32[1];
-			m_fileLengths[0] = read32(buf, &ix);
-			m_filePtrs[0] = read32(buf, &ix);
+			m_fileLengths[0] = read32(p + size);
+			m_filePtrs[0] = read32(p + size + 4);
+			size += 8;
 			if (logLevel >= 2)
 				printf("File is %d bytes long (at %d) (to %d)\n",
 					   m_fileLengths[0], m_filePtrs[0],
@@ -57,11 +60,13 @@ SISFileRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
 			m_filePtrs = new uint32[n];
 			for (int i = 0; i < n; ++i)
 				{
-				m_fileLengths[i] = read32(buf, &ix);
+				m_fileLengths[i] = read32(p + size);
+				size += 4;
 				}
 			for (int i = 0; i < n; ++i)
 				{
-				m_filePtrs[i] = read32(buf, &ix);
+				m_filePtrs[i] = read32(p + size);
+				size += 4;
 				int len = m_fileLengths[i];
 				if (logLevel >= 2)
 					printf("File %d (for %s) is %d bytes long (at %d)\n",
@@ -84,6 +89,6 @@ SISFileRecord::fillFrom(uchar* buf, int* base, SISFile* sisFile)
 			if (logLevel >= 2)
 				printf("Unknown file flags %d\n", m_flags);
 		}
-	*base = ix;
+	*base += size;
 }
 

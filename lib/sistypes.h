@@ -5,9 +5,11 @@ typedef unsigned short uint16;
 typedef unsigned int uint32;
 typedef unsigned char uchar;
 
-extern uint16 read16(uchar* buf, int* ix);
+extern uint16 read16(uchar* p);
 
-extern uint32 read32(uchar* buf, int* ix);
+extern uint32 read32(uchar* p);
+
+extern void write16(uchar* p, int val);
 
 extern void createCRCTable();
 

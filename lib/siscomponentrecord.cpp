@@ -13,7 +13,8 @@ SISComponentNameRecord::~SISComponentNameRecord()
 void
 SISComponentNameRecord::fillFrom(uchar* buf, int base, SISFile* sisFile)
 {
-	int ix = base;
+	uchar* p = buf + base;
+	int size = 0;
 
 	int n = sisFile->m_header.m_nlangs;
 	m_nameLengths = new uint32[n];
@@ -24,14 +25,16 @@ SISComponentNameRecord::fillFrom(uchar* buf, int base, SISFile* sisFile)
 	//
 	for (int i = 0; i < n; ++i)
 		{
-		m_nameLengths[i] = read32(buf, &ix);
+		m_nameLengths[i] = read32(p + size);
+		size += 4;
 		}
 
 	// Then read ptrs.
 	//
 	for (int i = 0; i < n; ++i)
 		{
-		m_namePtrs[i] = read32(buf, &ix);
+		m_namePtrs[i] = read32(p + size);
+		size += 4;
 		if (logLevel >= 2)
 			printf("Name %d (for %s) is %.*s\n",
 				   i,
@@ -44,7 +47,7 @@ SISComponentNameRecord::fillFrom(uchar* buf, int base, SISFile* sisFile)
 		m_names[i][len] = 0;
 		}
 	if (logLevel >= 1)
-		printf("%d .. %d (%d bytes): Name records\n", base, ix, ix - base);
+		printf("%d .. %d (%d bytes): Name records\n", base, base + size, size);
 }
 
 uchar*

@@ -65,6 +65,18 @@ SISFile::getName()
 }
 
 void
+SISFile::setDrive(char drive)
+{
+	m_header.setDrive(drive);
+}
+
+void
+SISFile::setFiles(int nFiles)
+{
+	m_header.setFiles(nFiles);
+}
+
+void
 SISFile::setLanguage(int lang)
 {
 	m_header.m_installationLanguage = lang;
