@@ -2,6 +2,7 @@
 #define _rfsv_h_
 
 #include <deque>
+#include <string>
 #include "Enum.h"
 #include "plpdirent.h"
 #include "bufferstore.h"
@@ -291,13 +292,11 @@ class rfsv {
 		 * Retrieves attributes, size and modification time of a file on the Psion.
 		 *
 		 * @param name The name of the file.
-		 * @param attr The file's attributes are returned here.
-		 * @param size The file's size in bytes is returned here.
-		 * @param time The file's modification time is returned here.
+		 * @param e @ref PlpDirent object, filled with the information on return.
 		 *
 		 * @returns A Psion error code (One of enum @ref #errs ).
 		 */
-		virtual Enum<errs> fgeteattr(const char * const name, long &attr, long &size, PsiTime &time) =0; 
+		virtual Enum<errs> fgeteattr(const char * const name, PlpDirent &e) =0; 
 
 		/**
 		 * @param name
@@ -541,7 +540,7 @@ class rfsv {
 		 * @returns Pointer to static textual representation of file attributes.
 		 *
 		 */
-		const char * const attr2String(const long attr);
+		string attr2String(const long attr);
 
 		/**
 		 * Converts an open-mode (A combination of the PSI_O_ constants.)
@@ -553,6 +552,12 @@ class rfsv {
 		 *          @ref fopen , @ref fcreatefile and @freplacefile.
 		 */
 		virtual long opMode(const long mode) = 0;
+
+		/**
+		 * Utility method, converts '/' to '\'.
+		 */
+		static string convertSlash(const string &name);
+
 protected:
 		/**
 		 * Retrieves the PLP protocol name. Mainly internal use.

@@ -19,7 +19,7 @@ public:
 	Enum<rfsv::errs> remove(const char * const);
 	Enum<rfsv::errs> rename(const char * const, const char * const);
 	Enum<rfsv::errs> mktemp(long &, char * const);
-	Enum<rfsv::errs> fgeteattr(const char * const, long &, long &, PsiTime &);
+	Enum<rfsv::errs> fgeteattr(const char * const, PlpDirent &);
 	Enum<rfsv::errs> fgetattr(const char * const, long &);
 	Enum<rfsv::errs> fsetattr(const char * const, const long, const long);
 	Enum<rfsv::errs> fgetmtime(const char * const, PsiTime &);
@@ -159,7 +159,6 @@ private:
 	// Communication
 	bool sendCommand(enum commands, bufferStore &);
 	Enum<rfsv::errs> getResponse(bufferStore &);
-	char *convertSlash(const char *);
 
 	// time-conversion
 	// unsigned long micro2time(unsigned long, unsigned long);

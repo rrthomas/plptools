@@ -16,7 +16,7 @@ public:
 	Enum<rfsv::errs> fgetmtime(const char * const, PsiTime &);
 	Enum<rfsv::errs> fsetmtime(const char * const, const PsiTime);
 	Enum<rfsv::errs> fgetattr(const char * const, long &);
-	Enum<rfsv::errs> fgeteattr(const char * const, long &, long &, PsiTime &);
+	Enum<rfsv::errs> fgeteattr(const char * const, PlpDirent &);
 	Enum<rfsv::errs> fsetattr(const char * const, const long seta, const long unseta);
 	Enum<rfsv::errs> dircount(const char * const, long &);
 	Enum<rfsv::errs> devlist(long &);
@@ -99,7 +99,6 @@ private:
   
 
 	// Miscellaneous
-	Enum<rfsv::errs> convertName(const char*, char *);
 	Enum<rfsv::errs> fopendir(const char * const, long &);
 	long attr2std(const long);
 	long std2attr(const long);

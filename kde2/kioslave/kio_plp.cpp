@@ -25,6 +25,7 @@
 
 #include "kio_plp.h"
 
+#include <iomanip>
 #include <stdio.h>
 #include <sys/stat.h>
 
@@ -33,6 +34,7 @@
 #include <kinstance.h>
 #include <kdebug.h>
 #include <klocale.h>
+#include <kconfig.h>
 
 #include <rfsvfactory.h>
 #include <bufferarray.h>
@@ -99,6 +101,10 @@ removeFirstPart(const QString& path, QString &removed) {
 
 PLPProtocol::PLPProtocol (const QCString &pool, const QCString &app)
 	:SlaveBase("psion", pool, app), plpRfsv(0), plpRfsvSocket(0) {
+
+	kdDebug(PLP_DEBUGAREA) << "PLPProtocol::PLPProtocol(" << pool << "," 
+			       << app << ")" << endl;
+
 	currentHost = "";
 	struct servent *se = getservbyname("psion", "tcp");
 	endservent();
@@ -106,7 +112,45 @@ PLPProtocol::PLPProtocol (const QCString &pool, const QCString &app)
 		currentPort = ntohs(se->s_port);
 	else
 		currentPort = DPORT;
-	kdDebug(PLP_DEBUGAREA) << "PLP::PLP: -" << pool << "-" << endl;
+
+	typedef QMap<QString,QString> UIDMap;
+	KConfig *cfg = new KConfig("kioslaverc");
+
+	UIDMap uids = cfg->entryMap("Psion/UIDmapping");
+	if (uids.isEmpty()) {
+		cfg->setGroup("Psion/UIDmapping");
+		// Builtin application types.
+		cfg->writeEntry("uid-10000037-1000006D-1000007F",
+				"application/x-psion-word");
+		cfg->writeEntry("uid-10000037-1000006D-10000088",
+				"application/x-psion-sheet");
+		cfg->writeEntry("uid-10000037-1000006D-1000006d",
+				"application/x-psion-record");
+		cfg->writeEntry("uid-10000037-1000006D-1000007d",
+				"application/x-psion-sketch");
+		cfg->writeEntry("uid-10000037-1000006D-10000085",
+				"application/x-psion-opl");
+		cfg->writeEntry("uid-10000050-1000006D-10000084",
+				"application/x-psion-agenda");
+		cfg->writeEntry("uid-10000050-1000006D-10000086",
+				"application/x-psion-data");
+		cfg->sync();
+		uids = cfg->entryMap("Psion/UIDmapping");
+	}
+	for (UIDMap::Iterator uit = uids.begin(); uit != uids.end(); ++uit) {
+		long u1, u2, u3;
+
+		sscanf(uit.key().data(), "uid-%08X-%08X-%08X", &u1, &u2, &u3);
+		puids.insert(PlpUID(u1, u2, u3), uit.data());
+	}
+#if 0
+	cout << "uids:" << endl;
+	for (UidMap::Iterator it = puids.begin(); it != puids.end(); it++) {
+		cout << "UID: " << hex << setw(8) << setfill('0') << it.key().uid[0]
+		     << it.key().uid[1] << it.key().uid[2] << dec << "->" <<
+			 it.data() << endl;
+	}
+#endif
 }
 
 PLPProtocol::~PLPProtocol() {
@@ -135,9 +179,9 @@ isDrive(const QString& path) {
 	for (QStringList::Iterator it = drives.begin(); it != drives.end(); it++) {
 		QString cmp = "/" + *it;
 		if (cmp == tmp)
-			return TRUE;
+			return true;
 	}
-	return FALSE;
+	return false;
 }
 
 bool PLPProtocol::
@@ -220,6 +264,19 @@ checkConnection() {
 	return (plpRfsv == 0);
 }
 
+QString PLPProtocol::
+uid2mime(PlpDirent &e) {
+	QString tmp;
+	PlpUID u = e.getUID();
+	UidMap::Iterator it = puids.find(u);
+
+	if (it != puids.end())
+		tmp = it.data();
+	else
+		tmp.sprintf("application/x-psion-uid-%08X-%08X-%08X", u[0], u[1], u[2]);
+	return tmp;
+}
+
 void PLPProtocol::
 listDir(const KURL& _url) {
 	KURL url(_url);
@@ -268,6 +325,7 @@ listDir(const KURL& _url) {
 	UDSEntry entry;
 	for (int i = 0; i < files.size(); i++) {
 		UDSAtom atom;
+
 		PlpDirent e = files[i];
 		long attr = e.getAttr();
 
@@ -276,9 +334,13 @@ listDir(const KURL& _url) {
 		atom.m_str = e.getName();
 		entry.append(atom);
 
-		if (rom)
-			attr |= rfsv::PSI_A_RDONLY;
-		completeUDSEntry(entry, attr, e.getSize(), e.getPsiTime().getTime());
+		if ((attr & rfsv::PSI_A_DIR) == 0) {
+			atom.m_uds = KIO::UDS_MIME_TYPE;
+			atom.m_str = uid2mime(e);
+			entry.append(atom);
+		}
+
+		completeUDSEntry(entry, e, rom);
 		listEntry(entry, false);
 	}
 	listEntry(entry, true); // ready
@@ -306,20 +368,17 @@ createVirtualDirEntry(UDSEntry & entry, bool rdonly) {
 
 bool PLPProtocol::
 emitTotalSize(QString &name) {
-	long attr;
-	long size;
-	bool err;
-	PsiTime time;
+	PlpDirent e;
 
-	Enum<rfsv::errs> res = plpRfsv->fgeteattr(name, attr, size, time);
+	Enum<rfsv::errs> res = plpRfsv->fgeteattr(name, e);
 	if (checkForError(res))
 		return true;
-	totalSize(size);
+	totalSize(e.getSize());
 	return false;
 }
 
 void PLPProtocol::
-stat( const KURL & url) {
+stat(const KURL & url) {
 	QString path(QFile::encodeName(url.path()));
 	UDSEntry entry;
 	UDSAtom atom;
@@ -351,33 +410,67 @@ stat( const KURL & url) {
 		return;
 	}
 
-	long attr, size;
-	PsiTime time;
-	Enum<rfsv::errs> res = plpRfsv->fgeteattr(path, attr, size, time);
+	PlpDirent e;
+
+	Enum<rfsv::errs> res = plpRfsv->fgeteattr(path, e);
 	if (checkForError(res))
 		return;
-	if (rom)
-		attr |= rfsv::PSI_A_RDONLY;
 
 	atom.m_uds = KIO::UDS_NAME;
 	atom.m_str = fileName;
 	entry.append(atom);
-	completeUDSEntry(entry, attr, size, time.getTime());
+	completeUDSEntry(entry, e, rom);
 	statEntry(entry);
 
 	finished();
 }
 
 void PLPProtocol::
-completeUDSEntry(UDSEntry& entry, const long attr, const long size, const time_t date) {
+mimetype(const KURL & url) {
+	QString path(QFile::encodeName(url.path()));
+	UDSEntry entry;
 	UDSAtom atom;
 
+	if (checkConnection())
+		return;
+
+	kdDebug(PLP_DEBUGAREA) << "mimetype(" << path << ")" << endl;
+	stripTrailingSlash(path);
+
+	if (isRoot(path) || isDrive(path)) {
+		mimeType("inode/directory");
+		finished();
+		return;
+	}
+	convertName(path);
+
+	if (path.isEmpty()) {
+		error(ERR_DOES_NOT_EXIST, path);
+		return;
+	}
+
+	PlpDirent e;
+	Enum<rfsv::errs> res = plpRfsv->fgeteattr(path, e);
+	if (checkForError(res))
+		return;
+	mimeType(uid2mime(e));
+	finished();
+}
+
+void PLPProtocol::
+completeUDSEntry(UDSEntry& entry, PlpDirent &e, bool rom) {
+	UDSAtom atom;
+	long attr = e.getAttr();
+
+	if (rom)
+		attr |= rfsv::PSI_A_RDONLY;
+
 	atom.m_uds = KIO::UDS_SIZE;
-	atom.m_long = size;
+	atom.m_long = e.getSize();
 	entry.append(atom);
 
 	atom.m_uds = KIO::UDS_MODIFICATION_TIME;
-	atom.m_long = date;
+	atom.m_long = e.getPsiTime().getTime();
 	entry.append(atom);
 
 	atom.m_uds = KIO::UDS_ACCESS;
@@ -392,7 +485,7 @@ completeUDSEntry(UDSEntry& entry, const long attr, const long size, const time_t
 	atom.m_long = (attr & rfsv::PSI_A_DIR) ? S_IFDIR : S_IFREG;
 	entry.append(atom);
 
-#if 0
+#if 1
 	KIO::UDSEntry::ConstIterator it = entry.begin();
 	for( ; it != entry.end(); it++ ) {
 		switch ((*it).m_uds) {
@@ -504,9 +597,9 @@ checkForError(Enum<rfsv::errs> res) {
 				error(ERR_UNKNOWN, text);
 				break;
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 void PLPProtocol::

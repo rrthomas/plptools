@@ -116,30 +116,35 @@ Enum<rfsv::errs> rfsv::getStatus(void) {
 	return status;
 }
 
-// beware this returns static data
-const char * const rfsv::
+string rfsv::
+convertSlash(const string &name)
+{
+	string tmp = "";
+	for (const char *p = name.c_str(); *p; p++)
+		tmp += (*p == '/') ? '\\' : *p;
+	return tmp;
+}
+
+string rfsv::
 attr2String(const long attr)
 {
-	static char buf[11];
-	buf[0] = ((attr & PSI_A_DIR) ? 'd' : '-');
-	buf[1] = ((attr & PSI_A_READ) ? 'r' : '-');
-	buf[2] = ((attr & PSI_A_RDONLY) ? '-' : 'w');
-	buf[3] = ((attr & PSI_A_HIDDEN) ? 'h' : '-');
-	buf[4] = ((attr & PSI_A_SYSTEM) ? 's' : '-');
-	buf[5] = ((attr & PSI_A_ARCHIVE) ? 'a' : '-');
-	buf[6] = ((attr & PSI_A_VOLUME) ? 'v' : '-');
+	string tmp = "";
+	tmp += ((attr & PSI_A_DIR) ? 'd' : '-');
+	tmp += ((attr & PSI_A_READ) ? 'r' : '-');
+	tmp += ((attr & PSI_A_RDONLY) ? '-' : 'w');
+	tmp += ((attr & PSI_A_HIDDEN) ? 'h' : '-');
+	tmp += ((attr & PSI_A_SYSTEM) ? 's' : '-');
+	tmp += ((attr & PSI_A_ARCHIVE) ? 'a' : '-');
+	tmp += ((attr & PSI_A_VOLUME) ? 'v' : '-');
 
 	// EPOC
-	buf[7] = ((attr & PSI_A_NORMAL) ? 'n' : '-');
-	buf[8] = ((attr & PSI_A_TEMP) ? 't' : '-');
-	buf[9] = ((attr & PSI_A_COMPRESSED) ? 'c' : '-');
-
+	tmp += ((attr & PSI_A_NORMAL) ? 'n' : '-');
+	tmp += ((attr & PSI_A_TEMP) ? 't' : '-');
+	tmp += ((attr & PSI_A_COMPRESSED) ? 'c' : '-');
 	// SIBO
-	buf[7] = ((attr & PSI_A_EXEC) ? 'x' : buf[7]);
-	buf[8] = ((attr & PSI_A_STREAM) ? 'b' : buf[8]);
-	buf[9] = ((attr & PSI_A_TEXT) ? 't' : buf[9]);
-
-	buf[10] = '\0';
-	return (char *) (&buf);
+	tmp[7] = ((attr & PSI_A_EXEC) ? 'x' : tmp[7]);
+	tmp[8] = ((attr & PSI_A_STREAM) ? 'b' : tmp[8]);
+	tmp[9] = ((attr & PSI_A_TEXT) ? 't' : tmp[9]);
+	return tmp;
 }
 

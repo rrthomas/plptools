@@ -5,6 +5,23 @@
 #include <psitime.h>
 #include <rfsv.h>
 
+class PlpUID
+{
+	friend inline bool operator<(const PlpUID &u1, const PlpUID &u2);
+public:
+	PlpUID();
+	PlpUID(const long u1, const long u2, const long u3);
+
+	long operator[](int idx);
+
+private:
+	long uid[3];
+};
+
+inline bool operator<(const PlpUID &u1, const PlpUID &u2) {
+	return (memcmp(u1.uid, u2.uid, sizeof(u1.uid)) < 0);
+}
+
 /**
  * A class, representing a directory entry of the Psion.
  * Objects of this type are used by @ref rfsv::readdir and
@@ -58,6 +75,13 @@ public:
 	long getUID(int uididx);
 
 	/**
+	 * Retrieves the @ref PlpUID object of a directory entry.
+	 *
+	 * @returns The PlpUID object.
+	 */
+	PlpUID &getUID();
+
+	/**
 	 * Retrieve the file name of a directory entry.
 	 *
 	 * @returns The name of the file.
@@ -102,7 +126,7 @@ public:
 private:
 	long    size;
 	long    attr;
-	long    uid[3];
+	PlpUID  UID;
 	PsiTime time;
 	string  attrstr;
 	string  name;

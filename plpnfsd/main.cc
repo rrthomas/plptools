@@ -393,12 +393,14 @@ long rfsv_setattr(const char *name, long sattr, long dattr) {
 
 long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
 	long res;
-	PsiTime pt;
+	PlpDirent e;
 	
 	if (!a)
 		return -1;
-	res = a->fgeteattr(name, *attr, *size, pt);
-	*time = pt.getTime();
+	res = a->fgeteattr(name, e);
+	*attr = e.getAttr();
+	*size = e.getSize();
+	*time = e.getPsiTime().getTime();
 	return res;
 }
 

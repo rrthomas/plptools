@@ -28,50 +28,55 @@
 #include <rfsv.h>
 #include <ppsocket.h>
 
+typedef QMap<PlpUID,QString> UidMap;
+
 class PLPProtocol : public KIO::SlaveBase
 {
-   public:
-      PLPProtocol (const QCString &pool, const QCString &app );
-      virtual ~PLPProtocol();
+public:
+	PLPProtocol (const QCString &pool, const QCString &app);
+	virtual ~PLPProtocol();
+	
+	virtual void openConnection();
+	virtual void closeConnection();
 
-      virtual void openConnection();
-      virtual void closeConnection();
+	virtual void setHost(const QString& host, int port, const QString&, const QString&);
 
-      virtual void setHost( const QString& host, int port, const QString& user, const QString& pass );
+	virtual void put(const KURL& url, int _mode,bool _overwrite, bool _resume);
+	virtual void get(const KURL& url);
+	virtual void listDir(const KURL& url);
+	virtual void stat(const KURL & url);
+	virtual void mimetype(const KURL & url);
+	virtual void mkdir(const KURL& url, int permissions);
+	virtual void del(const KURL& url, bool isfile);
+	virtual void chmod(const KURL& url, int permissions);
+	virtual void rename(const KURL &src, const KURL &dest, bool overwrite);
+	virtual void copy(const KURL& src, const KURL &dest, int mode, bool overwrite );
 
-      virtual void put( const KURL& url, int _mode,bool _overwrite, bool _resume );
-      virtual void get( const KURL& url );
-      virtual void listDir( const KURL& url);
-      virtual void stat( const KURL & url);
-      virtual void mkdir( const KURL& url, int permissions );
-      virtual void del( const KURL& url, bool isfile);
-      virtual void chmod(const KURL& url, int permissions );
-      virtual void rename(const KURL &src, const KURL &dest, bool overwrite);
-      virtual void copy( const KURL& src, const KURL &dest, int mode, bool overwrite );
+	void calcprogress(long total);
+private:
+	bool checkConnection();
 
-      void calcprogress(long total);
-   private:
-      bool checkConnection();
+	char driveChar(const QString& path);
 
-      char driveChar(const QString& path);
+	void createVirtualDirEntry(KIO::UDSEntry & entry, bool rdonly);
+	void completeUDSEntry(KIO::UDSEntry& entry, PlpDirent &e, bool rom);
+	bool checkForError(Enum<rfsv::errs> res);
+	bool isRomDrive(const QString& path);
+	bool isDrive(const QString& path);
+	bool isRoot(const QString& path);
+	void convertName(QString &path);
+	bool emitTotalSize(QString &name);
+	QString uid2mime(PlpDirent &e);
 
-      void createVirtualDirEntry(KIO::UDSEntry & entry, bool rdonly);
-      void completeUDSEntry(KIO::UDSEntry& entry, const long attr, const long size, const time_t date);
-      bool checkForError(Enum<rfsv::errs> res);
-      bool isRomDrive(const QString& path);
-      bool isDrive(const QString& path);
-      bool isRoot(const QString& path);
-      void convertName(QString &path);
-      bool emitTotalSize(QString &name);
-
-      rfsv *plpRfsv;
-      ppsocket *plpRfsvSocket;
-      QStringList drives;
-      QMap<QString,char> drivechars;
-      QString currentHost;
-      int    currentPort;
-      time_t t_last;
-      time_t t_start;
+	rfsv *plpRfsv;
+	ppsocket *plpRfsvSocket;
+	QStringList drives;
+	QMap<QString,char> drivechars;
+	UidMap puids; 
+	QString currentHost;
+	int    currentPort;
+	time_t t_last;
+	time_t t_start;
 };
 
 #endif

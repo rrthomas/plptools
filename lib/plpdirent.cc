@@ -2,11 +2,25 @@
 #include <stream.h>
 #include <iomanip>
 
+PlpUID::PlpUID() {
+	memset(uid, 0, sizeof(uid));
+}
+
+PlpUID::PlpUID(const long u1, const long u2, const long u3) {
+	uid[0] = u1; uid[1] = u2; uid[2] = u3;
+}
+
+long PlpUID::
+operator[](int idx) {
+	assert ((idx > -1) && (idx < 3));
+	return uid[idx];
+}
+
 PlpDirent::PlpDirent(const PlpDirent &e) {
 	size    = e.size;
 	attr    = e.attr;
 	time    = e.time;
-	memcpy(uid, e.uid, sizeof(uid));
+	UID     = e.UID;
 	name    = e.name;
 	attrstr = e.attrstr;
 }
@@ -24,8 +38,13 @@ getAttr() {
 long PlpDirent::
 getUID(int uididx) {
 	if ((uididx >= 0) && (uididx < 4))
-		return uid[uididx];
+		return UID[uididx];
 	return 0;
+}
+
+PlpUID &PlpDirent::
+getUID() {
+	return UID;
 }
 
 const char *PlpDirent::
@@ -48,7 +67,7 @@ operator=(const PlpDirent &e) {
 	size    = e.size;
 	attr    = e.attr;
 	time    = e.time;
-	memcpy(uid, e.uid, sizeof(uid));
+	UID     = e.UID;
 	name    = e.name;
 	attrstr = e.attrstr;
 	return *this;

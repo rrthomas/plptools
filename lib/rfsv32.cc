@@ -44,25 +44,14 @@ rfsv32::rfsv32(ppsocket * _skt)
 	reset();
 }
 
-char *rfsv32::
-convertSlash(const char *name)
-{
-	char *n = strdup(name);
-	for (char *p = n; *p; p++)
-		if (*p == '/')
-			*p = '\\';
-	return n;
-}
-
 Enum<rfsv::errs> rfsv32::
 fopen(long attr, const char *name, long &handle)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
+	string n = convertSlash(name);
 	a.addDWord(attr);
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(OPEN_FILE, a))
 		return E_PSI_FILE_DISC;
 	Enum<rfsv::errs> res = getResponse(a);
@@ -91,11 +80,10 @@ Enum<rfsv::errs> rfsv32::
 fcreatefile(long attr, const char *name, long &handle)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
+	string n = convertSlash(name);
 	a.addDWord(attr);
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(CREATE_FILE, a))
 		return E_PSI_FILE_DISC;
 	Enum<rfsv::errs> res = getResponse(a);
@@ -108,11 +96,10 @@ Enum<rfsv::errs> rfsv32::
 freplacefile(const long attr, const char * const name, long &handle)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
+	string n = convertSlash(name);
 	a.addDWord(attr);
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(REPLACE_FILE, a))
 		return E_PSI_FILE_DISC;
 	Enum<rfsv::errs> res = getResponse(a);
@@ -125,11 +112,10 @@ Enum<rfsv::errs> rfsv32::
 fopendir(const long attr, const char * const name, long &handle)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
+	string n = convertSlash(name);
 	a.addDWord(attr | EPOC_ATTR_GETUID);
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(OPEN_DIR, a))
 		return E_PSI_FILE_DISC;
 	Enum<rfsv::errs> res = getResponse(a);
@@ -177,11 +163,9 @@ readdir(rfsvDirhandle &dH, PlpDirent &e) {
 		long shortLen   = dH.b.getDWord(0);
 		long longLen    = dH.b.getDWord(32);
 
-		e.attr = attr2std(dH.b.getDWord(4));
-		e.size = dH.b.getDWord(8);
-		e.uid[0]  = dH.b.getDWord(20);
-		e.uid[1]  = dH.b.getDWord(24);
-		e.uid[2]  = dH.b.getDWord(28);
+		e.attr    = attr2std(dH.b.getDWord(4));
+		e.size    = dH.b.getDWord(8);
+		e.UID     = PlpUID(dH.b.getDWord(20), dH.b.getDWord(24), dH.b.getDWord(28));
 		e.time    = PsiTime(dH.b.getDWord(16), dH.b.getDWord(12));
 		e.name    = "";
 		e.attrstr = string(attr2String(e.attr));
@@ -232,16 +216,14 @@ Enum<rfsv::errs> rfsv32::
 fgetmtime(const char * const name, PsiTime &mtime)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	string n = convertSlash(name);
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(MODIFIED, a))
 		return E_PSI_FILE_DISC;
 	Enum<rfsv::errs> res = getResponse(a);
 	if (res != E_PSI_GEN_NONE)
 		return res;
-	//mtime = micro2time(a.getDWord(4), a.getDWord(0));
 	mtime.setPsiTime(a.getDWord(4), a.getDWord(0));
 	return res;
 }
@@ -250,14 +232,11 @@ Enum<rfsv::errs> rfsv32::
 fsetmtime(const char * const name, PsiTime mtime)
 {
 	bufferStore a;
-	//unsigned long microLo, microHi;
-	char *n = convertSlash(name);
-	// time2micro(mtime, microHi, microLo);
+	string n = convertSlash(name);
 	a.addDWord(mtime.getPsiTimeLo());
 	a.addDWord(mtime.getPsiTimeHi());
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(SET_MODIFIED, a))
 		return E_PSI_FILE_DISC;
 	return getResponse(a);
@@ -267,10 +246,9 @@ Enum<rfsv::errs> rfsv32::
 fgetattr(const char * const name, long &attr)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	string n = convertSlash(name);
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(ATT, a))
 		return E_PSI_FILE_DISC;
 	Enum<rfsv::errs> res = getResponse(a);
@@ -281,29 +259,33 @@ fgetattr(const char * const name, long &attr)
 }
 
 Enum<rfsv::errs> rfsv32::
-fgeteattr(const char * const name, long &attr, long &size, PsiTime &time)
+fgeteattr(const char * const name, PlpDirent &e)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	string n = convertSlash(name);
+	a.addWord(n.size());
+	a.addString(n.c_str());
+	const char *p = strrchr(n.c_str(), '\\');
+	if (p)
+		p++;
+	else
+		p = n.c_str();
+	e.name = p;
+
 	if (!sendCommand(REMOTE_ENTRY, a))
 		return E_PSI_FILE_DISC;
 	Enum<rfsv::errs> res = getResponse(a);
 	if (res != E_PSI_GEN_NONE)
 		return res;
 	// long shortLen = a.getDWord(0);
-	attr = attr2std(a.getDWord(4));
-	size = a.getDWord(8);
-	//unsigned long modLow = a.getDWord(12);
-	//unsigned long modHi = a.getDWord(16);
-	// long uid1 = a.getDWord(20);
-	// long uid2 = a.getDWord(24);
-	// long uid3 = a.getDWord(28);
 	// long longLen = a.getDWord(32);
-	//time = micro2time(modHi, modLow);
-	time.setPsiTime(a.getDWord(16), a.getDWord(12));
+
+	e.attr    = attr2std(a.getDWord(4));
+	e.size    = a.getDWord(8);
+	e.UID     = PlpUID(a.getDWord(20), a.getDWord(24), a.getDWord(28));
+	e.time    = PsiTime(a.getDWord(16), a.getDWord(12));
+	e.attrstr = string(attr2String(e.attr));
+
 	return res;
 }
 
@@ -311,12 +293,11 @@ Enum<rfsv::errs> rfsv32::
 fsetattr(const char * const name, const long seta, const long unseta)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
+	string n = convertSlash(name);
 	a.addDWord(std2attr(seta));
 	a.addDWord(std2attr(unseta));
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(SET_ATT, a))
 		return E_PSI_FILE_DISC;
 	return getResponse(a);
@@ -557,13 +538,10 @@ copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 {
 	long handle_from;
 	long handle_to;
-	long attr;
-	long from_size;
-	long to_size;
-	PsiTime time;
+	PlpDirent from_e;
 	Enum<rfsv::errs> res;
 
-	if ((res = fgeteattr(from, attr, from_size, time)) != E_PSI_GEN_NONE)
+	if ((res = fgeteattr(from, from_e)) != E_PSI_GEN_NONE)
 		return res;
 	if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle_from))
 	    != E_PSI_GEN_NONE)
@@ -736,16 +714,11 @@ Enum<rfsv::errs> rfsv32::
 mkdir(const char *name)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
-	if (strlen(n) && (n[strlen(n) - 1] != '\\')) {
-		a.addWord(strlen(n) + 1);
-		a.addString(n);
-		a.addByte('\\');
-	} else {
-		a.addWord(strlen(n));
-		a.addString(n);
-	}
-	free(n);
+	string n = convertSlash(name);
+	if (n.find_last_of('\\') == (n.size() - 1))
+		n += '\\';
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(MK_DIR_ALL, a))
 		return E_PSI_FILE_DISC;
 	return getResponse(a);
@@ -755,16 +728,11 @@ Enum<rfsv::errs> rfsv32::
 rmdir(const char *name)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
-	if (strlen(n) && (n[strlen(n) - 1] != '\\')) {
-		a.addWord(strlen(n) + 1);
-		a.addString(n);
-		a.addByte('\\');
-	} else {
-		a.addWord(strlen(n));
-		a.addString(n);
-	}
-	free(n);
+	string n = convertSlash(name);
+	if (n.find_last_of('\\') == (n.size() - 1))
+		n += '\\';
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(RM_DIR, a))
 		return E_PSI_FILE_DISC;
 	return getResponse(a);
@@ -774,14 +742,12 @@ Enum<rfsv::errs> rfsv32::
 rename(const char *oldname, const char *newname)
 {
 	bufferStore a;
-	char *on = convertSlash(oldname);
-	char *nn = convertSlash(newname);
-	a.addWord(strlen(on));
-	a.addString(on);
-	a.addWord(strlen(nn));
-	a.addString(nn);
-	free(on);
-	free(nn);
+	string on = convertSlash(oldname);
+	string nn = convertSlash(newname);
+	a.addWord(on.size());
+	a.addString(on.c_str());
+	a.addWord(nn.size());
+	a.addString(nn.c_str());
 	if (!sendCommand(RENAME, a))
 		return E_PSI_FILE_DISC;
 	return getResponse(a);
@@ -791,10 +757,9 @@ Enum<rfsv::errs> rfsv32::
 remove(const char *name)
 {
 	bufferStore a;
-	char *n = convertSlash(name);
-	a.addWord(strlen(n));
-	a.addString(n);
-	free(n);
+	string n = convertSlash(name);
+	a.addWord(n.size());
+	a.addString(n.c_str());
 	if (!sendCommand(DELETE, a))
 		return E_PSI_FILE_DISC;
 	return getResponse(a);

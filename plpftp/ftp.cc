@@ -328,17 +328,13 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 			continue;
 		}
 		if (!strcmp(argv[0], "test") && (argc == 2)) {
-			long attr, size;
-			PsiTime time;
+			PlpDirent e;
 			strcpy(f1, psionDir);
 			strcat(f1, argv[1]);
-			if ((res = a.fgeteattr(f1, attr, size, time)) != rfsv::E_PSI_GEN_NONE)
+			if ((res = a.fgeteattr(f1, e)) != rfsv::E_PSI_GEN_NONE)
 				cerr << "Error: " << res << endl;
-			else {
-                               	cout << a.attr2String(attr);
-                               	cout << " " << dec << setw(10) << setfill(' ') << size;
-                               	cout << " " << time << " " << argv[1] << endl;
-			}
+			else
+                               	cout << e << endl;
 			continue;
 		}
 		if (!strcmp(argv[0], "gattr") && (argc == 2)) {
@@ -993,49 +989,40 @@ static char *remote_dir_commands[] = {
 
 static PlpDir comp_files;
 static long maskAttr;
-static char tmpPath[1024];
 static char cplPath[1024];
 
 static char*
 filename_generator(char *text, int state)
 {
 	static int len;
-
+	string tmp;
 
 	if (!state) {
-		char *p;
 		Enum<rfsv::errs> res;
 		len = strlen(text);
-		strcpy(tmpPath, psionDir);
-		strcat(tmpPath, cplPath);
-		for (p = tmpPath; *p; p++)
-			if (*p == '/')
-				*p = '\\';
-		if ((res = comp_a->dir(tmpPath, comp_files)) != rfsv::E_PSI_GEN_NONE) {
+		tmp = psionDir;
+		tmp += cplPath;
+		tmp = rfsv::convertSlash(tmp);
+		if ((res = comp_a->dir(tmp.c_str(), comp_files)) != rfsv::E_PSI_GEN_NONE) {
 			cerr << "Error: " << res << endl;
 			return NULL;
 		}
 	}
-	for (int i = 0; i < comp_files.size(); i++) {
-		PlpDirent e = comp_files[i];
+	while (!comp_files.empty()) {
+		PlpDirent e = comp_files.front();
 		long attr = e.getAttr();
-		char *p;
 
+		comp_files.pop_front();
 		if ((attr & maskAttr) == 0)
 			continue;
-		strcpy(tmpPath, cplPath);
-		strcat(tmpPath, e.getName());
-		for (p = tmpPath; *p; p++)
-			if (*p == '\\')
-				*p = '/';
-		if (!(strncmp(tmpPath, text, len))) {
-			char fnbuf[1024];
-			strcpy(fnbuf, tmpPath);
+		tmp = cplPath;
+		tmp += e.getName();
+		if (!(strncmp(tmp.c_str(), text, len))) {
 			if (attr & rfsv::PSI_A_DIR) {
 				rl_completion_append_character = '\0';
-				strcat(fnbuf, "/");
+				tmp += '/';
 			}
-			return (strdup(fnbuf));
+			return (strdup(tmp.c_str()));
 		}
 	}
 	return NULL;

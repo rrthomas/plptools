@@ -30,7 +30,7 @@
 #include <stream.h>
 #include <stdlib.h>
 #include <fstream.h>
-#include <iomanip.h>
+#include <iomanip>
 #include <time.h>
 #include <string>
 
@@ -50,55 +50,13 @@ rfsv16::rfsv16(ppsocket *_skt)
 }
 
 Enum<rfsv::errs> rfsv16::
-convertName(const char* orig, char *retVal)
-{
-	int len = strlen(orig);
-	char *temp = new char [len+1];
-
-	// FIXME: need to return 1 if OOM?
-	for (int i=0; i <= len; i++) {
-		if (orig[i] == '/')
-			temp[i] = '\\';
-		else
-			temp[i] = orig[i];
-	}
-
-	if (len == 0 || temp[1] != ':') {
-		// We can automatically supply a drive letter
-		strcpy(retVal, DDRIVE);
-
-		if (len == 0 || temp[0] != '\\') {
-			strcat(retVal, DBASEDIR);
-		}
-		else {
-			retVal[strlen(retVal)-1] = 0;
-		}
-
-		strcat(retVal, temp);
-	}
-	else {
-		strcpy(retVal, temp);
-	}
-
-	delete [] temp;
-	cout << retVal << endl;
-	return E_PSI_GEN_NONE;
-}
-
-Enum<rfsv::errs> rfsv16::
 fopen(long attr, const char *name, long &handle)
 { 
 	bufferStore a;
-	char realName[200];
-	Enum<rfsv::errs> rv = convertName(name, realName);
-	if (rv) return rv;
-
-	// FIXME: anything that calls fopen should NOT do the name
-	// conversion - it's just done here. 
+	string realName	= convertSlash(name);
 
 	a.addWord(attr & 0xFFFF);
-	a.addString(realName);
-	a.addByte(0x00); // Needs to be manually Null-Terminated.
+	a.addStringT(realName.c_str());
 	if (!sendCommand(FOPEN, a))
 		return E_PSI_FILE_DISC;
   
@@ -197,11 +155,11 @@ readdir(rfsvDirhandle &dH, PlpDirent &e) {
 			cerr << "dir: not version 2" << endl;
 			return E_PSI_GEN_FAIL;
 		}
-		e.attr = attr2std((long)dH.b.getWord(2));
-		e.size = dH.b.getDWord(4);
-		e.time = PsiTime((time_t)dH.b.getDWord(8));
-		e.name = dH.b.getString(16);
-		e.uid[0] = e.uid[1] = e.uid[2] = 0;
+		e.attr    = attr2std((long)dH.b.getWord(2));
+		e.size    = dH.b.getDWord(4);
+		e.time    = PsiTime((time_t)dH.b.getDWord(8));
+		e.name    = dH.b.getString(16);
+		// e.UID     = PlpUID(0,0,0);
 		e.attrstr = attr2String(e.attr);
 
 		dH.b.discardFirstBytes(17 + e.name.length());
@@ -295,11 +253,8 @@ fgetmtime(const char * const name, PsiTime &mtime)
 cerr << "rfsv16::fgetmtime" << endl;
 	// NB: fgetattr, fgeteattr is almost identical...
 	bufferStore a;
-	char realName[200];
-	Enum<rfsv::errs> rv = convertName(name, realName);
-	if (rv) return rv;
-	a.addString(realName);
-	a.addByte(0x00); 	// needs to be null-terminated, 
+	string realName = convertSlash(name);
+	a.addStringT(realName.c_str());
 				// and this needs sending in the length word.
 	if (!sendCommand(FINFO, a))
 		return E_PSI_FILE_DISC;
@@ -310,10 +265,6 @@ cerr << "rfsv16::fgetmtime" << endl;
 		return res;
 	}
 	else if (a.getLen() == 16) {
-		// struct timeval tv;
-		// tv.tv_sec = a.getDWord(8);
-		// tv.tv_usec = 0;
-		// mtime.setUnixTime(&tv);
 		mtime.setUnixTime(a.getDWord(8));
 		return res;
 	}
@@ -335,11 +286,8 @@ fgetattr(const char * const name, long &attr)
 {
 	// NB: fgetmtime, fgeteattr are almost identical...
 	bufferStore a;
-	char realName[200];
-	Enum<rfsv::errs> rv = convertName(name, realName);
-	if (rv) return rv;
-	a.addString(realName);
-	a.addByte(0x00); 	// needs to be null-terminated, 
+	string realName = convertSlash(name);
+	a.addStringT(realName.c_str());
 				// and this needs sending in the length word.
 	if (!sendCommand(FINFO, a))
 		return E_PSI_FILE_DISC;
@@ -358,28 +306,29 @@ fgetattr(const char * const name, long &attr)
 }
 
 Enum<rfsv::errs> rfsv16::
-fgeteattr(const char * const name, long &attr, long &size, PsiTime &time)
+fgeteattr(const char * const name, PlpDirent &e)
 {
 	bufferStore a;
-	char realName[200];
-	Enum<rfsv::errs> rv = convertName(name, realName);
-	if (rv) return rv;
-	a.addString(realName);
-	a.addByte(0x00); 	// needs to be null-terminated, 
-				// and this needs sending in the length word.
+	string realName = convertSlash(name);
+	a.addStringT(realName.c_str());
 	if (!sendCommand(FINFO, a))
 		return E_PSI_FILE_DISC;
-  
 	Enum<rfsv::errs> res = getResponse(a);
 	if (res != 0) {
 		cerr << "fgeteattr: Error " << res << " on file " << name << endl;
 		return res;
 	}
 	else if (a.getLen() == 16) {
-		attr = a.getWord(2);
-		size = a.getDWord(4);
-		time.setUnixTime(a.getDWord(8));
-		//time = a.getDWord(8);
+		const char *p = strrchr(realName.c_str(), '\\');
+		if (p)
+			p++;
+		else
+			p = realName.c_str();
+		e.name = p;
+		e.attr = a.getWord(2);
+		e.size = a.getDWord(4);
+		e.time = PsiTime(a.getDWord(8));
+		e.UID  = PlpUID(0,0,0);
 		return res;
 	}
 	cerr << "fgeteattr: Unknown response (" << name << ") " << a <<endl;
@@ -903,15 +852,11 @@ fseek(const long handle, const long pos, const long mode, long &resultpos)
 Enum<rfsv::errs> rfsv16::
 mkdir(const char* dirName)
 {
-	char realName[200];
-	Enum<rfsv::errs> res = convertName(dirName, realName);
-	if (res != E_PSI_GEN_NONE) return res;
+	string realName = convertSlash(dirName);
 	bufferStore a;
-	a.addString(realName);
-	a.addByte(0x00); 	// needs to be null-terminated, 
-				// and this needs sending in the length word.
+	a.addStringT(realName.c_str());
 	sendCommand(MKDIR, a);
-	res = getResponse(a);
+	Enum<rfsv::errs> res = getResponse(a);
 	if (res == E_PSI_GEN_NONE) {
 		// Correct response
 		return res;
@@ -932,21 +877,14 @@ Enum<rfsv::errs> rfsv16::
 rename(const char *oldName, const char *newName)
 {
 cerr << "rfsv16::rename ***" << endl;
-	char realOldName[200];
-	Enum<rfsv::errs> res = convertName(oldName, realOldName);
-	if (res != E_PSI_GEN_NONE) return res;
-	char realNewName[200];
-	res = convertName(newName, realNewName);
-	if (res != E_PSI_GEN_NONE) return res;
+
+	string realOldName = convertSlash(oldName);
+	string realNewName = convertSlash(newName);
 	bufferStore a;
-	a.addString(realOldName);
-	a.addByte(0x00); 	// needs to be null-terminated, 
-				// and this needs sending in the length word.
-	a.addString(realNewName);
-	a.addByte(0x00); 	// needs to be null-terminated, 
-				// and this needs sending in the length word.
+	a.addStringT(realOldName.c_str());
+	a.addStringT(realNewName.c_str());
 	sendCommand(RENAME, a);
-	res = getResponse(a);
+	Enum<rfsv::errs> res = getResponse(a);
 	if (res == E_PSI_GEN_NONE) {
 		// Correct response
 		return res;
@@ -958,12 +896,10 @@ cerr << "rfsv16::rename ***" << endl;
 Enum<rfsv::errs> rfsv16::
 remove(const char* psionName)
 {
-	char realName[200];
-	Enum<rfsv::errs> res = convertName(psionName, realName);
-	if (res != E_PSI_GEN_NONE) return res;
+	Enum<rfsv::errs> res;
+	string realName = convertSlash(psionName);
 	bufferStore a;
-	a.addString(realName);
-	a.addByte(0x00); 	// needs to be null-terminated, 
+	a.addStringT(realName.c_str());
 				// and this needs sending in the length word.
 	sendCommand(DELETE, a);
 	res = getResponse(a);
@@ -1054,5 +990,3 @@ std2attr(const long attr)
 
 	return res;
 }
-
-
