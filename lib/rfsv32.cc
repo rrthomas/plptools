@@ -915,7 +915,7 @@ long rfsv32::
 remove(const char *name)
 {
 	bufferStore a;
-	char *n = convertSlash(oldname);
+	char *n = convertSlash(name);
 	a.addWord(strlen(n));
 	a.addString(n);
 	free(n);
