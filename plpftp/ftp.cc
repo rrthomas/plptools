@@ -4,7 +4,7 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -208,7 +208,6 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
     Enum<rfsv::errs> res;
     bool prompt = true;
     bool hash = false;
-    bool S5mx = false;
     cpCallback_t cab = checkAbortNoHash;
     bool once = false;
 
@@ -230,13 +229,6 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		while (!b.empty())
 		    cout << "  " << b.pop().getString() << endl;
 		cout << endl;
-	    }
-	    if (machType == rpcs::PSI_MACH_S5) {
-		rpcs::machineInfo mi;
-		if ((res = r.getMachineInfo(mi)) == rfsv::E_PSI_GEN_NONE) {
-		    if (!strcmp(mi.machineName, "SERIES5mx"))
-			S5mx = true;
-		}
 	    }
 	} else
 	    cerr << _("OwnerInfo returned error ") << res << endl;
@@ -426,12 +418,16 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 
 		    if ((devbits & 1) != 0) {
 			if (a.devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE)
-			    cout << (char) ('A' + i) << "     " <<
-				hex << setw(4) << setfill('0') << drive.getMediaType() << " " <<
-				setw(12) << setfill(' ') << setiosflags(ios::left) <<
-				drive.getName().c_str() << resetiosflags(ios::left) << dec << setw(9) <<
-				drive.getSize() << setw(9) << drive.getSpace() << "  " << setw(8) << setfill('0') << hex <<
-				drive.getUID() << endl;
+			    cout << (char) ('A' + i) << "     " << hex
+				 << setw(4) << setfill('0')
+				 << drive.getMediaType() << " " << setw(12)
+				 << setfill(' ') << setiosflags(ios::left)
+				 << drive.getName().c_str()
+				 << resetiosflags(ios::left) << dec << setw(9)
+				 << drive.getSize() << setw(9)
+				 << drive.getSpace() << "  " << setw(8)
+				 << setfill('0') << hex << drive.getUID()
+				 << dec << endl;
 		    }
 		    devbits >>= 1;
 		}
@@ -476,7 +472,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		strcpy(dtmp, f1);
 		dname = dtmp;
 	    }
-		
+
 	    if ((res = a.dir(dname, files)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else
@@ -575,7 +571,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		dt += dsec;
 		stat(f2, &stbuf);
 		float cps = (float)(stbuf.st_size) / dt;
-		cout << _("Transfer complete, (") << stbuf.st_size
+		cout << _("Transfer complete, (") << dec << stbuf.st_size
 		     << _(" bytes in ") << dsec << "."
 		     << dhse << _(" secs = ") << cps << " cps)\n";
 	    }
@@ -666,7 +662,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		dt += dsec;
 		stat(f1, &stbuf);
 		float cps = (float)(stbuf.st_size) / dt;
-		cout << _("Transfer complete, (") << stbuf.st_size
+		cout << _("Transfer complete, (") << dec << stbuf.st_size
 		     << _(" bytes in ") << dsec << "."
 		     << dhse << _(" secs = ") << cps << " cps)\n";
 	    }
@@ -771,7 +767,8 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 #ifdef EXPERIMENTAL
 	if (!strcmp(argv[0], "x")) {
 	    u_int16_t hhh;
-	    if (r.regOpenIter(-1, "%PDF-", hhh) == rfsv::E_PSI_GEN_NONE) {
+	    if (r.regOpenIter((u_int32_t)-1, "%PDF-", hhh)
+		== rfsv::E_PSI_GEN_NONE) {
 		Enum<rfsv::errs> res;
 		while ((res = r.regReadIter(hhh)) == rfsv::E_PSI_GEN_NONE)
 			;;
@@ -795,7 +792,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		} else
 		    strcpy(argbuf, argv[i]);
 	    }
-	    if (argv[1][1] != ':') {
+	    if (!strchr(argv[1], ':')) {
 		strcpy(cmdbuf, psionDir);
 		strcat(cmdbuf, argv[1]);
 	    } else
@@ -926,8 +923,8 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    continue;
 	}
 	if (!strcmp(argv[0], "killsave") && (argc == 2)) {
-	    bufferArray tmp;
-	    if ((res = r.queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE)
+	    processList tmp;
+	    if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else {
 		ofstream op(argv[1]);
@@ -936,51 +933,31 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 		    continue;
 		}
 		op << "#plpftp processlist" << endl;
-		while (!tmp.empty()) {
-		    char pbuf[128];
-		    bufferStore cmdargs;
-		    bufferStore bs = tmp.pop();
-		    int pid = bs.getWord(0);
-		    const char *proc = bs.getString(2);
-		    if (S5mx)
-			sprintf(pbuf, "%s.$%02d", proc, pid);
-		    else
-			sprintf(pbuf, "%s.$%d", proc, pid);
-		    bs = tmp.pop();
-		    if (r.getCmdLine(pbuf, cmdargs) == 0)
-			op << cmdargs.getString(0) << " " << bs.getString(0) << endl;
-		    r.stopProgram(pbuf);
+		processList::iterator i;
+		for (i = tmp.begin(); i != tmp.end(); i++) {
+		    op << i->getArgs() << endl;
+		    r.stopProgram(i->getProcId());
 		}
 		op.close();
 	    }
 	    continue;
 	}
 	if (!strcmp(argv[0], "kill") && (argc >= 2)) {
-	    bufferArray tmp, tmp2;
+	    processList tmp;
 	    bool anykilled = false;
-	    if ((res = r.queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE)
+	    if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else {
-		tmp2 = tmp;
 		for (int i = 1; i < argc; i++) {
 		    int kpid;
-		    tmp = tmp2;
 		    if (!strcmp(argv[i], "all"))
 			kpid = -1;
 		    else
 			sscanf(argv[i], "%d", &kpid);
-		    while (!tmp.empty()) {
-			bufferStore bs = tmp.pop();
-			tmp.pop();
-			int pid = bs.getWord(0);
-			const char *proc = bs.getString(2);
-			if (kpid == -1 || kpid == pid) {
-			    char pbuf[128];
-			    if (S5mx)
-				sprintf(pbuf, "%s.$%02d", proc, pid);
-			    else
-				sprintf(pbuf, "%s.$%d", proc, pid);
-			    r.stopProgram(pbuf);
+		    processList::iterator j;
+		    for (j = tmp.begin(); j != tmp.end(); j++) {
+			if (kpid == -1 || kpid == j->getPID()) {
+			    r.stopProgram(j->getProcId());
 			    anykilled = true;
 			}
 		    }
@@ -993,20 +970,13 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    continue;
 	}
 	if (!strcmp(argv[0], "ps")) {
-	    bufferArray tmp;
-	    if ((res = r.queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE)
+	    processList tmp;
+	    if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else {
 		cout << "PID   CMD          ARGS" << endl;
-		while (!tmp.empty()) {
-		    bufferStore bs = tmp.pop();
-		    bufferStore bs2 = tmp.pop();
-		    int pid = bs.getWord(0);
-		    const char *proc = bs.getString(2);
-		    const char *arg = bs2.getString();
-
-		    printf("%5d %-12s %s\n", pid, proc, arg);
-		}
+		for (processList::iterator i = tmp.begin(); i != tmp.end(); i++)
+		    cout << *i << endl;
 	    }
 	    continue;
 	}

@@ -40,53 +40,12 @@
 rpcs32::rpcs32(ppsocket * _skt)
 {
     skt = _skt;
+    mtCacheS5mx = 0;
     reset();
 }
 
 Enum<rfsv::errs> rpcs32::
-queryDrive(char drive, bufferArray &ret)
-{
-    bufferStore a;
-    Enum<rfsv::errs> res;
-
-    a.addByte(drive);
-    if (!sendCommand(rpcs::QUERY_DRIVE, a))
-	return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, false)) != rfsv::E_PSI_GEN_NONE)
-	return res;
-    int l = a.getLen();
-    ret.clear();
-    while (l > 0) {
-	bufferStore b, c;
-	const char *s;
-	char *p;
-	int pid;
-	int sl;
-
-	s = a.getString(0);
-	sl = strlen(s) + 1;
-	l -= sl;
-	a.discardFirstBytes(sl);
-	if ((p = strstr(s, ".$"))) {
-	    *p = '\0'; p += 2;
-	    sscanf(p, "%d", &pid);
-	} else
-	    pid = 0;
-	b.addWord(pid);
-	b.addStringT(s);
-	s = a.getString(0);
-	sl = strlen(s) + 1;
-	l -= sl;
-	a.discardFirstBytes(sl);
-	c.addStringT(s);
-	ret.push(c);
-	ret.push(b);
-    }
-    return res;
-}
-
-Enum<rfsv::errs> rpcs32::
-getCmdLine(const char *process, bufferStore &ret)
+getCmdLine(const char *process, string &ret)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
@@ -94,8 +53,8 @@ getCmdLine(const char *process, bufferStore &ret)
     a.addStringT(process);
     if (!sendCommand(rpcs::GET_CMDLINE, a))
 	return rfsv::E_PSI_FILE_DISC;
-    res = getResponse(a, true);
-    ret = a;
+    if ((res = getResponse(a, true)) == rfsv::E_PSI_GEN_NONE)
+	ret = a.getString(0);
     return res;
 }
 
@@ -162,6 +121,12 @@ getMachineInfo(machineInfo &mi)
     mi.backupBatteryUsedTime.tv_high = a.getDWord(128);
 
     mi.externalPower = (a.getDWord(120) != 0);
+
+    mtCacheS5mx |= 8;
+    if (res == rfsv::E_PSI_GEN_NONE) {
+	if (!strcmp(mi.machineName, "SERIES5mx"))
+	    mtCacheS5mx |= 2;
+    }
 
     return res;
 }

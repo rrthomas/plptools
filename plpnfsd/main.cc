@@ -116,23 +116,22 @@ static long psread(builtin_node *node, char *buf, unsigned long offset, long len
 
 long rpcs_ps() {
     Enum<rfsv::errs> res;
-    bufferArray psbuf;
+    processList psbuf;
 
     if (!rpcs_isalive())
 	return -1;
-    res = r->queryDrive('C', psbuf);
+    res = r->queryPrograms(psbuf);
     if (res != rfsv::E_PSI_GEN_NONE)
 	return -1;
-    while (!psbuf.empty()) {
+    processList::iterator i;
+    for (i = psbuf.begin(); i != psbuf.end(); i++) {
 	builtin_node *dn;
 	builtin_node *fn1;
 	builtin_node *fn2;
 	builtin_node *bn;
 	char bname[40];
 
-	bufferStore bs = psbuf.pop();
-	bufferStore bs2 = psbuf.pop();
-	sprintf(bname, "%d", bs.getWord(0));
+	sprintf(bname, "%d", i->getPID());
 
 	dn = (builtin_node *)malloc(sizeof(builtin_node));
 	if (!dn)
@@ -163,7 +162,7 @@ long rpcs_ps() {
 
 	fn1->name = "cmd";
 	fn1->attr = PSI_A_READ | PSI_A_RDONLY;
-	fn1->private_data = (char *)malloc(strlen(bs.getString(2))+2);
+	fn1->private_data = (char *)malloc(strlen(i->getName())+2);
 	if (!fn1->private_data) {
 	    free(fn1);
 	    free(fn2);
@@ -171,12 +170,12 @@ long rpcs_ps() {
 	    return -1;
 	}
 	fn1->read = psread;
-	sprintf(fn1->private_data, "%s\n", bs.getString(2));
+	sprintf(fn1->private_data, "%s\n", i->getName());
 	fn1->size = strlen(fn1->private_data);
 
 	fn2->name = "args";
 	fn2->attr = PSI_A_READ | PSI_A_RDONLY;
-	fn2->private_data = (char *)malloc(strlen(bs2.getString())+2);
+	fn2->private_data = (char *)malloc(strlen(i->getArgs())+2);
 	if (!fn2->private_data) {
 	    free(fn1->private_data);
 	    free(fn1);
@@ -185,7 +184,7 @@ long rpcs_ps() {
 	    return -1;
 	}
 	fn2->read = psread;
-	sprintf(fn2->private_data, "%s\n", bs2.getString());
+	sprintf(fn2->private_data, "%s\n", i->getArgs());
 	fn2->size = strlen(fn2->private_data);
 
 	if (!(bn = register_builtin("proc", dn))) {

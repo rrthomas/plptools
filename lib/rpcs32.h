@@ -4,7 +4,7 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,8 +40,7 @@ class rpcs32 : public rpcs {
     friend rpcsfactory;
 
  public:
-    Enum<rfsv::errs> queryDrive(const char, bufferArray &);
-    Enum<rfsv::errs> getCmdLine(const char *, bufferStore &);
+    Enum<rfsv::errs> getCmdLine(const char *, string &);
     Enum<rfsv::errs> getMachineInfo(machineInfo &);
     Enum<rfsv::errs> configOpen(void);
     Enum<rfsv::errs> configRead(void);

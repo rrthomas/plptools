@@ -25,6 +25,7 @@
 #endif
 
 #include <stream.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <fstream.h>
 #include <iomanip.h>
@@ -35,6 +36,7 @@
 #include "bufferstore.h"
 #include "ppsocket.h"
 #include "bufferarray.h"
+#include "psiprocess.h"
 #include "Enum.h"
 
 ENUM_DEFINITION(rpcs::machs, rpcs::PSI_MACH_UNKNOWN) {
@@ -110,6 +112,7 @@ void rpcs::
 reset(void)
 {
     bufferStore a;
+    mtCacheS5mx = 0;
     status = rfsv::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
@@ -215,10 +218,11 @@ execProgram(const char *program, const char *args)
     * Without this hack, The Drive-Character gets lost. Other apps don't
     * seem to be hurt by the additional blank.
     */
-    a.addByte(strlen(args) + 1);
+    a.addByte(strlen(args)+1);
     a.addByte(' ');
 
     a.addStringT(args);
+
     if (!sendCommand(EXEC_PROG, a))
 	return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);
@@ -244,6 +248,82 @@ queryProgram(const char *program)
     if (!sendCommand(QUERY_PROG, a))
 	return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);
+}
+
+Enum<rfsv::errs> rpcs::
+queryPrograms(processList &ret)
+{
+    bufferStore a;
+    const char *drives;
+    const char *dptr;
+    bool anySuccess = false;
+    Enum<rfsv::errs> res;
+
+    // First, check how many drives we need to query
+    a.addStringT("M:"); // Drive M only exists on a SIBO
+    if (!sendCommand(rpcs::GET_UNIQUEID, a))
+	return rfsv::E_PSI_FILE_DISC;
+    if (getResponse(a, false) == rfsv::E_PSI_GEN_NONE)
+	// A SIBO; Must query all possible drives
+	drives = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    else
+	// A Series 5; Query of C is sufficient
+	drives = "C";
+
+    dptr = drives;
+    ret.clear();
+
+    if ((mtCacheS5mx & 4) == 0) {
+	Enum<machs> tmp;
+	if (getMachineType(tmp) != rfsv::E_PSI_GEN_NONE)
+	    return rfsv::E_PSI_GEN_FAIL;
+
+    }
+    if ((mtCacheS5mx & 9) == 1) {
+	machineInfo tmp;
+	if (getMachineInfo(tmp) == rfsv::E_PSI_FILE_DISC)
+	    return rfsv::E_PSI_FILE_DISC;
+    }
+    bool s5mx = (mtCacheS5mx == 15);
+    while (*dptr) {
+	a.init();
+	a.addByte(*dptr);
+	if (!sendCommand(rpcs::QUERY_DRIVE, a))
+	    return rfsv::E_PSI_FILE_DISC;
+	if (getResponse(a, false) == rfsv::E_PSI_GEN_NONE) {
+	    anySuccess = true;
+	    int l = a.getLen();
+	    while (l > 0) {
+		const char *s;
+		char *p;
+		int pid;
+		int sl;
+
+		s = a.getString(0);
+		sl = strlen(s) + 1;
+		l -= sl;
+		a.discardFirstBytes(sl);
+		if ((p = strstr(s, ".$"))) {
+		    *p = '\0'; p += 2;
+		    sscanf(p, "%d", &pid);
+		} else
+		    pid = 0;
+		PsiProcess proc(pid, s, a.getString(0), s5mx);
+		ret.push_back(proc);
+		sl = strlen(a.getString(0)) + 1;
+		l -= sl;
+		a.discardFirstBytes(sl);
+	    }
+	}
+	dptr++;
+    }
+    if (anySuccess && !ret.empty())
+	for (processList::iterator i = ret.begin(); i != ret.end(); i++) {
+	    string cmdline;
+	    if (getCmdLine(i->getProcId(), cmdline) == rfsv::E_PSI_GEN_NONE)
+		i->setArgs(cmdline + " " + i->getArgs());
+	}
+    return anySuccess ? rfsv::E_PSI_GEN_NONE : rfsv::E_PSI_GEN_FAIL;
 }
 
 Enum<rfsv::errs> rpcs::
@@ -339,6 +419,11 @@ getMachineType(Enum<machs> &type)
     if (a.getLen() != 2)
 	return rfsv::E_PSI_GEN_FAIL;
     type = (enum machs)a.getWord(0);
+    mtCacheS5mx |= 4;
+    if (res == rfsv::E_PSI_GEN_NONE) {
+	if (type == rpcs::PSI_MACH_S5)
+	    mtCacheS5mx |= 1;
+    }
     return res;
 }
 

@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999 Matt J. Gumbley <matt@gumbley.demon.co.uk>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -87,14 +87,12 @@ mktemp(u_int32_t &handle, string &tmpname)
     return res;
 }
 
-// internal and external
 Enum<rfsv::errs> rfsv16::
 fcreatefile(u_int32_t attr, const char *name, u_int32_t &handle)
 {
     return fopen(attr | P_FCREATE, name, handle);
 }
 
-// this is internal - not used by plpnfsd, unlike fcreatefile
 Enum<rfsv::errs> rfsv16::
 freplacefile(u_int32_t attr, const char *name, u_int32_t &handle)
 {
@@ -141,19 +139,22 @@ readdir(rfsvDirhandle &dH, PlpDirent &e) {
 	if (!sendCommand(FDIRREAD, dH.b))
 	    return E_PSI_FILE_DISC;
 	res = getResponse(dH.b);
-	dH.b.discardFirstBytes(2); // Don't know what these mean!
+	if (res == E_PSI_GEN_NONE) {
+	    u_int16_t bufferLen = dH.b.getWord(0);
+	    dH.b.discardFirstBytes(2);
+	    if (dH.b.getLen() != bufferLen)
+		return E_PSI_GEN_FAIL;
+	}
     }
     if ((res == E_PSI_GEN_NONE) && (dH.b.getLen() > 16)) {
 	u_int16_t version = dH.b.getWord(0);
-	if (version != 2) {
-	    cerr << "dir: not version 2" << endl;
+	if (version != 2)
 	    return E_PSI_GEN_FAIL;
-	}
 	e.attr    = attr2std((u_int32_t)dH.b.getWord(2));
 	e.size    = dH.b.getDWord(4);
-	e.time    = PsiTime((time_t)dH.b.getDWord(8));
+	e.time.setSiboTime(dH.b.getDWord(8));
 	e.name    = dH.b.getString(16);
-	// e.UID     = PlpUID(0,0,0);
+	//e.UID     = PlpUID(0,0,0);
 	e.attrstr = attr2String(e.attr);
 
 	dH.b.discardFirstBytes(17 + e.name.length());
@@ -167,7 +168,7 @@ dir(const char *name, PlpDir &files)
 {
     rfsvDirhandle h;
     files.clear();
-    Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN | PSI_A_SYSTEM | PSI_A_DIR, name, h);
+    Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN|PSI_A_SYSTEM|PSI_A_DIR, name, h);
     while (res == E_PSI_GEN_NONE) {
 	PlpDirent e;
 	res = readdir(h, e);
@@ -197,25 +198,21 @@ opMode(u_int32_t mode)
 Enum<rfsv::errs> rfsv16::
 fgetmtime(const char * const name, PsiTime &mtime)
 {
-    cerr << "rfsv16::fgetmtime" << endl;
-    // NB: fgetattr, fgeteattr is almost identical...
     bufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
-    // and this needs sending in the length word.
     if (!sendCommand(FINFO, a))
 	return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
-    if (res != E_PSI_GEN_NONE) {
-	cerr << "fgetmtime: Error " << res << " on file " << name << endl;
+    if (res != E_PSI_GEN_NONE)
 	return res;
-    }
     else if (a.getLen() == 16) {
-	mtime.setUnixTime(a.getDWord(8));
+	// According to Alex's docs, Psion's file times are in
+	// seconds since 13:00!!, 1.1.1970
+	mtime.setSiboTime(a.getDWord(8));
 	return res;
     }
-    cerr << "fgetmtime: Unknown response (" << name << ") " << a <<endl;
     return E_PSI_GEN_FAIL;
 }
 
@@ -227,39 +224,31 @@ fsetmtime(const char *name, PsiTime mtime)
     // time. So call SFDATE here.
     bufferStore a;
     string realName = convertSlash(name);
-    a.addDWord(mtime.getTime());
+    // According to Alex's docs, Psion's file times are in
+    // seconds since 13:00!!, 1.1.1970
+    a.addDWord(mtime.getSiboTime());
     a.addStringT(realName.c_str());
-    // and this needs sending in the length word.
     if (!sendCommand(SFDATE, a))
         return E_PSI_FILE_DISC;
-  
-    Enum<rfsv::errs> res = getResponse(a);
-    if (res != E_PSI_GEN_NONE)
-        cerr << "fsetmtime: Error " << res << " on file " << name << endl;
-    return res;
+    return getResponse(a);
 }
 
 Enum<rfsv::errs> rfsv16::
 fgetattr(const char * const name, u_int32_t &attr)
 {
-    // NB: fgetmtime, fgeteattr are almost identical...
     bufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
-    // and this needs sending in the length word.
     if (!sendCommand(FINFO, a))
 	return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
-    if (res != 0) {
-	cerr << "fgetattr: Error " << res << " on file " << name << endl;
+    if (res != E_PSI_GEN_NONE)
 	return res;
-    }
     else if (a.getLen() == 16) {
 	attr = attr2std((long)a.getWord(2));
 	return res;
     }
-    cerr << "fgetattr: Unknown response (" << name << ") " << a <<endl;
     return E_PSI_GEN_FAIL;
 }
 
@@ -272,10 +261,8 @@ fgeteattr(const char * const name, PlpDirent &e)
     if (!sendCommand(FINFO, a))
 	return E_PSI_FILE_DISC;
     Enum<rfsv::errs> res = getResponse(a);
-    if (res != 0) {
-	cerr << "fgeteattr: Error " << res << " on file " << name << endl;
+    if (res != E_PSI_GEN_NONE)
 	return res;
-    }
     else if (a.getLen() == 16) {
 	const char *p = strrchr(realName.c_str(), '\\');
 	if (p)
@@ -285,36 +272,24 @@ fgeteattr(const char * const name, PlpDirent &e)
 	e.name = p;
 	e.attr = attr2std((long)a.getWord(2));
 	e.size = a.getDWord(4);
-	e.time = PsiTime(a.getDWord(8));
+	e.time.setSiboTime(a.getDWord(8));
 	e.UID  = PlpUID(0,0,0);
 	e.attrstr = string(attr2String(e.attr));
 	return res;
     }
-    cerr << "fgeteattr: Unknown response (" << name << ") " << a <<endl;
     return E_PSI_GEN_FAIL;
 }
 
 Enum<rfsv::errs> rfsv16::
 fsetattr(const char *name, u_int32_t seta, u_int32_t unseta)
 {
-    cerr << "rfsv16::fsetattr" << endl;
-    // seta are attributes to set; unseta are attributes to unset. Need to
-    // turn this into attributes to change state and a bit mask.
-    // 210000
-    // 008421
-    // a  shr
     u_int32_t statusword = std2attr(seta) & (~ std2attr(unseta));
     statusword ^= 0x0000001; // r bit is inverted
     u_int32_t bitmask = std2attr(seta) | std2attr(unseta);
-    // cerr << "seta is   " << hex << setw(2) << setfill('0') << seta << endl;
-    // cerr << "unseta is " << hex << setw(2) << setfill('0') << unseta << endl;
-    // cerr << "statusword is  " << hex << setw(2) << setfill('0') << statusword << endl;
-    // cerr << "bitmask is     " << hex << setw(2) << setfill('0') << bitmask << endl;
     bufferStore a;
     a.addWord(statusword & 0xFFFF);
     a.addWord(bitmask & 0xFFFF);
     a.addStringT(name);
-    // and this needs sending in the length word.
     if (!sendCommand(SFSTAT, a))
 	return E_PSI_FILE_DISC;
     return getResponse(a);
@@ -323,41 +298,17 @@ fsetattr(const char *name, u_int32_t seta, u_int32_t unseta)
 Enum<rfsv::errs> rfsv16::
 dircount(const char * const name, u_int32_t &count)
 {
-    u_int32_t fileHandle;
-    Enum<rfsv::errs> res;
-    count = 0;
-
-    res = fopen(P_FDIR, name, fileHandle);
-    if (res != E_PSI_GEN_NONE)
-	return res;
-
-    while (1) {
-	bufferStore a;
-	a.addWord(fileHandle & 0xFFFF);
-	if (!sendCommand(FDIRREAD, a))
-	    return E_PSI_FILE_DISC;
-	res = getResponse(a);
-	if (res != E_PSI_GEN_NONE)
-	    break;
-	a.discardFirstBytes(2); // Don't know what these mean!
-	while (a.getLen() > 16) {
-	    int version = a.getWord(0);
-	    if (version != 2) {
-		cerr << "dir: not version 2" << endl;
-		fclose(fileHandle);
-		return E_PSI_GEN_FAIL;
-	    }
-	    // int status = a.getWord(2);
-	    // long size = a.getDWord(4);
-	    // long date = a.getDWord(8);
-	    const char *s = a.getString(16);
-	    a.discardFirstBytes(17+strlen(s));
+    rfsvDirhandle h;
+    Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN|PSI_A_SYSTEM|PSI_A_DIR, name, h);
+    while (res == E_PSI_GEN_NONE) {
+	PlpDirent e;
+	res = readdir(h, e);
+	if (res == E_PSI_GEN_NONE)
 	    count++;
-	}
     }
+    closedir(h);
     if (res == E_PSI_FILE_EOF)
 	res = E_PSI_GEN_NONE;
-    fclose(fileHandle);
     return res;
 }
 
@@ -439,7 +390,6 @@ devinfo(const char drive, PlpDrive &dinfo)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
-    // long fileHandle;
 
     // Again, this is taken from an exchange between PsiWin and a 3c.
     // For each drive, we PARSE with its drive letter to get a response
@@ -454,10 +404,8 @@ devinfo(const char drive, PlpDrive &dinfo)
     a.addByte(0x00); // No name 3
     if (!sendCommand(PARSE, a))
 	return E_PSI_FILE_DISC;
-    if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
-	// cerr << "devinfo PARSE res is " << dec << (signed short int) res << endl;
+    if ((res = getResponse(a)) != E_PSI_GEN_NONE)
 	return res;
-    }
 
     a.init();
     a.addByte(toupper(drive)); // Name 1
@@ -466,10 +414,8 @@ devinfo(const char drive, PlpDrive &dinfo)
     a.addByte(0x00);
     if (!sendCommand(STATUSDEVICE, a))
 	return E_PSI_FILE_DISC;
-    if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
-	// cerr << "devinfo STATUSDEVICE res is " << dec << (signed short int) res << endl;
+    if ((res = getResponse(a)) != E_PSI_GEN_NONE)
 	return res;
-    }
 
     int attr = a.getWord(2);
     attr = sibo_dattr[a.getWord(2) & 0xff];
@@ -867,13 +813,7 @@ mkdir(const char* dirName)
     bufferStore a;
     a.addStringT(realName.c_str());
     sendCommand(MKDIR, a);
-    Enum<rfsv::errs> res = getResponse(a);
-    if (res == E_PSI_GEN_NONE) {
-	// Correct response
-	return res;
-    }
-    cerr << "Unknown response from mkdir "<< res <<endl;
-    return E_PSI_GEN_FAIL;
+    return getResponse(a);
 }
 
 Enum<rfsv::errs> rfsv16::
@@ -887,39 +827,24 @@ rmdir(const char *dirName)
 Enum<rfsv::errs> rfsv16::
 rename(const char *oldName, const char *newName)
 {
-    cerr << "rfsv16::rename ***" << endl;
-
     string realOldName = convertSlash(oldName);
     string realNewName = convertSlash(newName);
     bufferStore a;
     a.addStringT(realOldName.c_str());
     a.addStringT(realNewName.c_str());
     sendCommand(RENAME, a);
-    Enum<rfsv::errs> res = getResponse(a);
-    if (res == E_PSI_GEN_NONE) {
-	// Correct response
-	return res;
-    }
-    cerr << "Unknown response from rename "<< res <<endl;
-    return E_PSI_GEN_FAIL;
+    return getResponse(a);
 }
 
 Enum<rfsv::errs> rfsv16::
 remove(const char* psionName)
 {
-    Enum<rfsv::errs> res;
     string realName = convertSlash(psionName);
     bufferStore a;
     a.addStringT(realName.c_str());
     // and this needs sending in the length word.
     sendCommand(DELETE, a);
-    res = getResponse(a);
-    if (res == E_PSI_GEN_NONE) {
-	// Correct response
-	return res;
-    }
-    cerr << "Unknown response from delete "<< res <<endl;
-    return E_PSI_GEN_FAIL;
+    return getResponse(a);
 }
 
 Enum<rfsv::errs> rfsv16::

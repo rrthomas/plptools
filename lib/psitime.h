@@ -3,7 +3,7 @@
  *
  * This file is part of plptools.
  *
- *  Copyright (C) 2000-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2000-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -192,6 +192,13 @@ public:
     /**
     * Modifies the value of this instance.
     *
+    * @param stime The new SIBO time representation.
+    */
+    void setSiboTime(u_int32_t stime);
+
+    /**
+    * Modifies the value of this instance.
+    *
     * @param _ptvHi The high 32 bits of a Psion time.
     * @param _ptvLo The low 32 bits of a Psion time.
     */
@@ -239,6 +246,14 @@ public:
     * @returns The instance's current time as Unix time_t.
     */
     time_t getTime(void);
+
+    /**
+    * Retrieves the instance's current value
+    * in SIBO time format.
+    *
+    * @returns The instance's current time as SIBO time.
+    */
+    u_int32_t getSiboTime();
 
     /**
     * Retrieves the instance's current value

@@ -3,7 +3,7 @@
  *
  * This file is part of plptools.
  *
- *  Copyright (C) 2000-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2000-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 #include "psitime.h"
 #include <stdlib.h>
 #include <plp_inttypes.h>
+
+#define OnePM 3600 // 13:00 offset for SIBO
 
 PsiTime::PsiTime(void) {
     ptzValid = false;
@@ -208,6 +210,22 @@ evalOffset(psi_timezone ptz, time_t time, bool valid) {
 
     offset *= 1000000;
     return offset;
+}
+
+void PsiTime::setSiboTime(u_int32_t stime) {
+    unsigned long long micro = evalOffset(ptz, time(0), false);
+
+    micro /= 1000000;
+    utv.tv_sec = stime + OnePM - micro;
+    utv.tv_usec = 0;
+//    unix2psi();
+}
+
+u_int32_t PsiTime::getSiboTime(void) {
+    unsigned long long micro = evalOffset(ptz, time(0), false);
+
+    micro /= 1000000;
+    return utv.tv_sec - OnePM + micro;
 }
 
 void PsiTime::psi2unix(void) {

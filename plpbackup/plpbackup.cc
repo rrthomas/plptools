@@ -160,43 +160,24 @@ checkAbort()
 static int
 stopPrograms() {
     Enum<rfsv::errs> res;
-    bufferArray tmp;
+    processList tmp;
 
     if (verbose > 0)
 	cout << _("Stopping programs ...") << endl;
-    if ((res = Rpcs->queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE) {
+    if ((res = Rpcs->queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
 	cerr << _("plpbackup: Could not get process list: ") << res << endl;
 	return 1;
     } else {
-	while (!tmp.empty()) {
-	    ostrstream pbuf;
-	    bufferStore cmdargs;
-	    bufferStore bs = tmp.pop();
-	    int pid = bs.getWord(0);
-
-	    pbuf << bs.getString(2) << ".$";
-	    if (S5mx)
-		pbuf << dec << setw(2) << setfill(0) << pid;
-	    else
-		pbuf << dec << pid;
-	    pbuf << '\0';
-	    bs = tmp.pop();
-	    if (Rpcs->getCmdLine(pbuf.str(), cmdargs) == 0) {
-		string cmdline = cmdargs.getString(0);
-		cmdline += " ";
-		cmdline += bs.getString(0);
-		savedCommands.push_back(cmdline);
-		if (verbose > 1)
-		    cout << cmdline << endl;
-	    }
-	    Rpcs->stopProgram(pbuf.str());
+	for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {
+	    savedCommands.push_back(i->getArgs());
+	    Rpcs->stopProgram(i->getProcId());
 	}
 	time_t tstart = time(0) + 5;
 	while (true) {
 	    usleep(100000);
 	    if (checkAbort())
 		return 1;
-	    if ((res = Rpcs->queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE) {
+	    if ((res = Rpcs->queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
 		cerr << "Could not get process list, Error: " << res << endl;
 		return 1;
 	    }

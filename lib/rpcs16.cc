@@ -26,6 +26,7 @@
 #endif
 
 #include <stream.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <fstream.h>
 #include <iomanip.h>
@@ -34,30 +35,28 @@
 
 #include "rpcs16.h"
 #include "bufferstore.h"
+#include "bufferarray.h"
 #include "ppsocket.h"
 
 rpcs16::rpcs16(ppsocket * _skt)
 {
     skt = _skt;
+    mtCacheS5mx = 0;
     reset();
 }
 
 Enum<rfsv::errs> rpcs16::
-queryDrive(char drive, bufferArray &ret)
+getCmdLine(const char *process, string &ret)
 {
     bufferStore a;
-    a.addByte(drive);
-    if (!sendCommand(rpcs::QUERY_DRIVE, a))
-	return rfsv::E_PSI_FILE_DISC;
-    Enum<rfsv::errs> res = getResponse(a, true);
-    cout << dec << "qd: " << res << " " << a.getLen() << " a="<< a << endl;
-    return res;
-}
+    Enum<rfsv::errs> res;
 
-Enum<rfsv::errs> rpcs16::
-getCmdLine(const char *process, bufferStore &ret)
-{
-    return rfsv::E_PSI_GEN_NONE;
+    a.addStringT(process);
+    if (!sendCommand(rpcs::GET_CMDLINE, a))
+	return rfsv::E_PSI_FILE_DISC;
+    if ((res = getResponse(a, true)) == rfsv::E_PSI_GEN_NONE)
+	ret = a.getString(0);
+    return res;
 }
 
 /*

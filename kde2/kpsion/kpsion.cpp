@@ -3,8 +3,7 @@
  *
  * This file is part of plptools.
  *
- *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 2000, 2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2000-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -51,6 +50,7 @@
 #include <rfsvfactory.h>
 #include <rpcsfactory.h>
 #include <bufferarray.h>
+#include <psiprocess.h>
 
 #define STID_CONNECTION 1
 
@@ -292,15 +292,84 @@ queryPsion() {
 
     statusBar()->changeItem(i18n("Retrieving machine info ..."),
 			    STID_CONNECTION);
-    rpcs::machineInfo mi;
-    if ((res = plpRpcs->getMachineInfo(mi)) != rfsv::E_PSI_GEN_NONE) {
-	QString msg = i18n("Could not get Psion machine info");
+
+    Enum<rpcs::machs> machType;
+    if (plpRpcs->getMachineType(machType) != rfsv::E_PSI_GEN_NONE) {
+	QString msg = i18n("Could not get Psion machine type");
 	statusBar()->changeItem(msg, STID_CONNECTION);
 	KMessageBox::error(this, msg);
 	return;
     }
-    machineUID = mi.machineUID;
-    S5mx = (strcmp(mi.machineName, "SERIES5mx") == 0);
+    if (machType == rpcs::PSI_MACH_S5) {
+	rpcs::machineInfo mi;
+	if ((res = plpRpcs->getMachineInfo(mi)) != rfsv::E_PSI_GEN_NONE) {
+	    QString msg = i18n("Could not get Psion machine info");
+	    statusBar()->changeItem(msg, STID_CONNECTION);
+	    KMessageBox::error(this, msg);
+	    return;
+	}
+	machineUID = mi.machineUID;
+	S5mx = (strcmp(mi.machineName, "SERIES5mx") == 0);
+    } else {
+	// On a SIBO, first check for a file 'SYS$PT.CFG' on the default
+	// directory. If it exists, read the UID from it. Otherwise
+	// calculate a virtual machine UID from the OwnerInfo data and
+	// write it to that file.
+	bufferArray b;
+	u_int32_t handle;
+	u_int32_t count;
+
+	res = plpRfsv->fopen(plpRfsv->opMode(rfsv::PSI_O_RDONLY),
+			     "SYS$PT.CFG", handle);
+	if (res == rfsv::E_PSI_GEN_NONE) {
+	    res = plpRfsv->fread(handle, (unsigned char *)&machineUID,
+				 sizeof(machineUID), count);
+	    plpRfsv->fclose(handle);
+	    if ((res != rfsv::E_PSI_GEN_NONE) || (count != sizeof(machineUID))) {
+		QString msg = i18n("Could not read SIBO UID file");
+		statusBar()->changeItem(msg, STID_CONNECTION);
+		KMessageBox::error(this, msg);
+		return;
+	    }
+	} else {
+	    if ((res = plpRpcs->getOwnerInfo(b)) != rfsv::E_PSI_GEN_NONE) {
+		QString msg = i18n("Could not get Psion owner info");
+		statusBar()->changeItem(msg, STID_CONNECTION);
+		KMessageBox::error(this, msg);
+		return;
+	    }
+	    machineUID = 0;
+	    string oi = "";
+	    while (!b.empty()) {
+		oi += b.pop().getString();
+		oi += "\n";
+	    }
+	    const char *p = oi.c_str();
+	    unsigned long long z;
+	    int i = 0;
+
+	    while (*p) {
+                z = *p;
+                machineUID ^= (z << i);
+                p++; i++;
+                i &= ((sizeof(machineUID) * 8) - 1);
+	    }
+	    res = plpRfsv->fcreatefile(plpRfsv->opMode(rfsv::PSI_O_RDWR),
+				 "SYS$PT.CFG", handle);
+	    if (res == rfsv::E_PSI_GEN_NONE) {
+		res = plpRfsv->fwrite(handle, (const unsigned char *)&machineUID,
+				      sizeof(machineUID), count);
+		plpRfsv->fclose(handle);
+	    }
+	    if (res != rfsv::E_PSI_GEN_NONE) {
+		QString msg = i18n("Could not write SIBO UID file %1").arg((const char *)res);
+		statusBar()->changeItem(msg, STID_CONNECTION);
+		KMessageBox::error(this, msg);
+		return;
+	    }
+        }
+	S5mx = false;
+    }
 
     QString uid = getMachineUID();
     bool machineFound = false;
@@ -1603,33 +1672,18 @@ collectFiles(QString dir) {
 void KPsionMainWindow::
 killSave() {
     Enum<rfsv::errs> res;
-    bufferArray tmp;
+    processList tmp;
 
     savedCommands.clear();
-    if ((res = plpRpcs->queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE) {
+    if ((res = plpRpcs->queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
 	cerr << "Could not get process list, Error: " << res << endl;
 	return;
     } else {
-	while (!tmp.empty()) {
-	    QString pbuf;
-	    bufferStore cmdargs;
-	    bufferStore bs = tmp.pop();
-	    int pid = bs.getWord(0);
-	    const char *proc = bs.getString(2);
-	    if (S5mx)
-		pbuf.sprintf("%s.$%02d", proc, pid);
-	    else
-		pbuf.sprintf("%s.$%d", proc, pid);
-	    bs = tmp.pop();
-	    if (plpRpcs->getCmdLine(pbuf.data(), cmdargs) == 0) {
-		QString cmdline(cmdargs.getString(0));
-		cmdline += " ";
-		cmdline += bs.getString(0);
-		savedCommands += cmdline;
-	    }
-	    emit setProgressText(i18n("Stopping %1").arg(cmdargs.getString(0)));
+	for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {
+	    savedCommands += i->getArgs();
+	    emit setProgressText(i18n("Stopping %1").arg(i->getName()));
 	    kapp->processEvents();
-	    plpRpcs->stopProgram(pbuf);
+	    plpRpcs->stopProgram(i->getProcId());
 	}
     }
     time_t tstart = time(0) + 5;
@@ -1637,7 +1691,7 @@ killSave() {
 	kapp->processEvents();
 	usleep(100000);
 	kapp->processEvents();
-	if ((res = plpRpcs->queryDrive('C', tmp)) != rfsv::E_PSI_GEN_NONE) {
+	if ((res = plpRpcs->queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
 	    cerr << "Could not get process list, Error: " << res << endl;
 	    return;
 	}

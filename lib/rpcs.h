@@ -3,7 +3,7 @@
  *
  * This file is part of plptools.
  *
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,13 +23,17 @@
 #ifndef _RPCS_H_
 #define _RPCS_H_
 
+#include <vector>
 #include <psitime.h>
+#include <psiprocess.h>
 #include <rfsv.h>
 #include <Enum.h>
 
 class ppsocket;
 class bufferStore;
 class bufferArray;
+
+typedef vector<PsiProcess> processList;
 
 /**
  * Remote procedure call services via PLP
@@ -312,20 +316,32 @@ public:
     */
     Enum<rfsv::errs> quitServer(void);
 
-    // API different on SIBO and EPOC
-    virtual Enum<rfsv::errs> queryDrive(const char, bufferArray &) = 0;
+    /**
+     * Retrieves a list of all running Programs.
+     *
+     * This function works with both SIBO and EPOC.
+     *
+     * @param ret The list of currently running processes is returned here.
+     *
+     * @returns A psion error code. 0 = Ok.
+     */
+    Enum<rfsv::errs> queryPrograms(processList &ret);
+
     /**
     * Retrieves the command line of a running process.
     *
-    * This function works with EPOC only. Using it with SIBO
-    * machines, returns always an error code E_PSI_NOT_SIBO.
+    * This function works with both SIBO and EPOC.
+    * Note: @ref rfsv::getPrograms calls this method internally and sets
+    * the args member of @ref PsiProcess , so you usually don't have to call
+    * this method yourself.
     *
     * @param process Name of process. Format: processname.$pid
     * @param ret The program name and arguments are returned here.
     *
     * @return Psion error code. 0 = Ok.
     */
-    virtual Enum<rfsv::errs> getCmdLine(const char *process, bufferStore &ret) = 0;
+    virtual Enum<rfsv::errs> getCmdLine(const char *process, string &ret) = 0;
+
     /**
     * Retrieve general Information about the connected
     * machine.
@@ -337,6 +353,7 @@ public:
     * @return Psion error code. 0 = Ok.
     */
     virtual Enum<rfsv::errs> getMachineInfo(machineInfo &) { return rfsv::E_PSI_NOT_SIBO;}
+
     virtual Enum<rfsv::errs> closeHandle(int) { return rfsv::E_PSI_NOT_SIBO;}
     virtual Enum<rfsv::errs> regOpenIter(u_int32_t, char *, u_int16_t &) { return rfsv::E_PSI_NOT_SIBO;}
     virtual Enum<rfsv::errs> regReadIter(u_int16_t) { return rfsv::E_PSI_NOT_SIBO;}
@@ -392,6 +409,12 @@ protected:
 	QUERY_READ       = 0x70,
 	QUIT_SERVER      = 0xff
     };
+
+    /**
+     * Flag: getMachineType and getMachineInfo have been called and the
+     * machine is an S5mx.
+     */
+    int mtCacheS5mx;
 
    /**
     * Sends a command to the remote side.
