@@ -29,15 +29,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <intl.h>
 
-#include "ppsocket.h"
-#include "rfsv.h"
-#include "rfsvfactory.h"
-#include "rpcs.h"
-#include "rpcsfactory.h"
+#include <plpintl.h>
+#include <ppsocket.h>
+#include <rfsv.h>
+#include <rfsvfactory.h>
+#include <rpcs.h>
+#include <rpcsfactory.h>
+#include <bufferstore.h>
+
 #include "ftp.h"
-#include "bufferstore.h"
 
 void
 usage()
@@ -71,7 +72,7 @@ main(int argc, char **argv)
     int status = 0;
     int sockNum = DPORT;
 
-    bind_textdomain_codeset(PACKAGE, "latin1");
+    setlocale (LC_ALL, "");
     textdomain(PACKAGE);
 
     struct servent *se = getservbyname("psion", "tcp");
