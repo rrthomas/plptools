@@ -344,8 +344,9 @@ PlpFileAttrPage::PlpFileAttrPage(KPropertiesDialog *_props) {
 
     d->jobReturned = false;
     KIO_ARGS << int(PLP_CMD_GETATTR) << _props->item()->url().path();
-    KIO::StatJob *job = new KIO::StatJob(KURL("psion:/"), KIO::CMD_SPECIAL,
-					 packedArgs, false);
+    KURL u(_props->item()->url());
+    u.setPath("/");
+    KIO::StatJob *job = new KIO::StatJob(u, KIO::CMD_SPECIAL, packedArgs, false);
     connect(job, SIGNAL(result(KIO::Job *)),
 	    SLOT(slotGetSpecialFinished(KIO::Job *)));
 }
@@ -401,9 +402,10 @@ void PlpFileAttrPage::applyChanges() {
 
 	KIO_ARGS << int(PLP_CMD_SETATTR) << sattr << dattr
 		 << d->props->item()->url().path();
-	KIO::SimpleJob *sjob = new KIO::SimpleJob(KURL("psion:/"),
-						  KIO::CMD_SPECIAL, packedArgs,
-						  false);
+	KURL u(d->props->item()->url());
+	u.setPath("/");
+	KIO::SimpleJob *sjob = new KIO::SimpleJob(u, KIO::CMD_SPECIAL,
+						  packedArgs, false);
 	connect(sjob, SIGNAL(result(KIO::Job *)),
 		SLOT(slotSetSpecialFinished(KIO::Job *)));
     }
@@ -595,8 +597,9 @@ PlpDriveAttrPage::PlpDriveAttrPage(KPropertiesDialog *_props) {
     box->addStretch(10);
 
     KIO_ARGS << int(PLP_CMD_DRIVEINFO) << _props->item()->url().path();
-    KIO::StatJob *job = new KIO::StatJob(KURL("psion:/"), KIO::CMD_SPECIAL,
-					 packedArgs, false);
+    KURL u(_props->item()->url());
+    u.setPath("/");
+    KIO::StatJob *job = new KIO::StatJob(u, KIO::CMD_SPECIAL, packedArgs, false);
     connect(job, SIGNAL(result(KIO::Job *)),
 	    SLOT(slotSpecialFinished(KIO::Job *)));
 
@@ -901,7 +904,8 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     d->g->setColStretch(1, 1);
     box->addStretch(10);
 
-    KURL u("psion:/0:_MachInfo");
+    KURL u(_props->item()->url());
+    u.setPath("/0:_MachInfo");
     KIO::TransferJob *job = KIO::get(u, false, false);
 
     connect(job, SIGNAL(result(KIO::Job *)),
@@ -1042,8 +1046,9 @@ PlpOwnerPage::PlpOwnerPage( KPropertiesDialog *_props ) {
 		    i18n("This shows the owner's information of the connected device."));
 
     KIO_ARGS << int(PLP_CMD_OWNERINFO);
-    KIO::StatJob *job = new KIO::StatJob(KURL("psion:/"),
-					 KIO::CMD_SPECIAL, packedArgs, false);
+    KURL u(_props->item()->url());
+    u.setPath("/");
+    KIO::StatJob *job = new KIO::StatJob(u, KIO::CMD_SPECIAL, packedArgs, false);
     connect(job, SIGNAL(result(KIO::Job *)),
 	    SLOT(slotSpecialFinished(KIO::Job *)));
 
