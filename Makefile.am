@@ -29,7 +29,7 @@ maintainer-clean-local:
 
 install-data-local:
 	test "$(initdir)" != "none" && \
-		install -m 755 etc/psion $(DESTDIR)$(initdir)/psion
+		install -m 755 etc/psion $(DESTDIR)$(initdir)/psion || :
 
 dist-hook:
 	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile
