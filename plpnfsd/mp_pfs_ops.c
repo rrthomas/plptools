@@ -46,7 +46,7 @@ create_it(createargs *ca, int isdir)
 			rfsv_ret = rfsv_fclose(phandle);
 	}
 	if (rfsv_ret) {
-		res.status = psion_alive ? NFSERR_NAMETOOLONG : NO_PSION;
+		res.status = rfsv_isalive() ? NFSERR_NAMETOOLONG : NO_PSION;
 		return &res;
 	}
 	inode = get_nam(name);
@@ -304,7 +304,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 		*fp = cp->attr;	/* gotcha */
 		if (fp->type == NFDIR) {
 			if (mp_dircount(inode, &dcount)) {
-				res.status = psion_alive ? NFSERR_NOENT : NO_PSION;
+				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 				return &res;
 			}
 			if (fp->nlink != (dcount + 2))
@@ -348,7 +348,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 					fp->mode |= 0200;
 				fp->fileid = inode->inode;
 				if (mp_dircount(inode, &dcount)) {
-					res.status = psion_alive ? NFSERR_NOENT : NO_PSION;
+					res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 					return &res;
 				}
 				if (fp->nlink != (dcount + 2))
@@ -361,13 +361,13 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 			printf("\tgetattr:fileordir\n");
 		/* It's a normal file/dir */
 		if (rfsv_getattr(inode->name, &pattr, &psize, &ptime)) {
-			res.status = psion_alive ? NFSERR_NOENT : NO_PSION;
+			res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 			return &res;
 		}
 		pattr2attr(pattr, psize, ptime, fp, (unsigned char *) fh->data);
 		if (fp->type == NFDIR) {
 			if (mp_dircount(inode, &dcount)) {
-				res.status = psion_alive ? NFSERR_NOENT : NO_PSION;
+				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 				return &res;
 			}
 			if (fp->nlink != (dcount + 2))
@@ -525,7 +525,7 @@ nfsproc_readdir_2(readdirargs *ra)
 		if (debug)
 			printf("\tnfsdir: dir\n");
 		if (rfsv_dir(dirname(inode->name), &e)) {
-			res.status = psion_alive ? NFSERR_NOENT : NO_PSION;
+			res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 			return &res;
 		}
 		while (e) {
@@ -576,7 +576,7 @@ nfsproc_setattr_2(sattrargs *sa)
 		if (debug)
 			printf("\t\tsetattr truncating to %d bytes\n", sa->attributes.size);
 		if (rfsv_setsize(inode->name, sa->attributes.size) != 0) {
-			res.status = psion_alive ? NFSERR_ROFS : NO_PSION;
+			res.status = rfsv_isalive() ? NFSERR_ROFS : NO_PSION;
 			return &res;
 		}
 		fp->size = sa->attributes.size;
@@ -586,7 +586,7 @@ nfsproc_setattr_2(sattrargs *sa)
 	if ((sa->attributes.mtime.seconds != fp->mtime.seconds) &&
 	    (sa->attributes.mtime.seconds != -1)) {
 		if (rfsv_setmtime(inode->name, sa->attributes.mtime.seconds)) {
-			res.status = (psion_alive) ? NFSERR_ACCES : NO_PSION;
+			res.status = (rfsv_isalive()) ? NFSERR_ACCES : NO_PSION;
 			return &res;
 		}
 		fp->mtime.seconds = fp->atime.seconds = sa->attributes.mtime.seconds;
@@ -598,7 +598,7 @@ nfsproc_setattr_2(sattrargs *sa)
 		long psisattr, psidattr;
 		attr2pattr(sa->attributes.mode, fp->mode, &psisattr, &psidattr);
 		if (rfsv_setattr(inode->name, psisattr, psidattr)) {
-			res.status = (psion_alive) ? NFSERR_ACCES : NO_PSION;
+			res.status = (rfsv_isalive()) ? NFSERR_ACCES : NO_PSION;
 			return &res;
 		}
 		fp->mode = sa->attributes.mode;
@@ -630,7 +630,7 @@ remove_it(diropargs *da, int isdir)
 	else
 		rfsv_res = rfsv_remove(build_path(inode->name, da->name));
 	if (rfsv_res != 0) {
-		res = psion_alive ? NFSERR_ACCES : NO_PSION;
+		res = rfsv_isalive() ? NFSERR_ACCES : NO_PSION;
 		return &res;
 	}
 	rem_cache(&attrcache, inode->inode);
@@ -673,7 +673,7 @@ nfsproc_rename_2(renameargs *ra)
 		printf("\tRename: %s -> %s\n", old, ldata + 1);
 	res = NFS_OK;
 	if (rfsv_rename(old, ldata + 1)) {
-		res = (psion_alive) ? NFSERR_ACCES : NO_PSION;
+		res = (rfsv_isalive()) ? NFSERR_ACCES : NO_PSION;
 		return &res;
 	}
 	if (res == NFS_OK) {
@@ -705,7 +705,7 @@ nfsproc_statfs_2(struct nfs_fh *fh)
 
 	if (query_devices()) {
 		/* Allow to mount it whithout the psion attached */
-		if (psion_alive)
+		if (rfsv_isalive())
 			return &res;	/* res.status = NO_PSION;  Hmm */
 	}
 	for (dp = devices; dp; dp = dp->next) {
@@ -763,7 +763,7 @@ nfsproc_read_2(struct readargs *ra)
 		return &res;
 	}
 	if (rfsv_fopen(1, inode->name, &phandle) != 0) {
-		res.status = psion_alive ? NFSERR_NOENT : NO_PSION;
+		res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 		return &res;
 	}
 	if (rfsv_read(rop, ra->offset,
@@ -940,14 +940,14 @@ nfsproc_write_2(writeargs *wa)
 		if (rfsv_fopen(0x200, inode->name, &phandle) != 0) {
 			if (debug)
 				printf("write: open failed\n");
-			res.status = psion_alive ? NFSERR_NOSPC : NO_PSION;
+			res.status = rfsv_isalive() ? NFSERR_NOSPC : NO_PSION;
 			return &res;
 		}
 		if (rfsv_write(dcp->data, dcp->offset, dcp->len, phandle) != dcp->len) {
 			rfsv_fclose(phandle);
 			if (debug)
 				printf("write: dump failed\n");
-			res.status = psion_alive ? NFSERR_NOSPC : NO_PSION;
+			res.status = rfsv_isalive() ? NFSERR_NOSPC : NO_PSION;
 			return &res;
 		}
 		rfsv_fclose(phandle);

@@ -27,7 +27,7 @@ extern void nfs_program_2();
 static char
 *user, *dir = DDIR;
 
-int gmtoffset, debug, exiting, psion_alive, query_cache = 0;
+int gmtoffset, debug, exiting, query_cache = 0;
 
 fattr root_fattr =
 {

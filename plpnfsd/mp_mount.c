@@ -14,7 +14,6 @@ extern int inet_addr(char *);
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-
 #ifdef __sgi
 #include <bstring.h>
 #endif
@@ -94,7 +93,7 @@ extern int _rpc_dtablesize();
 #include <sys/socket.h>
 #include <netdb.h>
 
-#include "mp.h"
+#include "rfsv_api.h"
 
 #ifdef __sgi
 #define vfork fork
@@ -588,13 +587,22 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 			clean_cache(&attrcache);
 			query_cache = 0;	/* clear the GETDENTS "cache". */
 		}
-		ret = 1 /* FRITZ fd_is_still_alive(psionfd, 0) */ ;
-		if (isalive && !ret) {
-			if (debug)
-				printf("Disconnected...\n");
-		} else if (!isalive && ret) {
-			if (debug)
-				printf("Connected...\n");
+		ret = rfsv_isalive();
+		if (isalive) {
+			if (!ret) {
+				if (debug)
+					printf("Disconnected...\n");
+				rfsv_startup();
+			}
+		} else {
+			if (ret) {
+				if (debug)
+					printf("Connected...\n");
+			} else {
+				if (debug)
+					printf("Try connecting...\n");
+				rfsv_startup();
+			}
 		}
 		isalive = ret;
 	}

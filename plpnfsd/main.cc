@@ -34,13 +34,21 @@ extern "C" {
 #include "rfsv_api.h"
 }
 
-static rfsv32 *a;
+static rfsv32 *a = 0L;
+static ppsocket *skt = 0L;
+
+long rfsv_isalive() {
+	if (!a)
+		return 0;
+	return (a->getStatus() == 0);
+}
 
 long rfsv_dir(const char *file, dentry **e) {
+	if (!a)
+		return -1;
 	bufferArray entries;
 	dentry *tmp;
 	long ret = a->dir(&(*file), &entries);
-	psion_alive = (a->getStatus() == 0);
 	while (!entries.empty()) {
 		bufferStore s;
 		s = entries.popBuffer();
@@ -58,113 +66,121 @@ long rfsv_dir(const char *file, dentry **e) {
 }
 
 long rfsv_dircount(const char *file, long *count) {
-	long ret = a->dircount(&(*file), &(*count));
-	psion_alive = (a->getStatus() == 0);
-	return ret;
+	if (!a)
+		return -1;
+	return a->dircount(&(*file), &(*count));
 }
 
 long rfsv_rmdir(const char *name) {
-	long ret = a->rmdir(name);
-	psion_alive = (a->getStatus() == 0);
-	return ret;
+	if (!a)
+		return -1;
+	return a->rmdir(name);
 }
 
 long rfsv_mkdir(const char *file) {
-	long ret = a->mkdir(file);
-	psion_alive = (a->getStatus() == 0);
-	return ret;
+	if (!a)
+		return -1;
+	return a->mkdir(file);
 }
 
 long rfsv_remove(const char *file) {
-	long ret = a->remove(file);
-	psion_alive = (a->getStatus() == 0);
-	return ret;
+	if (!a)
+		return -1;
+	return a->remove(file);
 }
 
 long rfsv_fclose(long handle) {
-	long ret = a->fclose(handle);
-	psion_alive = (a->getStatus() == 0);
-	return ret;
+	if (!a)
+		return -1;
+	return a->fclose(handle);
 }
 
 long rfsv_fopen(long attr, const char *file, long *handle) {
+	if (!a)
+		return -1;
 	long ph;
 	long ret = a->fopen(attr, file, ph);
 	*handle = ph;
-	psion_alive = (a->getStatus() == 0);
 	return ret;
 }
 
 long rfsv_fcreate(long attr, const char *file, long *handle) {
+	if (!a)
+		return -1;
 	long ph;
 	long ret = a->fcreatefile(attr, file, ph);
 	*handle = ph;
-	psion_alive = (a->getStatus() == 0);
 	return ret;
 }
 
 long rfsv_read(char *buf, long offset, long len, long handle) {
+	if (!a)
+		return -1;
 	long ret = a->fseek(handle, offset, rfsv32::PSEEK_SET);
 	if (ret >= 0)
 		ret = a->fread(handle, buf, len);
-	psion_alive = (a->getStatus() == 0);
 	return ret;
 }
 
 long rfsv_write(char *buf, long offset, long len, long handle) {
+	if (!a)
+		return -1;
 	long ret = a->fseek(handle, offset, rfsv32::PSEEK_SET);
 	if (ret >= 0)
 		ret = a->fwrite(handle, buf, len);
-	psion_alive = (a->getStatus() == 0);
 	return ret;
 }
 
 long rfsv_setmtime(const char *name, long time) {
-	long ret = a->fsetmtime(name, time);
-	psion_alive = (a->getStatus() == 0);
-	return ret;
+	if (!a)
+		return -1;
+	return a->fsetmtime(name, time);
 }
 
 long rfsv_setsize(const char *name, long size) {
+	if (!a)
+		return -1;
 	long ph;
 	long ret = a->fopen(0x200, name, ph);
 	if (!ret) {
 		ret = a->fsetsize(ph, size);
 		a->fclose(ph);
 	}
-	psion_alive = (a->getStatus() == 0);
 	return ret;
 }
 
 long rfsv_setattr(const char *name, long sattr, long dattr) {
-	long ret = a->fsetattr(name, dattr, sattr);
-	psion_alive = (a->getStatus() == 0);
-	return ret;
+	if (!a)
+		return -1;
+	return a->fsetattr(name, dattr, sattr);
 }
 
 long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
-	long ret = a->fgeteattr(&(*name), &(*attr), &(*size), &(*time));
-	psion_alive = (a->getStatus() == 0);
-	return ret;
+	if (!a)
+		return -1;
+	return a->fgeteattr(&(*name), &(*attr), &(*size), &(*time));
 }
 
 long rfsv_statdev(char letter) {
+	if (!a)
+		return -1;
 	long vfree, vtotal, vattr, vuniqueid;
 	int devnum = letter - 'A';
 	char *name;
 
     	name = a->devinfo(devnum, &vfree, &vtotal, &vattr, &vuniqueid);
-	psion_alive = (a->getStatus() == 0);
 	return (name == NULL);
 }
 
 long rfsv_rename(const char *oldname, const char *newname) {
-	long ret = a->rename(oldname, newname);
-	psion_alive = (a->getStatus() == 0);
-	return ret;
+	if (!a)
+		return -1;
+	return a->rename(oldname, newname);
 }
 
 long rfsv_drivelist(int *cnt, device **dlist) {
+	if (!a)
+		return -1;
 	*dlist = NULL;
 	long devbits;
 	long ret;
@@ -190,26 +206,29 @@ long rfsv_drivelist(int *cnt, device **dlist) {
 			}
 			devbits >>= 1;
 		}
-	psion_alive = (a->getStatus() == 0);
 	return ret;
 }
 
+void rfsv_startup()
+{
+	bool res;
+
+	if (a) {
+		delete a;
+		a = 0L;
+	}
+	if (skt) {
+		delete skt;
+		skt = 0L;
+	}
+	skt = new ppsocket();
+	skt->startup();
+	res = skt->connect(NULL, DEFAULT_SOCKET);
+	a = new rfsv32(skt);
+}
+
 int main(int argc, char**argv) {
-  ppsocket *skt;
-  bool res;
-  
-  // Command line parameter processing
-  int sockNum = DEFAULT_SOCKET;
-
-  skt = new ppsocket();
-  skt->startup();
-  res = skt->connect(NULL, sockNum);
-  
-  a = new rfsv32(skt);
-
-  char *mp_args[] = { "mp_main", "-v", "-dir", "/mnt/psion", NULL };
-  mp_main(4, mp_args);
-  
-  delete a;
-  return 0;
+	char *mp_args[] = { "mp_main", "-v", "-dir", "/mnt/psion", NULL };
+	mp_main(4, mp_args);
+	return 0;
 }

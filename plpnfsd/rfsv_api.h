@@ -25,5 +25,7 @@ extern long rfsv_setmtime(const char *name, long time);
 extern long rfsv_drivelist(int *cnt, device **devlist);
 extern long rfsv_dircount(const char *name, long *count);
 extern long rfsv_statdev(char letter);
+extern long rfsv_isalive();
+extern void rfsv_startup();
 
 #endif
