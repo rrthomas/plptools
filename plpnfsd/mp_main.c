@@ -16,6 +16,7 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <pwd.h>
+#include <grp.h>
 #include <stdarg.h>
 #include <syslog.h>
 #include <errno.h>
@@ -40,6 +41,8 @@
 extern void nfs_program_2();
 
 int debug, exiting, query_cache = 0;
+time_t devcache_keep = 120;
+time_t devcache_stamp = 0;
 
 fattr root_fattr =
 {
@@ -110,6 +113,59 @@ infolog(char *fmt, ...)
 	return 0;
 }
 
+int force_cache_clean = 0;
+
+int set_owner(char *user, int logstdio) {
+	struct passwd *pw = NULL;
+
+	if (user && *user) {
+		if (!(pw = getpwnam(user))) {
+			if (logstdio)
+				fprintf(stderr, "User %s not found.\n", user);
+			else
+				errorlog("User %s not found.\n", user);
+			endpwent();
+			return 1;
+		}
+		if (getuid() && pw->pw_uid != getuid()) {
+			if (logstdio)
+				fprintf(stderr, "Only root can set owner to someone other.\n");
+			else
+				errorlog("Only root can set owner to someone other.\n");
+			endpwent();
+			return 1;
+		}
+	} else {
+		if (!logstdio) {
+			errorlog("Request to change owner with empty argument.\n");
+			return 1;
+		}
+		if (!(pw = getpwuid(getuid()))) {
+			fprintf(stderr, "You don't exist, go away!\n");
+			endpwent();
+			return 1;
+		}
+	}
+	if (pw) {
+		if ((root_fattr.uid != pw->pw_uid) || (root_fattr.gid != pw->pw_gid)) {
+			struct group *g = getgrgid(pw->pw_gid);
+			char *gname = (g && g->gr_name && *(g->gr_name)) ? g->gr_name : "???";
+
+			root_fattr.uid = pw->pw_uid;
+			root_fattr.gid = pw->pw_gid;
+			if (logstdio)
+				printf("Owner set to %s.%s\n", pw->pw_name, gname);
+			else
+				infolog("Owner set to %s.%s\n", pw->pw_name, gname);
+			endgrent();
+			force_cache_clean = 1;
+			cache_flush();
+		}
+	}
+	endpwent();
+	return 0;
+}
+
 int
 mp_main(int verbose, char *dir, char *user)
 {
@@ -123,30 +179,22 @@ mp_main(int verbose, char *dir, char *user)
 	int i;
 
 
-	if (!(user = (char *) getenv("USER")))
-		user = (char *) getenv("logname");
-	if (user && *user) {
-		if (!(pw = getpwnam(user))) {
-			fprintf(stderr, "User %s not found.\n", user);
-			return 1;
-		}
-	} else if (!(pw = getpwuid(getuid()))) {
+	if (!(pw = getpwuid(getuid()))) {
 		fprintf(stderr, "You don't exist, go away!\n");
 		return 1;
 	}
-	if (getuid() && pw->pw_uid != getuid()) {
-		fprintf(stderr, "%s? You must be kidding...\n", user);
-		return 1;
+	if (!user) {
+		if (!(user = (char *) getenv("USER")))
+			user = (char *) getenv("logname");
 	}
-	root_fattr.uid = pw->pw_uid;
-	root_fattr.gid = pw->pw_gid;
 	endpwent();
-
+	if (set_owner(user, 1))
+		return 1;
 	gettimeofday(&tv, &tz);
 
 	debug = verbose;
 	if (debug)
-		printf("plpnfsd: version %s, mounting on %s\n", VERSION, dir);
+		printf("plpnfsd: version %s, mounting on %s ...\n", VERSION, dir);
 
 	/* Check if mountdir is empty (or else you can overmount e.g /etc)
 	   It is done here, because exit hangs, if hardware flowcontrol is

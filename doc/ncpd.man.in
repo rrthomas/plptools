@@ -1,0 +1,89 @@
+.\" Manual page for ncpd
+.\" $Id$
+.\" CHECKIN $Date$
+.\"
+.\" Process this file with
+.\" groff -man -Tascii ncpd.8 for ASCII output, or
+.\" groff -man -Tps ncpd.8 for PostScript output
+.\"
+.TH ncpd 8 "@MANDATE@" "plptools @VERSION@" "System Administration"
+.SH NAME
+ncpd \- Daemon which handles the serial link to a Psion
+.SH SYNOPSIS
+.B ncpd
+.B [-V]
+.BI "[-v " logclass ]
+.B [-d]
+.BI "[-p " port ]
+.BI "[-s " device ]
+.BI "[-b " baudrate ]
+
+.SH DESCRIPTION
+ncpd is the daemon which handles the serial link to your Psion.
+It listens at port @DPORT@ for local connections and provides
+basic PLP/NCP services for plpnfsd and plpftp. It autoconnects
+to the psion, even after unplugging/switching off therefore it
+can run always in background (if you have a spare serial-device)
+
+.SH OPTIONS
+.TP
+.B \-V
+Display the version and exit
+.TP
+.BI "\-v " logclass
+Increase the logging level of the program. the possible values for logclass
+are:
+.TP
+.I nl
+Set NCP debug level to LOG
+.TP
+.I nd
+Set NCP debug level to DEBUG
+.TP
+.I ll
+Set Link debug level to LOG
+.TP
+.I ld
+Set Link debug level to DEBUG
+.TP
+.I pl
+Set Packet debug level to LOG
+.TP
+.I pd
+Set Packet debug level to DEBUG
+.TP
+.I ph
+Set Packet debug level to HANDSHAKE
+.TP
+.I m
+Set overall debug level to verbose
+.TP
+.I all
+Turn on all the above logging on.
+
+.TP
+.B \-d
+Do not background the daemon.
+.TP
+.BI "\-p " port
+Specify the port to listen on - by default this is @DPORT@
+.TP
+.BI "\-s " device
+Specify the serial device to use to connect to the Psion - this defaults to
+@DDEV@
+.TP
+.BI "\-b " baudrate
+Specify the baud rate to use for the serial connection - this defaults to
+@DSPEED@ baud.
+
+.SH SEE ALSO
+plpftp(1), plpnfsd(8)
+
+.SH AUTHOR
+Fritz Elfert
+Heavily based on p3nfsd by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
+and
+plp_1_7 by Philip Proudman (phil@proudman51.freeserve.co.uk)
+Patches from Matt Gumbley (matt@gumbley.demon.co.uk)
+Man page by John Lines (john+plpman@paladin.demon.co.uk)
+

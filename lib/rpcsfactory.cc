@@ -37,7 +37,7 @@
 #include "bufferstore.h"
 #include "ppsocket.h"
 
-rpcsfactory::rpcsfactory(ppsocket *_skt) //: serNum(0)
+rpcsfactory::rpcsfactory(ppsocket *_skt)
 {
 	skt = _skt;
 }
@@ -58,7 +58,6 @@ rpcs * rpcsfactory::create(bool reconnect)
 			cerr << "rpcsfactory::create couldn't send version request" << endl;
 		else {
 			skt->closeSocket();
-			// serNum = 0;
 			skt->reconnect();
 		}
 		return NULL;
@@ -72,13 +71,11 @@ rpcs * rpcsfactory::create(bool reconnect)
 		}
 		if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
 			skt->closeSocket();
-			// serNum = 0;
 			skt->reconnect();
 			return NULL;
 		}
 		// Invalid protocol version
-		cerr << "rpcsfactory::create received odd protocol version from
-ncpd! (" << a << ")" << endl;
+		cerr << "rpcsfactory::create received odd protocol version from ncpd! (" << a << ")" << endl;
 	} else {
 		cerr << "rpcsfactory::create sent, response not 1" << endl;
 	}

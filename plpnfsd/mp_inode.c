@@ -180,22 +180,21 @@ unsigned inode;
 }
 
 struct cache *
-add_cache(root, inode, fp)
-struct cache **root;
-unsigned inode;
-fattr *fp;
-{
+add_cache(struct cache **root, unsigned int inode, fattr *fp) {
 	struct cache *cp;
 
 	if (debug)
 		debuglog("add_cache %d\n", inode);
 	cp = (struct cache *) malloc(sizeof(*cp));
-	cp->inode = inode;
-	cp->attr = *fp;
-	cp->dcache = 0;
-	cp->actual_size = fp->size;
-	cp->next = *root;
-	*root = cp;
+	if (cp != NULL) {
+		cp->stamp = time(0);
+		cp->inode = inode;
+		cp->attr = *fp;
+		cp->dcache = 0;
+		cp->actual_size = fp->size;
+		cp->next = *root;
+		*root = cp;
+	}
 	return cp;
 }
 
@@ -247,10 +246,7 @@ unsigned int off, len;
 }
 
 void
-rem_cache(root, inode)
-struct cache **root;
-unsigned inode;
-{
+rem_cache(struct cache **root, unsigned int inode) {
 	struct cache *cp, **cpp;
 
 	if (debug)
@@ -265,18 +261,24 @@ unsigned inode;
 	free(cp);
 }
 
-void
-clean_cache(root)
-struct cache **root;
-{
-	struct cache *cp, *cpn;
+time_t cache_keep = 30;
 
-	for (cp = *root; cp; cp = cpn) {
-		cpn = cp->next;
-		clean_dcache(cp);
-		free(cp);
+void
+clean_cache(struct cache **root) {
+	struct cache **cp = root;
+	time_t now = time(0);
+
+	while (*cp) {
+		if (force_cache_clean || ((now - (*cp)->stamp) > cache_keep)) {
+			struct cache *old = *cp;
+			if (debug)
+				debuglog("clean_cache %d\n", (*cp)->inode);
+			*cp = (*cp)->next;
+			clean_dcache(old);
+			free(old);
+		} else
+			cp = &(*cp)->next;
 	}
-	*root = 0;
 }
 
 char *

@@ -9,6 +9,7 @@
 #define _rfsv_api_h_
 
 #include "mp.h"
+#include "builtins.h"
 
 extern long rfsv_dir(const char *name, dentry **e);
 extern long rfsv_mkdir(const char *name);
@@ -28,6 +29,9 @@ extern long rfsv_dircount(const char *name, long *count);
 extern long rfsv_statdev(char letter);
 extern long rfsv_isalive();
 extern long rfsv_closecached(void);
+
+extern long rpcs_ownerRead(builtin_node *, char *buf, unsigned long  offset, long len);
+extern long rpcs_ownerSize(builtin_node *);
 
 /* File attributes, C-style */
 #define	PSI_A_RDONLY		0x0001

@@ -8,44 +8,22 @@
 #include "fparam.h"
 #include "nfs_prot.h"
 
-#define PFS_OP_CREATE   0x01
-#define PFS_OP_GETATTR  0x02
-#define PFS_OP_MKDIR    0x03
-#define PFS_OP_READ     0x04
-#define PFS_OP_READDIR  0x05
-#define PFS_OP_REMOVE   0x06
-#define PFS_OP_RENAME   0x07
-#define PFS_OP_RMDIR    0x08
-#define PFS_OP_SETATTR  0x09
-#define PFS_OP_WRITE    0x0a
-#define PFS_OP_GETDEVS  0x0b
-/* The same as getattr without the stat (for linkcount purposes */
-#define PFS_OP_STATDEV  0x0c
-
-/* Only for the new nfsc */
-#define PFS_OP_TTYDATA  0x0d
-#define PFS_OP_EXEC  	0x0e
-#define PFS_OP_ECHO  	0x0f
-#define PREFIX	0x80
-
-typedef struct p_inode
-{
-  int inode;
-  char *name;
-  struct p_inode *nextnam, *nextnum;
+typedef struct p_inode {
+	int inode;
+	char *name;
+	struct p_inode *nextnam, *nextnum;
 } p_inode;
 
-/*
+/**
  * Description of a Psion-Device
  */
-typedef struct p_device
-{
-  char *name;  /* Volume-Name */
-  char letter; /* Drive-Number (zero-based, i.e. 0 = A, 1 = B, 2 = C ...) */
-  long attrib; /* Device-Attribs */
-  long total;  /* Total capacity in bytes */
-  long free;   /* Free space in bytes */
-  struct p_device *next;
+typedef struct p_device {
+	char *name;  /* Volume-Name */
+	char letter; /* Drive-Number (zero-based, i.e. 0 = A, 1 = B, 2 = C ...) */
+	long attrib; /* Device-Attribs */
+	long total;  /* Total capacity in bytes */
+	long free;   /* Free space in bytes */
+	struct p_device *next;
 } device;
 
 /*
@@ -61,36 +39,39 @@ typedef struct p_dentry
 	struct p_dentry *next;
 } dentry;
 
-/* data cache */
-struct dcache
-{
-  struct dcache *next;
-  unsigned char *data;
-  unsigned int offset, len;
-  int towrite;
+/**
+ * data cache
+ */
+struct dcache {
+	struct dcache *next;
+	unsigned char *data;
+	unsigned int offset, len;
+	int towrite;
 };
 
-/* attribute cache */
-struct cache
-{
-  struct cache *next;
-  unsigned int inode;
-  int actual_size;
-  struct dcache *dcache;
-  fattr attr;
+/**
+ * attribute cache
+ */
+struct cache {
+	struct cache *next;
+	time_t stamp;
+	unsigned int inode;
+	int actual_size;
+	struct dcache *dcache;
+	fattr attr;
 };
 
-struct entrycache
-{
-  int inode;
-  entry *head;
-  struct entrycache *next;
-};
+extern int debug;
+extern int exiting;
+extern int query_cache;
+extern int force_cache_clean;
 
-extern int debug, gmtoffset, exiting, psion_alive, dowakeup,
-           query_cache, series5;
 extern fattr root_fattr;
-extern struct cache *datacache, *attrcache;
+extern struct cache *attrcache;
+
+extern time_t cache_keep;
+extern time_t devcache_keep;
+extern time_t devcache_stamp;
 
 #ifdef __SVR4
 #define bzero(a,b) memset(a,0,b)
@@ -105,10 +86,8 @@ extern char *index(), *rindex(), *strdup();
 #endif
 
 
-#define THE_END        (struct entry *)-1
 #define PBUFSIZE       8192
 
-#define TIMEOUT       -54
 #define BLOCKSIZE      512
 #define FID            7 /* File system id */
 
@@ -128,14 +107,8 @@ extern char *index(), *rindex(), *strdup();
      extern void usleep __P((int usec));
 #  endif
 #endif
-
-/* mp_serial.c */
-int init_serial __P((char *dev, int speed));
-int fd_is_still_alive __P((int fd, int wake));
-void reset_serial __P((int fd));
-
-/* crc.c */
-int docrc16 __P((unsigned char *, int));
+extern int set_owner(char *user, int logstdio);
+extern void cache_flush(void);
 
 /* mp_mount.c */
 void mount_and_run __P((char *dir, void (*proc)(), nfs_fh *root_fh));
@@ -164,17 +137,6 @@ extern struct dcache *add_dcache __P((struct cache *, unsigned int, unsigned int
 extern void           clean_dcache __P((struct cache *));
 extern struct dcache *search_dcache __P((struct cache *, unsigned int, unsigned int));
 
-/* mp_xmit.c */
-int sendop __P((int cmd, char *fname, char *rest, int restlen));
-int getstr __P((char *str));
-int getanswer __P((void));
-int sendcmd __P((int cmd, char *fname, char *rest, int restlen));
-int getcount __P((unsigned char *str, int num));
-int senddata __P((char *p, int len));
-void long2pstr __P((unsigned int l, unsigned char *s));
-void short2pstr __P((unsigned int l, unsigned char *s));
-unsigned int pstr2long __P((unsigned char *s));
-
 /* mp_pfs_ops.c */
 extern void *nfsproc_null_2 __P((void));
 extern void *nfsproc_root_2 __P((void));
@@ -197,7 +159,6 @@ extern struct readlinkres *nfsproc_readlink_2 __P((struct nfs_fh *fh));
 
 extern int mp_main(int, char *, char *);
 
-extern int logsyslog;
 extern int debuglog(char *fmt, ...);
 extern int errorlog(char *fmt, ...);
 extern int infolog(char *fmt, ...);

@@ -16,7 +16,9 @@
 
 #include "bool.h"
 #include "rfsv.h"
+#include "rpcs.h"
 #include "rfsvfactory.h"
+#include "rpcsfactory.h"
 #include "bufferstore.h"
 #include "bufferarray.h"
 #include "ppsocket.h"
@@ -31,12 +33,59 @@ static long  a_handle;
 static long  a_offset;
 static long  a_openmode;
 
+static rpcs *r;
+static rpcsfactory *rp;
+static bufferStore owner;
+
+long rpcs_isalive() {
+	long s;
+
+	if (!r) {
+		if (!(r = rp->create(true)))
+			return 0;
+	}
+	s = r->getStatus();
+	if (s == rfsv::E_PSI_FILE_DISC)
+		r->reconnect();
+	return (r->getStatus() == rfsv::E_PSI_GEN_NONE);
+}
+
+long rpcs_ownerRead(builtin_node *, char *buf, unsigned long  offset, long len) {
+
+	if (offset >= (owner.getLen() - 1))
+		return 0;
+	const char *s = owner.getString(offset);
+	int sl = strlen(s);
+	if (sl > len)
+		sl = len;
+	strncpy(buf, s, sl);
+	return sl;
+}
+
+long rpcs_ownerSize(builtin_node *) {
+	Enum<rfsv::errs> res;
+	bufferArray a;
+
+	if (!rpcs_isalive())
+		return 0;
+	res = r->getOwnerInfo(a);
+	owner.init();
+	if (res == rfsv::E_PSI_GEN_NONE) {
+		while (!a.empty()) {
+			owner.addString(a.pop().getString());
+			owner.addByte('\n');
+		}
+	}
+	owner.addByte(0);
+	return owner.getLen() - 1;
+}
+
 long rfsv_isalive() {
 	if (!a) {
 		if (!(a = rf->create(true)))
 			return 0;
 	}
-	return (a->getStatus() == 0);
+	return (a->getStatus() == rfsv::E_PSI_GEN_NONE);
 }
 
 long rfsv_dir(const char *file, dentry **e) {
@@ -287,6 +336,7 @@ void usage()
 
 int main(int argc, char**argv) {
 	ppsocket *skt;
+	ppsocket *skt2;
 	char *user = 0L;
 	char *mdir = DMOUNTPOINT;
 	int sockNum = DPORT;
@@ -313,16 +363,25 @@ int main(int argc, char**argv) {
 	if (!skt->connect(NULL, sockNum)) {
 		cerr << "plpnfsd: could not connect to ncpd" << endl;
 		status = 1;
-	} else {
+	}
+	skt2 = new ppsocket();
+	if (!skt2->connect(NULL, sockNum)) {
+		cerr << "plpnfsd: could not connect to ncpd" << endl;
+		status = 1;
+	}
+	if (status == 0) {
 		rf = new rfsvfactory(skt);
+		rp = new rpcsfactory(skt2);
 		a = rf->create(true);
+		r = rp->create(true);
 		openlog("plpnfsd", LOG_PID|LOG_CONS, LOG_DAEMON);
-		if (a != NULL)
+		if ((a != NULL) && (r != NULL))
 			syslog(LOG_INFO, "connected, status is %d", status);
 		else
-			syslog(LOG_INFO, "could not create rfsv object, connect delayed");
+			syslog(LOG_INFO, "could not create rfsv or rpcs object, connect delayed");
 		status = mp_main(verbose, mdir, user);
 		delete a;
+		delete r;
 	}
 	exit(status);
 }

@@ -139,9 +139,7 @@ hup_handler SIGARG
 	exiting = 5;
 };
 
-static void
-doexit()
-{
+static void doexit() {
 #ifndef DONT_UPDATE_MTAB
 	FILE *fpin, *fpout;
 #if defined(sun) && defined(__SVR4)
@@ -214,6 +212,45 @@ doexit()
 	infolog("plpnfsd: terminating.\n");
 
 	exit(0);
+}
+
+void cache_flush() {
+	struct cache *cp;
+	struct dcache *dcp;
+
+	/*
+	 * Solaris sends blocks in a way which is not very pleasent
+	 * for us. It sends blocks 0,1,2,3,4,5,6, then 9,10,11 and
+	 * do on. A little bit later block 7 and 8 arrives. This "bit"
+	 * is more that 2 seconds, it is about 6 seconds. It occurs,
+	 * if we're rewriting a file. We set MAXWRITE to 15, meaning
+	 * that we are waiting for 30 seconds to receive the missing
+	 * blocks.
+	 */
+
+#define MAXWRITE 15
+
+	int doclean = 1;
+	for (cp = attrcache; cp; cp = cp->next)
+		for (dcp = cp->dcache; dcp; dcp = dcp->next)
+			if (dcp->towrite) {
+				debuglog("waiting for block %d in %s to write (%d)\n",
+					       dcp->offset, get_num(cp->inode)->name, dcp->towrite);
+				if (++dcp->towrite <= MAXWRITE)
+					doclean = 0;	/* Wait with cleaning */
+			}
+	if (doclean || force_cache_clean) {
+		for (cp = attrcache; cp; cp = cp->next)
+			for (dcp = cp->dcache; dcp; dcp = dcp->next)
+				if (dcp->towrite)
+					errorlog("PLPNFSD WARNING: file %s block at %d not written\n",
+					       get_num(cp->inode)->name, dcp->offset);
+		clean_cache(&attrcache);
+		if (force_cache_clean || ((time(0) - devcache_stamp) > devcache_keep))
+			query_cache = 0;	/* clear the GETDENTS "cache". */
+		rfsv_closecached();
+		force_cache_clean = 0;
+	}
 }
 
 void
@@ -515,7 +552,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 	}
 
 /*** Third part: let's go */
-	infolog("to stop the server do \"ls %s/exit\".\n", mntdir);
+	infolog("to stop the server do \"echo stop > %s/proc/exit\".\n", mntdir);
 
 #if defined(sun) && !defined(__SVR4)
 	dtbsize = _rpc_dtablesize();
@@ -535,8 +572,6 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 	for (;;) {
 		fd_set readfd;
 		struct timeval tv;
-		struct cache *cp;
-		struct dcache *dcp;
 
 		readfd = svc_fdset;
 		tv.tv_sec = 2;
@@ -553,46 +588,21 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 		if (exiting)
 			doexit();
 
-		/*
-		 * Solaris sends blocks in a way which is not very pleasent
-		 * for us. It sends blocks 0,1,2,3,4,5,6, then 9,10,11 and
-		 * do on. A little bit later block 7 and 8 arrives. This "bit"
-		 * is more that 2 seconds, it is about 6 seconds. It occurs,
-		 * if we're rewriting a file. We set MAXWRITE to 15, meaning
-		 * that we are waiting for 30 seconds to receive the missing
-		 * blocks.
-		 */
+		cache_flush();
 
-#define MAXWRITE 15
-		doclean = 1;
-		for (cp = attrcache; cp; cp = cp->next)
-			for (dcp = cp->dcache; dcp; dcp = dcp->next)
-				if (dcp->towrite) {
-					debuglog("waiting for block %d in %s to write (%d)\n",
-						       dcp->offset, get_num(cp->inode)->name, dcp->towrite);
-					if (++dcp->towrite <= MAXWRITE)
-						doclean = 0;	/* Wait with cleaning */
-				}
 		ret = rfsv_isalive();
 		if (isalive) {
 			if (!ret) {
 				debuglog("Disconnected...\n");
 				doclean = 1;
+				root_fattr.mtime.seconds = time(0);
 			}
 		} else {
-			if (ret)
+			if (ret) {
 				debuglog("Connected...\n");
+				root_fattr.mtime.seconds = time(0);
+			}
 		}
 		isalive = ret;
-		if (doclean) {
-			for (cp = attrcache; cp; cp = cp->next)
-				for (dcp = cp->dcache; dcp; dcp = dcp->next)
-					if (dcp->towrite)
-						errorlog("PLPNFSD WARNING: file %s block at %d not written\n",
-						       get_num(cp->inode)->name, dcp->offset);
-			clean_cache(&attrcache);
-			query_cache = 0;	/* clear the GETDENTS "cache". */
-			rfsv_closecached();
-		}
 	}
 }

@@ -1,0 +1,46 @@
+.\" Manual page for plpftp
+.\" $Id$
+.\" CHECKIN $Date$
+.\"
+.\" Process this file with
+.\" groff -man -Tascii plpftp.1 for ASCII output, or
+.\" groff -man -Tps plpftp.1 for PostScript output
+.\"
+.TH plpftp 1 "@MANDATE@" "plptools @VERSION@" local
+.SH NAME
+plpftp \- FTP-like program for manipulating files on the Psion.
+.SH SYNOPSIS
+.B plpftp
+.BI "[-p " port ]
+.BI "[ " ftpcommand " [" parameters ]]
+
+.SH DESCRIPTION
+
+plpftp provides an ftp style interface for the psion. It requires the ncpd to
+be running already to provide access to the serial port.
+
+plpftp has online help. To see the available commands start the program and
+enter "help".
+
+.SH OPTIONS
+
+.TP
+.BI "\-p " port
+Specify the port to connect to (e.g. The port where ncpd is listening on) -
+by default this is @DPORT@
+.TP
+.I ftpcommand parameters
+Allows you to specify an plpftp command on the command line. If specified,
+plpftp enters non interactive mode and terminates after executing the
+command.
+
+.SH SEE ALSO
+ncpd(8), plpncpd(8)
+
+.SH AUTHOR
+Fritz Elfert
+Heavily based on p3nfsd by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
+and
+plp_1_7 by Philip Proudman (phil@proudman51.freeserve.co.uk)
+Man page by John Lines (john+plpman@paladin.demon.co.uk)
+

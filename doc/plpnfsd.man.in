@@ -1,0 +1,76 @@
+.\" Manual page for plpnfsd
+.\" $Id$
+.\" CHECKIN $Date$
+.\"
+.\" Process this file with
+.\" groff -man -Tascii plpnfsd.8 for ASCII output, or
+.\" groff -man -Tps plpnfsd.8 for PostScript output
+.\"
+.TH plpnfsd 8 "@MANDATE@" "plptools @VERSION@" "System Administration"
+.SH NAME
+plpnfsd \- Daemon to mount a Psion an nfs like filesystem
+.SH SYNOPSIS
+.B plpnfsd
+.B [-V]
+.B [-v]
+.BI "[-p " port ]
+.BI "[-d " mountdir ]
+.BI "[-u " user ]
+
+.SH DESCRIPTION
+plpnfsd is a daemon, which provides NFS-like access to your Psion.
+It automatically makes the psion's filesystems available below
+an NFS-mounted directory (default /mnt/psion).
+By default, plpnfsd is installed suid-root, so any normal user
+can start it and get's the mounted directory owned by himself.
+As this program is usually used on single-user machines, this
+does not hurt security. Like the others, this program
+auto-reconnects after a link-failure, so you can keep the
+psion mounted all the time, even when it is not connected.
+Due to Rudolf Koenig's clever error-handling, you don't need to
+worry about blocked io-processes if the psion isn't available.
+You simply will get an "device not configured" error, when
+accessing a file on a previously connected psion which has been
+disconnected. After that, the mount-point will appear empty.
+As soon as the psion is connected again, the subdirectories
+will reappear. (possibly with a few secs delay)
+
+
+.SH OPTIONS
+.TP
+.B \-V
+Display the version and exit
+.TP
+.B \-v
+Produce verbose logging output. Can be specified more than once to increase the
+debug level (up to 3 times)
+
+.TP
+.BI "\-p " port
+Specify the port to connect to (e.g. the port where ncpd is listening on) - by
+default this is
+.I @DPORT@.
+.TP
+.BI "\-d " mountdir
+Specify the directory to mount the psion file system on. This defaults
+to
+.I @DMOUNTPOINT@
+.TP
+.BI "\-u " user
+Specify the user who will own the psion files. This defaults to the user
+who is running plpnfsd. If the user running plpnfsd is
+.I root
+, s/he may
+also specify a different user.
+
+.SH SEE ALSO
+ncpd(8), plpftp(1)
+
+.SH AUTHOR
+Fritz Elfert
+Heavily based on p3nfsd by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
+and
+plp_1_7 by Philip Proudman (phil@proudman51.freeserve.co.uk)
+Patches from Matt Gumbley (matt@gumbley.demon.co.uk)
+Man page by John Lines (john+plpman@paladin.demon.co.uk)
+

@@ -13,6 +13,8 @@ dnl checks for programs
 AC_AIX
 AC_PROG_MAKE_SET
 AC_CHECK_COMPILERS
+AC_PROG_AWK
+AC_PATH_PROG(SED,sed)
 
 CFLAGS="-O"
 test "$GCC" = yes && CFLAGS="-O2 -Wall"
@@ -84,6 +86,7 @@ AC_ARG_WITH(serial,
     ]
 )
 AC_DEFINE_UNQUOTED(DDEV,"$DDEV")
+AC_SUBST(DDEV)
 
 AC_ARG_WITH(speed,
     [  --with-speed=SPEED      override default serial speed [115200]],
@@ -94,6 +97,7 @@ AC_ARG_WITH(speed,
     ]
 )
 AC_DEFINE_UNQUOTED(DSPEED,$DSPEED)
+AC_SUBST(DSPEED)
 
 AC_ARG_WITH(port,
     [  --with-port=PORT        override default port [7501]],
@@ -104,6 +108,7 @@ AC_ARG_WITH(port,
     ]
 )
 AC_DEFINE_UNQUOTED(DPORT,$DPORT)
+AC_SUBST(DPORT)
 
 AC_ARG_WITH(drive,
     [  --with-drive=DRIVE      override default Psion drive [AUTO]],
@@ -134,6 +139,7 @@ AC_ARG_WITH(mountdir,
     ]
 )
 AC_DEFINE_UNQUOTED(DMOUNTPOINT,"$DMOUNTPOINT")
+AC_SUBST(DMOUNTPOINT)
 
 
 AC_OUTPUT(
@@ -146,4 +152,7 @@ AC_OUTPUT(
 	doc/api/Makefile
 	include/config.h
 	etc/psion
+	doc/ncpd.man
+	doc/plpnfsd.man
+	doc/plpftp.man
 )

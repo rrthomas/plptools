@@ -9,6 +9,7 @@
 #include "OSdefs.h"
 #include <stdio.h>
 #include <ctype.h>
+#include <pwd.h>
 #if defined(__SVR4) || defined(__GLIBC__)
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,9 +18,125 @@
 #include "nfs_prot.h"
 #include "mp.h"
 #include "rfsv_api.h"
+#include "builtins.h"
 
 static device *devices;
-struct cache *attrcache;
+struct cache *attrcache = NULL;
+
+long param_read(builtin_node *node, char *buf, unsigned long offset, long len) {
+	char tmp[10];
+	unsigned long val = 0;
+
+	if (!strcmp(node->name, "acache"))
+		val = cache_keep;
+	if (!strcmp(node->name, "dcache"))
+		val = devcache_keep;
+	if (!strcmp(node->name, "debuglevel"))
+		val = debug;
+	sprintf(tmp, "%ld\n", val);
+	if (offset >= strlen(tmp))
+		return 0;
+	strncpy(buf, &tmp[offset], len);
+	return strlen(buf);
+}
+
+long param_write(builtin_node *node, char *buf, unsigned long offset, long len) {
+	unsigned long val;
+
+	if (len > 1 && offset == 0) {
+		int res = sscanf(buf, "%ld", &val);
+		if (res == 1) {
+			if (!strcmp(node->name, "acache"))
+				cache_keep = val;
+			if (!strcmp(node->name, "dcache"))
+				devcache_keep = val;
+			if (!strcmp(node->name, "debuglevel")) {
+				if (val != debug) {
+					if (val > debug)
+						debug = val;
+					debuglog("Set debug level to %d\n", val);
+					debug = val;
+				}
+			}
+		}
+	}
+	return len;
+}
+
+long param_getsize(builtin_node *node) {
+	char tmp[10];
+	return param_read(node, tmp, 0, sizeof(tmp));
+}
+
+long exit_write(builtin_node *node, char *buf, unsigned long offset, long len) {
+	if (len >= 4 && offset == 0) {
+		if (!strncmp(buf, "stop", 4))
+			exiting = 5; /* Lets try it 5 times (10 sec) */
+	}
+	return len;
+}
+
+long exit_read(builtin_node *node, char *buf, unsigned long offset, long len) {
+	if (offset > 4)
+		return 0;
+	if ((len + offset) > 5)
+		len = 5 - offset;
+	strncpy(buf, "----\n", len);
+	return strlen(buf);
+}
+
+long user_write(builtin_node *node, char *buf, unsigned long offset, long len) {
+	char tmp[256];
+	if (len > 1 && offset == 0) {
+		char *p;
+
+		if (len > (sizeof(tmp) - 1))
+			len = sizeof(tmp) - 1;
+		strncpy(tmp, buf, len);
+		debuglog("pwrite: %d\n", len);
+		tmp[len] = '\0';
+		if ((p = strchr(tmp, '\n')))
+			*p = '\0';
+		set_owner(tmp, 0);
+	}
+	return len;
+}
+
+long user_read(builtin_node *node, char *buf, unsigned long offset, long len) {
+	struct passwd *pw = getpwuid(root_fattr.uid);
+	char tmp[255];
+
+	if (pw)
+		sprintf(tmp, "%s\n", pw->pw_name);
+	else
+		sprintf(tmp, "???\n");
+	endpwent();
+	if (offset >= strlen(tmp))
+		return 0;
+	strncpy(buf, &tmp[offset], len);
+	return strlen(buf);
+}
+
+long user_getsize(builtin_node *node) {
+	char tmp[255];
+	return user_read(node, tmp, 0, sizeof(tmp));
+}
+
+static long generic_sattr(builtin_node *p, unsigned long sa, unsigned long da) {
+	p->attr |= sa;
+	p->attr &= ~da;
+	return 0;
+}
+
+static builtin_node builtins[] = {
+	{ "owner",      0,                PSI_A_READ | PSI_A_RDONLY, 0, rpcs_ownerSize, rpcs_ownerRead, NULL, NULL },
+	{ "debuglevel", BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, param_getsize, param_read, param_write, generic_sattr },
+	{ "acache",     BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, param_getsize, param_read, param_write, generic_sattr },
+	{ "dcache",     BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, param_getsize, param_read, param_write, generic_sattr },
+	{ "unixowner",  BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 0, user_getsize, user_read, user_write, NULL },
+	{ "exit",       BF_EXISTS_ALWAYS|BF_NOCACHE, PSI_A_READ, 5, NULL, exit_read, exit_write, NULL },
+};
+static int num_builtins = sizeof(builtins) / sizeof(builtin_node);
 
 /*
  * Nfsd returned NFSERR_STALE if the psion wasn't present, but I didn't like
@@ -139,7 +256,7 @@ attr2pattr(long oattr, long nattr, long *psisattr, long *psidattr)
 }
 
 static void
-dpattr2attr(long psiattr, long size, long ftime, fattr *fp, int inode)
+pattr2attr(long psiattr, long size, long ftime, fattr *fp, int inode)
 {
 	bzero((char *) fp, sizeof(*fp));
 
@@ -166,7 +283,7 @@ dpattr2attr(long psiattr, long size, long ftime, fattr *fp, int inode)
 		 * work properly
 		 */
 		if (psiattr & PSI_A_READ)
-		fp->mode |= 0400;		/* File readable (?) */
+			fp->mode |= 0400;	/* File readable (?) */
 		if (!(psiattr & PSI_A_RDONLY))
 			fp->mode |= 0200;	/* File writeable  */
 		/* fp->mode |= 0100;		   File executable */
@@ -191,59 +308,6 @@ dpattr2attr(long psiattr, long size, long ftime, fattr *fp, int inode)
 	fp->mtime.seconds = fp->ctime.seconds = fp->atime.seconds;
 }
 
-static void
-pattr2attr(long psiattr, long size, long ftime, fattr *fp, unsigned char *fh)
-{
-	bzero((char *) fp, sizeof(*fp));
-
-	if (psiattr & PSI_A_DIR) {
-		fp->type = NFDIR;
-		fp->mode = NFSMODE_DIR | 0700;
-		/*
-		 * Damned filesystem.
-		 * We have to count the number of subdirectories
-		 * on the psion.
-		 */
-		fp->nlink = 0;
-		fp->size = BLOCKSIZE;
-		fp->blocks = 1;
-	} else {
-		fp->type = NFREG;
-		fp->mode = NFSMODE_REG;
-		fp->nlink = 1;
-		fp->size = size;
-		fp->blocks = (fp->size + BLOCKSIZE - 1) / BLOCKSIZE;
-
-		/*
-		 * Following flags have to be set in order to let backups
-		 * work properly
-		 */
-		if (psiattr & PSI_A_READ)
-		fp->mode |= 0400;		/* File readable (?) */
-		if (!(psiattr & PSI_A_RDONLY))
-			fp->mode |= 0200;	/* File writeable  */
-		/* fp->mode |= 0100;		   File executable */
-		if (!(psiattr & PSI_A_HIDDEN))
-			fp->mode |= 0004;	/* Not Hidden  <-> world read */
-		if (psiattr & PSI_A_SYSTEM)
-			fp->mode |= 0002;	/* System      <-> world write */
-		if (psiattr & PSI_A_VOLUME)
-			fp->mode |= 0001;	/* Volume      <-> world exec */
-		if (psiattr & PSI_A_ARCHIVE)
-			fp->mode |= 0020;	/* Modified    <-> group write */
-	/*		fp->mode |= 0040;	 Byte        <-> group read */
-	/*		fp->mode |= 0010;	 Text        <-> group exec */
-	}
-
-	fp->uid = root_fattr.uid;
-	fp->gid = root_fattr.gid;
-	fp->blocksize = BLOCKSIZE;
-	fp->fileid = fh2inode((char *) fh);
-	fp->rdev = fp->fsid = FID;
-	fp->atime.seconds = ftime;
-	fp->mtime.seconds = fp->ctime.seconds = fp->atime.seconds;
-}
-
 static int
 query_devices()
 {
@@ -258,10 +322,12 @@ query_devices()
 		free(dp);
 	}
 	devices = 0;
+	debuglog("RFSV drivelist\n");
 	if (rfsv_drivelist(&link_count, &devices))
 		return 1;
 	query_cache = 1;
-	root_fattr.nlink = link_count;
+	devcache_stamp = time(0);
+	root_fattr.nlink = link_count + 1;
 	return 0;
 }
 
@@ -272,7 +338,15 @@ mp_dircount(p_inode *inode, long *count)
 	long ret;
 
 	*count = 0;
-	debuglog("dircount: dir\n");
+	debuglog("dircount: %s\n", inode->name);
+	if (!strcmp(inode->name, "proc")) {
+		int i;
+		for (i = 0; i < num_builtins; i++)
+			if ((builtins[i].flags & BF_EXISTS_ALWAYS) || rfsv_isalive())
+				(*count)++;
+		return 0;
+	}
+	debuglog("RFSV dir %s\n", inode->name);
 	if ((ret = rfsv_dir(dirname(inode->name), &e)))
 		return ret;
 	while (e) {
@@ -285,7 +359,7 @@ mp_dircount(p_inode *inode, long *count)
 		ni = get_nam(build_path(inode->name, bp))->inode;
 		free(e->name);
 		if (!search_cache(attrcache, ni)) {
-			dpattr2attr(e->attr, e->size, e->time, &fp, ni);
+			pattr2attr(e->attr, e->size, e->time, &fp, ni);
 			if (rfsv_isalive())
 				add_cache(&attrcache, ni, &fp);
 		}
@@ -308,6 +382,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 	long psize;
 	long ptime;
 	long dcount;
+	int builtin = 0;
 	int l;
 
 	debuglog("getattr:'%s',%d\n", inode->name, inode->inode);
@@ -316,6 +391,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 	if ((cp = search_cache(attrcache, inode->inode))) {
 		debuglog("getattr: cache hit\n");
 		*fp = cp->attr;	/* gotcha */
+#if 0
 		if (fp->type == NFDIR) {
 			if (mp_dircount(inode, &dcount)) {
 				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
@@ -326,6 +402,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 			fp->nlink = dcount + 2;
 			cp->attr = *fp;
 		}
+#endif
 		return &res;
 	}
 	l = strlen(inode->name);
@@ -334,9 +411,18 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 		/* It's the root inode */
 		debuglog("getattr:root inode (%#o)\n", root_fattr.mode);
 
-		if (query_devices())	/* root inode is always there */
-			root_fattr.nlink = 2;
+		if (query_devices())	/* root inode and proc is always there */
+			root_fattr.nlink = 3;
 		*fp = root_fattr;
+	} else if (l == 4 && (!strcmp(inode->name, "proc"))) {
+		debuglog("getattr:proc (%#o)\n", root_fattr.mode);
+		*fp = root_fattr;
+		fp->fileid = inode->inode;
+		fp->type = NFDIR;
+		mp_dircount(inode, &dcount);
+		if (fp->nlink != (dcount + 2))
+			fp->mtime.seconds = time(0);
+		fp->nlink = dcount + 2;
 	} else if (l == 2 && inode->name[1] == ':') {
 		debuglog("getattr:device\n");
 		res.status = NO_PSION;
@@ -367,13 +453,31 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 			}
 		}
 	} else {
-		debuglog("getattr:fileordir\n");
-		/* It's a normal file/dir */
-		if (rfsv_getattr(inode->name, &pattr, &psize, &ptime)) {
-			res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
-			return &res;
+		int i;
+
+		for (i = 0; i < num_builtins; i++) {
+			if (!strcmp(inode->name, build_path("proc", builtins[i].name))) {
+				pattr = builtins[i].attr;
+				psize = (builtins[i].getsize != NULL) ? builtins[i].getsize(&builtins[i]) : builtins[i].size;
+				ptime = time(0);
+				res.status = NFS_OK;
+				builtin = 1;
+				if (builtins[i].flags && BF_NOCACHE)
+					builtin++;
+				break;
+			}
 		}
-		pattr2attr(pattr, psize, ptime, fp, (unsigned char *) fh->data);
+
+		if (!builtin) {
+			debuglog("getattr:fileordir\n");
+			/* It's a normal file/dir */
+			debuglog("RFSV getattr %s\n", inode->name);
+			if (rfsv_getattr(inode->name, &pattr, &psize, &ptime)) {
+				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
+				return &res;
+			}
+		}
+		pattr2attr(pattr, psize, ptime, fp, fh2inode((char *) fh->data));
 		if (fp->type == NFDIR) {
 			if (mp_dircount(inode, &dcount)) {
 				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
@@ -384,7 +488,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 			fp->nlink = dcount + 2;
 		}
 	}
-	if (rfsv_isalive())
+	if (rfsv_isalive() && builtin < 2)
 		add_cache(&attrcache, inode->inode, fp);
 	return &res;
 }
@@ -404,18 +508,6 @@ nfsproc_lookup_2(diropargs *da)
 	}
 	debuglog("lookup: in '%s'(%d) searching '%s'\n",
 		       inode->name, inode->inode, da->name);
-
-	if (inode->inode == root_fattr.fileid && !strcmp(da->name, "exit")) {
-		exiting = 5;	/* Lets try it 5 times (10 sec) */
-		res.status = NFSERR_EXIST;
-		return &res;
-	}
-	if (inode->inode == root_fattr.fileid && !strcmp(da->name, "debug")) {
-		debug = (debug + 1) & 3;	/* debug level of 0,1,2 & 3 */
-		debuglog("Set debug level to %d\n", debug);
-		res.status = NFSERR_EXIST;
-		return &res;
-	}
 	if (!strcmp(da->name, "."))
 		inode2fh(fh2inode(da->dir.data), fp);
 	else if (!strcmp(da->name, ".."))
@@ -510,15 +602,17 @@ nfsproc_readdir_2(readdirargs *ra)
 	debuglog("readdir: %s, cookie:%x, count:%d\n",
 		       inode->name, searchinode, ra->count);
 
-/* . & .. */
+	/* . & .. */
 	addentry(ra, &cp, &searchinode, inode->inode, ".");
 	addentry(ra, &cp, &searchinode, getpinode(inode), "..");
 
 	if (inode->inode == root_fattr.fileid) {	/* Root directory */
 		device *dp;
 
+		addentry(ra, &cp, &searchinode, get_nam("/proc")->inode, "proc");
 		if (query_devices()) {
-			res.status = NO_PSION;
+			res.readdirres_u.reply.eof = ra->count == RA_MAXCOUNT ? 0 : 1;
+			res.status = NFS_OK;
 			return &res;
 		}
 		for (dp = devices; dp; dp = dp->next) {
@@ -529,25 +623,35 @@ nfsproc_readdir_2(readdirargs *ra)
 	} else {
 		dentry *e = NULL;
 		debuglog("nfsdir: dir\n");
-		if (rfsv_dir(dirname(inode->name), &e)) {
-			res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
-			return &res;
-		}
-		while (e) {
-			fattr fp;
-			dentry *o;
-			int ni;
-
-			bp = filname(e->name);
-			ni = get_nam(build_path(inode->name, bp))->inode;
-			addentry(ra, &cp, &searchinode, ni, (char *) bp);
-			free(e->name);
-			dpattr2attr(e->attr, e->size, e->time, &fp, ni);
-			if (rfsv_isalive())
-				add_cache(&attrcache, ni, &fp);
-			o = e;
-			e = e->next;
-			free(o);
+		if (!strcmp(inode->name, "proc")) {
+			int i;
+			for (i = 0; i < num_builtins; i++)
+				if ((builtins[i].flags & BF_EXISTS_ALWAYS) || rfsv_isalive()) {
+					int ni = get_nam(build_path(inode->name, builtins[i].name))->inode;
+					addentry(ra, &cp, &searchinode, ni, builtins[i].name);
+				}
+		} else {
+			debuglog("RFSV dir2 %s\n", inode->name);
+			if (rfsv_dir(dirname(inode->name), &e)) {
+				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
+				return &res;
+			}
+			while (e) {
+				fattr fp;
+				dentry *o;
+				int ni;
+	
+				bp = filname(e->name);
+				ni = get_nam(build_path(inode->name, bp))->inode;
+				addentry(ra, &cp, &searchinode, ni, (char *) bp);
+				free(e->name);
+				pattr2attr(e->attr, e->size, e->time, &fp, ni);
+				if (rfsv_isalive())
+					add_cache(&attrcache, ni, &fp);
+				o = e;
+				e = e->next;
+				free(o);
+			}
 		}
 	}
 
@@ -562,6 +666,8 @@ nfsproc_setattr_2(sattrargs *sa)
 	static struct attrstat res;
 	p_inode *inode = get_num(fh2inode(sa->file.data));
 	fattr *fp;
+	int bi;
+	int builtin = 0;
 
 	if (!inode) {
 		debuglog("setattr: stale fh\n");
@@ -574,13 +680,28 @@ nfsproc_setattr_2(sattrargs *sa)
 		return &res;
 	fp = &res.attrstat_u.attributes;
 
+	for (bi = 0; bi < num_builtins; bi++) {
+		if (!strcmp(inode->name, build_path("proc", builtins[bi].name))) {
+			builtin = 1;
+			break;
+		}
+	}
+
 	if ((fp->type == NFREG) &&
 	    (sa->attributes.size != -1) &&
 	    (sa->attributes.size != fp->size)) {
-		debuglog("setattr truncating to %d bytes\n", sa->attributes.size);
-		if (rfsv_setsize(inode->name, sa->attributes.size) != 0) {
-			res.status = rfsv_isalive() ? NFSERR_ROFS : NO_PSION;
-			return &res;
+		debuglog("RFSV setsize %s %d\n", inode->name, sa->attributes.size);
+		if (builtin) {
+			if (builtins[bi].attr & PSI_A_RDONLY) {
+				res.status = NFSERR_ACCES;
+				return &res;
+			}
+		} else {
+			if (rfsv_setsize(inode->name, sa->attributes.size) != 0) {
+				// FIXME: more different error codes
+				res.status = rfsv_isalive() ? NFSERR_ROFS : NO_PSION;
+				return &res;
+			}
 		}
 		fp->size = sa->attributes.size;
 		rem_cache(&attrcache, inode->inode);
@@ -588,7 +709,8 @@ nfsproc_setattr_2(sattrargs *sa)
 			add_cache(&attrcache, inode->inode, fp);
 	}
 	if ((sa->attributes.mtime.seconds != fp->mtime.seconds) &&
-	    (sa->attributes.mtime.seconds != -1)) {
+	    (sa->attributes.mtime.seconds != -1) && !builtin) {
+		debuglog("RFSV setmtime %s %d\n", inode->name, sa->attributes.mtime.seconds);
 		if (rfsv_setmtime(inode->name, sa->attributes.mtime.seconds)) {
 			res.status = (rfsv_isalive()) ? NFSERR_ACCES : NO_PSION;
 			return &res;
@@ -602,13 +724,21 @@ nfsproc_setattr_2(sattrargs *sa)
 	    (sa->attributes.mode != -1)) {
 		long psisattr, psidattr;
 		attr2pattr(sa->attributes.mode, fp->mode, &psisattr, &psidattr);
-		if (rfsv_setattr(inode->name, psisattr, psidattr)) {
-			res.status = (rfsv_isalive()) ? NFSERR_ACCES : NO_PSION;
-			return &res;
+		debuglog("RFSV setattr %s %d %d\n", inode->name, psisattr, psidattr);
+		if (builtin) {
+			if ((builtins[bi].sattr == NULL) || builtins[bi].sattr(&builtins[bi], psisattr, psidattr)) {
+				res.status = NFSERR_ACCES;
+				return &res;
+			}
+		} else {
+			if (rfsv_setattr(inode->name, psisattr, psidattr)) {
+				res.status = (rfsv_isalive()) ? NFSERR_ACCES : NO_PSION;
+				return &res;
+			}
 		}
 		fp->mode = sa->attributes.mode;
 		rem_cache(&attrcache, inode->inode);
-		if (rfsv_isalive())
+		if (rfsv_isalive() && !builtin)
 			add_cache(&attrcache, inode->inode, fp);
 	}
 	res.status = NFS_OK;
@@ -629,10 +759,13 @@ remove_it(diropargs *da, int isdir)
 	}
 	debuglog("remove_it: in %s: %s (%d)\n", inode->name, da->name, isdir);
 
-	if (isdir)
+	if (isdir) {
+		debuglog("RFSV rmdir %s\n", build_path(inode->name, da->name));
 		rfsv_res = rfsv_rmdir(build_path(inode->name, da->name));
-	else
+	} else {
+		debuglog("RFSV remove %s\n", build_path(inode->name, da->name));
 		rfsv_res = rfsv_remove(build_path(inode->name, da->name));
+	}
 	if (rfsv_res != 0) {
 		res = rfsv_isalive() ? NFSERR_ACCES : NO_PSION;
 		return &res;
@@ -672,8 +805,8 @@ nfsproc_rename_2(renameargs *ra)
 	c = *ldata + 1;
 	old = build_path(from->name, ra->from.name);
 
-	debuglog("Rename: %s -> %s\n", old, ldata + 1);
 	res = NFS_OK;
+	debuglog("RFSV rename %s -> %s\n", old, ldata + 1);
 	if (rfsv_rename(old, ldata + 1)) {
 		res = (rfsv_isalive()) ? NFSERR_ACCES : NO_PSION;
 		return &res;
@@ -740,7 +873,9 @@ nfsproc_read_2(struct readargs *ra)
 	long pattr;
 	long psize;
 	long ptime;
-	int len;
+	int len = 0;
+	int bi;
+	int builtin = 0;
 
 	if (!inode) {
 		debuglog("read: stale fh\n");
@@ -760,40 +895,57 @@ nfsproc_read_2(struct readargs *ra)
 		return &res;
 	}
 
-	if(rfsv_read(rop, ra->offset,
-		ra->count, inode->name) < 0) {
-		res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
-		return &res;
+	debuglog("RFSV read %s\n", inode->name);
+
+	for (bi = 0; bi < num_builtins; bi++) {
+		if (!strcmp(inode->name, build_path("proc", builtins[bi].name))) {
+			if (builtins[bi].read != NULL) {
+				len = builtins[bi].read(&builtins[bi], rop, ra->offset, ra->count);
+				builtin = 1;
+				break;
+			}
+		}
 	}
 
+	if (!builtin) {
+		if (rfsv_read(rop, ra->offset,
+			ra->count, inode->name) < 0) {
+			res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
+			return &res;
+		}
+	}
 	fp = &res.readres_u.reply.attributes;
-	if(!cp)	// Problem: if an epoc process is enlarging the file, we wont recognize it
-	  {
-	    rfsv_getattr(inode->name, &pattr, &psize, &ptime);
-	    pattr2attr(pattr, psize, ptime, fp, (unsigned char *) ra->file.data);
-	    cp = add_cache(&attrcache, inode->inode, fp);
-          }
-	else
-	  {
-	    *fp = cp->attr;
-	  }
-
+	if (!cp) {
+		// Problem: if an epoc process is enlarging the file, we wont recognize it
+		debuglog("RFSV getattr %s\n", inode->name);
+		if (builtin) {
+			pattr = builtins[bi].attr;
+			psize = (builtins[bi].getsize != NULL) ? builtins[bi].getsize(&builtins[bi]) : builtins[bi].size;
+			ptime = time(0);
+		} else
+			rfsv_getattr(inode->name, &pattr, &psize, &ptime);
+		pattr2attr(pattr, psize, ptime, fp, fh2inode((char *)ra->file.data));
+		cp = add_cache(&attrcache, inode->inode, fp);
+	} else {
+		*fp = cp->attr;
+	}
 	
-
 	len = cp->actual_size - ra->offset;
 	if (len > ra->count)
 		len = ra->count;
 	if (cp->actual_size < ra->offset)
 		len = 0;
 	if (debug > 1)
-		debuglog("Read: filesize %d read %d @ %d\n", cp->actual_size,len,ra->offset);
-	res.readres_u.reply.data.data_len = len;
-	res.readres_u.reply.data.data_val = (char *) rop;
-
+		debuglog("Read: filesize %d read %d @ %d\n", cp->actual_size, len, ra->offset);
 	if (len) {
 		dcp = add_dcache(cp, ra->offset, ra->count, rop);
 		dcp->towrite = 0;	/* don't write it back */
 	}
+	if (builtin)
+		rem_cache(&attrcache, inode->inode);
+	res.readres_u.reply.data.data_len = len;
+	res.readres_u.reply.data.data_val = (char *) rop;
+
 	res.status = NFS_OK;
 	return &res;
 }
@@ -881,7 +1033,8 @@ nfsproc_write_2(writeargs *wa)
 	struct dcache *dcp;
 	fattr *fp;
 	struct attrstat *gres;
-	int len, dlen, doff;
+	int len = 0;
+	int i, dlen, doff;
 
 	if (!inode) {
 		debuglog("write: stale fh\n");
@@ -901,8 +1054,11 @@ nfsproc_write_2(writeargs *wa)
 			return &res;
 		}
 		cp = search_cache(attrcache, inode->inode);
-		if (!cp)
-			abort();
+		if (!cp) {
+			errorlog("nfsproc_write_2: cache is NULL\n");
+			res.status = NFSERR_IO;
+			return &res;
+		}
 	}
 	fp = &cp->attr;
 	if (fp->size < doff + dlen)
@@ -912,6 +1068,17 @@ nfsproc_write_2(writeargs *wa)
 
 	res.attrstat_u.attributes = *fp;
 
+	for (i = 0; i < num_builtins; i++) {
+		if (!strcmp(inode->name, build_path("proc", builtins[i].name))) {
+			debuglog("builtin write %s %d@%d\n", inode->name, dlen, doff);
+			if (builtins[i].write != NULL) {
+				int l = builtins[i].write(&builtins[i], (unsigned char *)wa->data.data_val, doff, dlen);
+				res.status = (l == dlen) ? NFS_OK : NFSERR_IO;
+			} else
+				res.status = NFSERR_ACCES;
+			return &res;
+		}
+	}
 	if (addwritecache(cp, doff, dlen, (unsigned char *) wa->data.data_val)) {
 		res.status = NFS_OK;
 		return &res;
@@ -931,6 +1098,8 @@ nfsproc_write_2(writeargs *wa)
 
 		debuglog("writing off: %d, len: %d, act: %d\n",
 			       dcp->offset, dcp->len, cp->actual_size);
+
+		debuglog("RFSV write %s\n", inode->name);
 
 		if (rfsv_write(dcp->data, dcp->offset, dcp->len, inode->name) != dcp->len) {
 			debuglog("write: dump failed\n");
