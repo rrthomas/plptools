@@ -3,7 +3,7 @@
 INCLUDES=-I$(top_srcdir)/lib
 
 sbin_PROGRAMS = plpprintd
-plpprintd_LDADD = $(LIB_PLP)
+plpprintd_LDADD = $(LIB_PLP) $(INTLLIBS)
 plpprintd_SOURCES = plpprintd.cc
 
 EXTRA_DIST = prolog.ps.in fontmap

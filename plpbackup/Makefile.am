@@ -3,7 +3,7 @@
 INCLUDES=-I$(top_srcdir)/lib
 
 bin_PROGRAMS = plpbackup
-plpbackup_LDADD = $(LIB_PLP)
+plpbackup_LDADD = $(LIB_PLP) $(INTLLIBS)
 plpbackup_SOURCES = plpbackup.cc
 
 maintainer-clean-local:
