@@ -1,0 +1,159 @@
+%%BeginResource: plpprint_prolog @VERSION@ 0
+% $Id$
+/ul false def
+/st false def
+/bg [0 0 0] def
+/fg [0 0 0] def
+/twips{1440 div 72 mul}bind def
+/EpocEncoding ISOLatin1Encoding 256 array copy dup 128
+[/Euro/.notdef/quotesinglbase/florin/quotedblbase/ellipsis/dagger/daggerdbl
+/circumflex/perthousand/Scaron/guilsinglleft/OE/.notdef/Zcaron/.notdef
+/.notdef/quoteleft/quoteright/quotedblleft/quotedblright/bullet/endash
+/emdash/tilde/trademark/scaron/guilsinglright/oe/.notdef/zcaron/ydieresis]
+putinterval def
+/fs{ % fontvalue fs pointvalue
+  1000 div 24 mul
+}bind def
+/m{
+  top exch sub moveto
+}bind def
+/l{
+  top exch sub lineto
+}bind def
+/UL{
+  1 eq /ul exch def
+}bind def
+/ST{
+  1 eq /st exch def
+}bind def
+/BG{ % r g b BG - (store background color)
+  mark 4 1 roll ] /bg exch def
+}bind def
+/FG{ % r g b FG - (store foreground color)
+  mark 4 1 roll ] /fg exch def
+}bind def
+/SC{ % colorarray SC - (set stored color)
+  dup 0 get 255 div exch
+  dup 1 get 255 div exch
+  2 get 255 div
+  setrgbcolor
+}bind def
+/F{
+  findfont
+  % reencode for ISOLatin1. (From redbook sec. 5.6.1) and add some
+  % special symbols, resulting in an EPOC encoding
+  dup length dict begin
+    {
+      1 index dup /FID ne {
+        /CharStrings ne {
+          def
+        } {
+          % must copy CharStrings dict to make it writeable
+          dup length dict begin {def} forall
+          % copy /Euro charstring from Symbol font
+          /Euro /Symbol findfont /CharStrings get /Euro get def
+          currentdict end def
+        } ifelse
+      } {
+        pop pop pop
+      } ifelse
+    } forall
+    % Replace encoding
+    /Encoding EpocEncoding def
+    currentdict
+  end dup /FontName get 80 string cvs (-EPOCLatin15) concatstrings cvn
+  exch definefont
+  % end of reencoding
+  exch twips scalefont setfont
+}bind def
+/L{ % x1 y1 x2 y2 L - (draw line from x1,y1 to x2,y2)
+  4 -1 roll twips 4 -1 roll twips m
+  twips exch twips exch l fg SC stroke
+}bind def
+/R{ % left top right bottom R - (draw rectangle)
+  4 dict begin
+    twips /y2 exch def
+    twips /x2 exch def
+    twips /y1 exch def
+    twips /x1 exch def
+    newpath
+    x1 y1 m x2 y1 l x2 y2 l x1 y2 l closepath
+    gsave bg SC fill grestore fg SC stroke
+  end
+}bind def
+/E { % ulx uly llx lly E - (draw ellipse)
+  6 dict begin
+    twips /lly exch def
+    twips /llx exch def
+    twips /uly exch def
+    twips /ulx exch def
+    /wx llx ulx sub def
+    /wy lly uly sub def
+    gsave
+      newpath
+      ulx wx 2 div add top uly sub wy 2 div sub translate
+      1 wy wx div scale
+      newpath wx 2 div 0 moveto
+      0 0 wx 2 div 0 360 arc closepath
+      gsave bg SC fill grestore fg SC stroke
+    grestore
+  end
+}bind def
+/P{ % pointarray P - (draw polygon)
+  4 dict begin
+    /points exch def
+    0 2 points length 1 sub {
+      /idx exch def
+      points idx get twips
+      points idx 1 add get twips
+      idx 0 eq {m}{l} ifelse
+    } for
+    gsave bg SC fill grestore fg SC stroke
+  end
+}bind def
+/T{ % string left bottom top right justify T - (draw text)
+  5 dict begin
+    /just exch def
+    twips /x2 exch def
+    twips /y2 exch def
+    twips /y1 exch def
+    twips /x1 exch def
+    x1 y1 m
+    gsave
+      just pop false {
+        gsave
+          newpath 0 0 moveto dup false charpath pathbbox
+        grestore
+        4 1 roll exch sub 3 1 roll sub % width height
+        y2 y1 sub exch div exch % yscale width
+        x2 x1 sub exch div exch % xscale yscale
+        scale
+      } if
+      ul {
+        gsave
+          currentfont /FontInfo known {
+            currentfont /FontInfo get begin
+              0 UnderlinePosition fs rmoveto
+              UnderlineThickness fs setlinewidth
+            end
+          } {
+            0 -10 rmoveto 0.5 setlinewidth
+          } ifelse
+          dup stringwidth rlineto stroke
+        grestore
+      } if
+      st {
+        gsave
+          newpath 0 0 moveto (I) false charpath pathbbox
+          exch pop exch sub exch pop 2 div 0 exch
+        grestore
+        gsave
+          rmoveto
+          dup stringwidth rlineto stroke
+        grestore
+      } if
+      show
+    grestore
+  end
+}bind def
+%%EndResource

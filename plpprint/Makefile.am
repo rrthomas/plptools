@@ -6,5 +6,7 @@ sbin_PROGRAMS = plpprintd
 plpprintd_LDADD = $(top_srcdir)/lib/libplp.la
 plpprintd_SOURCES = plpprintd.cc
 
+pkgdata_DATA = prolog.ps
+
 maintainer-clean-local:
-	rm -f Makefile.in
+	rm -f Makefile.in prolog.ps
