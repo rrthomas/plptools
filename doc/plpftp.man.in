@@ -27,7 +27,8 @@ enter "help".
 .TP
 .BI "\-p " port
 Specify the port to connect to (e.g. The port where ncpd is listening on) -
-by default this is @DPORT@
+by default this is looked up in /etc/services. If it is not found there,
+a builtin value of @DPORT@ is used.
 .TP
 .I ftpcommand parameters
 Allows you to specify an plpftp command on the command line. If specified,
