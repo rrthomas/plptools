@@ -36,7 +36,7 @@ SISComponentNameRecord::fillFrom(uint8_t* buf, int base, off_t len,
 								 SISFile* sisFile)
 {
 	int n = sisFile->m_header.m_nlangs;
-	if (base + 8 + n * 4 * 2)
+	if (base + 8 + n * 4 * 2 > len)
 		return SIS_TRUNCATED;
 
 	uint8_t* p = buf + base;
