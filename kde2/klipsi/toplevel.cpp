@@ -26,6 +26,8 @@
 #include <qmenudata.h>
 #include <qpainter.h>
 #include <qtimer.h>
+#include <qimage.h>
+#include <qcursor.h>
 
 #include <kaction.h>
 #include <kapp.h>
@@ -39,6 +41,7 @@
 #include <psibitmap.h>
 
 #define QUIT_ITEM    50
+#define ABOUT_ITEM    51
 #define CLIPFILE "C:/System/Data/Clpboard.cbd"
 
 TopLevel::TopLevel()
@@ -47,6 +50,9 @@ TopLevel::TopLevel()
     KNotifyClient::startDaemon();
 
     clip = kapp->clipboard();
+#if QT_VERSION > 300
+    clip->setSelectionMode(true);
+#endif
     menu = new KPopupMenu(0, "main_menu");
     timer = new QTimer();
 
@@ -70,8 +76,10 @@ TopLevel::TopLevel()
 
     menu->insertTitle(kapp->miniIcon(), i18n("Klipsi - Psion Clipboard"));
     menu->insertSeparator();
+    menu->insertItem(SmallIcon("help"), i18n("&About Klipsi"), ABOUT_ITEM);
     menu->insertItem(SmallIcon("exit"), i18n("&Quit"), QUIT_ITEM);
 
+    about = new KAboutApplication(0L, 0L, false);
     connect(menu, SIGNAL(activated(int)), this, SLOT(slotMenuSelected(int)));
     connect(clip, SIGNAL(dataChanged()), this, SLOT(slotClipboardChanged()));
     connect(timer, SIGNAL(timeout()), this, SLOT(slotTimer()));
@@ -208,10 +216,11 @@ slotClipboardChanged()
     if (!checkConnection())
 	return;
 
-    QImage clipImage = clip->image();
+    QImage clipImage = 0L;
     QString clipText = clip->text();
 
     if (clipText.isEmpty()) {
+	clipImage = clip->image();
 	if (clipImage.isNull())
 	    return;
 	inSend = true;
@@ -240,6 +249,9 @@ void TopLevel::
 slotMenuSelected(int id)
 {
     switch (id) {
+	case ABOUT_ITEM:
+	    about->show();
+	    break;
 	case QUIT_ITEM:
 	    kapp->quit();
 	    break;

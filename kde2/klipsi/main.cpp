@@ -36,13 +36,13 @@ int main(int argc, char *argv[])
     KAboutData about("klipsi", I18N_NOOP("Klipsi"), VERSION,
 		     I18N_NOOP("Psion remote clipboard utility"),
 		     KAboutData::License_GPL,
-		     "(c) 2001, Fritz Elfert",
+		     "(C) 2001, Fritz Elfert",
+		     "Klipsi is part of plptools",
 		     "http://plptools.sourceforge.net",
 		     "plptools-developers@sourceforge.net");
 
     about.addAuthor("Fritz Elfert", I18N_NOOP("Original Developer/Maintainer"),
-		    "felfert@users.sourceforge.net",
-		    "http://plptools.sourceforge.net");
+		    "felfert@users.sourceforge.net");
 
     KCmdLineArgs::init(argc, argv, &about);
     KUniqueApplication::addCmdLineOptions();

@@ -31,6 +31,7 @@
 #include <kapp.h>
 #include <kmainwindow.h>
 #include <kpopupmenu.h>
+#include <kaboutapplication.h>
 #include <qpixmap.h>
 #include <qtimer.h>
 
@@ -84,6 +85,7 @@ private:
 
     QClipboard  *clip;
     KPopupMenu  *menu;
+    KAboutApplication *about;
     QTimer      *timer;
 
     ppsocket    *rfsvSocket;
