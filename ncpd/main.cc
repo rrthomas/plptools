@@ -112,7 +112,7 @@ checkForNewSocketConnection()
 	    a.init();
 	    a.addStringT("No Psion Connected\n");
 	    next->sendBufferStore(a);
-	    next->closeSocket();
+	    delete next;
 	    if (verbose)
 		lout << "rejected" << endl;
 	} else
