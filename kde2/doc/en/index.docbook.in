@@ -1,13 +1,11 @@
-<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook V3.1-Based Variant V1.0//EN" [
-  <!ENTITY kpsion  "<application>KPsion</application>"
-    -- delete this, if kpsion is in global KDE entities -->
-  <!ENTITY kappname "&kpsion;" -- this only *seems* redundant -->
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.1-Based Variant V1.0//EN" "dtd/kdex.dtd" [
+  <!ENTITY kpsion  "<application>KPsion</application>">
+  <!ENTITY kappname "&kpsion;">
   <!ENTITY % addindex "IGNORE">
-  <!ENTITY % English "INCLUDE">
-  <!ENTITY % ents PUBLIC "-//KDE//ENTITIES Documentation V1.0//EN">
+  <!ENTITY % German "INCLUDE">
   <!-- DO NOT DELETE! $Revision$ -->
   <!-- DO NOT DELETE! $Date$ -->
-  %ents;
 ]>
 
 <book lang="&language;">
@@ -199,7 +197,7 @@ This option starts format of the specified <replaceable>DRIVE</replaceable>.
 <screeninfo>&kpsion; mainwindow.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="toplevel.png" format="PNG">
+      <imagedata fileref="toplevel.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>&kpsion; mainwindow</phrase>
@@ -217,7 +215,7 @@ toolbar buttons. These are:</para>
 <guiicon>
   <inlinemediaobject>
     <imageobject>
-      <imagedata fileref="psion_backup.png" format="PNG">
+      <imagedata fileref="psion_backup.png" format="PNG"></imagedata>
     </imageobject>
   </inlinemediaobject>
 </guiicon> Full backup.
@@ -226,7 +224,7 @@ toolbar buttons. These are:</para>
 <guiicon>
   <inlinemediaobject>
     <imageobject>
-      <imagedata fileref="psion_restore.png" format="PNG">
+      <imagedata fileref="psion_restore.png" format="PNG"></imagedata>
     </imageobject>
   </inlinemediaobject>
 </guiicon> Restore.
@@ -326,7 +324,7 @@ is divided into three steps:
 <screeninfo>Step one. Select a backup directory.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="firstwizard-1.png" format="PNG">
+      <imagedata fileref="firstwizard-1.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Selecting the backup directory</phrase>
@@ -350,7 +348,7 @@ to do so.
 <screeninfo>Step two. backup strategy.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="firstwizard-2.png" format="PNG">
+      <imagedata fileref="firstwizard-2.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Setting the backup strategy</phrase>
@@ -380,7 +378,7 @@ are more backup generations available and delete older backup generations.
 <screeninfo>Step three. connection parameters.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="firstwizard-3.png" format="PNG">
+      <imagedata fileref="firstwizard-3.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Setting connection parameters</phrase>
@@ -417,7 +415,7 @@ backed up when running in unattended backup mode.
 <screeninfo>Step one. psion name.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="newpsionwizard-1.png" format="PNG">
+      <imagedata fileref="newpsionwizard-1.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Setting a psion name</phrase>
@@ -437,7 +435,7 @@ displaying the machine's name when connected.
 <screeninfo>Step two. specifying backup drives.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="newpsionwizard-2.png" format="PNG">
+      <imagedata fileref="newpsionwizard-2.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Specifying backup drives</phrase>
@@ -467,7 +465,7 @@ consists of three tabs:
 <screeninfo>Setup, Backup.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="settings-backup.png" format="PNG">
+      <imagedata fileref="settings-backup.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Settings, Backup</phrase>
@@ -485,7 +483,7 @@ consists of three tabs:
 <screeninfo>Settings, Connection.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="settings-connection.png" format="PNG">
+      <imagedata fileref="settings-connection.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Settings, Connection</phrase>
@@ -503,7 +501,7 @@ consists of three tabs:
 <screeninfo>Settings, Machines.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="settings-machines.png" format="PNG">
+      <imagedata fileref="settings-machines.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Settings, Machines</phrase>

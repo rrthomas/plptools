@@ -89,9 +89,4 @@ else
   AC_MSG_RESULT($kde_result)
 fi
 
-save_BINDIR=$bindir
-bindir=$kde_bindir
-KDE_SUBST_PROGRAMS
-bindir=$save_BINDIR
-
 ])

@@ -13,6 +13,11 @@ AC_DEFUN(AC_PATH_KDE,[
 	)
 
 	AC_CREATE_KFSSTND($ac_use_path_checking)
+	save_BINDIR=$bindir
+	bindir=$kde_bindir
+	KDE_SUBST_PROGRAMS
+	bindir=$save_BINDIR
+	KDE_SUBST_PROGRAMS
 
 	AC_SUBST_KFSSTND
 	KDE_CREATE_LIBS_ALIASES
