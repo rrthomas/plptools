@@ -1,0 +1,1400 @@
+# Swedish texts for PLPTools.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# Daniel Brahneborg <basic@chello.se>, 2002.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: plptools 0.11\n"
+"POT-Creation-Date: 2002-03-06 23:15+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/rfsv.cc:31 lib/rfsvfactory.cc:43 lib/rpcsfactory.cc:43
+msgid "no error"
+msgstr "inget fel"
+
+#: lib/rfsv.cc:32
+msgid "general"
+msgstr "allmän(t)"
+
+#: lib/rfsv.cc:33
+msgid "bad argument"
+msgstr "felaktig parameter"
+
+#: lib/rfsv.cc:34
+msgid "OS error"
+msgstr "OS fel"
+
+#: lib/rfsv.cc:35
+msgid "not supported"
+msgstr "stöds ej"
+
+#: lib/rfsv.cc:36
+msgid "numeric underflow"
+msgstr "för litet tal"
+
+#: lib/rfsv.cc:37
+msgid "numeric overflow"
+msgstr "för stort tal"
+
+#: lib/rfsv.cc:38
+msgid "numeric exception"
+msgstr "numeriskt fel"
+
+#: lib/rfsv.cc:39
+msgid "in use"
+msgstr "används"
+
+#: lib/rfsv.cc:40
+msgid "out of memory"
+msgstr "minnet slut"
+
+#: lib/rfsv.cc:41
+msgid "out of segments"
+msgstr "slut på segment"
+
+#: lib/rfsv.cc:42
+msgid "out of semaphores"
+msgstr "slut på semaforer"
+
+#: lib/rfsv.cc:43
+msgid "out of processes"
+msgstr "slut på processer"
+
+#: lib/rfsv.cc:44
+msgid "already open"
+msgstr "redan öppen"
+
+#: lib/rfsv.cc:45
+msgid "not open"
+msgstr "inte öppen"
+
+#: lib/rfsv.cc:46
+msgid "bad image"
+msgstr "trasig fil"
+
+#: lib/rfsv.cc:47
+msgid "receiver error"
+msgstr "fel hos mottagaren"
+
+#: lib/rfsv.cc:48
+msgid "device error"
+msgstr "hårdvarufel"
+
+#: lib/rfsv.cc:49
+msgid "no filesystem"
+msgstr "inget filsystem"
+
+#: lib/rfsv.cc:50
+msgid "not ready"
+msgstr "inte klar"
+
+#: lib/rfsv.cc:51
+msgid "no font"
+msgstr "inget typsnitt"
+
+#: lib/rfsv.cc:52
+msgid "too wide"
+msgstr "för bred"
+
+#: lib/rfsv.cc:53
+msgid "too many"
+msgstr "för många"
+
+#: lib/rfsv.cc:54
+msgid "file already exists"
+msgstr "filen finns redan"
+
+#: lib/rfsv.cc:55
+msgid "no such file"
+msgstr "filen finns ej"
+
+#: lib/rfsv.cc:56
+msgid "write error"
+msgstr "skrivfel"
+
+#: lib/rfsv.cc:57
+msgid "read error"
+msgstr "läsfel"
+
+#: lib/rfsv.cc:58
+msgid "end of file"
+msgstr "filen slut"
+
+#: lib/rfsv.cc:59
+msgid "disk/serial read buffer full"
+msgstr "läsbuffer full"
+
+#: lib/rfsv.cc:60
+msgid "invalid name"
+msgstr "ogiltigt namn"
+
+#: lib/rfsv.cc:61
+msgid "access denied"
+msgstr "inget tillstånd"
+
+#: lib/rfsv.cc:62
+msgid "ressource locked"
+msgstr "resursen låst"
+
+#: lib/rfsv.cc:63
+msgid "no such device"
+msgstr "enheten finns inte"
+
+#: lib/rfsv.cc:64
+msgid "no such directory"
+msgstr "mappen finns inte"
+
+#: lib/rfsv.cc:65
+msgid "no such record"
+msgstr "posten finns inte"
+
+#: lib/rfsv.cc:66
+msgid "file is read-only"
+msgstr "filen kan bara läsas"
+
+#: lib/rfsv.cc:67
+msgid "invalid I/O operation"
+msgstr "ogiltig I/O-operation"
+
+#: lib/rfsv.cc:68
+msgid "I/O pending (not yet completed)"
+msgstr "I/O pågår"
+
+#: lib/rfsv.cc:69
+msgid "invalid volume name"
+msgstr "ogiltigt volymnamn"
+
+#: lib/rfsv.cc:70
+msgid "cancelled"
+msgstr "avbruten"
+
+#: lib/rfsv.cc:71
+msgid "no memory for control block"
+msgstr "inget minne till kontrollblocket"
+
+#: lib/rfsv.cc:72
+msgid "unit disconnected"
+msgstr "enheten urkopplad"
+
+#: lib/rfsv.cc:73
+msgid "already connected"
+msgstr "redan ikopplad"
+
+#: lib/rfsv.cc:74
+msgid "retransmission threshold exceeded"
+msgstr "överföringsgräns nådd"
+
+#: lib/rfsv.cc:75
+msgid "physical link failure"
+msgstr "fysiskt fel på länken"
+
+#: lib/rfsv.cc:76
+msgid "inactivity timer expired"
+msgstr "för lång inaktivitet"
+
+#: lib/rfsv.cc:77
+msgid "serial parity error"
+msgstr "paritetsfel"
+
+#: lib/rfsv.cc:78
+msgid "serial framing error"
+msgstr "seriellt ramfel"
+
+#: lib/rfsv.cc:79
+msgid "serial overrun error"
+msgstr "överfullt på serieporten"
+
+#: lib/rfsv.cc:80
+msgid "modem cannot connect to remote modem"
+msgstr "modemet kunde inte få kontakt med det uppringda modemet"
+
+#: lib/rfsv.cc:81
+msgid "remote modem busy"
+msgstr "det uppringa modemet är upptaget"
+
+#: lib/rfsv.cc:82
+msgid "remote modem did not answer"
+msgstr "det uppringa modemet svarade inte"
+
+#: lib/rfsv.cc:83
+msgid "number blacklisted by the modem"
+msgstr "numret svartlistat av modemet"
+
+#: lib/rfsv.cc:84
+msgid "drive not ready"
+msgstr "enheten är inte klar"
+
+#: lib/rfsv.cc:85
+msgid "unknown media"
+msgstr "okänt media"
+
+#: lib/rfsv.cc:86
+msgid "directory full"
+msgstr "mappen är full"
+
+#: lib/rfsv.cc:87
+msgid "write-protected"
+msgstr "skrivskyddad"
+
+#: lib/rfsv.cc:88
+msgid "media corrupt"
+msgstr "media är trasigt"
+
+#: lib/rfsv.cc:89
+msgid "aborted operation"
+msgstr "avbruten operation"
+
+#: lib/rfsv.cc:90
+msgid "failed to erase flash media"
+msgstr "kunde inte radera flashkortet"
+
+#: lib/rfsv.cc:91
+msgid "invalid file for DBF system"
+msgstr "ogiltig fil för DBF-systemet"
+
+#: lib/rfsv.cc:92
+msgid "power failure"
+msgstr "spänningsfel"
+
+#: lib/rfsv.cc:93
+msgid "too big"
+msgstr "för stor"
+
+#: lib/rfsv.cc:94
+msgid "bad descriptor"
+msgstr "ogiltigt handtag"
+
+#: lib/rfsv.cc:95
+msgid "bad entry point"
+msgstr "ogiltig ingångspunkt"
+
+#: lib/rfsv.cc:96
+msgid "could not diconnect"
+msgstr "kunde inte koppla ifrån"
+
+#: lib/rfsv.cc:97
+msgid "bad driver"
+msgstr "fel drivrutin"
+
+#: lib/rfsv.cc:98
+msgid "operation not completed"
+msgstr "funktionen ej avslutad"
+
+#: lib/rfsv.cc:99
+msgid "server busy"
+msgstr "servern är upptagen"
+
+#: lib/rfsv.cc:100
+msgid "terminated"
+msgstr "avbruten"
+
+#: lib/rfsv.cc:101
+msgid "died"
+msgstr "dog"
+
+#: lib/rfsv.cc:102
+msgid "bad handle"
+msgstr "ogiltigt handtag"
+
+#: lib/rfsv.cc:103
+msgid "invalid operation for RFSV16"
+msgstr "ogiltig funktion för RFSV16"
+
+#: lib/rfsv.cc:104
+msgid "libplp internal error"
+msgstr "internt fel i libplp"
+
+#: lib/rpcs.cc:41
+msgid "Unknown device"
+msgstr "Okänd enhet"
+
+#: lib/rpcs.cc:42
+msgid "PC"
+msgstr ""
+
+#: lib/rpcs.cc:43
+msgid "MC"
+msgstr ""
+
+#: lib/rpcs.cc:44
+msgid "HC"
+msgstr ""
+
+#: lib/rpcs.cc:45
+msgid "Series 3"
+msgstr "Serie 3"
+
+#: lib/rpcs.cc:46
+msgid "Series 3a, 3c or 3mx"
+msgstr "Serie 3a, 3c eller 3mx"
+
+#: lib/rpcs.cc:47
+msgid "Workabout"
+msgstr ""
+
+#: lib/rpcs.cc:48
+msgid "Sienna"
+msgstr ""
+
+#: lib/rpcs.cc:49
+msgid "Series 3c"
+msgstr "Serie 3c"
+
+#: lib/rpcs.cc:50
+msgid "Series 5"
+msgstr "Serie 5"
+
+#: lib/rpcs.cc:51
+msgid "WinC"
+msgstr ""
+
+#: lib/rpcs.cc:55
+msgid "Empty"
+msgstr "Tom"
+
+#: lib/rpcs.cc:56
+msgid "Very Low"
+msgstr "Mycket Låg"
+
+#: lib/rpcs.cc:57
+msgid "Low"
+msgstr "Låg"
+
+#: lib/rpcs.cc:58
+msgid "Good"
+msgstr "God"
+
+#: lib/rpcs.cc:62
+msgid "Test"
+msgstr ""
+
+#: lib/rpcs.cc:63
+msgid "English"
+msgstr "Engelska"
+
+#: lib/rpcs.cc:64
+msgid "German"
+msgstr "Tyska"
+
+#: lib/rpcs.cc:65
+msgid "French"
+msgstr "Franska"
+
+#: lib/rpcs.cc:66
+msgid "Spanish"
+msgstr "Spanska"
+
+#: lib/rpcs.cc:67
+msgid "Italian"
+msgstr "Italienska"
+
+#: lib/rpcs.cc:68
+msgid "Swedish"
+msgstr "Svenska"
+
+#: lib/rpcs.cc:69
+msgid "Danish"
+msgstr "Danska"
+
+#: lib/rpcs.cc:70
+msgid "Norwegian"
+msgstr "Norska"
+
+#: lib/rpcs.cc:71
+msgid "Finnish"
+msgstr "Finska"
+
+#: lib/rpcs.cc:72
+msgid "American"
+msgstr "Amerikanska"
+
+#: lib/rpcs.cc:73
+msgid "Swiss French"
+msgstr "Schweizisk Franska"
+
+#: lib/rpcs.cc:74
+msgid "Swiss German"
+msgstr "Schweizisk Tyska"
+
+#: lib/rpcs.cc:75
+msgid "Portugese"
+msgstr "Portugisiska"
+
+#: lib/rpcs.cc:76
+msgid "Turkish"
+msgstr "Turkiska"
+
+#: lib/rpcs.cc:77
+msgid "Icelandic"
+msgstr "Isländska"
+
+#: lib/rpcs.cc:78
+msgid "Russian"
+msgstr "Ryska"
+
+#: lib/rpcs.cc:79
+msgid "Hungarian"
+msgstr "Ungerska"
+
+#: lib/rpcs.cc:80
+msgid "Dutch"
+msgstr "Holländska"
+
+#: lib/rpcs.cc:81
+msgid "Belgian Flemish"
+msgstr "Belgisk Flamländska"
+
+#: lib/rpcs.cc:82
+msgid "Australian"
+msgstr "Australiensk Engelska"
+
+#: lib/rpcs.cc:83
+msgid "Belgish French"
+msgstr "Belgisk Franska"
+
+#: lib/rpcs.cc:84
+msgid "Austrian"
+msgstr "Österrikiska"
+
+#: lib/rpcs.cc:85
+msgid "New Zealand"
+msgstr "Nya Zeeländska"
+
+#. FIXME: not shure about ISO code
+#: lib/rpcs.cc:86
+msgid "International French"
+msgstr "Internationell Franska"
+
+#. FIXME: not shure about ISO code
+#: lib/rpcs.cc:87
+msgid "Czech"
+msgstr "Tjeckoslovakiska"
+
+#: lib/rpcs.cc:88
+msgid "Slovak"
+msgstr "Slovakiska"
+
+#: lib/rpcs.cc:89
+msgid "Polish"
+msgstr "Polska"
+
+#: lib/rpcs.cc:90
+msgid "Slovenian"
+msgstr "Slovenska"
+
+#: lib/psitime.h:73
+msgid " years "
+msgstr " år "
+
+#: lib/psitime.h:73
+msgid " year "
+msgstr " år "
+
+#: lib/psitime.h:75
+msgid " days "
+msgstr " dagar "
+
+#: lib/psitime.h:75
+msgid " day "
+msgstr " dag "
+
+#: lib/psitime.h:77
+msgid " hours "
+msgstr " timmar "
+
+#: lib/psitime.h:77
+msgid " hour "
+msgstr " timme "
+
+#: lib/psitime.h:79
+msgid " minutes "
+msgstr " minuter "
+
+#: lib/psitime.h:79
+msgid " minute "
+msgstr " minut "
+
+#: lib/psitime.h:80 plpftp/ftp.cc:837
+msgid " seconds"
+msgstr " sekunder"
+
+#: lib/psitime.h:80
+msgid " second"
+msgstr " sekund"
+
+#: lib/rfsvfactory.cc:44 lib/rpcsfactory.cc:44
+msgid "could not send version request"
+msgstr "kunde inte skicka versionsfråga"
+
+#: lib/rfsvfactory.cc:45 lib/rpcsfactory.cc:45
+msgid "try again"
+msgstr "försök igen"
+
+#: lib/rfsvfactory.cc:46 lib/rpcsfactory.cc:46
+msgid "no psion connected"
+msgstr "ingen psion ikopplad"
+
+#: lib/rfsvfactory.cc:47 lib/rpcsfactory.cc:47
+msgid "wrong protocol version"
+msgstr "fel protokollversion"
+
+#: lib/rfsvfactory.cc:48 lib/rpcsfactory.cc:48
+msgid "no response from ncpd"
+msgstr "inget svar från ncpd"
+
+#: lib/plpdirent.cc:173
+msgid "Not present"
+msgstr "Inte tillgänglig"
+
+#: lib/plpdirent.cc:174
+msgid "Unknown"
+msgstr "Okänd"
+
+#: lib/plpdirent.cc:175
+msgid "Floppy"
+msgstr ""
+
+#: lib/plpdirent.cc:176
+msgid "Disk"
+msgstr ""
+
+#: lib/plpdirent.cc:177
+msgid "CD-ROM"
+msgstr ""
+
+#: lib/plpdirent.cc:178
+msgid "RAM"
+msgstr ""
+
+#: lib/plpdirent.cc:179
+msgid "Flash Disk"
+msgstr ""
+
+#: lib/plpdirent.cc:180 lib/plpdirent.cc:207
+msgid "ROM"
+msgstr ""
+
+#: lib/plpdirent.cc:181
+msgid "Remote"
+msgstr "Extern"
+
+#: lib/plpdirent.cc:205
+msgid "local"
+msgstr "lokal"
+
+#: lib/plpdirent.cc:209
+msgid "redirected"
+msgstr "vidarekopplad"
+
+#: lib/plpdirent.cc:211
+msgid "substituted"
+msgstr "ersatt"
+
+#: lib/plpdirent.cc:213
+msgid "internal"
+msgstr "intern"
+
+#: lib/plpdirent.cc:215
+msgid "removable"
+msgstr "uttagbar"
+
+#: lib/plpdirent.cc:228
+msgid "variable size"
+msgstr "med variabel storlek"
+
+#: lib/plpdirent.cc:230
+msgid "dual density"
+msgstr "dubbel densitet"
+
+#: lib/plpdirent.cc:232
+msgid "formattable"
+msgstr "formatterbar"
+
+#: lib/plpdirent.cc:234
+msgid "write protected"
+msgstr "skrivskyddad"
+
+#: lib/siscomponentrecord.cpp:56
+#, c-format
+msgid "Length too large for name record %d.\n"
+msgstr "Längden för lång för namnpost nummer %d.\n"
+
+#: lib/siscomponentrecord.cpp:70
+#, c-format
+msgid "Position/length too large for name record %d.\n"
+msgstr "Position/längd för stor för namnpost %d.\n"
+
+#: lib/siscomponentrecord.cpp:75 lib/sisreqrecord.cpp:67
+#, c-format
+msgid "Name %d (for %s) is %.*s\n"
+msgstr "Namn %d (för %s) är %.*s\n"
+
+#: lib/siscomponentrecord.cpp:86
+#, c-format
+msgid "%d .. %d (%d bytes): Name records\n"
+msgstr "%d .. %d (%d bytes): Namnposter\n"
+
+#: lib/sisfile.cpp:44
+#, c-format
+msgid "Could not read header, rc = %d\n"
+msgstr "Kunde inte läsa headern, rc = %d\n"
+
+#: lib/sisfile.cpp:48
+#, c-format
+msgid "Ate header, got ix = %d\n"
+msgstr ""
+
+#: lib/sisfile.cpp:63
+#, c-format
+msgid "Problem reading language record %d, rc = %d.\n"
+msgstr "Kunde inte läsa språkpost %d, rc = %d.\n"
+
+#: lib/sisfile.cpp:80
+#, c-format
+msgid "Problem reading requisite record %d, rc = %d.\n"
+msgstr "Kunde inte läsa kravpost %d, rc = %d.\n"
+
+#: lib/sisfile.cpp:91
+#, c-format
+msgid "Problem reading the name record, rc = %d.\n"
+msgstr "Kunde inte läsa namnpost, rc = %d.\n"
+
+#: lib/sisfile.cpp:107
+#, c-format
+msgid "Problem reading file record %d, rc = %d.\n"
+msgstr "Kunde inte läsa filpost %d, rc = %d.\n"
+
+#: lib/sisfileheader.cpp:57
+#, c-format
+msgid "Got uid1 = %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:61
+msgid "Got bad uid2.\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:65
+#, c-format
+msgid "Got uid2 = %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:69
+msgid "Got bad uid3.\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:73
+#, c-format
+msgid "Got uid3 = %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:83
+#, c-format
+msgid "Got first crc = %08x, wanted %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:87
+msgid "Got bad crc.\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:93
+#, c-format
+msgid "Got %d languages\n"
+msgstr "Hittade %d språk\n"
+
+#: lib/sisfileheader.cpp:96
+#, c-format
+msgid "Got %d files\n"
+msgstr "Hittade %d filer\n"
+
+#: lib/sisfileheader.cpp:99
+#, c-format
+msgid "Got %d reqs\n"
+msgstr "Hittade %d krav\n"
+
+#: lib/sisfileheader.cpp:102
+#, c-format
+msgid "Selected language is %d\n"
+msgstr "Valt språk är %d\n"
+
+#: lib/sisfileheader.cpp:105
+#, c-format
+msgid "Installed files: %d / %d\n"
+msgstr "Installerade filer: %d / %d\n"
+
+#: lib/sisfileheader.cpp:108
+#, c-format
+msgid "Installed on drive %c\n"
+msgstr "Installerad på enhet %c\n"
+
+#: lib/sisfileheader.cpp:111
+#, c-format
+msgid "Got installer version: %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:114
+#, c-format
+msgid "Got options: %04x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:117
+#, c-format
+msgid "Got type: %0x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:120
+#, c-format
+msgid "Got major: %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:123
+#, c-format
+msgid "Got minor: %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:126
+#, c-format
+msgid "Got variant: %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:129
+#, c-format
+msgid "Languages begin at %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:134
+#, c-format
+msgid "Files begin at %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:139
+#, c-format
+msgid "Requisites begin at %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:145
+#, c-format
+msgid "Components begin at %d\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:39
+#, c-format
+msgid "Got flags %d\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:42
+#, c-format
+msgid "Got file type %d\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:45
+#, c-format
+msgid "Got file details %d\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:52
+#, c-format
+msgid "Got source name %.*s\n"
+msgstr "Hittade källnamn %.*s\n"
+
+#: lib/sisfilerecord.cpp:58
+#, c-format
+msgid "Got destination name %.*s\n"
+msgstr "Hittade destinationsnamn %.*s\n"
+
+#: lib/sisfilerecord.cpp:69
+#, c-format
+msgid "File is %d bytes long (at %d) (to %d)\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:73
+#, c-format
+msgid "%d .. %d (%d bytes): Single file record type %d, %.*s\n"
+msgstr "%d .. %d (%d bytes): Enstaka filpost typ %d, %s.*s\n"
+
+#: lib/sisfilerecord.cpp:103
+#, c-format
+msgid "File %d (for %s) is %d bytes long (at %d)\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:109
+#, c-format
+msgid "%d .. %d (%d bytes): File record (%s) for %.*s\n"
+msgstr "%d .. %d (%d bytes): Filpost (%s) för %.*s\n"
+
+#: lib/sisfilerecord.cpp:121
+#, c-format
+msgid "Unknown file flags %d\n"
+msgstr ""
+
+#: lib/sislangrecord.cpp:37
+#, c-format
+msgid "Got language %d (%s)\n"
+msgstr "Hittade språk %d (%s)\n"
+
+#: lib/sislangrecord.cpp:39
+#, c-format
+msgid "%d .. %d (%d bytes): Language record for %s\n"
+msgstr "%d .. %d (%d bytes): Språkpost för %s\n"
+
+#: lib/sisreqrecord.cpp:62
+#, c-format
+msgid "Position/length too large for req record %d.\n"
+msgstr "Position/längd för stor för kravpost %d.\n"
+
+#: lib/sisreqrecord.cpp:74
+#, c-format
+msgid "%d .. %d (%d bytes): Req record\n"
+msgstr "%d .. %d (%d bytes): Kravpost\n"
+
+#: plpftp/main.cc:50
+msgid ""
+"Usage: plpftp [OPTIONS]... [FTPCOMMAND]\n"
+"\n"
+"If FTPCOMMAND is given, connect; run FTPCOMMAND and\n"
+"terminate afterwards. If no FTPCOMMAND is given, start up\n"
+"in interactive mode. For help on supported FTPCOMMANDs,\n"
+"use `?' or `help' as FTPCOMMAND.\n"
+"\n"
+"Supported options:\n"
+"\n"
+" -h, --help              Display this text.\n"
+" -V, --version           Print version and exit.\n"
+" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
+"                         Default for HOST is 127.0.0.1\n"
+"                         Default for PORT is "
+msgstr "Användning: plpftp [OPTIONER]... [FTPKOMMANDO]\n"
+"\n"
+"Om FTPKOMMANDO är angivet, koppla upp; kör FTPKOMMANDO och\n"
+"avsluta efteråt. Om inget FTPKOMMANDO är angivet, starta\n"
+"i interaktivt läge. För mer information om tillgängliga\n"
+"FTPKOMMANDOn, använd `?' eller `help' som FTPKOMMANDO.\n"
+"\n"
+"Tillgängliga optioner:\n"
+"\n"
+" -h, --help          Visa den här texten.\n"
+" -V, --version       Visa versionsnummer och avsluta.\n"
+" -p, --port=[VÄRD:]PORT Ta kontakt med port PORT på maskin VÄRD.\n"
+"                        Om inget är angivet är VÄRD 127.0.0.1\n"
+"                        och PORT är "
+
+#: plpftp/main.cc:69
+msgid "Try `plpftp --help' for more information"
+msgstr "Prova 'plpftp --help' för mer information"
+
+#: plpftp/main.cc:82
+msgid "PLPFTP Version "
+msgstr ""
+
+#: plpftp/main.cc:83
+msgid " Copyright (C) 1999  Philip Proudman"
+msgstr ""
+
+#: plpftp/main.cc:84
+msgid " Additions Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>"
+msgstr " Ytterligare Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>"
+
+#: plpftp/main.cc:85
+msgid "                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>"
+msgstr ""
+
+#: plpftp/main.cc:86
+msgid "PLPFTP comes with ABSOLUTELY NO WARRANTY."
+msgstr "PLPFTP har INGEN SOM HELST GARANTI."
+
+#: plpftp/main.cc:87
+msgid "This is free software, and you are welcome to redistribute it"
+msgstr "Det här är fri mjukvara, och du får gärna distribuera den"
+
+#: plpftp/main.cc:88
+msgid "under GPL conditions; see the COPYING file in the distribution."
+msgstr "enligt villkoren i GPL; se filen COPYING i distributionen."
+
+#: plpftp/main.cc:90
+msgid "FTP like interface started. Type \"?\" for help."
+msgstr "FTP-liknande interface startat.  Skriv \"?\" för hjälp."
+
+#: plpftp/main.cc:153
+msgid "plpftp Version "
+msgstr ""
+
+#: plpftp/main.cc:168 plpftp/main.cc:173
+msgid "plpftp: could not connect to ncpd"
+msgstr "plpftp: kunde inte få kontakt med ncpd"
+
+#: plpftp/ftp.cc:84
+msgid "Known FTP commands:"
+msgstr "FTP-kommandon:"
+
+#: plpftp/ftp.cc:110
+msgid "Known RPC commands:"
+msgstr "RPC-kommandon:"
+
+#: plpftp/ftp.cc:227
+msgid "Connected to a "
+msgstr "Kopplad till en "
+
+#: plpftp/ftp.cc:227
+msgid ", OwnerInfo:"
+msgstr ", ÄgarInformation:"
+
+#: plpftp/ftp.cc:240
+msgid "OwnerInfo returned error "
+msgstr "ÄgarInformation returnerade fel "
+
+#: plpftp/ftp.cc:260
+msgid "FATAL: Couldn't find default Drive"
+msgstr "FATALT: Kunde inte hitta någon Enhet"
+
+#: plpftp/ftp.cc:269
+msgid "Psion dir is: \""
+msgstr "Psion-mappen är: \""
+
+#: plpftp/ftp.cc:284
+msgid "Prompting now "
+msgstr "Promptning är nu "
+
+#: plpftp/ftp.cc:284 plpftp/ftp.cc:289
+msgid "on"
+msgstr "på"
+
+#: plpftp/ftp.cc:284 plpftp/ftp.cc:289
+msgid "off"
+msgstr "av"
+
+#: plpftp/ftp.cc:289
+msgid "Hash printing now "
+msgstr "Brädgårdsmarkering är nu "
+
+#: plpftp/ftp.cc:294
+msgid "Local dir: \""
+msgstr "Lokal mapp: \""
+
+#: plpftp/ftp.cc:295
+msgid "Psion dir: \""
+msgstr "Psion mapp: \""
+
+#: plpftp/ftp.cc:300 plpftp/ftp.cc:310 plpftp/ftp.cc:319 plpftp/ftp.cc:327
+#: plpftp/ftp.cc:335 plpftp/ftp.cc:345 plpftp/ftp.cc:357 plpftp/ftp.cc:407
+#: plpftp/ftp.cc:413 plpftp/ftp.cc:437 plpftp/ftp.cc:479 plpftp/ftp.cc:536
+#: plpftp/ftp.cc:559 plpftp/ftp.cc:585 plpftp/ftp.cc:622 plpftp/ftp.cc:650
+#: plpftp/ftp.cc:711 plpftp/ftp.cc:731 plpftp/ftp.cc:738 plpftp/ftp.cc:745
+#: plpftp/ftp.cc:801 plpftp/ftp.cc:811 plpftp/ftp.cc:871 plpftp/ftp.cc:913
+#: plpftp/ftp.cc:923 plpftp/ftp.cc:954 plpftp/ftp.cc:990 plpftp/ftp.cc:1062
+msgid "Error: "
+msgstr "Fel: "
+
+#: plpftp/ftp.cc:415
+msgid " Entries"
+msgstr " Element"
+
+#: plpftp/ftp.cc:421
+msgid "Drive Type Volname     Total     Free      UniqueID"
+msgstr "Enhet Typ  Volymnamn   Totalt    Ledigt    UniktID"
+
+#: plpftp/ftp.cc:495
+msgid "No such directory"
+msgstr "Mappen finns inte"
+
+#: plpftp/ftp.cc:496 plpftp/ftp.cc:537
+msgid "Keeping original directory \""
+msgstr "Behåller ursprungsmappen \""
+
+#: plpftp/ftp.cc:576 plpftp/ftp.cc:667
+msgid "Transfer complete, ("
+msgstr "Överföringen klar, ("
+
+#: plpbackup/plpbackup.cc:587 plpftp/ftp.cc:577 plpftp/ftp.cc:668
+msgid " bytes in "
+msgstr " bytes på "
+
+#: plpftp/ftp.cc:578 plpftp/ftp.cc:669
+msgid " secs = "
+msgstr " sekunder = "
+
+#: plpftp/ftp.cc:598
+msgid "Get \""
+msgstr "Hämta \""
+
+#: plpftp/ftp.cc:627 plpftp/ftp.cc:716
+msgid "Transfer complete\n"
+msgstr "Överföringen klar\n"
+
+#: plpftp/ftp.cc:693
+msgid "Put \""
+msgstr "Skicka \""
+
+#: plpftp/ftp.cc:723
+msgid "Error in directory name \""
+msgstr "Fel i mappnamn \""
+
+#: plpftp/ftp.cc:759
+msgid "Starting subshell ...\n"
+msgstr "Startar kommandotolk ...\n"
+
+#: plpftp/ftp.cc:815
+msgid "General:"
+msgstr "Allmänt:"
+
+#: plpftp/ftp.cc:816
+msgid "  Machine Type: "
+msgstr "  Maskintyp:    "
+
+#: plpftp/ftp.cc:817
+msgid "  Machine Name: "
+msgstr "  Maskinnamn:   "
+
+#: plpftp/ftp.cc:818
+msgid "  Machine UID:  "
+msgstr "  Maskin UID:   "
+
+#: plpftp/ftp.cc:819
+msgid "  UI Language:  "
+msgstr "  Användarspråk:"
+
+#: plpftp/ftp.cc:820
+msgid "ROM:"
+msgstr ""
+
+#: plpftp/ftp.cc:821
+msgid "  Version:      "
+msgstr ""
+
+#: plpftp/ftp.cc:823 plpftp/ftp.cc:827
+msgid "  Size:         "
+msgstr "  Storlek:      "
+
+#: plpftp/ftp.cc:824
+msgid "  Programmable: "
+msgstr "  Programmerbar:"
+
+#: plpftp/ftp.cc:825 plpftp/ftp.cc:839
+msgid "yes"
+msgstr "ja"
+
+#: plpftp/ftp.cc:825 plpftp/ftp.cc:839
+msgid "no"
+msgstr "nej"
+
+#: plpftp/ftp.cc:826
+msgid "RAM:"
+msgstr ""
+
+#: plpftp/ftp.cc:828
+msgid "  Free:         "
+msgstr "  Ledigt:       "
+
+#: plpftp/ftp.cc:829
+msgid "  Free max:     "
+msgstr "  Max ledigt:   "
+
+#: plpftp/ftp.cc:830
+msgid "RAM disk size:  "
+msgstr "RAM-disk:       "
+
+#: plpftp/ftp.cc:831
+msgid "Registry size:  "
+msgstr "Inställningar:  "
+
+#: plpftp/ftp.cc:832
+msgid "Display size:   "
+msgstr "Bildskärm:      "
+
+#: plpftp/ftp.cc:834
+msgid "Time:"
+msgstr "Tid: "
+
+#: plpftp/ftp.cc:836
+msgid "  Current time: "
+msgstr "  Aktuell tid:  "
+
+#: plpftp/ftp.cc:837
+msgid "  UTC offset:   "
+msgstr ""
+
+#: plpftp/ftp.cc:838
+msgid "  DST:          "
+msgstr "  Sommartid:    "
+
+#: plpftp/ftp.cc:840
+msgid "  Timezone:     "
+msgstr "  Tidszon:      "
+
+#: plpftp/ftp.cc:841
+msgid "  Country Code: "
+msgstr "  Landskod:     "
+
+#: plpftp/ftp.cc:842
+msgid "Main battery:"
+msgstr "Huvudbatteri:"
+
+#: plpftp/ftp.cc:844
+msgid "  Changed at:   "
+msgstr "  Bytt:         "
+
+#: plpftp/ftp.cc:845 plpftp/ftp.cc:855
+msgid "  Used for:     "
+msgstr "  Använt i:     "
+
+#: plpftp/ftp.cc:846 plpftp/ftp.cc:852
+msgid "  Status:       "
+msgstr "  Tillstånd:    "
+
+#: plpftp/ftp.cc:847
+msgid "  Current:      "
+msgstr " Aktuell åtgång:"
+
+#: plpftp/ftp.cc:848
+msgid "  UsedPower:    "
+msgstr "  Använt:       "
+
+#: plpftp/ftp.cc:849 plpftp/ftp.cc:853
+msgid "  Voltage:      "
+msgstr ""
+
+#: plpftp/ftp.cc:850 plpftp/ftp.cc:854
+msgid "  Max. voltage: "
+msgstr "  Max spänning: "
+
+#: plpftp/ftp.cc:851
+msgid "Backup battery:"
+msgstr "Backupbatteri: "
+
+#: plpftp/ftp.cc:864
+msgid "Could not read processlist "
+msgstr "Kunde inte läsa processlistan "
+
+#: plpftp/ftp.cc:872
+msgid " is not a process list saved with killsave"
+msgstr " är inte en processlista som killsave har skapat"
+
+#: plpftp/ftp.cc:912
+msgid "Could not start "
+msgstr "Kunde inte starta "
+
+#: plpftp/ftp.cc:927
+msgid "Could not write processlist "
+msgstr "Kunde inte skriva processlistan "
+
+#: plpftp/ftp.cc:983
+msgid "no such process"
+msgstr "ingen sådan process"
+
+#: plpftp/ftp.cc:1006
+msgid "syntax error. Try \"help\""
+msgstr "syntax error. Prova \"help\""
+
+#: plpbackup/plpbackup.cc:91
+msgid "Could not get user's home directory from /etc/passwd"
+msgstr "Kunde inte hitta användarens hemdirectory från /etc/passwd"
+
+#: plpbackup/plpbackup.cc:106
+msgid "Could not get machine UID"
+msgstr "Kunde inte hämta maskinens UID"
+
+#: plpbackup/plpbackup.cc:134
+msgid "Got signal "
+msgstr "Fick signal "
+
+#: plpbackup/plpbackup.cc:146
+msgid "Abort? (y/N) "
+msgstr "Avbryt? (y/N) "
+
+#: plpbackup/plpbackup.cc:147
+msgid "Y"
+msgstr ""
+
+#: plpbackup/plpbackup.cc:163
+msgid "Stopping programs ..."
+msgstr "Avslutar program ..."
+
+#: plpbackup/plpbackup.cc:165
+msgid "plpbackup: Could not get process list: "
+msgstr "plpbackup: Kunde inte hämta processlistan: "
+
+#: plpbackup/plpbackup.cc:204
+msgid ""
+"Could not stop all processes. Please stop running\n"
+"programs manually on the Psion, then hit return."
+msgstr ""
+"Kunde inte avsluta alla processer. Var vänlig avsluta\n"
+"programmen manuellt på Psionen, tryck sedan på return."
+
+#: plpbackup/plpbackup.cc:219
+msgid "Restarting programs ..."
+msgstr "Startar om programmen ..."
+
+#: plpbackup/plpbackup.cc:525 plpbackup/plpbackup.cc:577
+#: plpbackup/plpbackup.cc:619 plpbackup/plpbackup.cc:669
+msgid "Backup aborted by user"
+msgstr "Backup avbruten av användaren"
+
+#: plpbackup/plpbackup.cc:544 plpbackup/plpbackup.cc:562
+msgid "Scanning Drive "
+msgstr "Går igenom Enhet "
+
+#: plpbackup/plpbackup.cc:557
+msgid "plpbackup: Couldn't get Drive list"
+msgstr "plpbackup: Kunde inte hämta listan på Enheter"
+
+#: plpbackup/plpbackup.cc:587
+msgid "Size of backup: "
+msgstr "Backupens storlek: "
+
+#: plpbackup/plpbackup.cc:588
+msgid " files."
+msgstr " filer."
+
+#: plpbackup/plpbackup.cc:591
+msgid "Nothing to backup"
+msgstr "Ingenting att kopiera"
+
+#: plpbackup/plpbackup.cc:607 plpbackup/plpbackup.cc:661
+msgid "Backing up "
+msgstr "Kopierar "
+
+#: plpbackup/plpbackup.cc:632
+msgid "Skipping "
+msgstr "Hoppar över "
+
+#: plpbackup/plpbackup.cc:635 plpbackup/plpbackup.cc:676
+msgid "Error during backup of "
+msgstr "Fel under kopiering av "
+
+#: plpbackup/plpbackup.cc:641
+msgid "STAR"
+msgstr "HDAF"
+
+#: plpbackup/plpbackup.cc:643
+msgid "(S)kip all, Skip (t)his, (A)bort, (R)etry: "
+msgstr "(H)oppa över alla, Hoppa över (d)en här, (A)vbryt, (F)örsök igen: "
+
+#: plpbackup/plpbackup.cc:695
+msgid "Writing index ..."
+msgstr "Skriver innehållslista ..."
+
+#: plpbackup/plpbackup.cc:722
+msgid "plpbackup: Could not write index "
+msgstr "plpbackup: Kunde inte skriva innehållslista "
+
+#: plpbackup/plpbackup.cc:732
+msgid "Creating tar archive ..."
+msgstr "Skapar tar-arkiv ..."
+
+#: plpbackup/plpbackup.cc:745
+msgid "plpbackup: Error during execution of "
+msgstr "plpbackup: Fel under körning av "
+
+#: plpbackup/plpbackup.cc:755
+msgid "Resetting archive attributes ..."
+msgstr "Återställer arkiveringsattribut ..."
+
+#: plpbackup/plpbackup.cc:774
+msgid "Backup aborted due to error"
+msgstr "Kopiering avbruten på grund av fel"
+
+#: plpbackup/plpbackup.cc:780
+msgid "Total time elapsed:     "
+msgstr "Totalt åtgången tid:    "
+
+#: plpbackup/plpbackup.cc:782
+msgid "Time for scanning:      "
+msgstr "Tid för genomgång:      "
+
+#: plpbackup/plpbackup.cc:785
+msgid "Time for transfer:      "
+msgstr "Tid för överföring:     "
+
+#: plpbackup/plpbackup.cc:787
+msgid "Average transfer speed: "
+msgstr "Överföringshastighet:   "
+
+#: plpbackup/plpbackup.cc:798
+msgid ""
+"Usage: plpbackup OPTIONS [<drive>:] [<drive>:] ...\n"
+"\n"
+"  Options:\n"
+"    -h, --help             Print this message and exit.\n"
+"    -V, --version          Print version and exit.\n"
+"    -p, --port=[HOST:]PORT Connect to ncpd on HOST, PORT.\n"
+"    -v, --verbose          Increase verbosity.\n"
+"    -q, --quiet            Decrease verbosity.\n"
+"    -f, --full             Do a full backup (incremental otherwise).\n"
+"    -b, --backup[=TGZ]     Backup to specified archive TGZ.\n"
+"    -r, --restore=TGZ      Restore from specified archive TGZ.\n"
+"    -F, --format           Format drive (can be combined with restore).\n"
+"\n"
+"  <drive> A drive character. If none given, scan all drives.\n"
+"\n"
+msgstr ""
+"Användning: plpbackup OPTIONER [<enhet>:] [<enhet>:] ...\n"
+"\n"
+"  Optioner:\n"
+"    -h, --help             Skriv en här texten och avsluta.\n"
+"    -V, --version          Skriv versionsnummer och avsluta.\n"
+"    -p, --port=[VÄRD:]PORT Ta kontakt med ncpd på VÄRD, PORT.\n"
+"    -v, --verbose          Öka mängden utskrifter.\n"
+"    -q, --quiet            Minska mängden utskrifter.\n"
+"    -f, --full             Kopiera allt (annars bara det som ändrats).\n"
+"    -b, --backup[=TGZ]     Kopiera till arkivet TGZ.\n"
+"    -r, --restore=TGZ      Återställ från arkivet TGZ.\n"
+"    -F, --format           Formattera enheterna (tillsammans med restore).\n"
+"\n"
+"  <enhet> En enhetsbokstav. Om ingen anges, gå igenom alla enheter.\n"
+"\n"
+
+#: plpbackup/plpbackup.cc:815
+msgid "Try 'plpbackup --help' for more information."
+msgstr "Prova 'plpbackup --help' för mer information."
+
+#: plpbackup/plpbackup.cc:886
+msgid "plpbackup version "
+msgstr ""
+
+#: plpbackup/plpbackup.cc:924
+msgid "Invalid drive argument "
+msgstr "Ogiltig enhetsbokstav "
+
+#: plpbackup/plpbackup.cc:930
+msgid "Backup mode can not be combined with format or restore."
+msgstr "Backup-läget kan inte kombineras med formattering eller återställning."
+
+#: plpbackup/plpbackup.cc:935
+msgid "Format mode needs at least one drive specified."
+msgstr "Formatläget kräver minst en enhetsbokstav."
+
+#: plpbackup/plpbackup.cc:939
+msgid "Backup can only create one archive at a time."
+msgstr "Backup kan bara skapa ett arkiv i taget."
+
+#: plpbackup/plpbackup.cc:948 plpbackup/plpbackup.cc:953
+msgid "plpbackup: could not connect to ncpd"
+msgstr "plpbackup: fick ingen kontakt med ncpd"
+
+#: sisinstall/sismain.cpp:48
+#, c-format
+msgid "Installing sis file %s%s\n"
+msgstr "Installerar sisfil %s%s\n"
+
+#: sisinstall/sismain.cpp:49
+msgid ", not really"
+msgstr ", inte egentligen"
+
+#: sisinstall/sismain.cpp:56
+#, c-format
+msgid "File is %d bytes long\n"
+msgstr "Filen är %d bytes lång\n"
+
+#: sisinstall/sismain.cpp:71
+msgid "Couldn't connect with the Psion\n"
+msgstr "Kunde inte få kontakt med Psionen\n"
+
+#: sisinstall/sismain.cpp:88
+msgid "Could not parse the sis file.\n"
+msgstr "Kunde inte parsa sisfilen.\n"
+

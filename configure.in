@@ -21,7 +21,7 @@ AC_PROG_AWK
 AC_PATH_PROG(SED,sed)
 
 dnl NLS support
-ALL_LINGUAS="de"
+ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
 dnl Additional glibc-intl checks
 PLP_CHECK_INTL
