@@ -36,7 +36,7 @@ void
 usage()
 {
 	cout << "Version " << VERSION << endl;
-	cout << "Usage : plpftp -s <socket number> <command> <parameters>\n";
+	cout << "Usage : plpftp -p <port> [ftpcommand parameters]\n";
 }
 
 void
@@ -56,7 +56,9 @@ int
 main(int argc, char **argv)
 {
 	ppsocket *skt;
-	bool res;
+	rfsv32 *a;
+	ftp f;
+	int status = 0;
 	sigset_t sigset;
 
 	// Command line parameter processing
@@ -65,7 +67,7 @@ main(int argc, char **argv)
 	sigaddset(&sigset, SIGPIPE);
 	sigprocmask(SIG_BLOCK, &sigset, 0L);
 
-	if ((argc > 2) && !strcmp(argv[1], "-s")) {
+	if ((argc > 2) && !strcmp(argv[1], "-p")) {
 		sockNum = atoi(argv[2]);
 		argc -= 2;
 		for (int i=1; i<argc; i++)
@@ -75,52 +77,10 @@ main(int argc, char **argv)
 	if (argc < 2)
 		ftpHeader();
 	skt = new ppsocket();
-	res = skt->connect(NULL, sockNum);
-	if (!res) {
-		delete skt;
-
-		// Let's try to start a daemon
-		char temp[200];
-		sprintf(temp, "ncp -s %d > /dev/null &", sockNum);
-		system(temp);
-
-		for (int retry = 0; !res && retry < 40; retry++) {
-			usleep(100000);
-			skt = new ppsocket();
-			skt->startup();
-			res = skt->connect(NULL, sockNum);
-			if (!res)
-				delete skt;
-		}
-
-		if (!res) {
-			delete skt;
-			cout << "Can't connect to ncp daemon on socket " << sockNum << endl;
-			return 1;
-		}
-		sleep(2);	// Let the psion connect
-
-	}
-	rfsv32 *a;
-	while (true) {
-		a = new rfsv32(skt);
-		if (a->getStatus() == 0)
-			break;
-		delete a;
-		delete skt;
-		cerr << "No Link available, waiting 2 secs ..." << endl;
-		sleep(2);
-		skt = new ppsocket();
-		skt->startup();
-		skt->connect(NULL, sockNum);
-	}
-
-	int status = 0;
-	ftp f;
+	skt->connect(NULL, sockNum);
+	a = new rfsv32(skt);
 	status = f.session(*a, argc, argv);
 
-	if (status != 0)
-		cerr << "Command failed\n";
 	delete a;
-	return 0;
+	return status;
 }

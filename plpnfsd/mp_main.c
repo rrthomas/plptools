@@ -3,6 +3,9 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <pwd.h>
+#include <stdarg.h>
+#include <syslog.h>
+#include <errno.h>
 #include "nfs_prot.h"
 #include "mp.h"
 #include "defs.h"
@@ -24,10 +27,7 @@
 
 extern void nfs_program_2();
 
-static char
-*user, *dir = DDIR;
-
-int gmtoffset, debug, exiting, query_cache = 0;
+int debug, exiting, query_cache = 0;
 
 fattr root_fattr =
 {
@@ -53,9 +53,52 @@ int usec;
 #endif				/* hpux */
 
 int
-mp_main(ac, av)
-int ac;
-char *av[];
+debuglog(char *fmt, ...)
+{
+	va_list ap;
+	char *buf;
+
+	if (!debug)
+		return 0;
+	buf = (char *)malloc(1024);
+	va_start(ap, fmt);
+	vsnprintf(buf, 1024, fmt, ap);
+	syslog(LOG_DEBUG, buf);
+	free(buf);
+	va_end(ap);
+	return 0;
+}
+
+int
+errorlog(char *fmt, ...)
+{
+	va_list ap;
+	char *buf = (char *)malloc(1024);
+
+	va_start(ap, fmt);
+	vsnprintf(buf, 1024, fmt, ap);
+	va_end(ap);
+	syslog(LOG_ERR, buf);
+	free(buf);
+	return 0;
+}
+
+int
+infolog(char *fmt, ...)
+{
+	va_list ap;
+	char *buf = (char *)malloc(1024);
+
+	va_start(ap, fmt);
+	vsnprintf(buf, 1024, fmt, ap);
+	syslog(LOG_INFO, buf);
+	free(buf);
+	va_end(ap);
+	return 0;
+}
+
+int
+mp_main(int verbose, char *dir, char *user)
 {
 	struct passwd *pw;
 	struct timeval tv;
@@ -69,29 +112,6 @@ char *av[];
 
 	if (!(user = (char *) getenv("USER")))
 		user = (char *) getenv("logname");
-
-	while (ac > 1) {
-		if (!strcmp(av[1], "-v")) {
-			debug++;
-		} else if (!strcmp(av[1], "-dir")) {
-			dir = av[2];
-			ac--;
-			av++;
-		} else if (!strcmp(av[1], "-user") || !strcmp(av[1], "-u")) {
-			user = av[2];
-			ac--;
-			av++;
-		} else {
-			printf("p3nfsd version %s\n", VERSION);
-			printf("Usage: p3nfsd [-dir directory] [-user username]\n");
-			printf("              [-wakeup] [-v] [-]\n");
-			printf("Defaults: -dir %s -user %s\n", dir, user);
-			return 1;
-		}
-		ac--;
-		av++;
-	}
-
 	if (user && *user) {
 		if (!(pw = getpwnam(user))) {
 			fprintf(stderr, "User %s not found.\n", user);
@@ -110,15 +130,9 @@ char *av[];
 	endpwent();
 
 	gettimeofday(&tv, &tz);
-#ifndef __SVR4
-	gmtoffset = -tz.tz_minuteswest * 60;
-#else
-	tzset();
-	gmtoffset = -timezone;
-#endif
 
 	printf("plpnfsd: version %s, mounting on %s\n", VERSION, dir);
-
+	debug = verbose;
 
 	/* Check if mountdir is empty (or else you can overmount e.g /etc)
 	   It is done here, because exit hangs, if hardware flowcontrol is
@@ -136,6 +150,7 @@ char *av[];
 		fprintf(stderr, "Sorry, directory %s is not empty, exiting.\n", dir);
 		return 1;
 	}
+	openlog("plpnfsd", LOG_PID|LOG_CONS, LOG_DAEMON);
 	rp = get_nam("");
 	inode2fh(rp->inode, root_fh.data);
 	root_fattr.fileid = rp->inode;

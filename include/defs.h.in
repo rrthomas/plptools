@@ -18,7 +18,7 @@
 #define DUSER "root"
 
 #ifndef DDIR
-# define DDIR "/psion.stand/mnt"
+# define DDIR "/mnt/psion"
 #endif
 
 #ifndef PSIONHOSTNAME

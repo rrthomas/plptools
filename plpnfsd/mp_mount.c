@@ -107,7 +107,6 @@ extern int _rpc_dtablesize();
 #define mntent mnttab
 #endif
 
-
 static char *mntdir;		/* where we mounted the psion */
 
 #ifdef __STDC__
@@ -118,14 +117,14 @@ static void
 usr1_handler SIGARG
 {
 	debug = (debug + 1) & 3;
-	printf("Set debug level to %d\n", debug);
+	infolog("Set debug level to %d\n", debug);
 };
 
 static void
 hup_handler SIGARG
 {
 	if (debug > 1)
-		printf("Got HUP signal\n");
+		debuglog("Got HUP signal\n");
 	exiting = 5;
 };
 
@@ -145,44 +144,40 @@ doexit()
 #endif
 
 	exiting--;
-
-	if (debug)
-		printf("Doing exit\n");
+	debuglog("Doing exit\n");
 
 #ifdef _IBMR2
 	if (stat(mntdir, &statb)) {
-		perror("stat");
+		errorlog("stat %s: %m\n", mntdir);
 		return;
 	}
-	if (debug)
-		printf("Next call: uvmount(%d, 0)\n", statb.st_vfs);
+	debuglog("Next call: uvmount(%d, 0)\n", statb.st_vfs);
 	if (uvmount(statb.st_vfs, 0)) {
-		perror("uvmount");
+		errorlog("uvmount: %m\n");
 		return;
 	}
 #else
 	if (umount(mntdir)) {
-		perror(mntdir);
+		errorlog("umount %s: %m\n", mntdir);
 		return;
 	}
 #endif
 
 #ifndef DONT_UPDATE_MTAB
-	if (debug)
-		printf("unmount succeeded, trying to fix mtab.\n");
+	debuglog("unmount succeeded, trying to fix mtab.\n");
 
 	if (!(fpout = setmntent(MTAB_TMP, "w"))) {
-		perror(MTAB_TMP);
+		errorlog("%s: %m\n", MTAB_TMP);
 		return;
 	}
 	if (!(fpin = setmntent(MTAB_PATH, "r"))) {
 		endmntent(fpout);
 		unlink(MTAB_TMP);
-		perror(MTAB_PATH);
+		errorlog("%s: %m\n", MTAB_PATH);
 		exit(0);
 	}
 	if (fstat(fileno(fpin), &statb))
-		perror("fstat");
+		errorlog("fstat: %m\n");
 	else
 		fchmod(fileno(fpout), statb.st_mode);
 
@@ -199,14 +194,13 @@ doexit()
 	endmntent(fpout);
 
 	if (rename(MTAB_TMP, MTAB_PATH)) {
-		perror(MTAB_PATH);
+		errorlog("%s: %m\n", MTAB_PATH);
 		unlink(MTAB_TMP);
 	}
 #else
-	if (debug)
-		printf("no mtab fixing needed\n");
+	debuglog("no mtab fixing needed\n");
 #endif
-	fprintf(stderr, "plpnfsd: exiting.\n");
+	infolog("plpnfsd: terminating.\n");
 
 	exit(0);
 }
@@ -243,7 +237,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 	/* Create udp socket */
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char *) &bufsiz, sizeof(bufsiz)))
-		perror("setsockopt");
+		errorlog("setsockopt: %m\n");
 
 	/* Bind it to a reserved port */
 	sain.sin_family = AF_INET;
@@ -254,19 +248,18 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 			break;
 	}
 	if (port <= IPPORT_RESERVED / 2) {
-		perror("bind to reserved port");
+		errorlog("bind to reserved port: %m\n");
 		exit(1);
 	}
 	if ((nfsxprt = svcudp_create(sock)) == 0) {
-		perror("svcudp_create");
+		errorlog("svcudp_create: %m\n");
 		exit(1);
 	}
 	if (!svc_register(nfsxprt, NFS_PROGRAM, NFS_VERSION, proc, 0)) {
-		perror("svc_register");
+		errorlog("svc_register: %m\n");
 		exit(1);
 	}
-	if (debug)
-		printf("created svc PROG=%d, VER=%d port=%d\n",
+	debuglog("created svc PROG=%d, VER=%d port=%d\n",
 		       NFS_PROGRAM, NFS_VERSION, port);
 
 
@@ -278,7 +271,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 	 */
 	ksock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (ksock < 0) {
-		perror("Cannot create kernel socket.");
+		errorlog("Cannot create kernel socket: %m\n");
 		exit(1);
 	}
 	kaddr.sin_family = AF_INET;
@@ -289,7 +282,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 			break;
 	}
 	if (kport <= IPPORT_RESERVED / 2) {
-		perror("bind to reserved port");
+		errorlog("bind to reserved port: %m\n");
 		exit(1);
 	}
 	nfs_mount_data.version = NFS_MOUNT_VERSION;
@@ -309,7 +302,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 	strcpy(nfs_mount_data.hostname, PSIONHOSTNAME);
 
 	if (connect(ksock, (struct sockaddr *) &nfs_mount_data.addr, sizeof(nfs_mount_data.addr)) < 0) {
-		perror("Cannot connect to plpnfsd");
+		errorlog("Cannot connect to plpnfsd: %m\n");
 		exit(1);
 	}
 	mount_flags = MS_MGC_VAL;	/* | MS_SYNC | MS_RDONLY | MS_NOEXEC | MS_NODEV | MS_NOSUID */
@@ -324,8 +317,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 		struct netconfig *nc = getnetconfigent("udp");
 		if (!nc) {
 			extern int errno;
-			fprintf(stderr, "getnetconfigent \"udp\": (errno %d) ", errno);
-			perror("");
+			errorlog("getnetconfigent \"udp\": (errno %d) %m\n", errno);
 			exit(1);
 		}
 		knc.knc_semantics = nc->nc_semantics;
@@ -334,16 +326,14 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 
 		if (stat(nc->nc_device, &stb)) {
 			extern int errno;
-			fprintf(stderr, "stat \"%s\": (errno %d) ", nc->nc_device, errno);
-			perror("");
+			errorlog("stat \"%s\": (errno %d) %m\n", nc->nc_device, errno);
 			exit(1);
 		}
 		knc.knc_rdev = stb.st_rdev;
 
 		/*freenetconfigent(nc) has the struct been allocated, or is it static ?!? */
 
-		if (debug)
-			printf("%d,%s,%s,%lx (1,inet,udp,0x002c0029)\n", (int) knc.knc_semantics,
+		debuglog("%d,%s,%s,%lx (1,inet,udp,0x002c0029)\n", (int) knc.knc_semantics,
 			 knc.knc_protofmly, knc.knc_proto, knc.knc_rdev);
 
 		myaddr.maxlen = myaddr.len = sizeof(sain);
@@ -442,11 +432,10 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 		case 0:
 			break;
 		case -1:
-			perror("fork");
+			errorlog("fork: %m\n");
 			exit(1);
 		default:
-			if (debug)
-				printf("Going to mount...\n");
+			debuglog("Going to mount...\n");
 
 #if defined(__sgi) || (defined(sun) && defined(__SVR4))
 			if (mount("", dir, MS_DATA, "nfs", &nfs_args, sizeof(nfs_args)))
@@ -476,10 +465,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 #endif
 
 			{
-				extern int errno;
-
-				fprintf(stderr, "nfs mount %s: (errno %d) ", dir, errno);
-				perror("");
+				errorlog("nfs mount %s: %m\n", dir);
 				kill(pid, SIGTERM);
 				exit(0);
 			} else {
@@ -490,8 +476,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 				char tim[32];
 #endif
 
-				if (debug)
-					printf("Mount succeded, making mtab entry.\n");
+				debuglog("Mount succeded, making mtab entry.\n");
 
 #if defined(sun) && defined(__SVR4)	/*gec */
 				mnt.mnt_special = nfshost;
@@ -511,7 +496,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 				if ((mfp = setmntent(MTAB_PATH, "a")))
 					addmntent(mfp, &mnt);
 				else
-					perror(MTAB_PATH);
+					errorlog("%s: %m\n", MTAB_PATH);
 				endmntent(mfp);
 #endif				/* !DONT_UPDATE_MTAB */
 			}
@@ -519,8 +504,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 	}
 
 /*** Third part: let's go */
-	printf("plpnfsd: to stop the server do \"ls %s/exit\". (pid %d)\n",
-	       mntdir, (int) getpid());
+	infolog("to stop the server do \"ls %s/exit\".\n", mntdir);
 
 #if defined(sun) && !defined(__SVR4)
 	dtbsize = _rpc_dtablesize();
@@ -535,6 +519,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 	 */
 	signal(SIGUSR1, usr1_handler);
 	signal(SIGHUP, hup_handler);
+	signal(SIGPIPE, SIG_IGN);
 
 	for (;;) {
 		fd_set readfd;
@@ -572,38 +557,30 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 		for (cp = attrcache; cp; cp = cp->next)
 			for (dcp = cp->dcache; dcp; dcp = dcp->next)
 				if (dcp->towrite) {
-					if (debug)
-						printf("\twaiting for block %d in %s to write (%d)\n",
+					debuglog("waiting for block %d in %s to write (%d)\n",
 						       dcp->offset, get_num(cp->inode)->name, dcp->towrite);
 					if (++dcp->towrite <= MAXWRITE)
 						doclean = 0;	/* Wait with cleaning */
 				}
+		ret = rfsv_isalive();
+		if (isalive) {
+			if (!ret) {
+				debuglog("Disconnected...\n");
+				doclean = 1;
+			}
+		} else {
+			if (ret)
+				debuglog("Connected...\n");
+		}
+		isalive = ret;
 		if (doclean) {
 			for (cp = attrcache; cp; cp = cp->next)
 				for (dcp = cp->dcache; dcp; dcp = dcp->next)
 					if (dcp->towrite)
-						printf("PLPNFSD WARNING: file %s block at %d not written\n",
+						errorlog("PLPNFSD WARNING: file %s block at %d not written\n",
 						       get_num(cp->inode)->name, dcp->offset);
 			clean_cache(&attrcache);
 			query_cache = 0;	/* clear the GETDENTS "cache". */
 		}
-		ret = rfsv_isalive();
-		if (isalive) {
-			if (!ret) {
-				if (debug)
-					printf("Disconnected...\n");
-				rfsv_startup();
-			}
-		} else {
-			if (ret) {
-				if (debug)
-					printf("Connected...\n");
-			} else {
-				if (debug)
-					printf("Try connecting...\n");
-				rfsv_startup();
-			}
-		}
-		isalive = ret;
 	}
 }

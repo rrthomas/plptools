@@ -36,53 +36,36 @@ public:
   ppsocket();
   virtual ~ppsocket();
 
-  virtual bool startup(void);
-
   virtual bool connect(char* Peer, int PeerPort, char* Host = NULL, int HostPort = 0);
   virtual bool reconnect();
-    
   virtual void printPeer();
-
   virtual bool listen(char* Host, int Port);
-
   ppsocket* accept(char* Peer, int MaxLen);
-
   bool dataToGet() const;
   int getBufferStore(bufferStore &a, bool wait = true);
   bool sendBufferStore(const bufferStore &a);
-  
   int printf(const char* Format, ...);
-
   int   readEx(char* Data, int cTerm, int MaxLen);
   bool  puts(const char* Data);
-
   char sgetc(void);
   bool sputc(char c);
-
   int read(void* Data, size_t Size, size_t NumObj);
   virtual int write(const void* Data, size_t Size, size_t NumObj);
-
   int recv(char* buf, int len, int flags);
   int send(const char* buf, int len, int flags);
-
   int readTimeout(char* buf, int len, int flags);
   int writeTimeout(const char* buf, int len, int flags);
-   
   inline void timeout(DWORD t) { m_Timeout = t; }
   inline DWORD timeout(void) { return(m_Timeout); }
-
   bool closeSocket(void);
   bool bindSocket(char* Host, int Port);
   bool bindInRange(char* Host, int Low, int High, int Retries);
   bool linger(bool LingerOn, int LingerTime = 0);
-    
   virtual bool createSocket(void);
-
   bool setPeer(char* Peer, int Port);
   bool getPeer(char* Peer, int MaxLen, int* Port);
   bool setHost(char* Host, int Port);
   bool getHost(char* Host, int MaxLen, int* Port);
-
   DWORD getLastError(void) { return(m_LastError); }
   inline SOCKET socket(void) const { return(m_Socket); }
   DWORD  lastErrorCode();
@@ -95,7 +78,6 @@ public:
 
 protected:
   ppsocket(const ppsocket&);
-    
   struct sockaddr* getPeerAddrStruct() { return &m_PeerAddr; }
   struct sockaddr* getHostAddrStruct() { return &m_HostAddr; }
   void setHostAddrStruct(struct sockaddr* pHostStruct) { m_HostAddr = *pHostStruct; }

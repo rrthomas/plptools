@@ -74,10 +74,9 @@ ppsocket::ppsocket()
 	((struct sockaddr_in *) &m_PeerAddr)->sin_family = AF_INET;
 
 	m_Bound = false;
-
+	m_LastError = 0;
 	m_Timeout = INFINITE;
 }
-
 
 ppsocket::~ppsocket()
 {
@@ -85,20 +84,6 @@ ppsocket::~ppsocket()
 		shutdown(m_Socket, 3);
 		close(m_Socket);
 	}
-}
-
-
-bool ppsocket::
-startup(void)
-{
-#ifdef WIN32
-	WSADATA wd;
-	m_LastError = WSAStartup(MAKEWORD(1, 1), &wd);
-#else
-	m_LastError = 0;
-#endif
-
-	return (m_LastError == 0 ? true : false);
 }
 
 bool ppsocket::
@@ -123,7 +108,6 @@ reconnect()
 	}
 	return (true);
 }
-
 
 void ppsocket::
 printPeer()
@@ -168,8 +152,6 @@ connect(char *Peer, int PeerPort, char *Host, int HostPort)
 	return (true);
 }
 
-
-
 bool ppsocket::
 listen(char *Host, int Port)
 {
@@ -192,7 +174,6 @@ listen(char *Host, int Port)
 	}
 	return (true);
 }
-
 
 ppsocket *ppsocket::
 accept(char *Peer, int MaxLen)
@@ -246,7 +227,6 @@ accept(char *Peer, int MaxLen)
 	}
 	return (accepted);
 }
-
 
 int ppsocket::
 printf(const char *Format,...)
@@ -381,8 +361,6 @@ puts(const char *Data)
 	return (true);
 }
 
-
-
 char ppsocket::
 sgetc(void)
 {
@@ -396,7 +374,6 @@ sgetc(void)
 	return (c);
 }
 
-
 bool ppsocket::
 sputc(char c)
 {
@@ -409,7 +386,6 @@ sputc(char c)
 	return (true);
 }
 
-
 int ppsocket::
 read(void *Data, size_t Size, size_t NumObj)
 {
@@ -418,7 +394,6 @@ read(void *Data, size_t Size, size_t NumObj)
 	return (i);
 }
 
-
 int ppsocket::
 write(const void *Data, size_t Size, size_t NumObj)
 {
@@ -426,7 +401,6 @@ write(const void *Data, size_t Size, size_t NumObj)
 
 	return (i);
 }
-
 
 int ppsocket::
 recv(char *buf, int len, int flags)
@@ -439,7 +413,6 @@ recv(char *buf, int len, int flags)
 	return (i);
 }
 
-
 int ppsocket::
 send(const char *buf, int len, int flags)
 {
@@ -450,7 +423,6 @@ send(const char *buf, int len, int flags)
 
 	return (i);
 }
-
 
 int ppsocket::
 readTimeout(char *buf, int len, int flags)
@@ -479,7 +451,6 @@ readTimeout(char *buf, int len, int flags)
 
 	return (i);
 }
-
 
 int ppsocket::
 writeTimeout(const char *buf, int len, int flags)
@@ -514,7 +485,6 @@ closeSocket(void)
 	return (true);
 }
 
-
 bool ppsocket::
 bindSocket(char *Host, int Port)
 {
@@ -546,7 +516,6 @@ bindSocket(char *Host, int Port)
 
 	return (true);
 }
-
 
 bool ppsocket::
 bindInRange(char *Host, int Low, int High, int Retries)
@@ -625,7 +594,6 @@ linger(bool LingerOn, int LingerTime)
 	return (true);
 }
 
-
 bool ppsocket::
 createSocket(void)
 {
@@ -672,7 +640,6 @@ setPeer(char *Peer, int Port)
 	return (true);
 }
 
-
 bool ppsocket::
 getPeer(char *Peer, int MaxLen, int *Port)
 {
@@ -691,7 +658,6 @@ getPeer(char *Peer, int MaxLen, int *Port)
 		*Port = ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port);
 	return (false);
 }
-
 
 bool ppsocket::
 setHost(char *Host, int Port)
@@ -721,7 +687,6 @@ setHost(char *Host, int Port)
 		((struct sockaddr_in *) &m_HostAddr)->sin_port = htons((SHORT) Port);
 	return (true);
 }
-
 
 bool ppsocket::
 getHost(char *Host, int MaxLen, int *Port)

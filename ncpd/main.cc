@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stream.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "defs.h"
 #include "ncp.h"
@@ -33,6 +34,9 @@
 #include "linkchan.h"
 #include "link.h"
 #include "packet.h"
+#include "log.h"
+
+static bool verbose = false;
 
 void
 checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp * a, IOWatch & iow)
@@ -41,12 +45,12 @@ checkForNewSocketConnection(ppsocket & skt, int &numScp, socketChan ** scp, ncp 
 	ppsocket *next = skt.accept(peer, 200);
 	if (next != NULL) {
 		// New connect
-		cout << "New socket connection from " << peer << endl;
+		if (verbose)
+			cout << "New socket connection from " << peer << endl;
 		if ((numScp == 7) || (!a->gotLinkChannel())) {
 			bufferStore a;
-			a.addStringT("No psion ncp channel free");
+			a.addStringT("No psion");
 			next->sendBufferStore(a);
-			sleep(1);
 			next->closeSocket();
 		} else
 			scp[numScp++] = new socketChan(next, a, iow);
@@ -70,31 +74,9 @@ pollSocketConnections(int &numScp, socketChan ** scp)
 }
 
 void
-resetSocketConnections(int &numScp, socketChan ** scp, ncp * a)
-{
-	for (int i = 0; i < numScp; i++) {
-		if (scp[i]->isConnected()) {
-			cout << "Killing\n";
-			delete scp[i];
-			numScp--;
-			for (int j = i; j < numScp; j++)
-				scp[j] = scp[j + 1];
-			i--;
-		} else {
-			scp[i]->newNcpController(a);
-			if (scp[i]->getNcpConnectName() != NULL) {
-				cout << "Connecting\n";
-				scp[i]->ncpConnect();
-			} else
-				cout << "Ignoring\n";
-		}
-	}
-}
-
-void
 usage()
 {
-	cerr << "Usage : ncpd [-s <socket number>] [-d <device>] [-b <baud rate>]\n";
+	cerr << "Usage : ncpd [-V] [-v logclass] [-p <port>] [-d <device>] [-b <baudrate>]\n";
 	exit(1);
 }
 
@@ -103,7 +85,7 @@ main(int argc, char **argv)
 {
 	ppsocket skt;
 	IOWatch iow;
-	skt.startup();
+	int pid;
 
 	// Command line parameter processing
 	int sockNum = DPORT;
@@ -113,8 +95,9 @@ main(int argc, char **argv)
 	short int pverbose = 0;
 	short int lverbose = 0;
 
+	signal(SIGPIPE, SIG_IGN);
 	for (int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-s") && i + 1 < argc) {
+		if (!strcmp(argv[i], "-p") && i + 1 < argc) {
 			sockNum = atoi(argv[++i]);
 		} else if (!strcmp(argv[i], "-d") && i + 1 < argc) {
 			serialDevice = argv[++i];
@@ -132,52 +115,64 @@ main(int argc, char **argv)
 				pverbose |= PKT_DEBUG_LOG;
 			if (!strcmp(argv[i], "pd"))
 				pverbose |= PKT_DEBUG_DUMP;
+			if (!strcmp(argv[i], "m"))
+				verbose = true;
 		} else if (!strcmp(argv[i], "-b") && i + 1 < argc) {
 			baudRate = atoi(argv[++i]);
 		} else if (!strcmp(argv[i], "-V")) {
-			cout << "plpnfsd version " << VERSION << endl;
+			cout << "ncpd version " << VERSION << endl;
 			exit(0);
 		} else
 			usage();
 	}
 
-	if (!skt.listen("127.0.0.1", sockNum)) {
-		cerr << "Could not initiate listen on socket " << sockNum << endl;
-	} else {
-		ncp *a = NULL;
-		int numScp;
-		socketChan *scp[8];
+	switch ((pid = fork())) {
+		case 0:
+			if (!skt.listen("127.0.0.1", sockNum))
+				cerr << "listen on port " << sockNum << ": " << strerror(errno) << endl;
+			else {
+				logbuf dlog(LOG_DEBUG);
+				logbuf elog(LOG_ERR);
+				ostream lout(&dlog);
+				ostream lerr(&elog);
+				cout = lout;
+				cerr = lerr;
+				openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
+				ncp *a = new ncp(serialDevice, baudRate, iow);
+				int numScp = 0;
+				socketChan *scp[8];
 
-		while (true) {
-			if (a == NULL) {
-				a = new ncp(serialDevice, baudRate, iow);
 				a->setVerbose(nverbose);
 				a->setLinkVerbose(lverbose);
 				a->setPktVerbose(pverbose);
-				numScp = 0;
 				iow.addIO(skt.socket());
+				while (true) {
+					// sockets
+					pollSocketConnections(numScp, scp);
+					checkForNewSocketConnection(skt, numScp, scp, a, iow);
+
+					// psion
+					a->poll();
+
+					if (a->stuffToSend())
+						iow.watch(0, 100000);
+					else
+						iow.watch(100000, 0);
+
+					if (a->hasFailed()) {
+						if (verbose)
+							cout << "ncp: restarting\n";
+						a->reset();
+					}
+				}
+				delete a;
 			}
-			// sockets
-			pollSocketConnections(numScp, scp);
-			checkForNewSocketConnection(skt, numScp, scp, a, iow);
-
-			// psion
-			a->poll();
-
-			if (a->stuffToSend())
-				iow.watch(0, 100000);
-			else
-				iow.watch(100000, 0);
-
-			if (a->hasFailed()) {
-				cout << "ncp: restarting\n";
-				// resetSocketConnections(numScp, scp, a);
-				// delete a;
-				// a = NULL;
-				a->reset();
-			}
-		}
-		delete a;
+			skt.closeSocket();
+			break;
+		case -1:
+			cerr << "fork: " << strerror(errno) << endl;
+			break;
+		default:
+			exit(0);
 	}
-	skt.closeSocket();
 }

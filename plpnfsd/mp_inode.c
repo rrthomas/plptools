@@ -46,7 +46,7 @@ int i;
 		if (i == ptr->inode)
 			break;
 	if (!ptr) {
-		printf("Inode %d not found (aborting)\n", i);
+		errorlog("Inode %d not found (aborting)\n", i);
 		abort();
 	}
 	return ptr;
@@ -88,7 +88,7 @@ char *name;
 	if (!ptr)
 		ptr = newinode(name, nextinode++);
 	if (debug > 1)
-		printf("\tget_nam(``%s'') returns %08x->inode = %d\n",
+		debuglog("get_nam(``%s'') returns %08x->inode = %d\n",
 		       name, (unsigned int) ptr, ptr->inode);
 	return ptr;
 }
@@ -123,7 +123,7 @@ char *old, *new;
 	int idx = hash(old);
 
 	if (debug)
-		printf("re_nam: %s->%s\n", old, new);
+		debuglog("re_nam: %s->%s\n", old, new);
 	for (nampp = &namtab[idx]; *nampp; nampp = &(*nampp)->nextnam)
 		if (!strcmp(old, (*nampp)->name))
 			break;
@@ -132,7 +132,7 @@ char *old, *new;
 
 	optr = *nampp;
 	if (debug)
-		printf("re_nam: %d\n", optr->inode);
+		debuglog("re_nam: %d\n", optr->inode);
 	*nampp = optr->nextnam;
 
 	/* delete it from the other hashtab too */
@@ -141,14 +141,14 @@ char *old, *new;
 		if (optr == (*numpp))
 			break;
 	if (!*numpp) {
-		printf("Entry in one hashtab only (aborting)\n");
+		errorlog("Entry in one hashtab only (aborting)\n");
 		abort();
 	}
 	*numpp = optr->nextnum;
 
 	nptr = newinode(new, optr->inode);
 	if (debug)
-		printf("re_nam: new entry created\n");
+		debuglog("re_nam: new entry created\n");
 	free(optr->name);
 	free(optr);
 
@@ -164,7 +164,7 @@ unsigned inode;
 	struct cache *cp;
 
 	if (debug)
-		printf("search_cache %d\n", inode);
+		debuglog("search_cache %d\n", inode);
 	for (cp = root; cp; cp = cp->next)
 		if (cp->inode == inode)
 			return cp;
@@ -180,7 +180,7 @@ fattr *fp;
 	struct cache *cp;
 
 	if (debug)
-		printf("add_cache %d\n", inode);
+		debuglog("add_cache %d\n", inode);
 	cp = (struct cache *) malloc(sizeof(*cp));
 	cp->inode = inode;
 	cp->attr = *fp;
@@ -246,7 +246,7 @@ unsigned inode;
 	struct cache *cp, **cpp;
 
 	if (debug)
-		printf("rem_cache %d\n", inode);
+		debuglog("rem_cache %d\n", inode);
 	for (cpp = root; (cp = *cpp); cpp = &cp->next)
 		if (cp->inode == inode)
 			break;

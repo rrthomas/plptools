@@ -224,7 +224,7 @@ session(rfsv32 & a, int xargc, char **xargv)
 						if (vname != NULL) {
 							cout << (char) ('A' + i) << "     " <<
 							    hex << setw(4) << setfill('0') << vattr << " " <<
-							    setw(12) << setfill(' ') << vname << dec << setw(9) <<
+							    setw(12) << setfill(' ') << setiosflags(ios::left) << vname << resetiosflags(ios::left) << dec << setw(9) <<
 							    vtotal << setw(9) << vfree << setw(10) << vuniqueid << endl;
 							free(vname);
 						}
@@ -485,7 +485,7 @@ session(rfsv32 & a, int xargc, char **xargv)
 		if (strcmp(argv[0], "bye") && strcmp(argv[0], "quit"))
 			usage();
 	} while (strcmp(argv[0], "bye") && strcmp(argv[0], "quit") &&
-		 ((a.getStatus() == 0) || (once == 0)));
+		 (once == 0));
 	return a.getStatus();
 }
 

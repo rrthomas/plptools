@@ -195,6 +195,11 @@ extern struct statfsres *nfsproc_statfs_2 __P((struct nfs_fh *fh));
 extern struct readdirres *nfsproc_readdir_2 __P((struct readdirargs *ra));
 extern struct readlinkres *nfsproc_readlink_2 __P((struct nfs_fh *fh));
 
-extern int mp_main(int argc, char **argv);
+extern int mp_main(int, char *, char *);
+
+extern int logsyslog;
+extern int debuglog(char *fmt, ...);
+extern int errorlog(char *fmt, ...);
+extern int infolog(char *fmt, ...);
 
 #endif
