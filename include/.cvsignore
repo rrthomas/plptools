@@ -1,4 +1,5 @@
 stamp-h.in
 stamp-h
 config.h
+config.h.in
 defs.h
