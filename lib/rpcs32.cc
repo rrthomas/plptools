@@ -169,18 +169,38 @@ getMachineInfo(machineInfo &mi)
 static unsigned long hhh;
 
 Enum<rfsv::errs> rpcs32::
-regOpenIter(void)
+regOpenIter(u_int32_t uid, char *match, u_int16_t &handle)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
 
-    a.addStringT("HKLM\\");
+    cout << "Oiter" << endl;
+    a.addDWord(uid);
+    a.addDWord(strlen(match));
+    a.addStringT(match);
     if (!sendCommand(rpcs::REG_OPEN_ITER, a))
 	return rfsv::E_PSI_FILE_DISC;
     res = getResponse(a, true);
     cout << "ro: r=" << res << " a=" << a << endl;
-    if (a.getLen() > 0)
-	hhh = a.getDWord(0);
+    if (a.getLen() == 2)
+	handle = a.getWord(0);
+    return rfsv::E_PSI_GEN_NONE;
+}
+
+Enum<rfsv::errs> rpcs32::
+regReadIter(u_int16_t handle)
+{
+    bufferStore a;
+    Enum<rfsv::errs> res;
+
+    cout << "Riter" << endl;
+    a.addWord(handle);
+    if (!sendCommand(rpcs::REG_READ_ITER, a))
+	return rfsv::E_PSI_FILE_DISC;
+    res = getResponse(a, true);
+    cout << "ro: r=" << res << " a=" << a << endl;
+    if ((a.getLen() == 3) && (a.getByte(2) == 0xff))
+	return rfsv::E_PSI_FILE_EOF;
     return rfsv::E_PSI_GEN_NONE;
 }
 

@@ -222,10 +222,21 @@ fgetmtime(const char * const name, PsiTime &mtime)
 Enum<rfsv::errs> rfsv16::
 fsetmtime(const char *name, PsiTime mtime)
 {
-    cerr << "rfsv16::fsetmtime ***" << endl;
-    // I don't think there's a protocol frame that allows us to set the
-    // modification time. SFDATE allows setting of creation time...
-    return E_PSI_NOT_SIBO;
+    // According to Alexander's protocol doc, SFDATE sets the modification
+    // time - and as far as I can see SIBO only keeps a modification
+    // time. So call SFDATE here.
+    bufferStore a;
+    string realName = convertSlash(name);
+    a.addDWord(mtime.getTime());
+    a.addStringT(realName.c_str());
+    // and this needs sending in the length word.
+    if (!sendCommand(SFDATE, a))
+        return E_PSI_FILE_DISC;
+  
+    Enum<rfsv::errs> res = getResponse(a);
+    if (res != E_PSI_GEN_NONE)
+        cerr << "fsetmtime: Error " << res << " on file " << name << endl;
+    return res;
 }
 
 Enum<rfsv::errs> rfsv16::

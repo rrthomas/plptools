@@ -48,9 +48,9 @@ class rpcs32 : public rpcs {
 #if 0
     Enum<rfsv::errs> closeHandle(int);
 #endif
-    Enum<rfsv::errs> regOpenIter(void);
+    Enum<rfsv::errs> regOpenIter(u_int32_t uid, char *match, u_int16_t &handle);
+    Enum<rfsv::errs> regReadIter(u_int16_t handle);
 #if 0
-    Enum<rfsv::errs> regReadIter(void);
     Enum<rfsv::errs> regWrite(void);
     Enum<rfsv::errs> regRead(void);
     Enum<rfsv::errs> regDelete(void);

@@ -338,8 +338,8 @@ public:
     */
     virtual Enum<rfsv::errs> getMachineInfo(machineInfo &) { return rfsv::E_PSI_NOT_SIBO;}
     virtual Enum<rfsv::errs> closeHandle(int) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regOpenIter(void) { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regReadIter(void) { return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<rfsv::errs> regOpenIter(u_int32_t, char *, u_int16_t &) { return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<rfsv::errs> regReadIter(u_int16_t) { return rfsv::E_PSI_NOT_SIBO;}
     virtual Enum<rfsv::errs> regWrite(void) { return rfsv::E_PSI_NOT_SIBO;}
     virtual Enum<rfsv::errs> regRead(void) { return rfsv::E_PSI_NOT_SIBO;}
     virtual Enum<rfsv::errs> regDelete(void) { return rfsv::E_PSI_NOT_SIBO;}

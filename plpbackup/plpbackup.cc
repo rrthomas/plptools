@@ -26,6 +26,7 @@
 #endif
 
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <dirent.h>
 #include <fstream>
 #include <strstream>
@@ -42,6 +43,7 @@
 #include <errno.h>
 #include <pwd.h>
 #include <getopt.h>
+#include <fcntl.h>
 
 #include <plpintl.h>
 #include <ppsocket.h>
@@ -68,6 +70,7 @@ unsigned long totalBytes = 0;
 unsigned long fileSize = 0;
 
 PlpDir toBackup;
+PlpDir toRestore;
 vector<string> driveList;
 vector<string> archList;
 vector<string> savedCommands;
@@ -115,7 +118,7 @@ generateBackupName()
 static const char * const
 generateTmpDir()
 {
-    char *tmpdir;
+    const char *tmpdir;
     static char nbuf[4096];
 
     if (!(tmpdir = getenv("TMPDIR")))
@@ -217,7 +220,7 @@ startPrograms() {
 
     if (verbose > 0)
 	cout << _("Restarting programs ...") << endl;
-    for (int i = 0; i < savedCommands.size(); i++) {
+    for (unsigned int i = 0; i < savedCommands.size(); i++) {
 	int firstBlank = savedCommands[i].find(' ');
 	string cmd = string(savedCommands[i], 0, firstBlank);
 	string arg = string(savedCommands[i], firstBlank + 1);
@@ -240,7 +243,7 @@ startPrograms() {
 		// not registered in the Psion's path properly. Now try
 		// the ususal \System\Apps\<AppName>\<AppName>.app
 		// on all drives.
-		if (cmd.find('\\') == -1) {
+		if (cmd.find('\\') == cmd.npos) {
 		    u_int32_t devbits;
 		    if ((res = Rfsv->devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 			int i;
@@ -312,7 +315,7 @@ collectFiles(bool &found, const char *dir) {
     if ((res = Rfsv->dir(tmp.c_str(), files)) != rfsv::E_PSI_GEN_NONE)
 	cerr << "Error: " << res << endl;
     else
-	for (int i = 0; i < files.size(); i++) {
+	for (unsigned int i = 0; i < files.size(); i++) {
 	    PlpDirent e = files[i];
 
 	    if (checkAbort())
@@ -337,7 +340,7 @@ collectFiles(bool &found, const char *dir) {
 static int
 reportProgress(void *, u_int32_t size)
 {
-    unsigned long percent;
+    unsigned long percent = 0;
     char pstr[10];
     char bstr[10];
 
@@ -347,13 +350,19 @@ reportProgress(void *, u_int32_t size)
 	return 1;
     switch (verbose) {
 	case 1:
-	    percent = (totalBytes + size) * 100 / backupSize;
+	    if (backupSize == 0)
+		percent = 100;
+	    else
+		percent = (totalBytes + size) * 100 / backupSize;
 	    break;
 	case 2:
-	    percent = size * 100 / fileSize;
+	    if (fileSize == 0)
+		percent = 100;
+	    else
+		percent = size * 100 / fileSize;
 	    break;
     }
-    sprintf(pstr, " %3d%%", percent);
+    sprintf(pstr, " %3ld%%", percent);
     memset(bstr, 8, sizeof(bstr));
     bstr[strlen(pstr)] = '\0';
     printf("%s%s", pstr, bstr);
@@ -443,7 +452,7 @@ startMessage(const char *arch)
 	    cout << "all drives";
 	else {
 	    cout << "Drive ";
-	    for (int i = 0; i < driveList.size(); i++) {
+	    for (unsigned int i = 0; i < driveList.size(); i++) {
 		cout << driveList[i++];
 		if (i < (driveList.size() - 1))
 		    cout << ", ";
@@ -480,17 +489,500 @@ runFormat()
     return 0;
 }
 
+static int
+editfile(char *name)
+{
+    int shin, shout, sherr;
+    int mode_out, mode_err;
+    int status;
+    int rc = -1;
+    int rerrno = 0;
+    int pid, w;
+
+#ifdef POSIX_SIGNALS
+    sigset_t sigset_mask, sigset_omask;
+    struct sigaction act, iact, qact;
+
+#else
+#ifdef BSD_SIGNALS
+    int mask;
+    struct sigvec vec, ivec, qvec;
+
+#else
+    RETSIGTYPE (*istat) (int), (*qstat) (int);
+#endif
+#endif
+
+    /* setup default file descriptor numbers */
+    shin = 0;
+    shout = 1;
+    sherr = 2;
+
+    /* set the file modes for stdout and stderr */
+    mode_out = mode_err = O_WRONLY | O_CREAT;
+
+    /* Make sure we don't flush this twice, once in the subprocess.  */
+    fflush (stdout);
+    fflush (stderr);
+
+    /* The output files, if any, are now created.  Do the fork and dups.
+
+       We use vfork not so much for a performance boost (the
+       performance boost, if any, is modest on most modern unices),
+       but for the sake of systems without a memory management unit,
+       which find it difficult or impossible to implement fork at all
+       (e.g. Amiga).  The other solution is spawn (see
+       windows-NT/run.c).  */
+
+#ifdef HAVE_VFORK
+    pid = vfork ();
+#else
+    pid = fork ();
+#endif
+    if (pid == 0)
+    {
+
+#ifdef SETXID_SUPPORT
+	/*
+	** This prevents a user from creating a privileged shell
+	** from the text editor when the SETXID_SUPPORT option is selected.
+	*/
+	if (!strcmp (run_argv[0], Editor) && setegid (getgid ()))
+	{
+	    error (0, errno, "cannot set egid to gid");
+	    _exit (127);
+	}
+#endif
+
+	/* dup'ing is done.  try to run it now */
+	char *editor = getenv("EDITOR");
+	if (!editor)
+	    editor = "vi";
+	execlp (editor, editor, name, NULL);
+	perror(editor);
+	_exit (127);
+    }
+    else if (pid == -1)
+    {
+	rerrno = errno;
+	goto out;
+    }
+
+    /* the parent.  Ignore some signals for now */
+#ifdef POSIX_SIGNALS
+    act.sa_handler = SIG_IGN;
+    (void) sigemptyset (&act.sa_mask);
+    act.sa_flags = 0;
+    (void) sigaction (SIGINT, &act, &iact);
+    (void) sigaction (SIGQUIT, &act, &qact);
+#else
+#ifdef BSD_SIGNALS
+    memset ((char *) &vec, 0, sizeof (vec));
+    vec.sv_handler = SIG_IGN;
+    (void) sigvec (SIGINT, &vec, &ivec);
+    (void) sigvec (SIGQUIT, &vec, &qvec);
+#else
+    istat = signal (SIGINT, SIG_IGN);
+    qstat = signal (SIGQUIT, SIG_IGN);
+#endif
+#endif
+
+    /* wait for our process to die and munge return status */
+#ifdef POSIX_SIGNALS
+    while ((w = waitpid (pid, &status, 0)) == -1 && errno == EINTR)
+	;
+#else
+    while ((w = wait (&status)) != pid) {
+	if (w == -1 && errno != EINTR)
+	    break;
+    }
+#endif
+
+    if (w == -1) {
+	rc = -1;
+	rerrno = errno;
+    }
+#ifndef VMS /* status is return status */
+    else if (WIFEXITED (status))
+	rc = WEXITSTATUS (status);
+    else if (WIFSIGNALED (status)) {
+	if (WTERMSIG (status) == SIGPIPE)
+	    perror("broken pipe");
+	rc = 2;
+    } else
+	rc = 1;
+#else /* VMS */
+    rc = WEXITSTATUS (status);
+#endif /* VMS */
+
+    /* restore the signals */
+#ifdef POSIX_SIGNALS
+    (void) sigaction (SIGINT, &iact, (struct sigaction *) NULL);
+    (void) sigaction (SIGQUIT, &qact, (struct sigaction *) NULL);
+#else
+#ifdef BSD_SIGNALS
+    (void) sigvec (SIGINT, &ivec, (struct sigvec *) NULL);
+    (void) sigvec (SIGQUIT, &qvec, (struct sigvec *) NULL);
+#else
+    (void) signal (SIGINT, istat);
+    (void) signal (SIGQUIT, qstat);
+#endif
+#endif
+
+  out:
+    if (rerrno)
+	errno = rerrno;
+    return (rc);
+}
+
+static void
+collectIndex(FILE *f, const char *archname)
+{
+    char buf[1024];
+    string drives;
+    int i;
+
+    PlpDir indexSel;
+    PlpDir indexRestore;
+    while (fgets(buf, sizeof(buf), f)) {
+	unsigned long attr;
+	unsigned long size;
+	unsigned long timeLo;
+	unsigned long timeHi;
+	char drive = buf[36];
+
+	char *p = strrchr(buf, '\n');
+	if (p)
+	    *p = '\0';
+	if (drive != '!') {
+	    sscanf(buf, "%08lx %08lx %08lx %08lx ",
+		   &timeHi, &timeLo, &size, &attr);
+	    PlpDirent e(size, attr, timeHi, timeLo, &buf[36]);
+	    indexSel.push_back(e);
+	    if (drives.find(drive) == drives.npos)
+		drives += drive;
+	}
+    }
+    // drives now contains the drive-chars of all drives found in
+    // the backup.
+    if (!drives.empty()) {
+	cout << "It contains Backups of drive ";
+	for (i = 0; i < drives.size(); i++) {
+	    if (i>0) {
+		if (i < (drives.size() - 1))
+		    cout << ", ";
+		else
+		    if (drives.size() > 1)
+			cout << " and ";
+	    }
+	    cout << drives[i] << ":";
+	}
+	cout << endl;
+
+	// Check, if one of the drives is in driveList (commandline args)
+	bool select = false;
+	for (i = 0; i < driveList.size(); i++) {
+	    if (drives.find(driveList[i][0]) != drives.npos)
+		select = true;
+	}
+	if (select) {
+	    cout << "Do you want to select individual files from this archive? (y/N)" << endl;
+	    const char *validA = _("Y");
+	    char answer;
+	    cin >> answer;
+	    if (toupper(answer) == *validA) {
+		strcpy(buf, "/tmp/plpbackupL_XXXXXX");
+		int fd = mkstemp(buf);
+		if (fd == -1) {
+		    perror("mkstemp");
+		    exit(-1);
+		}
+		FILE *tf = fdopen(fd, "w");
+		fprintf(tf, "# Edit this file to you needs and save it\n");
+		fprintf(tf, "# Change the 'N' in the first column to 'Y'\n");
+		fprintf(tf, "# if you want a file to be restored.\n");
+		fprintf(tf, "# DO NOT INSERT ANY LINES!\n");
+		for (i = 0; i < indexSel.size(); i++)
+		    for (int j = 0; j < driveList.size(); j++)
+			if (*(indexSel[i].getName()) == driveList[j][0])
+			    fprintf(tf, "N %s\n", indexSel[i].getName());
+		fclose(tf);
+		if (editfile(buf) == -1) {
+		    perror("Could not run external editor");
+		    unlink(buf);
+		    exit(-1);
+		}
+		tf = fopen(buf, "r");
+		if (!tf) {
+		    perror(buf);
+		    unlink(buf);
+		    exit(-1);
+		}
+		unlink(buf);
+		while (fgets(buf, sizeof(buf), tf)) {
+		    char *p = strrchr(buf, '\n');
+		    if (p)
+			*p = '\0';
+		    if (buf[0] == 'Y') {
+			for (i = 0; i < indexSel.size(); i++)
+			    if (!strcmp(indexSel[i].getName(), &buf[2]))
+				indexRestore.push_back(indexSel[i]);
+		    }
+		}
+		fclose(tf);
+	    } else {
+		for (i = 0; i < indexSel.size(); i++)
+		    for (int j = 0; j < driveList.size(); j++)
+			if (*(indexSel[i].getName()) == driveList[j][0])
+			    indexRestore.push_back(indexSel[i]);
+	    }
+	} else
+	    cout << "Archive skipped, because it does not contain any files on selected drives" << endl;
+    }
+    if (!indexRestore.empty()) {
+	PlpDirent e(0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef, archname);
+	for (i = 0; i < indexRestore.size(); i++)
+	    toRestore.push_back(indexRestore[i]);
+    }
+}
+
+static bool
+askOverwrite(const char *name)
+{
+    return true;
+}
+
+static int
+cps(unsigned long size, struct timeval *start, struct timeval *end)
+{
+    double t = tdiff(start, end);
+    if (t == 0.0)
+	return 99999;
+    else
+	return (int)(((double)size) / t);
+}
+
 static void
 runRestore()
 {
-    int i;
+    unsigned int i;
+    char indexbuf[40];
     ostrstream tarcmd;
+    string dstPath;
+    struct timeval start_tv, end_tv, cstart_tv, cend_tv, sstart_tv, send_tv;
+
     for (i = 0; i < archList.size(); i++) {
 	tarcmd << "tar --to-stdout -xzf " << archList[i]
 	       << " 'KPsion*Index'" << '\0';
+	char backupType = '?';
 	FILE *f = popen(tarcmd.str(), "r");
-
+	if (!f) {
+	    perror("Could not get backup index");
+	    continue;
+	}
+	fgets(indexbuf, sizeof(indexbuf), f);
+	if (!strncmp(indexbuf, "#plpbackup index ", 17))
+	    backupType = indexbuf[17];
+	switch (backupType) {
+	    case 'F':
+		cout << "'" << archList[i] << "' is a full backup" << endl;
+		collectIndex(f, archList[i].c_str());
+		break;
+	    case 'I':
+		cout << "'" << archList[i] << "' is a incremental backup" << endl;
+		collectIndex(f, archList[i].c_str());
+		break;
+	    default:
+		cerr << "'" << archList[i] << "' is NOT a plpbackup" << endl;
+		break;
+	}
 	pclose(f);
+    }
+    if (!toBackup.empty()) {
+	dstPath = "";
+	backupSize = backupCount = 0;
+	// Calculate number of files and total bytecount
+	for (i = 0; i < toRestore.size(); i++) {
+	    backupSize += toBackup[i].getSize();
+	    backupCount++;
+	}
+	// Stop all programs on Psion
+	stopPrograms();
+	string dest;
+	string pDir;
+	for (i = 0; i < toBackup.size(); i++) {
+	    PlpDirent e = toBackup[i];
+	    Enum<rfsv::errs> res;
+	    u_int32_t handle;
+	    struct timeval fstart_tv, fend_tv;
+	    const char *fn = e.getName();
+
+	    if ((e.getSize() == 0xdeadbeef) && (e.getAttr() == 0xdeadbeef) &&
+		(e.getPsiTime().getPsiTimeLo() == 0xdeadbeef) &&
+		(e.getPsiTime().getPsiTimeHi() == 0xdeadbeef)) {
+		if (!dstPath.empty())
+		    rmrf(dstPath.c_str());
+		dstPath = generateTmpDir();
+		tarcmd.flush();
+		tarcmd << "tar xCf " << dstPath << " " << fn << '\0';
+		system(tarcmd.str());
+	    }
+	    if (checkAbort()) {
+		// remove temporary dir
+		rmrf(dstPath.c_str());
+		// restart previously killed programs
+		startPrograms();
+		cout << _("Restore aborted by user") << endl;
+		return;
+	    }
+	    dest = dstPath;
+	    dest += '/';
+	    dest += psion2unix(fn);
+	    fileSize = e.getSize();
+	    if (verbose > 1)
+		cout << _("Restore ") << fn << flush;
+
+	    string cpDir(fn);
+	    int bslash = cpDir.rfind('\\');
+	    if (bslash != cpDir.npos)
+		cpDir.resize(bslash);
+
+	    if (pDir != cpDir) {
+		pDir = cpDir;
+		res = Rfsv->mkdir(pDir.c_str());
+		if ((res != rfsv::E_PSI_GEN_NONE) &&
+		    (res != rfsv::E_PSI_FILE_EXIST)) {
+		    cerr << "Could not create directory " << pDir << ": "
+			 << res << endl;
+		    continue;
+		}
+	    }
+
+	    res = Rfsv->fcreatefile(
+		Rfsv->opMode(rfsv::PSI_O_RDWR), fn, handle);
+	    if (res == rfsv::E_PSI_FILE_EXIST) {
+		if (!askOverwrite(fn))
+		    continue;
+		res = Rfsv->freplacefile(
+		    Rfsv->opMode(rfsv::PSI_O_RDWR), fn, handle);
+	    }
+	    if (res != rfsv::E_PSI_GEN_NONE) {
+		cerr << "Could not create " << fn << ": " << res << endl;
+		continue;
+	    }
+	    Rfsv->fclose(handle);
+	    gettimeofday(&fstart_tv, NULL);
+	    res = Rfsv->copyToPsion(dest.c_str(), fn, NULL, cab);
+	    if (res == rfsv::E_PSI_GEN_NONE) {
+		u_int32_t oldattr;
+		res = Rfsv->fgetattr(fn, oldattr);
+		if (res != rfsv::E_PSI_GEN_NONE) {
+		    cerr << "Could not get attributes of " << fn << ": " << res << endl;
+		    continue;
+		}
+		u_int32_t mask = e.getAttr() ^ oldattr;
+		u_int32_t sattr = e.getAttr() & mask;
+		u_int32_t dattr = ~sattr & mask;
+		int retry = 10;
+		// Retry, because file somtimes takes some time
+		// to close;
+		do {
+		    res = Rfsv->fsetattr(fn, sattr, dattr);
+		    if (res != rfsv::E_PSI_GEN_NONE)
+			usleep(100000);
+		    retry--;
+		} while ((res != rfsv::E_PSI_GEN_NONE) && (retry > 0));
+		if (res != rfsv::E_PSI_GEN_NONE) {
+		    cerr << "Could not set attributes of" << fn << ": "
+			 << res << endl;
+		    continue;
+		}
+		retry = 10;
+		do {
+		    res = Rfsv->fsetmtime(fn, e.getPsiTime());
+		    if (res != rfsv::E_PSI_GEN_NONE)
+			usleep(100000);
+		    retry--;
+		} while ((res != rfsv::E_PSI_GEN_NONE) && (retry > 0));
+		if (res != rfsv::E_PSI_GEN_NONE) {
+		    cerr << "Could not set modification time of " << fn << ": "
+			 << res << endl;
+		    continue;
+		}
+	    }
+	    if (checkAbort()) {
+		// remove temporary dir
+		rmrf(dstPath.c_str());
+		// restart previously killed programs
+		startPrograms();
+		cout << _("Backup aborted by user") << endl;
+		return;
+	    }
+	    gettimeofday(&fend_tv, NULL);
+	    if (verbose > 1)
+		cout << " " << cps(fileSize, &fstart_tv, &fend_tv)
+		     << " CPS " << endl;
+	    totalBytes += fileSize;
+	    if (res != rfsv::E_PSI_GEN_NONE) {
+		if (skipError) {
+		    e.setName("!");
+		    if (verbose > 0)
+			cerr << _("Skipping ") << fn << ": "
+			     << res << endl;
+		} else {
+		    cerr << _("Error during restore of ") << fn << ": "
+			 << res << endl;
+		    if (isatty(0)) {
+			bool askLoop = true;
+			do {
+			    char answer;
+			    string vans = _("STAR");
+
+			    cerr << _("(S)kip all, Skip (t)his, (A)bort, (R)etry: ")
+				 << flush;
+			    cin >> answer;
+			    switch (vans.find(toupper(answer))) {
+				case 0:
+				    skipError = true;
+				    // fall thru
+				case 1:
+				    e.setName("!");
+				    askLoop = false;
+				    break;
+				case 2:
+				    i = toBackup.size();
+				    askLoop = false;
+				    break;
+				case 3:
+				    if (verbose > 1)
+					cout << _("Restore ") << fn << flush;
+				    break;
+				    res = Rfsv->copyFromPsion(fn, dest.c_str(), NULL, cab);
+				    if (checkAbort()) {
+					// remove temporary dir
+					rmrf(dstPath.c_str());
+					// restart previously killed programs
+					startPrograms();
+					cout << _("Restore aborted by user")
+					     << endl;
+					return;
+				    }
+				    if (verbose > 1)
+					cout << endl;
+				    if (res != rfsv::E_PSI_GEN_NONE) {
+					cerr << _("Error during restore of ")
+					     << fn << ": " << res << endl;
+				    } else
+					askLoop = false;
+				    break;
+			    }
+			} while (askLoop);
+		    } else {
+			break;
+		    }
+		}
+	    }
+	}
     }
 }
 
@@ -539,7 +1031,7 @@ runBackup()
 		if ((devbits & 1) && Rfsv->devinfo(i + 'A', psidr)
 		    == rfsv::E_PSI_GEN_NONE) {
 		    if (psidr.getMediaType() != 7) {
-			sprintf(drive, "%c:\0", 'A' + i);
+			sprintf(drive, "%c:", 'A' + i);
 			if (verbose > 0)
 			    cout << _("Scanning Drive ") << drive << " ..."
 				 << flush;
@@ -622,8 +1114,7 @@ runBackup()
 	    gettimeofday(&fend_tv, NULL);
 	    if (verbose > 1)
 		cout << " "
-		     << (int)((double)fileSize / tdiff(&fstart_tv, &fend_tv))
-		     << " CPS" << endl;
+		     << cps(fileSize, &fstart_tv, &fend_tv) << " CPS" << endl;
 	    totalBytes += fileSize;
 	    if (res != rfsv::E_PSI_GEN_NONE) {
 		if (skipError) {
@@ -785,7 +1276,7 @@ runBackup()
 	    cout << _("Time for transfer:      ") << tdiff(&cstart_tv, &cend_tv)
 		 << endl;
 	    cout << _("Average transfer speed: ")
-		 << (double)backupSize / tdiff(&cstart_tv, &cend_tv) << endl;
+		 << cps(backupSize, &cstart_tv, &cend_tv) << endl;
 	}
     }
 }

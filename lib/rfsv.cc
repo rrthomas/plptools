@@ -167,6 +167,22 @@ attr2String(const u_int32_t attr)
     return tmp;
 }
 
+int rfsv::
+getSpeed()
+{
+    bufferStore a;
+    a.addStringT("NCP$GSPD");
+    if (!skt->sendBufferStore(a))
+	return -1;
+    if (skt->getBufferStore(a) != 1)
+	return -1;
+    if (a.getLen() != 5)
+	return -1;
+    if (a.getByte(0) != E_PSI_GEN_NONE)
+	return -1;
+    return a.getDWord(1);
+}
+
 /*
  * Local variables:
  * c-basic-offset: 4

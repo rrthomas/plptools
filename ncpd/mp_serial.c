@@ -131,7 +131,7 @@ init_serial(const char *dev, int speed, int debug)
 	perror("seteuid");
 	exit(1);
     }
-    if ((fd = open(dev, O_RDWR /*FRITZTEST | O_NDELAY */ | O_NOCTTY, 0)) < 0) {
+    if ((fd = open(dev, O_RDWR | O_NOCTTY, 0)) < 0) {
 	perror(dev);
 	exit(1);
     }
@@ -184,6 +184,9 @@ ser_exit(int fd)
 {
     struct termios ti;
 
+#ifdef TIOCNXCL
+    ioctl(fd, TIOCNXCL, (char *) 0);
+#endif
     if (tcgetattr(fd, &ti) < 0)
 	perror("tcgetattr");
     ti.c_cflag &= ~CRTSCTS;

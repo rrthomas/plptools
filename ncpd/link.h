@@ -32,6 +32,7 @@
 
 #include "bufferstore.h"
 #include "bufferarray.h"
+#include "Enum.h"
 #include <vector>
 
 #define LNK_DEBUG_LOG  4
@@ -69,6 +70,12 @@ extern "C" {
 
 class Link {
 public:
+
+    enum link_type {
+	LINK_TYPE_UNKNOWN = 0,
+	LINK_TYPE_SIBO    = 1,
+	LINK_TYPE_EPOC    = 2,
+    };
 
     /**
      * Construct a new link instance.
@@ -141,6 +148,20 @@ public:
      */
     unsigned short getVerbose();
 
+    /**
+     * Get the current link type.
+     *
+     * @returns One of LINK_TYPE_... values.
+     */
+    Enum<link_type> getLinkType();
+
+    /**
+     * Get current speed of the serial device
+     *
+     * @returns The current speed in baud.
+     */
+    int getSpeed();
+
 private:
     friend class packet;
     friend void * expire_check(void *);
@@ -148,11 +169,15 @@ private:
     void receive(bufferStore buf);
     void transmit(bufferStore buf);
     void sendAck(int seq);
-    void sendCon();
+    void sendReqReq();
+    void sendReqCon();
+    void sendReq();
     void multiAck(struct timeval);
     void retransmit();
     void transmitHoldQueue(int channel);
     void transmitWaitQueue();
+    void purgeAllQueues();
+    unsigned long retransTimeout();
 
     pthread_t checkthread;
     pthread_mutex_t queueMutex;
@@ -163,10 +188,10 @@ private:
     int rxSequence;
     int seqMask;
     int maxOutstanding;
-    unsigned long retransTimeout;
     unsigned long conMagic;
     unsigned short verbose;
     bool failed;
+    Enum<link_type> linkType;
 
     vector<ackWaitQueueElement> ackWaitQueue;
     vector<bufferStore> holdQueue;

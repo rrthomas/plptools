@@ -57,6 +57,7 @@ public:
     void setEpoc(bool);
     void setVerbose(short int);
     short int getVerbose();
+    int getSpeed();
     bool linkFailed();
     void reset();
 
@@ -71,6 +72,7 @@ private:
     void opByte(unsigned char a);
     void opCByte(unsigned char a, unsigned short *crc);
     void realWrite();
+    void internalReset();
 
     Link *theLINK;
     pthread_t datapump;
@@ -98,10 +100,14 @@ private:
     int foundSync;
     int fd;
     int serialStatus;
+    int baud_index;
+    int realBaud;
     short int verbose;
     bool esc;
     bool lastFatal;
     bool isEPOC;
+    bool justStarted;
+
     char *devname;
     int baud;
 };

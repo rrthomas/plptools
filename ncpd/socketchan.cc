@@ -32,6 +32,7 @@
 #include "socketchan.h"
 #include "ncp.h"
 #include <ppsocket.h>
+#include <rfsv.h>
 
 socketChan:: socketChan(ppsocket * _skt, ncp * _ncpController):
     channel(_ncpController)
@@ -72,11 +73,10 @@ ncpCommand(bufferStore & a)
 {
     // str is guaranteed to begin with NCP$, and all NCP commands are
     // greater than or equal to 8 characters in length.
-    const char *str = a.getString();
-    // unsigned long len = a.getLen();
+    const char *str = a.getString(4);
     bool ok = false;
 
-    if (!strncmp(str+4, "INFO", 4)) {
+    if (!strncmp(str, "INFO", 4)) {
 	// Send information discovered during the receipt of the
 	// NCON_MSG_NCP_INFO message.
 	a.init();
@@ -94,26 +94,50 @@ ncpCommand(bufferStore & a)
 	}
 	skt->sendBufferStore(a);
 	ok = true;
-    } else if (!strncmp(str+4, "CONN", 4)) {
+    } else if (!strncmp(str, "CONN", 4)) {
 	// Connect to a channel that was placed in 'pending' mode, by
 	// checking the channel table against the ID...
 	// DO ME LATER
 	ok = true;
-    } else if (!strncmp(str+4, "CHAL", 4)) {
+    } else if (!strncmp(str, "CHAL", 4)) {
 	// Challenge
 	// The idea is that the channel stays in 'secure' mode until a
 	// valid RESP is received
 	// DO ME LATER
 	ok = true;
-    } else if (!strncmp(str+4, "RESP", 4)) {
+    } else if (!strncmp(str, "RESP", 4)) {
 	// Reponse - here is the plaintext as sent in the CHAL - the
 	// channel will only open up if this matches what ncpd has for
 	// the encrypted plaintext.
 	// DO ME LATER
 	ok = true;
+    } else if (!strncmp(str, "GSPD", 4)) {
+	// Get Speed of serial device
+	cerr << "socketChan:: GETSPEED" << endl;
+	a.init();
+	a.addByte(rfsv::E_PSI_GEN_NONE);
+	a.addDWord(ncpGetSpeed());
+	skt->sendBufferStore(a);
+	ok = true;
+    } else if (!strncmp(str, "REGS", 4)) {
+	// Register a server-process on the PC side.
+	a.init();
+	const char *name = a.getString(8);
+	if (ncpFindPcServer(name))
+	    a.addByte(rfsv::E_PSI_FILE_EXIST);
+	else {
+	    ncpRegisterPcServer(skt, name);
+	    a.addByte(rfsv::E_PSI_GEN_NONE);
+	}
+	skt->sendBufferStore(a);
+	ok = true;
     }
-    if (!ok)
+    if (!ok) {
 	cerr << "socketChan:: received unknown NCP command (" << a << ")" << endl;
+	a.init();
+	a.addByte(rfsv::E_PSI_GEN_NSUP);
+	skt->sendBufferStore(a);
+    }
     return ok;
 }
 
@@ -223,6 +247,12 @@ socketPoll()
 	    ncpDisconnect();
 	    skt->closeSocket();
 	} else if (res == 1) {
+	    if (a.getLen() > 8 && !strncmp(a.getString(), "NCP$", 4)) {
+		if (!ncpCommand(a))
+		    cerr << "ncpd: command " << a << " unrecognized."
+			 << endl;
+		return;
+	    }
 	    ncpSend(a);
 	}
     } else if (time(0) > (tryStamp + 15))

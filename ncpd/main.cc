@@ -288,7 +288,10 @@ main(int argc, char **argv)
 		autoexit = true;
 		break;
 	    case 'b':
-		baudRate = atoi(optarg);
+		if (!strcmp(optarg, "auto"))
+		    baudRate = -1;
+		else
+		    baudRate = atoi(optarg);
 		break;
 	    case 's':
 		serialDevice = optarg;

@@ -31,6 +31,8 @@
 
 class ncp;
 class bufferStore;
+class PcServer;
+class ppsocket;
 
 class channel {
 public:
@@ -60,6 +62,11 @@ public:
     // The following two calls are used for destructing an instance
     virtual bool terminate(); // Mainloop will terminate this class if true
     void terminateWhenAsked();
+
+    PcServer *ncpFindPcServer(const char *name);
+    void ncpRegisterPcServer(ppsocket *skt, const char *name);
+    void ncpUnregisterPcServer(PcServer *server);
+    int ncpGetSpeed();
 
 protected:
     short int verbose;

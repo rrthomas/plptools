@@ -86,7 +86,8 @@ AC_ARG_ENABLE(history,
 if test "x$ac_enable_history" = "xyes" ; then
 	AC_CHECK_LIB(history, add_history,
 	[
-		AC_DEFINE_UNQUOTED(HAVE_LIBHISTORY)
+		AC_DEFINE_UNQUOTED(HAVE_LIBHISTORY,1,
+			[Define this, if you have libhistory])
 		ac_cv_libhistory=-lhistory
 	])
 fi
@@ -102,28 +103,33 @@ AC_CHECK_LIB(rpcsoc, svcudp_create,,LDFLAGS=$ac_save_LDFLAGS)
 dnl checks for mount table - if desired
 ac_enable_mnttab=yes
 AC_ARG_ENABLE(mnttab,
-       [  --disable-mnttab        disable mnttab writing [no]],
-       if test "$enableval" = "no" ; then
-               AC_MSG_RESULT([support for mnttab disabled])
-               ac_enable_mnttab=no
-       fi
+        [  --disable-mnttab        disable mnttab writing [no]],
+        if test "$enableval" = "no" ; then
+                AC_MSG_RESULT([support for mnttab disabled])
+                ac_enable_mnttab=no
+        fi
 )
 if test "x$ac_enable_mnttab" = "xyes" ; then
-       AC_MSG_CHECKING(for mount table)
-       PLP_FIND_FILE(/etc/mnttab /etc/mtab, MTAB)
-       AC_MSG_RESULT($MTAB)
-       test "$MTAB" = "NO" && AC_DEFINE_UNQUOTED(DONT_UPDATE_MTAB)
-       AC_DEFINE_UNQUOTED(MTAB_PATH,"$MTAB")
-       case "$target_alias" in
-               *linux*)
-                       AC_DEFINE_UNQUOTED(MTAB_TMP,"${MTAB}~")
-                       ;;
-               *)
-                       AC_DEFINE_UNQUOTED(MTAB_TMP,"${MTAB}.plpnfsd")
-                       ;;
-       esac
-else
-       AC_DEFINE_UNQUOTED(DONT_UPDATE_MTAB)
+        AC_MSG_CHECKING(for mount table)
+        PLP_FIND_FILE(/etc/mnttab /etc/mtab, MTAB)
+        AC_MSG_RESULT($MTAB)
+        if test "$MTAB" = "NO" ; then
+                AC_DEFINE_UNQUOTED(DONT_UPDATE_MTAB,1,
+	                [Define this this if you want to prevent plpnfsd from updating mtab])
+        else
+                AC_DEFINE_UNQUOTED(MTAB_PATH,"$MTAB",
+			[Define this to your mtab's path])
+	        ac_cv_mtab_tmp="${MTAB}~"
+                case "$target_alias" in
+                        *linux*)
+                                ;;
+                        *)
+                                ac_cv_mtab_tmp="${MTAB}.plpnfsd"
+                                ;;
+                esac
+                AC_DEFINE_UNQUOTED(MTAB_TMP,"${ac_cv_mtab_tmp}",
+			[Define this to your temporary mtab's path])
+	fi
 fi
 
 dnl Check, if bot time.h and sys/time.h may be included
@@ -158,19 +164,29 @@ AC_ARG_WITH(serial,
       test "$DDEV" = "NO" && AC_MSG_ERROR(NO serial lines. Use --with-serial.)
     ]
 )
-AC_DEFINE_UNQUOTED(DDEV,"$DDEV")
+AC_DEFINE_UNQUOTED(DDEV,"$DDEV",[Define this to your serial device node])
 AC_SUBST(DDEV)
 
 AC_ARG_WITH(speed,
-    [  --with-speed=SPEED      override default serial speed [115200]],
-    [ DSPEED="$withval"
-      AC_MSG_RESULT(Overriding serial speed: $DSPEED) ],
-    [ DSPEED=115200
-      AC_MSG_RESULT(Using default serial speed: $DSPEED)
+    [  --with-speed=SPEED      override default serial speed [auto]],
+    [ if "$withval" = "auto" ; then
+        DSNAME=auto
+        DSPEED=-1
+      else
+        DSPEED="$withval"
+        DSNAME="$withval"
+      fi
+      AC_MSG_RESULT(Overriding serial speed: $DSNAME) ],
+    [ DSPEED=-1
+      DSNAME=auto
+      AC_MSG_RESULT(Using default serial speed: auto)
     ]
 )
-AC_DEFINE_UNQUOTED(DSPEED,$DSPEED)
+AC_DEFINE_UNQUOTED(DSPEED,$DSPEED,[Define this to your serial device speed])
+AC_DEFINE_UNQUOTED(DSNAME,$DSNAME,
+	[Define this to your serial device speed alias])
 AC_SUBST(DSPEED)
+AC_SUBST(DSNAME)
 
 AC_ARG_WITH(port,
     [  --with-port=PORT        override default port [7501]],
@@ -180,7 +196,8 @@ AC_ARG_WITH(port,
       AC_MSG_RESULT(Using default port: $DPORT)
     ]
 )
-AC_DEFINE_UNQUOTED(DPORT,$DPORT)
+AC_DEFINE_UNQUOTED(DPORT,$DPORT,
+	[Define this to the TCP port ncpd should listen on])
 AC_SUBST(DPORT)
 
 AC_ARG_WITH(drive,
@@ -191,7 +208,8 @@ AC_ARG_WITH(drive,
       AC_MSG_RESULT(Using default Psion drive: $DDRIVE)
     ]
 )
-AC_DEFINE_UNQUOTED(DDRIVE,"$DDRIVE")
+AC_DEFINE_UNQUOTED(DDRIVE,"$DDRIVE",
+	[Define this to your default drive on your Psion])
 
 AC_ARG_WITH(basedir,
     [  --with-basedir=DIR      override default Psion directory [\\\\]],
@@ -201,7 +219,8 @@ AC_ARG_WITH(basedir,
       AC_MSG_RESULT(Using default Psion directory: $DBASEDIR)
     ]
 )
-AC_DEFINE_UNQUOTED(DBASEDIR,"$DBASEDIR")
+AC_DEFINE_UNQUOTED(DBASEDIR,"$DBASEDIR",
+	[Define this to your default directory on your Psion])
 
 AC_ARG_WITH(mountdir,
     [  --with-mountdir=DIR     override default mount point [/mnt/psion]],
@@ -211,7 +230,8 @@ AC_ARG_WITH(mountdir,
       AC_MSG_RESULT(Using default mount point: $DMOUNTPOINT)
     ]
 )
-AC_DEFINE_UNQUOTED(DMOUNTPOINT,"$DMOUNTPOINT")
+AC_DEFINE_UNQUOTED(DMOUNTPOINT,"$DMOUNTPOINT",
+	[Define this to your default mountpoint for plpnfsd])
 AC_SUBST(DMOUNTPOINT)
 test "x$prefix" = xNONE && prefix="$ac_default_prefix"
 eval PKGDATA="${datadir}/${PACKAGE}"

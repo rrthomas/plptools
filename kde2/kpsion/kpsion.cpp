@@ -864,37 +864,49 @@ doBackup() {
 	u_int32_t handle;
 
 	kapp->processEvents();
-	res = plpRfsv->fopen(plpRfsv->opMode(rfsv::PSI_O_RDONLY), fn,
-			     handle);
-	if (res != rfsv::E_PSI_GEN_NONE) {
-	    if (KMessageBox::warningYesNo(this, i18n("<QT>Could not open<BR/><B>%1</B></QT>").arg(fn)) == KMessageBox::No) {
-		badBackup = true;
-		break;
-	    } else {
-		e.setName("!");
-		continue;
-	    }
-	}
-	unsigned char *buff = new unsigned char[RFSV_SENDLEN];
-	u_int32_t len;
+	bool tryLoop = true;
 	do {
-	    if ((res = plpRfsv->fread(handle, buff, RFSV_SENDLEN, len)) ==
-		rfsv::E_PSI_GEN_NONE) {
-		os.writeRawBytes((char *)buff, len);
-		updateProgress(len);
+	    res = plpRfsv->fopen(plpRfsv->opMode(rfsv::PSI_O_RDONLY), fn,
+				 handle);
+	    if (res == rfsv::E_PSI_GEN_NONE) {
+		unsigned char *buff = new unsigned char[RFSV_SENDLEN];
+		u_int32_t len;
+		do {
+		    if ((res = plpRfsv->fread(handle, buff, RFSV_SENDLEN,
+					      len)) == rfsv::E_PSI_GEN_NONE) {
+			os.writeRawBytes((char *)buff, len);
+			updateProgress(len);
+		    }
+		} while ((len > 0) && (res == rfsv::E_PSI_GEN_NONE));
+		delete[]buff;
+		plpRfsv->fclose(handle);
 	    }
-	} while ((len > 0) && (res == rfsv::E_PSI_GEN_NONE));
-	delete[]buff;
-	plpRfsv->fclose(handle);
-	if (res != rfsv::E_PSI_GEN_NONE) {
-	    if (KMessageBox::warningYesNo(this, i18n("<QT>Could not read<BR/><B>%1</B></QT>").arg(fn)) == KMessageBox::No) {
-		badBackup = true;
-		break;
+	    if (res != rfsv::E_PSI_GEN_NONE) {
+		switch (KMessageBox::warningYesNoCancel(
+			    this, i18n(
+				"<QT>Could not backup<BR/><B>%1</B><BR/>"
+				"<FONT COLOR=RED>%2</FONT><BR/></QT>"
+				).arg(fn).arg((const char *)res),
+			    QString::null, i18n("Retry"), i18n("Ignore"))) {
+		    case KMessageBox::Cancel:
+			badBackup = true;
+			tryLoop = false;
+			break;
+		    case KMessageBox::No:
+			e.setName("!");
+			tryLoop = false;
+			break;
+		    case KMessageBox::Yes:
+			break;
+		}
 	    } else {
-		e.setName("!");
-		continue;
+		tryLoop = false;
 	    }
-	}
+	} while (tryLoop);
+	if (badBackup)
+	    break;
+	if (res != rfsv::E_PSI_GEN_NONE)
+	    continue;
 	backupTgz->writeFile(unixname, "root", "root", ba.size(), ba.data());
     }
 
@@ -915,7 +927,7 @@ doBackup() {
 		kapp->processEvents();
 		res = plpRfsv->fsetattr(fn, 0, rfsv::PSI_A_ARCHIVE);
 		if (res != rfsv::E_PSI_GEN_NONE) {
-		    if (KMessageBox::warningYesNo(this, i18n("<QT>Could not set attributes of<BR/><B>%1</B></QT>").arg(fn)) == KMessageBox::No) {
+		    if (KMessageBox::warningYesNo(this, i18n("<QT>Could not set attributes of<BR/><B>%1</B><BR/><FONT COLOR=red>%2</FONT><BR/>Continue?</QT>").arg(fn)) == KMessageBox::No) {
 			break;
 		    }
 		}
@@ -998,7 +1010,6 @@ removeOldBackups(QStringList &drives) {
     QFileInfoListIterator it(*fil);
     QFileInfo *fi;
     ArchList alist;
-    Barchive *a;
 
     // Build a list of full-backups sorted by date
     while ((fi = it.current())) {
@@ -1637,7 +1648,7 @@ killSave() {
 		"<QT>Could not stop all processes.<BR/>"
 		"Please stop running programs manually on the Psion, "
 		"then klick <B>Ok</B>."));
-	    time_t tstart = time(0) + 5;
+	    tstart = time(0) + 5;
 	}
     }
     return;

@@ -87,6 +87,30 @@ ncpDisconnect()
     ncpController->disconnect(ncpChannel);
 }
 
+PcServer *channel::
+ncpFindPcServer(const char *name)
+{
+    return ncpController->findPcServer(name);
+}
+
+void channel::
+ncpRegisterPcServer(ppsocket *skt, const char *name)
+{
+    ncpController->registerPcServer(skt, name);
+}
+
+void channel::
+ncpUnregisterPcServer(PcServer *server)
+{
+    ncpController->unregisterPcServer(server);
+}
+
+int channel::
+ncpGetSpeed()
+{
+    return ncpController->getSpeed();
+}
+
 short int channel::
 ncpProtocolVersion()
 {

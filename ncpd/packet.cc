@@ -138,9 +138,16 @@ static void *pump_run(void *arg)
     }
 }
 
-//static pthread_mutex_t outMutex;
-//static pthread_mutex_t inMutex;
 };
+
+static const int baud_table[] = {
+    115200,
+    57600,
+    38400,
+    19200,
+    // Lower rates don't make sense ?!
+};
+#define BAUD_TABLE_SIZE (sizeof(baud_table) / sizeof(int))
 
 packet::
 packet(const char *fname, int _baud, Link *_link, unsigned short _verbose)
@@ -151,6 +158,7 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose)
     baud = _baud;
     theLINK = _link;
     isEPOC = false;
+    justStarted = true;
 
     // Initialize CRC table
     crc_table[0] = 0;
@@ -174,12 +182,15 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose)
     crcIn = crcOut = 0;
 
     thisThread = pthread_self();
-    fd = init_serial(devname, baud, 0);
+    realBaud = baud;
+    if (baud < 0) {
+	baud_index = 1;
+	realBaud = baud_table[0];
+    }
+    fd = init_serial(devname, realBaud, 0);
     if (fd == -1)
 	lastFatal = true;
     else {
-//	pthread_mutex_init(&inMutex, NULL);
-//	pthread_mutex_init(&outMutex, NULL);
 	signal(SIGUSR1, usr1handler);
 	pthread_create(&datapump, NULL, pump_run, this);
     }
@@ -201,30 +212,46 @@ packet::
 void packet::
 reset()
 {
+    if (fd != -1)
+	pthread_cancel(datapump);
+    outRead = outWrite = 0;
+    internalReset();
+    if (fd != -1)
+	pthread_create(&datapump, NULL, pump_run, this);
+}
+
+void packet::
+internalReset()
+{
     if (verbose & PKT_DEBUG_LOG)
 	cout << "resetting serial connection" << endl;
     if (fd != -1) {
-	pthread_cancel(datapump);
 	ser_exit(fd);
 	fd = -1;
     }
-    usleep(100000);
-    inRead = inWrite = outRead = outWrite = 0;
+    usleep(1000000);
+    inRead = inWrite = 0;
     esc = false;
     lastFatal = false;
     serialStatus = -1;
     lastSYN = startPkt = -1;
     crcIn = crcOut = 0;
-    fd = init_serial(devname, baud, 0);
-    if (fd != -1)
-	lastFatal = false;
-    else {
-//	pthread_mutex_init(&inMutex, NULL);
-//	pthread_mutex_init(&outMutex, NULL);
-	pthread_create(&datapump, NULL, pump_run, this);
+    realBaud = baud;
+    justStarted = true;
+    if (baud < 0) {
+	realBaud = baud_table[baud_index++];
+	if (baud_index >= BAUD_TABLE_SIZE)
+	    baud_index = 0;
     }
+
+    fd = init_serial(devname, realBaud, 0);
     if (verbose & PKT_DEBUG_LOG)
-	cout << "serial connection reset, fd=" << fd << endl;
+	cout << "serial connection set to " << dec << realBaud
+	     << " baud, fd=" << fd << endl;
+    if (fd != -1) {
+	lastFatal = false;
+	realWrite();
+    }
 }
 
 short int packet::
@@ -243,6 +270,12 @@ void packet::
 setEpoc(bool _epoc)
 {
     isEPOC = _epoc;
+}
+
+int packet::
+getSpeed()
+{
+    return realBaud;
 }
 
 void packet::
@@ -350,6 +383,7 @@ findSync()
 	}
     }
     if (startPkt >= 0) {
+	justStarted = false;
 	while (p != inw) {
 	    unsigned char c = inBuffer[p];
 	    switch (inCRCstate) {
@@ -393,7 +427,6 @@ findSync()
 			if (verbose & PKT_DEBUG_LOG)
 			    cout << "packet: BAD CRC" << endl;
 		    } else {
-			// inQueue += rcv;
 			if (verbose & PKT_DEBUG_LOG) {
 			    cout << "packet: << ";
 			    if (verbose & PKT_DEBUG_DUMP)
@@ -412,6 +445,18 @@ findSync()
 	    inc1(p);
 	}
 	lastSYN = p;
+    } else {
+	// If we get here, no sync was found.
+	// If we are just started and the amount of received data exceeds
+	// 15 bytes, the baudrate is obviously wrong.
+	// (or the connected device is not an EPOC device). Reset the
+	// serial connection and try next baudrate, if auto-baud is set.
+	if (justStarted) {
+	    int rx_amount = (inw > inRead) ?
+		inw - inRead : BUFLEN - inRead + inw;
+	    if (rx_amount > 15)
+		internalReset();
+	}
     }
 }
 
@@ -422,8 +467,8 @@ linkFailed()
     int res;
     bool failed = false;
 
-    if (lastFatal)
-	reset();
+    if (fd == -1)
+	return false;
     res = ioctl(fd, TIOCMGET, &arg);
     if (res < 0)
 	lastFatal = true;
@@ -453,10 +498,8 @@ linkFailed()
 	|| ((arg & TIOCM_DSR) == 0)
 #endif
 	) {
-	// eat possible junk on line
-	//while (read(fd, &res, sizeof(res)) > 0)
-	//	;
 	failed = true;
+	justStarted = true;
     }
     if ((verbose & PKT_DEBUG_LOG) && lastFatal)
 	cout << "packet: linkFATAL\n";

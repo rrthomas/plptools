@@ -600,6 +600,13 @@ public:
     */
     static string convertSlash(const string &name);
 
+    /**
+     * Retrieve speed of serial link.
+     *
+     * @returns The speed of the serial link in baud or -1 on error.
+     */
+    int getSpeed();
+
 protected:
     /**
     * Retrieves the PLP protocol name. Mainly internal use.

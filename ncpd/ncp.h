@@ -27,13 +27,32 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+
+#include <vector>
+
 #include "bufferstore.h"
 #include "linkchan.h"
+#include "ppsocket.h"
+
 class Link;
 class channel;
 
 #define NCP_DEBUG_LOG  1
 #define NCP_DEBUG_DUMP 2
+
+/**
+ * Representation of a server process on the PC
+ * A dummy which does not allow connects for now.
+ */
+class PcServer {
+public:
+    PcServer(ppsocket *, string _name) { name = _name; }
+    ~PcServer() {}
+    bool clientConnect(int, int) { return false; }
+    string getName() { return name; }
+private:
+    string name;
+};
 
 class ncp {
 public:
@@ -51,9 +70,14 @@ public:
     bool hasFailed();
     bool gotLinkChannel();
 
+    PcServer *findPcServer(const char *name);
+    void registerPcServer(ppsocket *skt, const char *name);
+    void unregisterPcServer(PcServer *server);
+
     void setVerbose(unsigned short);
     unsigned short getVerbose();
     short int getProtocolVersion();
+    int getSpeed();
 
 private:
     friend class Link;
@@ -87,6 +111,7 @@ private:
     short int protocolVersion;
     linkChan *lChan;
     int maxChannels;
+    vector<PcServer> pcServers;
 };
 
 #endif

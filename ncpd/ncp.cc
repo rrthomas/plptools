@@ -31,9 +31,10 @@
 
 #include "ncp.h"
 #include "linkchan.h"
-#include <bufferstore.h>
 #include "link.h"
+#include <bufferstore.h>
 #include <bufferarray.h>
+#include <rfsv.h>
 
 #define MAX_CHANNELS_PSION 256
 #define MAX_CHANNELS_SIBO  8
@@ -54,6 +55,7 @@ ncp::ncp(const char *fname, int baud, unsigned short _verbose)
     // until detected on receipt of INFO we use these.
     maxChannels = MAX_CHANNELS_SIBO;
     protocolVersion = PV_SERIES_5;
+    lChan = NULL;
 
     // init channels
     for (int i = 0; i < MAX_CHANNELS_PSION; i++)
@@ -94,6 +96,8 @@ reset() {
 	channelPtr[i] = NULL;
     }
     failed = false;
+    if (lChan)
+	delete(lChan);
     lChan = NULL;
     protocolVersion = PV_SERIES_5; // until detected on receipt of INFO
     l->reset();
@@ -158,6 +162,35 @@ controlChannel(int chan, enum interControllerMessageType t, bufferStore & comman
     l->send(open);
 }
 
+PcServer *ncp::
+findPcServer(const char *name)
+{
+    if (name) {
+	vector<PcServer>::iterator i;
+	for (i = pcServers.begin(); i != pcServers.end(); i++)
+	    if (i->getName() == name)
+		return i;
+    }
+    return NULL;
+}
+
+void ncp::
+registerPcServer(ppsocket *skt, const char *name) {
+    pcServers.push_back(PcServer(skt, name));
+}
+
+void ncp::
+unregisterPcServer(PcServer *server) {
+    if (server) {
+	vector<PcServer>::iterator i;
+	for (i = pcServers.begin(); i != pcServers.end(); i++)
+	    if (i == server) {
+		pcServers.erase(i);
+		return;
+	    }
+    }
+}
+
 void ncp::
 decodeControlMessage(bufferStore & buff)
 {
@@ -169,6 +202,7 @@ decodeControlMessage(bufferStore & buff)
 	cout << "ncp: << " << ctrlMsgName(imt) << " " << remoteChan;
 
     bufferStore b;
+    int localChan;
 
     switch (imt) {
 	case NCON_MSG_CONNECT_TO_SERVER:
@@ -178,33 +212,51 @@ decodeControlMessage(bufferStore & buff)
 		cout << endl;
 	    }
 
-	    int localChan;
-
-	    // Ack with connect response
-	    localChan = getFirstUnusedChan();
-	    b.addByte(remoteChan);
-	    b.addByte(0);
-	    controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
-
-	    // NOTE: we don't allow connections from the
-	    // Psion to any local "processes" other than
-	    // LINK.* - Matt might need to change this for
-	    // his NCP<->TCP/IP bridge code...
-
+	    failed = false;
 	    if (!strcmp(buff.getString(0), "LINK.*")) {
 		if (lChan)
-		    failed = true;
+		    localChan = lChan->getNcpChannel();
+		else
+		    localChan = getFirstUnusedChan();
+
+		// Ack with connect response
+		b.addByte(remoteChan);
+		b.addByte(0);
+		controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
 		if (verbose & NCP_DEBUG_LOG)
 		    cout << "ncp: Link UP" << endl;
-		channelPtr[localChan] = lChan = new linkChan(this, localChan);
-		lChan->setVerbose(verbose);
+		// Create linkchan if it does not yet exist
+		if (!lChan) {
+		    if (verbose & NCP_DEBUG_LOG)
+			cout << "ncp: new passive linkChan" << endl;
+		    channelPtr[localChan] =
+			lChan = new linkChan(this, localChan);
+		    lChan->setVerbose(verbose);
+		}
 		lChan->ncpConnectAck();
 	    } else {
-		if (verbose & NCP_DEBUG_LOG)
-		    cout << "ncp: REJECT connect" << endl;
-		bufferStore b;
+		PcServer *s = findPcServer(buff.getString(0));
+		bool ok = false;
+
+		if (s) {
+		    localChan = getFirstUnusedChan();
+		    ok = s->clientConnect(localChan, remoteChan);
+		    if (!ok)
+			// release channel ptr
+			channelPtr[localChan] = NULL;
+		}
 		b.addByte(remoteChan);
-		controlChannel(0, NCON_MSG_CHANNEL_DISCONNECT, b);
+		if (ok) {
+		    b.addByte(rfsv::E_PSI_GEN_NONE);
+		    if (verbose & NCP_DEBUG_LOG)
+			cout << "ncp: ACCEPT client connect" << endl;
+		} else {
+		    localChan = 0;
+		    b.addByte(rfsv::E_PSI_FILE_NXIST);
+		    if (verbose & NCP_DEBUG_LOG)
+			cout << "ncp: REJECT client connect" << endl;
+		}
+		controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
 	    }
 	    break;
 
@@ -212,6 +264,7 @@ decodeControlMessage(bufferStore & buff)
 
 	    int forChan;
 
+	    failed = false;
 	    forChan = buff.getByte(0);
 	    if (verbose & NCP_DEBUG_LOG)
 		cout << " ch=" << forChan << " stat=";
@@ -237,6 +290,7 @@ decodeControlMessage(bufferStore & buff)
 
 	    int ver;
 
+	    failed = false;
 	    ver = buff.getByte(0);
 	    // Series 3c returns '3', as does mclink. PsiWin 1.1
 	    // returns version 2. We return whatever version we're
@@ -263,11 +317,12 @@ decodeControlMessage(bufferStore & buff)
 		// Do we send a time of 0 or a real time?
 		// The Psion uses this to determine whether to
 		// restart. (See protocol docs for details)
-		// b.addDWord(0);
 		b.addDWord(time(NULL));
 		controlChannel(0, NCON_MSG_NCP_INFO, b);
-	    } else
+	    } else {
 		cout << "ALERT!!!! Unexpected Protocol Version!! (No Series 5/3?)!" << endl;
+		failed = true;
+	    }
 	    break;
 
 	case NCON_MSG_CHANNEL_DISCONNECT:
@@ -318,7 +373,7 @@ RegisterAck(int chan, const char *name)
 	cout << "ncp: RegisterAck: chan=" << chan << endl;
     for (int cNum = 1; cNum < maxLinks(); cNum++) {
 	channel *ch = channelPtr[cNum];
-	if (ch && ch->getNcpChannel() == chan) {
+	if (isValidChannel(cNum) && ch->getNcpChannel() == chan) {
 	    ch->setNcpConnectName(name);
 	    ch->ncpRegisterAck();
 	    return;
@@ -420,15 +475,32 @@ stuffToSend()
 bool ncp::
 hasFailed()
 {
-    if (failed)
-	return true;
-    return l->hasFailed();
+    bool lfailed = l->hasFailed();
+    if (failed || lfailed) {
+	if (verbose & NCP_DEBUG_LOG)
+	    cout << "ncp: hasFailed: " << failed << ", " << lfailed << endl;
+    }
+    failed |= lfailed;
+    if (failed) {
+	if (lChan) {
+	    channelPtr[lChan->getNcpChannel()] = NULL;
+	    delete lChan;
+	}
+	lChan = NULL;
+    }
+    return failed;
 }
 
 bool ncp::
 gotLinkChannel()
 {
     return (lChan != NULL);
+}
+
+int ncp::
+getSpeed()
+{
+    return l->getSpeed();
 }
 
 char *ncp::

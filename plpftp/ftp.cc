@@ -224,7 +224,9 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	if ((res = r.getOwnerInfo(b)) == rfsv::E_PSI_GEN_NONE) {
 	    r.getMachineType(machType);
 	    if (!once) {
-		cout << _("Connected to a ") << machType << _(", OwnerInfo:") << endl;
+		int speed = a.getSpeed();
+		cout << _("Connected to a ") << machType << _(" at ")
+		     << speed << _(" baud, OwnerInfo:") << endl;
 		while (!b.empty())
 		    cout << "  " << b.pop().getString() << endl;
 		cout << endl;
@@ -765,9 +767,15 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    continue;
 	}
 	// RPCS commands
+#define EXPERIMENTAL
 #ifdef EXPERIMENTAL
 	if (!strcmp(argv[0], "x")) {
-	    r.regOpenIter();
+	    u_int16_t hhh;
+	    if (r.regOpenIter(-1, "%PDF-", hhh) == rfsv::E_PSI_GEN_NONE) {
+		Enum<rfsv::errs> res;
+		while ((res = r.regReadIter(hhh)) == rfsv::E_PSI_GEN_NONE)
+			;;
+	    }
 	    continue;
 	}
 	if (!strcmp(argv[0], "y")) {

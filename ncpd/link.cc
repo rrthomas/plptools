@@ -44,16 +44,21 @@ extern "C" {
 	Link *l = (Link *)arg;
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 	while (1) {
-	    usleep(l->retransTimeout * 500);
+	    usleep(l->retransTimeout() * 500);
 	    l->retransmit();
 	}
     }
 };
 
+ENUM_DEFINITION(Link::link_type, Link::LINK_TYPE_UNKNOWN) {
+    stringRep.add(Link::LINK_TYPE_UNKNOWN, N_("Unknown"));
+    stringRep.add(Link::LINK_TYPE_SIBO,    N_("SIBO"));
+    stringRep.add(Link::LINK_TYPE_EPOC,    N_("EPOC"));
+}
+
 Link::Link(const char *fname, int baud, ncp *_ncp, unsigned short _verbose)
+    : p(0)
 {
-    p = new packet(fname, baud, this, _verbose);
-    retransTimeout = ((unsigned long)baud * 1000 / 13200) + 200;
     theNCP = _ncp;
     verbose = _verbose;
     txSequence = 1;
@@ -61,18 +66,20 @@ Link::Link(const char *fname, int baud, ncp *_ncp, unsigned short _verbose)
     failed = false;
     seqMask = 7;
     maxOutstanding = 1;
+    linkType = LINK_TYPE_UNKNOWN;
     for (int i = 0; i < 256; i++)
 	xoff[i] = false;
-    // generate magic number for sendCon()
+    // generate magic number for sendReqCon()
     srandom(time(NULL));
     conMagic = random();
+
+    p = new packet(fname, baud, this, _verbose);
 
     pthread_mutex_init(&queueMutex, NULL);
     pthread_create(&checkthread, NULL, expire_check, this);
 
     // submit a link request
-    bufferStore blank;
-    transmit(blank);
+    sendReqReq();
 }
 
 Link::~Link()
@@ -83,22 +90,27 @@ Link::~Link()
     delete p;
 }
 
+unsigned long Link::
+retransTimeout()
+{
+    return ((unsigned long)getSpeed() * 1000 / 13200) + 200;
+}
+
 void Link::
 reset() {
+    p->reset();
     txSequence = 1;
     rxSequence = -1;
     failed = false;
-
-    pthread_mutex_lock(&queueMutex);
-    ackWaitQueue.clear();
-    holdQueue.clear();
-    pthread_mutex_unlock(&queueMutex);
+    seqMask = 7;
+    maxOutstanding = 1;
+    linkType = LINK_TYPE_UNKNOWN;
+    purgeAllQueues();
     for (int i = 0; i < 256; i++)
 	xoff[i] = false;
 
     // submit a link request
-    bufferStore blank;
-    transmit(blank);
+    sendReqReq();
 }
 
 unsigned short Link::
@@ -121,6 +133,15 @@ send(const bufferStore & buff)
 	failed = true;
     } else
 	transmit(buff);
+}
+
+void Link::
+purgeAllQueues()
+{
+    pthread_mutex_lock(&queueMutex);
+    ackWaitQueue.clear();
+    holdQueue.clear();
+    pthread_mutex_unlock(&queueMutex);
 }
 
 void Link::
@@ -161,7 +182,7 @@ sendAck(int seq)
 }
 
 void Link::
-sendCon()
+sendReqCon()
 {
     if (hasFailed())
 	return;
@@ -182,8 +203,44 @@ sendCon()
 }
 
 void Link::
+sendReqReq()
+{
+    if (hasFailed())
+	return;
+    bufferStore tmp;
+    if (verbose & LNK_DEBUG_LOG)
+	cout << "Link: >> con seq=1" << endl;
+    tmp.addByte(0x21);
+    ackWaitQueueElement e;
+    e.seq = 0; // expected response is Ack with seq=0 or ReqCon
+    gettimeofday(&e.stamp, NULL);
+    e.data = tmp;
+    e.txcount = 4;
+    pthread_mutex_lock(&queueMutex);
+    ackWaitQueue.push_back(e);
+    pthread_mutex_unlock(&queueMutex);
+    p->send(tmp);
+}
+
+void Link::
+sendReq()
+{
+    if (hasFailed())
+	return;
+    bufferStore tmp;
+    if (verbose & LNK_DEBUG_LOG)
+	cout << "Link: >> con seq=1" << endl;
+    tmp.addByte(0x20);
+    // No Ack expected for this, so no new entry in ackWaitQueue
+    p->send(tmp);
+}
+
+void Link::
 receive(bufferStore buff)
 {
+    if (!p)
+	return;
+
     vector<ackWaitQueueElement>::iterator i;
     bool ackFound;
     bool conFound;
@@ -267,17 +324,58 @@ receive(bufferStore buff)
 		}
 	    pthread_mutex_unlock(&queueMutex);
 	    if (ackFound) {
+		if ((linkType == LINK_TYPE_UNKNOWN) && (seq == 0)) {
+		    // If the remote device runs SIBO protocol, this ACK
+		    // should be 0 (the Ack on our ReqReq request, which is
+		    // treated as a normal Req by the SIBO machine.
+		    failed = false;
+		    linkType = LINK_TYPE_SIBO;
+		    seqMask = 7;
+		    maxOutstanding = 1;
+		    rxSequence = 0;
+		    txSequence = 1;
+		    purgeAllQueues();
+		    if (verbose & LNK_DEBUG_LOG)
+			cout << "Link: 1-linkType set to " << linkType << endl;
+		}
 		// Older packets implicitely ack'ed
 		multiAck(refstamp);
 		// Transmit waiting packets
 		transmitWaitQueue();
 	    } else {
 		if (verbose & LNK_DEBUG_LOG) {
-		    cout << "Link: << UNMATCHED ack seq=" << seq ;
+		    cout << "Link: << UNMATCHED ack seq=" << seq;
 		    if (verbose & LNK_DEBUG_DUMP)
 			cout << " " << buff;
 		    cout << endl;
 		}
+		// If packet with seq+1 is in ackWaitQueue, resend it immediately
+		// (Receiving an ack for a packet not on our wait queue is a
+		// hint by the Psion about which was the last packet it
+		// received successfully.)
+		pthread_mutex_lock(&queueMutex);
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		for (i = ackWaitQueue.begin(); i != ackWaitQueue.end(); i++)
+		    if (i->seq == seq+1) {
+			if (i->txcount-- == 0) {
+			    // timeout, remove packet
+			    if (verbose & LNK_DEBUG_LOG)
+				cout << "Link: >> TRANSMIT timeout seq=" <<
+				    i->seq << endl;
+			    ackWaitQueue.erase(i);
+			    i--;
+			} else {
+			    // retransmit it
+			    i->stamp = now;
+			    if (verbose & LNK_DEBUG_LOG)
+				cout << "Link: >> RETRANSMIT seq=" << i->seq
+				     << endl;
+			    p->send(i->data);
+			}
+			break;
+		    }
+		pthread_mutex_unlock(&queueMutex);
 	    }
 	    break;
 
@@ -288,10 +386,13 @@ receive(bufferStore buff)
 		// May be a link confirm packet (EPOC)
 		pthread_mutex_lock(&queueMutex);
 		for (i = ackWaitQueue.begin(); i != ackWaitQueue.end(); i++)
-		    if ((i->seq > 0) && (i->seq < 4) &&
-			(i->data.getByte(0) & 0xf0) == 0x20) {
+		    if ((i->seq == 0) && (i->data.getByte(0) & 0xf0) == 0x20) {
 			ackWaitQueue.erase(i);
+			linkType = LINK_TYPE_EPOC;
+			if (verbose & LNK_DEBUG_LOG)
+			    cout << "Link: 2-linkType set to " << linkType << endl;
 			conFound = true;
+			failed = false;
 			// EPOC can handle extended sequence numbers
 			seqMask = 0x7ff;
 			// EPOC can handle up to 8 unacknowledged packets
@@ -310,6 +411,7 @@ receive(bufferStore buff)
 	    if (conFound) {
 		rxSequence = 0;
 		txSequence = 1;
+		purgeAllQueues();
 		sendAck(rxSequence);
 	    } else {
 		if (verbose & LNK_DEBUG_LOG) {
@@ -320,14 +422,30 @@ receive(bufferStore buff)
 		}
 		rxSequence = txSequence = 0;
 		if (seq > 0) {
+		    linkType = LINK_TYPE_EPOC;
+		    if (verbose & LNK_DEBUG_LOG)
+			cout << "Link: 3-linkType set to " << linkType << endl;
 		    // EPOC can handle extended sequence numbers
 		    seqMask = 0x7ff;
 		    // EPOC can handle up to 8 unacknowledged packets
 		    maxOutstanding = 8;
 		    p->setEpoc(true);
-		    sendCon();
-		} else
+		    purgeAllQueues();
+		    failed = false;
+		    sendReqCon();
+		} else {
+		    // SIBO
+		    linkType = LINK_TYPE_SIBO;
+		    failed = false;
+		    seqMask = 7;
+		    maxOutstanding = 1;
+		    if (verbose & LNK_DEBUG_LOG)
+			cout << "Link: 4-linkType set to " << linkType << endl;
+		    rxSequence = 0;
+		    txSequence = 1; // Our ReqReq was seq 0
+		    purgeAllQueues();
 		    sendAck(rxSequence);
+		}
 	    }
 	    break;
 
@@ -481,10 +599,7 @@ retransmit()
 {
 
     if (hasFailed()) {
-	pthread_mutex_lock(&queueMutex);
-	ackWaitQueue.clear();
-	holdQueue.clear();
-	pthread_mutex_unlock(&queueMutex);
+	purgeAllQueues();
 	return;
     }
 
@@ -493,7 +608,7 @@ retransmit()
     struct timeval now;
     gettimeofday(&now, NULL);
     struct timeval expired = now;
-    timesub(&expired, retransTimeout);
+    timesub(&expired, retransTimeout());
     for (i = ackWaitQueue.begin(); i != ackWaitQueue.end(); i++)
 	if (olderthan(i->stamp, expired)) {
 	    if (i->txcount-- == 0) {
@@ -501,6 +616,7 @@ retransmit()
 		if (verbose & LNK_DEBUG_LOG)
 		    cout << "Link: >> TRANSMIT timeout seq=" << i->seq << endl;
 		ackWaitQueue.erase(i);
+		failed = true;
 		i--;
 	    } else {
 		// retransmit it
@@ -528,8 +644,25 @@ stuffToSend()
 bool Link::
 hasFailed()
 {
-    failed |= p->linkFailed();
+    bool lfailed = p->linkFailed();
+    if (failed || lfailed) {
+	if (verbose & LNK_DEBUG_LOG)
+	    cout << "Link: hasFailed: " << failed << ", " << lfailed << endl;
+    }
+    failed |= lfailed;
     return failed;
+}
+
+Enum<Link::link_type> Link::
+getLinkType()
+{
+    return linkType;
+}
+
+int Link::
+getSpeed()
+{
+    return p->getSpeed();
 }
 
 /*
