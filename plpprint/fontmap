@@ -1,0 +1,31 @@
+# $Id$
+# This file specifies the font-mapping from Psion fonts
+# to PostScript fonts for plpprintd.
+# Format:
+#
+# FN:B:I:PSFN
+#
+# Where
+#   FN   is the Psion fontname
+#   B    is a flag for Bold (0 or 1)
+#   I    is a flag for Italic (0 or 1)
+#   PSFN is the corresponding PostScript font to use
+#
+# Lines, starting with a hash or empty lines are ignored.
+#
+Times New Roman:0:0:Times-Roman
+Times New Roman:1:0:Times-Bold
+Times New Roman:0:1:Times-Italic
+Times New Roman:1:1:Times-BoldItalic
+Arial:0:0:Helvetica
+Arial:1:0:Helvetica-Bold
+Arial:0:1:Helvetica-Oblique
+Arial:1:1:Helvetica-BoldOblique
+Courier New:0:0:Courier
+Courier New:1:0:Courier-Bold
+Courier New:0:1:Courier-Oblique
+Courier New:1:1:Courier-BoldOblique
+Swiss:0:0:Courier
+Swiss:1:0:Courier-Bold
+Swiss:0:1:Courier-Oblique
+Swiss:1:1:Courier-BoldOblique

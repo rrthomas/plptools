@@ -42,9 +42,12 @@
 #include <getopt.h>
 
 #define TEMPLATE "plpprint_XXXXXX"
+#define PRINTCMD "lpr -Ppsion"
+#define SPOOLDIR "/var/spool/plpprint"
+#define PSDICT   "/prolog.ps"
 
-char *spooldir = "/var/spool/plpprint";
-char *printcmd = "lpr -Ppsion";
+char *spooldir = SPOOLDIR;
+char *printcmd = PRINTCMD;
 wprt *wPrt;
 bool serviceLoop;
 bool debug = false;
@@ -117,7 +120,8 @@ infolog(char *fmt, ...)
 static int minx, maxx, miny, maxy;
 string usedfonts;
 
-typedef struct {
+typedef struct fontmap_entry_s {
+    struct fontmap_entry_s *next;
     char *psifont;
     bool bold;
     bool italic;
@@ -126,25 +130,111 @@ typedef struct {
 
 #define FALLBACK_FONT "Courier"
 
-static fontmap_entry fontmap[] = {
-    { "Times New Roman", false, false, "Times-Roman"},
-    { "Times New Roman", true,  false, "Times-Bold"},
-    { "Times New Roman", false, true,  "Times-Italic"},
-    { "Times New Roman", true,  true,  "Times-BoldItalic"},
-    { "Arial",           false, false, "Helvetica"},
-    { "Arial",           true,  false, "Helvetica-Bold"},
-    { "Arial",           false, true,  "Helvetica-Oblique"},
-    { "Arial",           true,  true,  "Helvetica-BoldOblique"},
-    { "Courier New",     false, false, "Courier"},
-    { "Courier New",     true,  false, "Courier-Bold"},
-    { "Courier New",     false, true,  "Courier-Oblique"},
-    { "Courier New",     true,  true,  "Courier-BoldOblique"},
-    { "Swiss",           false, false, "Courier"},
-    { "Swiss",           true,  false, "Courier-Bold"},
-    { "Swiss",           false, true,  "Courier-Oblique"},
-    { "Swiss",           true,  true,  "Courier-BoldOblique"},
-    { NULL,              false, false, NULL}
+static fontmap_entry default_fontmap[] = {
+    // NEXT, PsionFontname, bold, italic, PSFontName
+    { NULL, "Times New Roman", false, false, "Times-Roman"},
+    { NULL, "Times New Roman", true,  false, "Times-Bold"},
+    { NULL, "Times New Roman", false, true,  "Times-Italic"},
+    { NULL, "Times New Roman", true,  true,  "Times-BoldItalic"},
+    { NULL, "Arial",           false, false, "Helvetica"},
+    { NULL, "Arial",           true,  false, "Helvetica-Bold"},
+    { NULL, "Arial",           false, true,  "Helvetica-Oblique"},
+    { NULL, "Arial",           true,  true,  "Helvetica-BoldOblique"},
+    { NULL, "Courier New",     false, false, "Courier"},
+    { NULL, "Courier New",     true,  false, "Courier-Bold"},
+    { NULL, "Courier New",     false, true,  "Courier-Oblique"},
+    { NULL, "Courier New",     true,  true,  "Courier-BoldOblique"},
+    { NULL, "Swiss",           false, false, "Courier"},
+    { NULL, "Swiss",           true,  false, "Courier-Bold"},
+    { NULL, "Swiss",           false, true,  "Courier-Oblique"},
+    { NULL, "Swiss",           true,  true,  "Courier-BoldOblique"},
+    { NULL, NULL,              false, false, NULL}
 };
+
+static fontmap_entry *fontmap = NULL;
+
+static void
+init_fontmap() {
+    FILE *f;
+    fontmap_entry *new_fontmap = NULL;
+    fontmap_entry *fe;
+
+    if ((f = fopen(PKGDATA "/fontmap", "r"))) {
+	char *p;
+	int bold;
+	int italic;
+	char *psifont;
+	char *psfont;
+	char *tmp;
+	char buf[1024];
+	while (fgets(buf, sizeof(buf), f)) {
+	    char *bp = buf;
+	    int ne;
+	    if ((p = strchr(buf, '#')))
+		*p = '\0';
+	    if ((p = strchr(buf, '\n')))
+		*p = '\0';
+	    
+	    psifont = strsep(&bp, ":");
+	    if (!psifont || !(*psifont))
+		continue;
+	    tmp = strsep(&bp, ":");
+	    if (!tmp || !(*tmp) || (sscanf(tmp, "%d", &bold) != 1))
+		continue;
+	    tmp = strsep(&bp, ":");
+	    if (!tmp || !(*tmp) || (sscanf(tmp, "%d", &italic) != 1))
+		continue;
+	    psfont = strsep(&bp, ":");
+	    if (!psfont || !(*psfont))
+		continue;
+	    fe = (fontmap_entry *)malloc(sizeof(fontmap_entry));
+	    if (!fe)
+		break;
+	    if (!(fe->psifont = strdup(psifont))) {
+		free(fe);
+		break;
+	    }
+	    if (!(fe->psfont = strdup(psfont))) {
+		free(fe->psifont);
+		free(fe);
+		break;
+	    }
+	    fe->bold = bold ? true : false;
+	    fe->italic = italic ? true : false;
+	    fe->next = new_fontmap;
+	    new_fontmap = fe;
+	}
+	fclose(f);
+    }
+    if (new_fontmap && (new_fontmap->psifont))
+	fontmap = new_fontmap;
+    else {
+	errorlog("No fontmap found in %s/fontmap, using builtin mapping",
+		 PKGDATA);
+	fe = default_fontmap;
+	while (fe->psifont) {
+	    fontmap_entry *nfe = (fontmap_entry *)malloc(sizeof(fontmap_entry));
+	    if (!nfe)
+		break;
+	    memcpy(nfe, fe, sizeof(fontmap_entry));
+	    nfe->next = fontmap;
+	    fontmap = nfe;
+	    fe++;
+	}
+    }
+#ifdef DEBUG
+    debuglog("Active Font-Mapping:");
+    debuglog("%-20s%-7s%-7s%-20s", "Psion", "Bold", "Italic", "PS-Font");
+    fe = fontmap;
+    while (fe) {
+	debuglog("%-20s%-7s%-7s%-20s", fe->psifont,
+		 fe->bold ? "true" : "false",
+		 fe->italic ? "true" : "false",
+		 fe->psfont);
+	fe = fe->next;
+    }
+#endif
+}
 
 static void
 ps_setfont(FILE *f, const char *fname, bool bold, bool italic,
@@ -152,18 +242,18 @@ ps_setfont(FILE *f, const char *fname, bool bold, bool italic,
 {
     fontmap_entry *fe = fontmap;
     char *psf = NULL;
-    while (fe->psifont) {
+    while (fe) {
 	if ((!strcmp(fe->psifont, fname)) &&
 	    (fe->bold == bold) &&
 	    (fe->italic == italic)) {
 	    psf = fe->psfont;
 	    break;
 	}
-	fe++;
+	fe = fe->next;
     }
     if (!psf) {
 	psf = FALLBACK_FONT;
-	errorlog("No font mapping for '%s' (%s%s%s); fallback to %s\n",
+	errorlog("No font mapping for '%s' (%s%s%s); fallback to %s",
 		 fname, (bold) ? "Bold" : "", (italic) ? "Italic" : "",
 		 (bold || italic) ? "" : "Regular", psf);
     }
@@ -213,7 +303,6 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
     unsigned long top    = 0;
     unsigned long right  = 0;
     unsigned long bottom = 0;
-    int lmargin = -1;
 
 #ifdef DEBUG
     char dumpname[128];
@@ -221,7 +310,7 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
     FILE *df = fopen(dumpname, "w");
     fwrite(buf.getString(0), 1, len, df);
     fclose(df);
-    debuglog("Saved page input to %s\n", dumpname);
+    debuglog("Saved page input to %s", dumpname);
 #endif
     if (page == 0) {
 	time_t now = time(NULL);
@@ -234,7 +323,7 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    "%%Pages: (atend)\n"
 	    "%%BoundingBox: (atend)\n"
 	    "%%DocumentNeededResources: (atend)\n"
-	    "%%LanguageLvel: 2\n"
+	    "%%LanguageLevel: 2\n"
 	    "%%EndComments\n"
 	    "%%BeginProlog\n", f);
 	char pbuf[1024];
@@ -246,6 +335,7 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    "%%EndProlog\n"
 	    "%%BeginSetup\n"
 	    "currentpagedevice /PageSize get 1 get /top exch def\n"
+	    "1 1 TH 32 DM RC 1 PS\n"
 	    "%%EndSetup\n", f);
 	minx = miny = 9999;
 	maxx = maxy = 0;
@@ -257,8 +347,10 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	switch (opcode) {
 	    case 0x00: {
 		// Start of section
-		unsigned long section = buf.getDWord(i+1);
-		fprintf(f, "%% @%d: Section %d\n", i, section);
+		unsigned long section = buf.getDWord(i+1) & 3;
+		unsigned long pagenr = buf.getDWord(i+1) >> 2;
+		fprintf(f, "%% @%d: Section %d, Page %d\n", i, section, pagenr);
+		fprintf(f, "1 1 TH 32 DM RC 1 PS CC\n");
 		// (section & 3) =
 		// 0 = Header, 1 = Body, 2 = Footer, 3 = Footer
 		i += 5;
@@ -270,20 +362,60 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    }
 		break;
 	    case 0x03: {
-		// ???
-		fprintf(f, "%% @%d: U03 %d\n", i, buf.getByte(i+1));
-		debuglog("@%d: U03 %d", i, buf.getByte(i+1));
+		// Set drawing mode
+		unsigned char drwmode = buf.getByte(i+1);
+		fprintf(f, "%% @%d: Drawing mode %02x\n", i, drwmode);
+		switch (drwmode) {
+		    case 0x01:
+			// ~screen
+			break;
+		    case 0x02:
+			// colour ^ screen
+			break;
+		    case 0x03:
+			// ~colour ^ screen
+			break;
+		    case 0x04:
+			// colour | screen
+			break;
+		    case 0x05:
+			// colour | ~screen
+			break;
+		    case 0x08:
+			// colour & screen
+			break;
+		    case 0x09:
+			// colour & ~screen
+			break;
+		    case 0x14:
+			// ~colour | screen
+			break;
+		    case 0x15:
+			// ~colour | ~screen
+			break;
+		    case 0x18:
+			// ~colour & screen
+			break;
+		    case 0x19:
+			// ~colour & ~screen
+			break;
+		    case 0x20:
+			// colour
+			break;
+		    case 0x30:
+			// ~colour
+			break;
+		}
+		fprintf(f, "%d DM\n", drwmode);
 		i += 2;
 	    }
 		break;
 	    case 0x04: {
-		// Bounding box
+		// Bounding box (clipping rectangle)
 		left   = buf.getDWord(i+1);
 		top    = buf.getDWord(i+5);
 		right  = buf.getDWord(i+9);
 		bottom = buf.getDWord(i+13);
-		if (lmargin == -1)
-		    lmargin = left;
 		if (left < minx)
 		    minx = left;
 		if (right > maxx)
@@ -295,20 +427,20 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 		i += 17;
 		fprintf(f, "%% @%d: bbox %d %d %d %d\n", i, left, top, right,
 			bottom);
+		fprintf(f, "%d %d %d %d CB\n", left, top, right, bottom);
 	    }
 		break;
 	    case 0x05: {
-		// ???
-		fprintf(f, "%% @%d: U05\n", i);
-		debuglog("@%d: U05", i);
+		// Cancel clipping rect
+		left = top = right = bottom = 0;
+		fprintf(f, "%% @%d: Cancel Cliprect\n", i);
+		fprintf(f, "CC\n");
 		i++;
 	    }
 		break;
 	    case 0x06: {
 		// ???
 		fprintf(f, "%% @%d: U06 %d 0x%08x\n", i,
-			 buf.getByte(i+1), buf.getDWord(i+2));
-		debuglog("@%d: U06 %d 0x%08x", i,
 			 buf.getByte(i+1), buf.getDWord(i+2));
 		i += 6;
 	    }
@@ -341,9 +473,8 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    }
 		break;
 	    case 0x08: {
-		// ???
-		fprintf(f, "%% @%d: U08\n", i);
-		debuglog("@%d: U08", i);
+		// End Font
+		fprintf(f, "%% @%d: End Font\n", i);
 		i++;
 	    }
 		break;
@@ -385,18 +516,38 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    }
 		break;
 	    case 0x0e: {
-		// ???
-		fprintf(f, "%% @%d: U0e %d\n", i, buf.getByte(i+1));
-		debuglog("@%d: U0e %d", i, buf.getByte(i+1));
+		// Set pen style
+		unsigned char pstyle = buf.getByte(i+1);
+		switch (pstyle) {
+		    case 0x00:
+			// Don't draw
+			break;
+		    case 0x01:
+			// Solid
+			break;
+		    case 0x02:
+			// Dotted line
+			break;
+		    case 0x03:
+			// Dashed line
+			break;
+		    case 0x04:
+			// Dash Dot
+			break;
+		    case 0x05:
+			// Dash Dot Dot
+			break;
+		}
+		fprintf(f, "%% @%d: Pen Style %d\n", i, pstyle);
+		fprintf(f, "%d PS\n", pstyle);
 		i += 2;
 	    }
 		break;
 	    case 0x0f: {
-		// ???
-		fprintf(f, "%% @%d: U0f %d %d\n", i, buf.getDWord(i+1),
+		// Pen thickness x, y
+		fprintf(f, "%% @%d: Pen thickness %d %d\n", i, buf.getDWord(i+1),
 			 buf.getDWord(i+5));
-		debuglog("@%d: U0f %d %d", i, buf.getDWord(i+1),
-			 buf.getDWord(i+5));
+		fprintf(f, "%d %d TH\n", buf.getDWord(i+1), buf.getDWord(i+5));
 		i += 9;
 	    }
 		break;
@@ -410,17 +561,45 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    }
 		break;
 	    case 0x11: {
-		// ???
-		fprintf(f, "%% @%d: U11 %d\n", i, buf.getByte(i+1));
-		debuglog("@%d: U11 %d", i, buf.getByte(i+1));
+		// Brush style
+		unsigned char bstyle = buf.getByte(i+1);
+		switch (bstyle) {
+		    case 0x00:
+			// No brush
+			break;
+		    case 0x01:
+			// Solid brush
+			break;
+		    case 0x02:
+			// Patterned brush
+			break;
+		    case 0x03:
+			// Vertical hatch brush
+			break;
+		    case 0x04:
+			// Diagonal hatch brush (bottom left to top right)
+			break;
+		    case 0x05:
+			// Horizontal hatch brush
+			break;
+		    case 0x06:
+			// Rev. diagonal hatch brush (top left to bottom right)
+			break;
+		    case 0x07:
+			// Square cross hatch (horizontal and vertical)
+			break;
+		    case 0x08:
+			// Diamond cross hatch (both diagonals)
+			break;
+		}
+		fprintf(f, "%% @%d: Brush style %d\n", i, bstyle);
+		fprintf(f, "%d BS\n", bstyle);
 		i += 2;
 	    }
 		break;
 	    case 0x17: {
 		// ???
 		fprintf(f, "%% @%d: U17 %d %d\n", i, buf.getDWord(i+1),
-			 buf.getDWord(i+5));
-		debuglog("@%d: U17 %d %d", i, buf.getDWord(i+1),
 			 buf.getDWord(i+5));
 		i += 9;
 	    }
@@ -439,8 +618,6 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    case 0x1b: {
 		// ???
 		fprintf(f, "%% @%d: U1b %d %d\n", i, buf.getDWord(i+1),
-			 buf.getDWord(i+5));
-		debuglog("@%d: U1b %d %d", i, buf.getDWord(i+1),
 			 buf.getDWord(i+5));
 		i += 9;
 	    }
@@ -479,13 +656,13 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 			    buf.getDWord(o+4));
 		    o += 8;
 		}
-		fprintf(f, "] P\n");
+		unsigned char frule = buf.getByte(o);
+		fprintf(f, "] %s P\n", frule ? "false" : "true");
 		i = o + 1;
 	    }
 		break;
 	    case 0x25: {
 		// Draw bitmap
-		// skip for now
 		unsigned long llx  = buf.getDWord(i+1);
 		unsigned long lly  = buf.getDWord(i+13);
 		unsigned long urx  = buf.getDWord(i+9);
@@ -526,13 +703,15 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 		string text(buf.getString(ofs), tlen);
 		ofs += tlen;
 		ps_escape(text);
-		fprintf(f, "(%s) %d %d 0 0 false T\n", text.c_str(),
+		fprintf(f, "%% @%d: Text '%s' %d %d\n", i,
+			text.c_str(), buf.getDWord(ofs), buf.getDWord(ofs+4));
+		fprintf(f, "(%s) %d %d 0 0 -1 T\n", text.c_str(),
 			buf.getDWord(ofs), buf.getDWord(ofs+4) + boffset);
 		i = ofs + 8;
 	    }
 		break;
 	    case 0x28: {
-		// Draw text
+		// Draw justified text
 		int tlen;
 		int ofs;
 		if (buf.getByte(i+1) & 1) {
@@ -544,21 +723,29 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 		}
 		string text(buf.getString(ofs), tlen);
 		ofs += tlen;
-		int x = buf.getDWord(ofs);
-		fprintf(f, "%% @%d: Text '%s' %d %d %d %d ?%d ?%d\n", i,
-			text.c_str(), x, buf.getDWord(ofs+12) + boffset,
-			buf.getDWord(ofs+4), buf.getDWord(ofs+8),
-			buf.getByte(ofs+16), buf.getDWord(ofs+17));
+		int left = buf.getDWord(ofs);
+		int top = buf.getDWord(ofs+4);
+		int right = buf.getDWord(ofs+8);
+		int bottom = buf.getDWord(ofs+12);
+		int baseline = buf.getDWord(ofs+16);
+		unsigned char align = buf.getByte(ofs+20);
+		int amargin = buf.getDWord(ofs+21);
+		fprintf(f, "%% @%d: JText '%s' %d %d %d %d %d %d %d\n", i,
+			text.c_str(), left, bottom + boffset, top, right,
+			baseline, align, amargin);
 		ps_escape(text);
-		if ((x == 0) && (lmargin != -1))
-		    x = lmargin;
-		fprintf(f, "(%s) %d %d %d %d true T\n", text.c_str(),
-			x, buf.getDWord(ofs+12) + boffset,
-			buf.getDWord(ofs+4), buf.getDWord(ofs+8));
+		if (align == 2)
+		    right -= amargin;
+		else
+		    left += amargin;
+		bottom -= ((bottom - top) / 4);
+		fprintf(f, "(%s) %d %d %d %d %d T\n", text.c_str(),
+			left, bottom + boffset, top, right, align);
 		i = ofs + 25;
 	    }
 		break;
 	    default:
+		fprintf(f, "@%d: UNHANDLED OPCODE %02x\n", i, opcode);
 		debuglog("@%d: UNHANDLED OPCODE %02x", i, opcode);
 		i++;
 		break;
@@ -666,8 +853,32 @@ service_loop()
 			fclose(f);
 		    if (!cancelled) {
 			if (pageCount > 0) {
-			    infolog("Spooling %d pages", pageCount);
-			    // TODO: print it...
+			    if (!printcmd)
+				infolog("Output stored in %s", jname);
+			    else {
+				int r;
+				char cbuf[4096];
+
+				infolog("Spooling %d pages", pageCount);
+				FILE *pipe = popen(printcmd, "w");
+				if (!pipe) {
+				    errorlog("Could not execute %s: %m",
+					     printcmd);
+				    unlink(jname);
+				}
+				f = fopen(jname, "r");
+				if (!f) {
+				    errorlog("Could not read %s: %m",
+					     jname);
+				    pclose(pipe);
+				    unlink(jname);
+				}
+				while ((r = fread(cbuf, 1, sizeof(cbuf), f)) > 0)
+				    fwrite(cbuf, 1, r, pipe);
+				pclose(pipe);
+				fclose(f);
+				unlink(jname);
+			    }
 			}
 		    } else
 			unlink(jname);
@@ -690,7 +901,9 @@ help() {
 	" -V, --version          Print version and exit.\n"
 	" -p, --port=[HOST:]PORT Connect to port PORT on host HOST.\n"
 	" -s, --spooldir=DIR     Specify spooldir DIR.\n"
-	" -c, --printcmd=CMD     Specify print command.\n";
+	"                        Default: " SPOOLDIR "\n"
+	" -c, --printcmd=CMD     Specify print command.\n"
+	"                        Default: " PRINTCMD "\n";
 }
 
 static void
@@ -781,7 +994,10 @@ main(int argc, char **argv)
 		spooldir = strdup(optarg);
 		break;
 	    case 'c':
-		printcmd = strdup(optarg);
+		if (!strcmp(optarg, "-"))
+		    printcmd = NULL;
+		else
+		    printcmd = strdup(optarg);
 		break;
 	}
     }
@@ -814,7 +1030,8 @@ main(int argc, char **argv)
 			close(devnull);
 		}
 	    }
-	    infolog("started, waiting for requests.\n");
+	    init_fontmap();
+	    infolog("started, waiting for requests.");
 	    serviceLoop = true;
 	    while (serviceLoop) {
 		wPrt = new wprt(skt);

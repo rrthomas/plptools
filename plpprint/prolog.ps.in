@@ -5,6 +5,7 @@
 /bg [0 0 0] def
 /fg [0 0 0] def
 /twips{1440 div 72 mul}bind def
+/pixel{10 twips mul}bind def
 /EpocEncoding ISOLatin1Encoding 256 array copy dup 128
 [/Euro/.notdef/quotesinglbase/florin/quotedblbase/ellipsis/dagger/daggerdbl
 /circumflex/perthousand/Scaron/guilsinglleft/OE/.notdef/Zcaron/.notdef
@@ -20,6 +21,15 @@ putinterval def
 /l{
   top exch sub lineto
 }bind def
+/f{
+  dofill { fill } if
+}bind def
+/s{
+  pen_st 0 ne{stroke}if
+}bind def
+/ef{
+  dofill { eofill } if
+}bind def
 /UL{
   1 eq /ul exch def
 }bind def
@@ -31,6 +41,10 @@ putinterval def
 }bind def
 /FG{ % r g b FG - (store foreground color)
   mark 4 1 roll ] /fg exch def
+}bind def
+/RC{ % - RC - (reset colors)
+  0 BS
+  0 0 0 FG
 }bind def
 /SC{ % colorarray SC - (set stored color)
   dup 0 get 255 div exch
@@ -68,7 +82,7 @@ putinterval def
 }bind def
 /L{ % x1 y1 x2 y2 L - (draw line from x1,y1 to x2,y2)
   4 -1 roll twips 4 -1 roll twips m
-  twips exch twips exch l fg SC stroke
+  twips exch twips exch l fg SC s
 }bind def
 /R{ % left top right bottom R - (draw rectangle)
   4 dict begin
@@ -78,7 +92,7 @@ putinterval def
     twips /x1 exch def
     newpath
     x1 y1 m x2 y1 l x2 y2 l x1 y2 l closepath
-    gsave bg SC fill grestore fg SC stroke
+    gsave bg SC f grestore fg SC s
   end
 }bind def
 /E { % ulx uly llx lly E - (draw ellipse)
@@ -95,12 +109,13 @@ putinterval def
       1 wy wx div scale
       newpath wx 2 div 0 moveto
       0 0 wx 2 div 0 360 arc closepath
-      gsave bg SC fill grestore fg SC stroke
+      gsave bg SC f grestore fg SC s
     grestore
   end
 }bind def
-/P{ % pointarray P - (draw polygon)
-  4 dict begin
+/P{ % pointarray eofill P - (draw polygon)
+  5 dict begin
+    /efmode exch def
     /points exch def
     0 2 points length 1 sub {
       /idx exch def
@@ -108,51 +123,47 @@ putinterval def
       points idx 1 add get twips
       idx 0 eq {m}{l} ifelse
     } for
-    gsave bg SC fill grestore fg SC stroke
+    gsave bg SC efmode {ef}{f}ifelse grestore fg SC s
   end
 }bind def
 /T{ % string left bottom top right justify T - (draw text)
-  5 dict begin
+  6 dict begin
     /just exch def
     twips /x2 exch def
     twips /y2 exch def
     twips /y1 exch def
     twips /x1 exch def
-    x1 y1 m
+    dup stringwidth pop /sw exch def
+    just 0 gt {
+      just 1 gt {x2 sw sub}{x2 x1 sub sw sub 2 div x1 add}ifelse
+    } {x1} ifelse
+    y1 m
     gsave
-      just pop false {
-        gsave
-          newpath 0 0 moveto dup false charpath pathbbox
-        grestore
-        4 1 roll exch sub 3 1 roll sub % width height
-        y2 y1 sub exch div exch % yscale width
-        x2 x1 sub exch div exch % xscale yscale
-        scale
-      } if
-      ul {
-        gsave
-          currentfont /FontInfo known {
-            currentfont /FontInfo get begin
-              0 UnderlinePosition fs rmoveto
-              UnderlineThickness fs setlinewidth
-            end
-          } {
-            0 -10 rmoveto 0.5 setlinewidth
-          } ifelse
-          dup stringwidth rlineto stroke
-        grestore
-      } if
-      st {
-        gsave
-          newpath 0 0 moveto (I) false charpath pathbbox
-          exch pop exch sub exch pop 2 div 0 exch
-        grestore
-        gsave
-          rmoveto
-          dup stringwidth rlineto stroke
-        grestore
-      } if
-      show
+    ul {
+      gsave
+        currentfont /FontInfo known {
+          currentfont /FontInfo get begin
+            0 UnderlinePosition fs rmoveto
+            UnderlineThickness fs setlinewidth
+          end
+        } {
+          0 -10 rmoveto 0.5 setlinewidth
+        } ifelse
+        sw 0 rlineto s
+	pen_th setlinewidth
+      grestore
+    } if
+    st {
+      gsave
+        newpath 0 0 moveto (I) false charpath pathbbox
+        exch pop exch sub exch pop 2 div 0 exch
+      grestore
+      gsave
+        rmoveto
+        sw 0 rlineto s
+      grestore
+    } if
+    show
     grestore
   end
 }bind def
@@ -172,5 +183,33 @@ putinterval def
       {currentfile ibuf readhexstring pop} image
     grestore
   end
+}bind def
+/TH{ % xwid ywid TH - (set pen thickness)
+  pop pixel /pen_th exch def
+  pen_th setlinewidth
+}bind def
+/DM{ % mode DM - (set drawing mode)
+  pop
+}bind def
+/PS{ % style PS - (set pen style)
+  /pen_st exch def
+}bind def
+/BS{ % style BS - (set brush style)
+  dup /brush_st exch def
+  0 ne /dofill exch def
+}bind def
+/CB{ % left top right bottom CB - (clipping bbox)
+  4 dict begin
+    twips /y2 exch def
+    twips /x2 exch def
+    twips /y1 exch def
+    twips /x1 exch def
+    newpath
+    x1 y1 m x2 y1 l x2 y2 l x1 y2 l closepath clip
+    newpath
+  end
+}bind def
+/CC{ % - CC - (restore clipping)
+  initclip
 }bind def
 %%EndResource
