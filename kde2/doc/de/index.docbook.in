@@ -1,13 +1,11 @@
-<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook V3.1-Based Variant V1.0//EN" [
-  <!ENTITY kpsion  "<application>KPsion</application>"
-    -- delete this, if kpsion is in global KDE entities -->
-  <!ENTITY kappname "&kpsion;" -- this only *seems* redundant -->
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.1-Based Variant V1.0//EN" "dtd/kdex.dtd" [
+  <!ENTITY kpsion  "<application>KPsion</application>">
+  <!ENTITY kappname "&kpsion;">
   <!ENTITY % addindex "IGNORE">
   <!ENTITY % German "INCLUDE">
-  <!ENTITY % ents PUBLIC "-//KDE//ENTITIES Documentation V1.0//EN">
   <!-- DO NOT DELETE! $Revision$ -->
   <!-- DO NOT DELETE! $Date$ -->
-  %ents;
 ]>
 
 <book lang="&language;">
@@ -49,7 +47,7 @@
 
 
 <abstract><para>
-&kpsion; ist ein Programm zur Daten-sicherung/rücksicherung
+&kpsion; ist ein Programm zur Daten-sicherung/rÃ¼cksicherung
 von Psion PDAs, sowie zum Formatieren von Lauferken derselben.
 </para></abstract>
 
@@ -61,22 +59,22 @@ von Psion PDAs, sowie zum Formatieren von Lauferken derselben.
 <keyword>EPOC</keyword>
 <keyword>PDA</keyword>
 <keyword>Sicherung</keyword>
-<keyword>Rücksicherung</keyword>
+<keyword>RÃ¼cksicherung</keyword>
 <keyword>formatieren</keyword>
 </keywordset>
 
 </bookinfo>
 
 <chapter id="Introduction">
-<title>Einführung</title>
+<title>EinfÃ¼hrung</title>
 
 <para>Willkommen bei &kpsion;! &kpsion; ist ein KDE-Programm zum Sichern und
-Rücksichern von Daten eines Psion PDAs sowie zum Formatieren von
+RÃ¼cksichern von Daten eines Psion PDAs sowie zum Formatieren von
 Laufwerken solcher PDAs. Es benutzt den Daemonen <command>ncpd</command>
 und die Bibliotheken aus dem Packet plptools.
 </para>
 
-<para>Dieses Programm kann von der Kommandozeile oder über eine
+<para>Dieses Programm kann von der Kommandozeile oder Ã¼ber eine
 <filename>.desktop</filename> Datei gestartet werden.
 </para>
 
@@ -89,7 +87,7 @@ und die Bibliotheken aus dem Packet plptools.
 <title>Download</title>
 
 <para>&kpsion; ist Bestandteil des Packets plptools. Das Packet plptools
-ist auf <ulink url="http://plptools.sourceforge.net/">http://plptools.sourceforge.net/</ulink> zum Download verfügbar.</para>
+ist auf <ulink url="http://plptools.sourceforge.net/">http://plptools.sourceforge.net/</ulink> zum Download verfÃ¼gbar.</para>
 
 </sect1>
 
@@ -99,10 +97,10 @@ ist auf <ulink url="http://plptools.sourceforge.net/">http://plptools.sourceforg
 <para>Das Packet plptools ist eigentlich kein KDE packet, sondern eine Sammlung
 von Anwendungen zum Umgang mit dem PLP-Protokoll (dem Protokoll zur Kommunikation mit einem Psion (EPOC) PDA). Deshalb ist beim Bau des Packets plptools der
 KDE-spezifische Teil explizit zu aktivieren. Hierzu wird die Option
-<option>--enable-kde</option> beim Ausführen des configure von plptools
+<option>--enable-kde</option> beim AusfÃ¼hren des configure von plptools
 benutzt.</para>
 
-<para>Das Bauen läuft üblicherweise folgendermaßen ab:</para>
+<para>Das Bauen lÃ¤uft Ã¼blicherweise folgendermaÃŸen ab:</para>
 
 <screen>
 <prompt>$</prompt> <command>./configure <option>--enable-kde</option></command>
@@ -110,7 +108,7 @@ benutzt.</para>
 <prompt>$</prompt> <command>make <option>install</option></command>
 </screen>
 
-<para>Der letzte Schritt ist hierbei unter der Benutzerkennung root durchzuführen. Der Installationsprozess benötigt Schreibzugriff auf die systemweiten
+<para>Der letzte Schritt ist hierbei unter der Benutzerkennung root durchzufÃ¼hren. Der Installationsprozess benÃ¶tigt Schreibzugriff auf die systemweiten
 KDE-Verzeichnisse.</para>
 
 </sect1>
@@ -120,10 +118,10 @@ KDE-Verzeichnisse.</para>
 <title>&kpsion; verwenden</title>
 
 <para>
-Die Verwendung von &kpsion; ist einfach. Normalerweise wird &kpsion; über den
-entsprechenden Eintrag im Untermenü Werkzeuge des K-Menüs gestartet.
+Die Verwendung von &kpsion; ist einfach. Normalerweise wird &kpsion; Ã¼ber den
+entsprechenden Eintrag im UntermenÃ¼ Werkzeuge des K-MenÃ¼s gestartet.
 
-Sie können &kpsion; aber auch von der Kommandozeile starten. In diesem Fall
+Sie kÃ¶nnen &kpsion; aber auch von der Kommandozeile starten. In diesem Fall
 benutzen Sie eine der folgenden Befehle:
 </para>
 
@@ -152,7 +150,7 @@ benutzen Sie eine der folgenden Befehle:
     </cmdsynopsis>
 
 <para>Wenn &kpsion; ohne jede Option gestartet wird, so startet das
-Programm im interaktiven Modus. Werden Optionen verwendet, führt &kpsion;
+Programm im interaktiven Modus. Werden Optionen verwendet, fÃ¼hrt &kpsion;
 die angegebene Aufgabe automatisch durch.</para>
 
 <variablelist>
@@ -160,7 +158,7 @@ die angegebene Aufgabe automatisch durch.</para>
 <term><option>--autobackup</option></term>
 <listitem><para>
 Diese Option weist &kpsion; an, eine geplante Sicherung des angeschlossenen
-Gerätes durchzuführen. Ist zum Zeitpunkt des Starts kein Psion angeschlossen,
+GerÃ¤tes durchzufÃ¼hren. Ist zum Zeitpunkt des Starts kein Psion angeschlossen,
 beendet sich das Programm sofort.
 </para></listitem>
 </varlistentry>
@@ -176,7 +174,7 @@ Diese Option startet die Sicherung des angegebenen Laufwerks <replaceable>DRIVE<
 <varlistentry>
 <term><option>--restore <replaceable>DRIVE</replaceable></option></term>
 <listitem><para>
-Diese Option startet die Rückicherung des angegebenen Laufwerks <replaceable>DRIVE</replaceable>.
+Diese Option startet die RÃ¼ckicherung des angegebenen Laufwerks <replaceable>DRIVE</replaceable>.
 <replaceable>DRIVE</replaceable> ist hierbei ein einzelner Laufwerks-Buchstabe.
 </para></listitem>
 </varlistentry>
@@ -203,7 +201,7 @@ Diese Option startet das Formatieren des angegebenen Laufwerks <replaceable>DRIV
 <screeninfo>&kpsion; mainwindow.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="toplevel.png" format="PNG">
+      <imagedata fileref="toplevel.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>&kpsion; mainwindow</phrase>
@@ -212,17 +210,17 @@ Diese Option startet das Formatieren des angegebenen Laufwerks <replaceable>DRIV
 </screenshot>
 Ist ein Psion PDA angeschlossen, so werden dessen Laufwerke im zentralen
 Icon-Fenster des Programms angezeigt. Durch einen Mausklick auf ein
-Laufwerk, können Sie dieses Laufwerk an- bzw. abwählen. Sind Laufwerke
-angewählt, so werden die Einträge der möglichen Aktionen im Datei-Menü und
+Laufwerk, kÃ¶nnen Sie dieses Laufwerk an- bzw. abwÃ¤hlen. Sind Laufwerke
+angewÃ¤hlt, so werden die EintrÃ¤ge der mÃ¶glichen Aktionen im Datei-MenÃ¼ und
 in der Werkzeugleiste aktiviert. In der Werkzeugleiste sind die am
-häufigsten benötigten <guimenu>Aktionen</guimenu> verfügbar. Diese sind:</para>
+hÃ¤ufigsten benÃ¶tigten <guimenu>Aktionen</guimenu> verfÃ¼gbar. Diese sind:</para>
 <para>
 <itemizedlist>
 <listitem><para>
 <guiicon>
   <inlinemediaobject>
     <imageobject>
-      <imagedata fileref="psion_backup.png" format="PNG">
+      <imagedata fileref="psion_backup.png" format="PNG"></imagedata>
     </imageobject>
   </inlinemediaobject>
 </guiicon> Komplettsicherung.
@@ -231,15 +229,15 @@ häufigsten benötigten <guimenu>Aktionen</guimenu> verfügbar. Diese sind:</para>
 <guiicon>
   <inlinemediaobject>
     <imageobject>
-      <imagedata fileref="psion_restore.png" format="PNG">
+      <imagedata fileref="psion_restore.png" format="PNG"></imagedata>
     </imageobject>
   </inlinemediaobject>
-</guiicon> Rücksicherung.
+</guiicon> RÃ¼cksicherung.
 </para></listitem>
 </itemizedlist>
 </para>
 
-<sect2><title>Das Datei Menü</title><para><variablelist>
+<sect2><title>Das Datei MenÃ¼</title><para><variablelist>
 
 <varlistentry>
 <term><menuchoice>
@@ -250,7 +248,7 @@ häufigsten benötigten <guimenu>Aktionen</guimenu> verfügbar. Diese sind:</para>
 <guimenuitem>Starte Komplettsicherung</guimenuitem>
 </menuchoice></term>
 <listitem><para>
-Startet eine <action>Komplettsicherung</action> der gewählten Laufwerke.
+Startet eine <action>Komplettsicherung</action> der gewÃ¤hlten Laufwerke.
 </para></listitem>
 </varlistentry>
 
@@ -263,7 +261,7 @@ Startet eine <action>Komplettsicherung</action> der gewählten Laufwerke.
 <guimenuitem>Start Inkrementelle Sicherung</guimenuitem>
 </menuchoice></term>
 <listitem><para>
-Startet eine <action>inkrementelle Sicherung</action> der gewählten Laufwerke.
+Startet eine <action>inkrementelle Sicherung</action> der gewÃ¤hlten Laufwerke.
 </para></listitem>
 </varlistentry>
 
@@ -273,10 +271,10 @@ Startet eine <action>inkrementelle Sicherung</action> der gewählten Laufwerke.
 <keycombo><keycap>Ctrl</keycap><keycap>r</keycap></keycombo>
 </shortcut>
 <guimenu>Datei</guimenu>
-<guimenuitem>Starte Rücksicherung</guimenuitem>
+<guimenuitem>Starte RÃ¼cksicherung</guimenuitem>
 </menuchoice></term>
 <listitem><para>
-Startet eine <action>Rücksicherung</action> der gewählten Laufwerke.
+Startet eine <action>RÃ¼cksicherung</action> der gewÃ¤hlten Laufwerke.
 </para></listitem>
 </varlistentry>
 
@@ -289,7 +287,7 @@ Startet eine <action>Rücksicherung</action> der gewählten Laufwerke.
 <guimenuitem>Starte Formatierung</guimenuitem>
 </menuchoice></term>
 <listitem><para>
-Startet das <action>Formatieren</action> der gewählten Laufwerke.
+Startet das <action>Formatieren</action> der gewÃ¤hlten Laufwerke.
 </para></listitem>
 </varlistentry>
 
@@ -320,7 +318,7 @@ Startet das <action>Formatieren</action> der gewählten Laufwerke.
 
 <para>
 Wenn Sie &kpsion; zum ersten Mal starten, erscheint ein Assistent zur
-Einrichtung und einfachen Anpassung von &kpsion; an Ihre persönlichen
+Einrichtung und einfachen Anpassung von &kpsion; an Ihre persÃ¶nlichen
 Vorgaben. Dieser Vorgang ist in drei Schritte unterteilt:
 </para>
 
@@ -331,7 +329,7 @@ Vorgaben. Dieser Vorgang ist in drei Schritte unterteilt:
 <screeninfo>Step one. Select a backup directory.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="firstwizard-1.png" format="PNG">
+      <imagedata fileref="firstwizard-1.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Selecting the backup directory</phrase>
@@ -339,12 +337,12 @@ Vorgaben. Dieser Vorgang ist in drei Schritte unterteilt:
   </mediaobject>
 </screenshot>
 Der Sicherungs-Ordner wird von &kpsion; zur Ablage von Sicherungs-Archiven
-verwendet. Im Normalfall können Sie einfach den vorgeschlagenen Ordner
-unterhalb Ihres Heimatverzeichnisses unverändert übernehmen. Sollten Sie
-einen anderen Ordner wünschen (z.B. weil der Plattenplatz auf der
-entsprechenden Partition knapp ist.), so können Sie dies durch einen
-Mausklick auf die Schaltfäche Durchsuchen. Natürlich sind zum Anlegen
-des Ordners Schreibrechte im übergeordneten Ordner nötig.
+verwendet. Im Normalfall kÃ¶nnen Sie einfach den vorgeschlagenen Ordner
+unterhalb Ihres Heimatverzeichnisses unverÃ¤ndert Ã¼bernehmen. Sollten Sie
+einen anderen Ordner wÃ¼nschen (z.B. weil der Plattenplatz auf der
+entsprechenden Partition knapp ist.), so kÃ¶nnen Sie dies durch einen
+Mausklick auf die SchaltfÃ¤che Durchsuchen. NatÃ¼rlich sind zum Anlegen
+des Ordners Schreibrechte im Ã¼bergeordneten Ordner nÃ¶tig.
 </para>
 <para></para>
 </sect2>
@@ -356,29 +354,29 @@ des Ordners Schreibrechte im übergeordneten Ordner nötig.
 <screeninfo>Step two. backup strategy.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="firstwizard-2.png" format="PNG">
+      <imagedata fileref="firstwizard-2.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Setting the backup strategy</phrase>
     </textobject>
   </mediaobject>
 </screenshot>
-Im zweiten Schritt können Sie die Sicherungs-Strategie anpassen. Sowohl
-für inkrementelle als auch komplette Sicherungen können Sie einen Intervall
+Im zweiten Schritt kÃ¶nnen Sie die Sicherungs-Strategie anpassen. Sowohl
+fÃ¼r inkrementelle als auch komplette Sicherungen kÃ¶nnen Sie einen Intervall
 angeben. Ist mindestens einer dieser Intervalle aktiviert, so legt &kpsion;
 einen <filename>.desktop</filename> Eintrag in Ihrem KDE-Autostart-Ordner an.
 Jedes Mal, wenn Sie in Zukunft KDE starten, wird dann &kpsion; im automatischen
 Sicherungs-Modus gestartet. Wenn dabei dann ein Intervall abgelaufen ist (und
 ein Psion angeschlossen ist), so wird &kpsion; eine entspechende automatische
-Sicherung durchführen.
+Sicherung durchfÃ¼hren.
 </para>
 <para>
-Die dritte Einstellung, die Sie anpassen können, ist die Anzahl von
+Die dritte Einstellung, die Sie anpassen kÃ¶nnen, ist die Anzahl von
 Sicherungs-Generationen. Eine Sicherungs-Generation besteht aus einer
 Komplett-Sicherung und den darauf aufbauenden inkrementellen Sicherungen.
-In Anschluss an eine erfolgreiche Komplett-Sicherung prüft &kpsion;, ob
-mehr als die hier angegebene Anzahl Generationen bestehen und löscht
-ggf. ältere Sicherungs-Generationen.
+In Anschluss an eine erfolgreiche Komplett-Sicherung prÃ¼ft &kpsion;, ob
+mehr als die hier angegebene Anzahl Generationen bestehen und lÃ¶scht
+ggf. Ã¤ltere Sicherungs-Generationen.
 </para>
 <para></para>
 </sect2>
@@ -390,20 +388,20 @@ ggf. ältere Sicherungs-Generationen.
 <screeninfo>Step three. connection parameters.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="firstwizard-3.png" format="PNG">
+      <imagedata fileref="firstwizard-3.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Setting connection parameters</phrase>
     </textobject>
   </mediaobject>
 </screenshot>
-Im dritten Schritt, können Sie das Verhalten von &kpsion; während des
+Im dritten Schritt, kÃ¶nnen Sie das Verhalten von &kpsion; wÃ¤hrend des
 Verbindungs-Aufbaus beeinflussen. Wenn Sie den Verbindungs-Intervall
 auf einen Wert ungleich Null einstellen, so wird &kpsion; kontinuierlich
 einen gescheiterten Verbindungsaufbau wiederholen. Da &kpsion; hierzu
-den Daemonen ncpd benötigt, ist es zudem möglich, diesen bei Bedarf
-automatisch zu starten. Damit dies funktioniert, müssen Sie zusätzlich
-Schreibrechte für die entsprechende serielle Schnittstelle besitzen.
+den Daemonen ncpd benÃ¶tigt, ist es zudem mÃ¶glich, diesen bei Bedarf
+automatisch zu starten. Damit dies funktioniert, mÃ¼ssen Sie zusÃ¤tzlich
+Schreibrechte fÃ¼r die entsprechende serielle Schnittstelle besitzen.
 </para>
 <para></para>
 </sect2>
@@ -417,8 +415,8 @@ Schreibrechte für die entsprechende serielle Schnittstelle besitzen.
 Wenn &kpsion; eine Verbindung zum Psion aufbaut, so fragt er dessen
 Seriennummer ab. Ist der angeschlossene Psion noch nie vorher angeschlossen
 gewesen, so erscheint ein Assistent mit dem Sie dem angeschlossenen Psion
-einen Namen geben, sowie die Laufwerke für automatische Sicherungen auswählen
-können.
+einen Namen geben, sowie die Laufwerke fÃ¼r automatische Sicherungen auswÃ¤hlen
+kÃ¶nnen.
 </para>
 
 <sect2>
@@ -428,7 +426,7 @@ können.
 <screeninfo>Step one. psion name.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="newpsionwizard-1.png" format="PNG">
+      <imagedata fileref="newpsionwizard-1.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Setting a psion name</phrase>
@@ -448,16 +446,16 @@ stets die Seriennummer des Psion zur Identifikation.
 <screeninfo>Step two. specifying backup drives.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="newpsionwizard-2.png" format="PNG">
+      <imagedata fileref="newpsionwizard-2.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Specifying backup drives</phrase>
     </textobject>
   </mediaobject>
 </screenshot>
-Üblicherweise wählen Sie hier alle Laufwerke ausgenommen das ROM Laufwerk.
-Das ROM Laufwerk kann zwar gesichert werden, aber natürlich ist damit
-keine Rücksicherung möglich.
+Ãœblicherweise wÃ¤hlen Sie hier alle Laufwerke ausgenommen das ROM Laufwerk.
+Das ROM Laufwerk kann zwar gesichert werden, aber natÃ¼rlich ist damit
+keine RÃ¼cksicherung mÃ¶glich.
 </para>
 <para></para>
 </sect2>
@@ -467,8 +465,8 @@ keine Rücksicherung möglich.
 <title>Einstellungen</title>
 
 <para>
-Alle Einstellungen die in den Assistenten vorgenommen wurden, können Sie
-zu einem beliebigen späteren Zeitpunkt mit dem Dialog Einstellungen
+Alle Einstellungen die in den Assistenten vorgenommen wurden, kÃ¶nnen Sie
+zu einem beliebigen spÃ¤teren Zeitpunkt mit dem Dialog Einstellungen
 modifizieren. Der Dialog Einstellungen besteht aus drei Seiten:
 </para>
 
@@ -479,7 +477,7 @@ modifizieren. Der Dialog Einstellungen besteht aus drei Seiten:
 <screeninfo>Setup, Backup.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="settings-backup.png" format="PNG">
+      <imagedata fileref="settings-backup.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Settings, Backup</phrase>
@@ -497,7 +495,7 @@ modifizieren. Der Dialog Einstellungen besteht aus drei Seiten:
 <screeninfo>Settings, Connection.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="settings-connection.png" format="PNG">
+      <imagedata fileref="settings-connection.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Settings, Connection</phrase>
@@ -509,13 +507,13 @@ modifizieren. Der Dialog Einstellungen besteht aus drei Seiten:
 </sect2>
 
 <sect2>
-<title>Geräte</title>
+<title>GerÃ¤te</title>
 <para>
 <screenshot>
 <screeninfo>Settings, Machines.</screeninfo>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="settings-machines.png" format="PNG">
+      <imagedata fileref="settings-machines.png" format="PNG"></imagedata>
     </imageobject>
     <textobject>
       <phrase>Settings, Machines</phrase>
@@ -548,8 +546,8 @@ Die Dateien sind nach folgendem Schema benannt:
   <varlistentry>
   <term>TYP</term>
   <listitem><para>
-    ein einzelnes Zeichen ist und den Backup-Typ repräsentiert. 'I' steht für
-    incrementell und 'F' steht für englisch 'full' (Komplett-Backup).
+    ein einzelnes Zeichen ist und den Backup-Typ reprÃ¤sentiert. 'I' steht fÃ¼r
+    incrementell und 'F' steht fÃ¼r englisch 'full' (Komplett-Backup).
   </para></listitem>
   </varlistentry>
   <varlistentry>
@@ -593,17 +591,17 @@ Die Dateien sind nach folgendem Schema benannt:
 </varlistentry>
 </variablelist>
 Die Dateinamen innerhalb des tar-Archives sind konvertiert um den
-allgemein unter Unix gültigen Namens-Schemata zu genügen: Alle Vorkommen
+allgemein unter Unix gÃ¼ltigen Namens-Schemata zu genÃ¼gen: Alle Vorkommen
 des Zeichens '%' sind in die Zeichenkette '%25' umgewandelt, alle Vorkommen
 des Zeichens '/' sind in die Zeichenkette '%2f' umgewandelt und alle
 Vorkommen von '\' sind nach '/' gewandelt.
 </para>
 <para>
-Zusätzlich zu den gesicherten Dateien des Psion, enthält jedes tar-Archiv
+ZusÃ¤tzlich zu den gesicherten Dateien des Psion, enthÃ¤lt jedes tar-Archiv
 eine spezielle Indexdatei, in der die original-Dateiattribute und die
 64-bit Dateizeit des Psion gespeichert werden. Diese Indexdatei hat den
-Namen KPsionIncrementalIndex (für incrementelle Backups) oder
-KPsionFullIndex (für Komplett-Backups). Die Indexdatei befindet sich im
+Namen KPsionIncrementalIndex (fÃ¼r incrementelle Backups) oder
+KPsionFullIndex (fÃ¼r Komplett-Backups). Die Indexdatei befindet sich im
 Wurzelverzeichnis des Archivs und ist eine ASCII-Datei mit folgendem
 Aufbau:
 <variablelist>
@@ -615,27 +613,27 @@ Aufbau:
   <varlistentry>
   <term>hhhhhhhh</term>
   <listitem><para>
-    eine 8-stellige Hexadezimalzahl ist, die die obere Hälfte des
-    Datei-Modifikationsdatums enthält.
+    eine 8-stellige Hexadezimalzahl ist, die die obere HÃ¤lfte des
+    Datei-Modifikationsdatums enthÃ¤lt.
   </para></listitem>
   </varlistentry>
   <varlistentry>
   <term>llllllll</term>
   <listitem><para>
-    eine 8-stellige Hexadezimalzahl ist, die die untere Hälfte des
-    Datei-Modifikationsdatums enthält.
+    eine 8-stellige Hexadezimalzahl ist, die die untere HÃ¤lfte des
+    Datei-Modifikationsdatums enthÃ¤lt.
   </para></listitem>
   </varlistentry>
   <varlistentry>
   <term>ssssssss</term>
   <listitem><para>
-    eine 8-stellige Hexadezimalzahl ist, die die Dateigrösse enthält.
+    eine 8-stellige Hexadezimalzahl ist, die die DateigrÃ¶sse enthÃ¤lt.
   </para></listitem>
   </varlistentry>
   <varlistentry>
   <term>aaaaaaaa</term>
   <listitem><para>
-    eine 8-stellige Hexadezimalzahl ist, die die Dateiattribute enthält.
+    eine 8-stellige Hexadezimalzahl ist, die die Dateiattribute enthÃ¤lt.
   </para></listitem>
   </varlistentry>
   <varlistentry>
@@ -648,7 +646,7 @@ Aufbau:
 </para></listitem>
 </varlistentry>
 </variablelist>
-Die erste Zeile der Indexdatei enthält einen Header mit dem folgenden
+Die erste Zeile der Indexdatei enthÃ¤lt einen Header mit dem folgenden
 Format:
 <variablelist>
 <varlistentry>
@@ -659,8 +657,8 @@ Format:
   <varlistentry>
   <term>T</term>
   <listitem><para>
-    ein einzelnes Zeichen ist, welches den Backup-Typ repräsentiert.
-    'I' steht für incrementell und 'F' steht für englisch 'full'
+    ein einzelnes Zeichen ist, welches den Backup-Typ reprÃ¤sentiert.
+    'I' steht fÃ¼r incrementell und 'F' steht fÃ¼r englisch 'full'
     (Komplett-Backup).
   </para></listitem>
   </varlistentry>
@@ -697,9 +695,9 @@ Format:
 
 <para>&kpsion; wurde erstellt von Fritz Elfert.</para>
 
-<para>Der Autor kann über e-Mail unter der Adresse
+<para>Der Autor kann Ã¼ber e-Mail unter der Adresse
 <email>felfert@to.com</email> erreicht werden.  Bitte melden Sie Fehler
-und Wünsche an mich so daß diese in zukünftigen Versionen behoben/berücksichtigt werden können.</para>
+und WÃ¼nsche an mich so daÃŸ diese in zukÃ¼nftigen Versionen behoben/berÃ¼cksichtigt werden kÃ¶nnen.</para>
 
 &underFDL;
 &underGPL;

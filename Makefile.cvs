@@ -3,10 +3,6 @@ AUTOMAKEFILES = conf/mkinstalldirs conf/missing conf/install-sh
 CONFIGHIN = include/config.h.in
 ACLOCAL = conf/aclocal.m4
 GETTEXT = intl/Makefile.in
-KDEVER=$(shell kde-config -v | grep -q "KDE: 3" && echo 3 || echo 2)
-ifeq ($(KDEVER),3)
-AM_EDIT_ARGS=--kde3
-endif
 
 all:
 	@echo "Use make devel for development, make dist for distribution"
@@ -51,4 +47,4 @@ $(GETTEXT): $(ACLOCAL)
 
 $(AUTOMAKEFILES): $(ACLOCAL) $(CONFIGHIN)
 	automake --add-missing
-	make AM_EDIT_ARGS=$(AM_EDIT_ARGS) -C kde2 -f Makefile.am am_edit
+	make -C kde2 -f Makefile.am am_edit
