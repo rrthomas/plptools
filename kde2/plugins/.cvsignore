@@ -1,4 +1,9 @@
 *.closure
 *.moc
+*.lo
+*.la
+*_meta_unload.*
+.deps
+.libs
 Makefile.in
 Makefile
