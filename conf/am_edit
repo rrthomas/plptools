@@ -982,6 +982,7 @@ sub tag_ICON()
   my $lookup = '([^\s]*)_ICON\s*=\s*([^\n]*)';
   my $install = "";
   my $uninstall = "";
+  my $distfiles_icons = "";
 
   while ($MakefileData =~ /\n$lookup/g) {
     my $destdir;
@@ -1024,6 +1025,7 @@ sub tag_ICON()
 
     foreach $file (@files)
     {
+      $distfiles_icons .= "\\\n\t$file ";
       my $newfile = $file;
       my $prefix = $file;
       $prefix =~ s/\.(png|xpm)$//;
@@ -1099,6 +1101,13 @@ sub tag_ICON()
     }
   }
 
+  if (length($distfiles_icons)) {
+    $lookup = 'DISTFILES\s*=\s*(.*)';
+    if ($MakefileData =~ /\n$lookup\n/) {
+      $tmp = "DISTFILES = $1 $distfiles_icons";
+      substituteLine ($lookup, $tmp);
+    }
+  }
   if (length($install)) {
     $target_adds{"install-data-am"} .= "install-kde-icons ";
     $target_adds{"uninstall-am"} .= "uninstall-kde-icons ";

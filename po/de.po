@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-02-28 02:15+0100\n"
+"POT-Creation-Date: 2001-03-01 01:24+0100\n"
 "PO-Revision-Date: 2001-02-28 02:44CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -925,4 +925,3 @@ msgstr "Kein solcher Prozess"
 #: plpftp/ftp.cc:966
 msgid "syntax error. Try \"help\""
 msgstr "Syntaxfehler. Probieren Sie \"help\""
-
