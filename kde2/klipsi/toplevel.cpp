@@ -597,7 +597,7 @@ checkConnection() {
 		    KMessageBox::error(NULL, i18n(
 			"<QT>Your Psion does not support the remote clipboard "
 			"protocol.<BR/>The reason for that is usually a missing "
-			"server library on your Psion.<BR/>Make shure, that "
+			"server library on your Psion.<BR/>Make sure that "
 			"<B>C:\\System\\Libs\\clipsvr.rsy</B> exists.<BR/>"
 			"This file is part of PsiWin and usually gets copied "
 			"to your Psion when you enable CopyAnywhere in PsiWin. "
