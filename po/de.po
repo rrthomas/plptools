@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-17 19:55+0200\n"
+"POT-Creation-Date: 2003-02-01 00:01+0100\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.6\n"
 
-#: lib/rfsv.cc:33 lib/rfsvfactory.cc:45 lib/rpcsfactory.cc:43
+#: lib/rfsv.cc:33 lib/rpcsfactory.cc:43 lib/rfsvfactory.cc:45
 msgid "no error"
 msgstr "kein Fehler"
 
@@ -467,13 +467,11 @@ msgid "New Zealand"
 msgstr "Neuseeländisch"
 
 #  FIXME: not shure about ISO code
-#. FIXME: not shure about ISO code
 #: lib/rpcs.cc:90
 msgid "International French"
 msgstr "Internationales Französisch"
 
 #  FIXME: not shure about ISO code
-#. FIXME: not shure about ISO code
 #: lib/rpcs.cc:91
 msgid "Czech"
 msgstr "Tschechisch"
@@ -530,23 +528,23 @@ msgstr " Sekunden"
 msgid " second"
 msgstr " Sekunde"
 
-#: lib/rfsvfactory.cc:46 lib/rpcsfactory.cc:44
+#: lib/rpcsfactory.cc:44 lib/rfsvfactory.cc:46
 msgid "could not send version request"
 msgstr "Konnte Versions-Anforderung nicht versenden"
 
-#: lib/rfsvfactory.cc:47 lib/rpcsfactory.cc:45
+#: lib/rpcsfactory.cc:45 lib/rfsvfactory.cc:47
 msgid "try again"
 msgstr "Erneut versuchen"
 
-#: lib/rfsvfactory.cc:48 lib/rpcsfactory.cc:46
+#: lib/rpcsfactory.cc:46 lib/rfsvfactory.cc:48
 msgid "no psion connected"
 msgstr "Kein Psion angeschlossen"
 
-#: lib/rfsvfactory.cc:49 lib/rpcsfactory.cc:47
+#: lib/rpcsfactory.cc:47 lib/rfsvfactory.cc:49
 msgid "wrong protocol version"
 msgstr "Falsche Protokoll-Version"
 
-#: lib/rfsvfactory.cc:50 lib/rpcsfactory.cc:48
+#: lib/rpcsfactory.cc:48 lib/rfsvfactory.cc:50
 msgid "no response from ncpd"
 msgstr "Keine Antwort vom ncpd"
 
@@ -1036,7 +1034,7 @@ msgstr "Behalte ursprünglichen Ordner \""
 msgid "Transfer complete, ("
 msgstr "Übertragung abgeschlossen, ("
 
-#: plpbackup/plpbackup.cc:1202 plpftp/ftp.cc:578 plpftp/ftp.cc:669
+#: plpftp/ftp.cc:578 plpftp/ftp.cc:669 plpbackup/plpbackup.cc:1202
 msgid " bytes in "
 msgstr " Bytes in "
 
@@ -1859,6 +1857,6 @@ msgstr "Versuchen Sie `plpnfsd --help' für weitere Informationen."
 msgid "plpnfsd Version "
 msgstr "ncpd Version "
 
-#: plpprint/plpprintd.cc:1016
+#: plpprint/plpprintd.cc:1023
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: Konnte ncpd nicht kontaktieren."

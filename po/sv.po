@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-17 19:55+0200\n"
+"POT-Creation-Date: 2003-02-01 00:01+0100\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: lib/rfsv.cc:33 lib/rfsvfactory.cc:45 lib/rpcsfactory.cc:43
+#: lib/rfsv.cc:33 lib/rpcsfactory.cc:43 lib/rfsvfactory.cc:45
 msgid "no error"
 msgstr "inget fel"
 
@@ -466,13 +466,11 @@ msgid "New Zealand"
 msgstr "Nya Zeeländska"
 
 #  FIXME: not shure about ISO code
-#. FIXME: not shure about ISO code
 #: lib/rpcs.cc:90
 msgid "International French"
 msgstr "Internationell Franska"
 
 #  FIXME: not shure about ISO code
-#. FIXME: not shure about ISO code
 #: lib/rpcs.cc:91
 msgid "Czech"
 msgstr "Tjeckoslovakiska"
@@ -529,23 +527,23 @@ msgstr " sekunder"
 msgid " second"
 msgstr " sekund"
 
-#: lib/rfsvfactory.cc:46 lib/rpcsfactory.cc:44
+#: lib/rpcsfactory.cc:44 lib/rfsvfactory.cc:46
 msgid "could not send version request"
 msgstr "kunde inte skicka versionsfråga"
 
-#: lib/rfsvfactory.cc:47 lib/rpcsfactory.cc:45
+#: lib/rpcsfactory.cc:45 lib/rfsvfactory.cc:47
 msgid "try again"
 msgstr "försök igen"
 
-#: lib/rfsvfactory.cc:48 lib/rpcsfactory.cc:46
+#: lib/rpcsfactory.cc:46 lib/rfsvfactory.cc:48
 msgid "no psion connected"
 msgstr "ingen psion ikopplad"
 
-#: lib/rfsvfactory.cc:49 lib/rpcsfactory.cc:47
+#: lib/rpcsfactory.cc:47 lib/rfsvfactory.cc:49
 msgid "wrong protocol version"
 msgstr "fel protokollversion"
 
-#: lib/rfsvfactory.cc:50 lib/rpcsfactory.cc:48
+#: lib/rpcsfactory.cc:48 lib/rfsvfactory.cc:50
 msgid "no response from ncpd"
 msgstr "inget svar från ncpd"
 
@@ -1037,7 +1035,7 @@ msgstr "Behåller ursprungsmappen \""
 msgid "Transfer complete, ("
 msgstr "Överfringen klar, ("
 
-#: plpbackup/plpbackup.cc:1202 plpftp/ftp.cc:578 plpftp/ftp.cc:669
+#: plpftp/ftp.cc:578 plpftp/ftp.cc:669 plpbackup/plpbackup.cc:1202
 msgid " bytes in "
 msgstr " bytes på "
 
@@ -1816,6 +1814,6 @@ msgstr "Prova 'plpnfsd --help' för mer information"
 msgid "plpnfsd Version "
 msgstr ""
 
-#: plpprint/plpprintd.cc:1016
+#: plpprint/plpprintd.cc:1023
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: kunde inte få kontakt med ncpd"

@@ -3,14 +3,14 @@ ServiceTypes=inode/x-psion-drive
 Actions=Backup;Restore;Format
 Patterns=
 [Desktop Action Backup]
-Exec=kpsion backup %u
+Exec=kpsion --backup %u
 Name=backup this drive
 Name[de]=Laufwerk sichern
 [Desktop Action Format]
-Exec=kpsion format %u
+Exec=kpsion --format %u
 Name=format this drive
 Name[de]=Laufwerk formatieren
 [Desktop Action Restore]
-Exec=kpsion restore %u
+Exec=kpsion --restore %u
 Name=restore this drive
 Name[de]=Laufwerk rücksichern

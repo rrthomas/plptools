@@ -73,4 +73,3 @@ msgstr ""
 #: toplevel.moc.cpp:34 toplevel.moc.cpp:42
 msgid "TopLevel"
 msgstr "TopLevel"
-

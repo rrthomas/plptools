@@ -519,13 +519,23 @@ slotAutoAction() {
 	QCStringList::Iterator it;
 
 	for (it = argl.begin(); it != argl.end(); ++it) {
-	    QString drv((*it).upper());
-
-	    for (i = view->firstItem(); i; i = i->nextItem()) {
-		if (i->key() == drv) {
-		    i->setSelected(true);
-		    any = true;
+	    i = 0L;
+	    if ((*it).left(7) == "psion:/") {
+		QString volname((*it).mid(7));
+		for (i = view->firstItem(); i; i = i->nextItem()) {
+		    if (i->text().startsWith(volname + " "))
+			break;
 		}
+	    } else {
+		QString drv((*it).upper());
+		for (i = view->firstItem(); i; i = i->nextItem()) {
+		    if (i->key() == drv)
+			break;
+		}
+	    }
+	    if (i) {
+		i->setSelected(true);
+		any = true;
 	    }
 	}
 	if (any) {
@@ -543,18 +553,29 @@ slotAutoAction() {
 	QCStringList::Iterator it;
 
 	for (it = argl.begin(); it != argl.end(); ++it) {
-	    QString drv((*it).upper());
-	    if (drv == "Z") {
-		KMessageBox::sorry(this, i18n(
-		    "<QT>The selected drive <B>Z:</B> is "
-		    "a <B>ROM</B> drive and therefore cannot be restored.</QT>"));
-		continue;
-	    }
-	    for (i = view->firstItem(); i; i = i->nextItem()) {
-		if (i->key() == drv) {
-		    i->setSelected(true);
-		    any = true;
+	    i = 0L;
+	    if ((*it).left(7) == "psion:/") {
+		QString volname((*it).mid(7));
+		for (i = view->firstItem(); i; i = i->nextItem()) {
+		    if (i->text().startsWith(volname + " "))
+			break;
 		}
+	    } else {
+		QString drv((*it).upper());
+		for (i = view->firstItem(); i; i = i->nextItem()) {
+		    if (i->key() == drv)
+			break;
+		}
+	    }
+	    if (i) {
+		if (i->key() == "Z") {
+		    KMessageBox::sorry(this, i18n(
+			"<QT>The selected drive <B>Z:</B> is "
+			"a <B>ROM</B> drive and therefore cannot be restored.</QT>"));
+		    continue;
+		}
+		i->setSelected(true);
+		any = true;
 	    }
 	}
 	if (any)
@@ -569,12 +590,29 @@ slotAutoAction() {
 	QCStringList::Iterator it;
 
 	for (it = argl.begin(); it != argl.end(); ++it) {
-	    QString drv((*it).upper());
-	    for (i = view->firstItem(); i; i = i->nextItem()) {
-		if (i->key() == drv) {
-		    i->setSelected(true);
-		    any = true;
+	    i = 0L;
+	    if ((*it).left(7) == "psion:/") {
+		QString volname((*it).mid(7));
+		for (i = view->firstItem(); i; i = i->nextItem()) {
+		    if (i->text().startsWith(volname + " "))
+			break;
 		}
+	    } else {
+		QString drv((*it).upper());
+		for (i = view->firstItem(); i; i = i->nextItem()) {
+		    if (i->key() == drv)
+			break;
+		}
+	    }
+	    if (i) {
+		if (i->key() == "Z") {
+		    KMessageBox::sorry(this, i18n(
+			"<QT>The selected drive <B>Z:</B> is "
+			"a <B>ROM</B> drive and therefore cannot be formatted.</QT>"));
+		    continue;
+		}
+		i->setSelected(true);
+		any = true;
 	    }
 	}
 	if (any)

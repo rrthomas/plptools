@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
 
     if (acnt > 1)
 	KCmdLineArgs::usage(i18n(
-	    "The options are mutually exclusive. "
+	    "The actions are mutually exclusive. "
 	    "I.e. You cannot specify more than one action at once."));
 
     KPsionMainWindow *w = new KPsionMainWindow();
