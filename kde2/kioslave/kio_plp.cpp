@@ -278,7 +278,7 @@ openConnection() {
 	for (int i = 0; i < 26; i++) {
 	    if ((devbits & 1) != 0) {
 		PlpDrive drive;
-		if (plpRfsv->devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE) {
+		if (plpRfsv->devinfo('A' + i, drive) == rfsv::E_PSI_GEN_NONE) {
 		    string vname = drive.getName();
 		    QString name;
 
@@ -815,38 +815,49 @@ get( const KURL& url ) {
     if (checkConnection())
 	return;
     kdDebug(PLP_DEBUGAREA) << "get(" << name << ")" << endl;
-    if (isRoot(name) || isDrive(name)) {
-	error(ERR_ACCESS_DENIED, i18n("%1: virtual directory").arg(url.path()));
-	return;
-    }
-    convertName(name);
 
-    Enum<rfsv::errs> res;
-    u_int32_t handle;
-    u_int32_t len;
-    u_int32_t size;
-    u_int32_t total = 0;
-
-    if (emitTotalSize(name))
-	return;
-    res = plpRfsv->fopen(plpRfsv->opMode(rfsv::PSI_O_RDONLY), name.latin1(), handle);
-    if (checkForError(res, url.path()))
-	return;
-
-    QByteArray a(RFSV_SENDLEN);
-    do {
-	if ((res = plpRfsv->fread(handle, (unsigned char *)(a.data()),
-				  RFSV_SENDLEN, len)) == rfsv::E_PSI_GEN_NONE) {
-	    if (len < RFSV_SENDLEN)
-		a.resize(len);
+    if (name == "/0:_MachInfo") {
+	    QByteArray a(sizeof(machInfo));
+	    a.duplicate((const char *)&machInfo, sizeof(machInfo));
 	    data(a);
-	    total += len;
-	    calcprogress(total);
+    } else {
+	if (isRoot(name) || isDrive(name)) {
+	    error(ERR_ACCESS_DENIED,
+		  i18n("%1: virtual directory").arg(url.path()));
+	    return;
 	}
-    } while ((len > 0) && (res == rfsv::E_PSI_GEN_NONE));
-    plpRfsv->fclose(handle);
-    if (checkForError(res, url.path()))
-	return;
+	convertName(name);
+
+	Enum<rfsv::errs> res;
+	u_int32_t handle;
+	u_int32_t len;
+	u_int32_t size;
+	u_int32_t total = 0;
+
+	if (emitTotalSize(name))
+	    return;
+	res = plpRfsv->fopen(plpRfsv->opMode(
+	    rfsv::PSI_O_RDONLY), name.latin1(), handle);
+	if (checkForError(res, url.path()))
+	    return;
+
+	QByteArray a(RFSV_SENDLEN);
+	do {
+	    if ((res = plpRfsv->fread(handle,
+				      (unsigned char *)(a.data()),
+				      RFSV_SENDLEN, len)) ==
+		rfsv::E_PSI_GEN_NONE) {
+		if (len < RFSV_SENDLEN)
+		    a.resize(len);
+		data(a);
+		total += len;
+		calcprogress(total);
+	    }
+	} while ((len > 0) && (res == rfsv::E_PSI_GEN_NONE));
+	plpRfsv->fclose(handle);
+	if (checkForError(res, url.path()))
+	    return;
+    }
     data(QByteArray());
 
     finished();
@@ -1047,7 +1058,7 @@ special(const QByteArray &a) {
 	    PlpDrive drive;
 
 	    Enum<rfsv::errs> res;
-	    int drv;
+	    char drv;
 
 	    stream >> param;
 	    cout << "p='" << param << "'" << endl;
@@ -1181,14 +1192,6 @@ special(const QByteArray &a) {
 						     unseta);
 	    if (checkForError(res, name))
 		return;
-	}
-	    break;
-	case 5: {
-	    kdDebug(PLP_DEBUGAREA) << "get machineInfo" << endl;
-	    QByteArray a(sizeof(machInfo));
-	    a.duplicate((const char *)&machInfo, sizeof(machInfo));
-	    data(a);
-	    data(QByteArray());
 	}
 	    break;
 	default:

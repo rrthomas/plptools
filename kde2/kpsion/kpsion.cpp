@@ -77,7 +77,7 @@ KPsionMainWindow::KPsionMainWindow()
     restoreRunning = false;
     formatRunning = false;
     doScheduledBackup = false;
-    quitImmediately = true;
+    quitImmediately = false;
 
     view = new KIconView(this, "iconview");
     view->setSelectionMode(KIconView::Multi);
@@ -403,7 +403,7 @@ queryPsion() {
 	    quitImmediately = true;
 	    return;
 	}
-	
+
     }
     if (doScheduledBackup || args->isSet("backup") ||
 	args->isSet("restore") || args->isSet("format")) {
@@ -543,6 +543,10 @@ tryConnect() {
     rfsvSocket = new ppsocket();
     statusBar()->changeItem(i18n("Connecting ..."), STID_CONNECTION);
     if (!rfsvSocket->connect(NULL, 7501)) {
+	if (args->isSet("autobackup")) {
+	    quitImmediately = true;
+	    return;
+	}
 	statusMsg = i18n("RFSV could not connect to ncpd at %1:%2. ").arg("localhost").arg(7501);
 	if (reconnectTime) {
 	    nextTry = reconnectTime;
@@ -563,6 +567,10 @@ tryConnect() {
     rfsvfactory factory(rfsvSocket);
     plpRfsv = factory.create(false);
     if (plpRfsv == 0L) {
+	if (args->isSet("autobackup")) {
+	    quitImmediately = true;
+	    return;
+	}
 	statusMsg = i18n("RFSV could not establish link: %1.").arg(KGlobal::locale()->translate(factory.getError()));
 	delete rfsvSocket;
 	rfsvSocket = 0L;
@@ -584,6 +592,10 @@ tryConnect() {
 
     rpcsSocket = new ppsocket();
     if (!rpcsSocket->connect(NULL, 7501)) {
+	if (args->isSet("autobackup")) {
+	    quitImmediately = true;
+	    return;
+	}
 	statusMsg = i18n("RPCS could not connect to ncpd at %1:%2.").arg("localhost").arg(7501);
 	delete plpRfsv;
 	plpRfsv = 0L;
@@ -607,6 +619,10 @@ tryConnect() {
     rpcsfactory factory2(rpcsSocket);
     plpRpcs = factory2.create(false);
     if (plpRpcs == 0L) {
+	if (args->isSet("autobackup")) {
+	    quitImmediately = true;
+	    return;
+	}
 	statusMsg = i18n("RPCS could not establish link: %1.").arg(KGlobal::locale()->translate(factory2.getError()));
 	delete plpRfsv;
 	plpRfsv = 0L;
@@ -689,7 +705,7 @@ updateBackupStamps() {
     QString uid = getMachineUID();
     int cfgBtype = (fullBackup)
 	? KPsionConfig::OPT_LASTFULL : KPsionConfig::OPT_LASTINC;
-    
+
     config->setGroup(pcfg.getSectionName(cfgBtype));
     for (QIconViewItem *i = view->firstItem(); i; i = i->nextItem()) {
 	QString key = pcfg.getOptionName(cfgBtype).arg(uid).arg(i->key());
@@ -876,7 +892,7 @@ doBackup() {
     else {
 	// Rename Tarfile to its final name;
 	::rename(archiveName.latin1(),
-		 archiveName.replace(QRegExp("\\.tmp\\.gz$"), ".tar.gz"));
+		 archiveName.replace(QRegExp("\\.tmp\\.gz$"), ".tar.gz").latin1());
 
     }
 

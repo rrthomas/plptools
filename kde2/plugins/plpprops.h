@@ -38,17 +38,6 @@
 
 #include "pie3dwidget.h"
 
-class PlpMachInfoJob : public KIO::TransferJob {
-    Q_OBJECT
-
-public:
-    PlpMachInfoJob(const QByteArray &packedArgs);
-
-protected slots:
-    virtual void slotFinished();
-
-};
-
 class PlpPropsPlugin : public KPropsDlgPlugin {
     Q_OBJECT
 

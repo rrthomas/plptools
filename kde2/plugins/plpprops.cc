@@ -876,8 +876,11 @@ PlpMachinePage::PlpMachinePage( KPropertiesDialog *_props ) {
     d->g->setColStretch(1, 1);
     box->addStretch(10);
 
-    KIO_ARGS << int(PLP_CMD_MACHINFO);
-    PlpMachInfoJob *job = new PlpMachInfoJob(packedArgs);
+//    KIO_ARGS << int(PLP_CMD_MACHINFO);
+//    PlpMachInfoJob *job = new PlpMachInfoJob(packedArgs);
+    KURL u("psion:/0:_MachInfo");
+    KIO::TransferJob *job = KIO::get(u, false, false);
+
     connect(job, SIGNAL(result(KIO::Job *)),
 	    SLOT(slotJobFinished(KIO::Job *)));
     connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)),
@@ -958,10 +961,11 @@ void PlpMachinePage::slotJobData(KIO::Job *job, const QByteArray &data) {
 }
 
 void PlpMachinePage::slotJobFinished(KIO::Job *job) {
-    PlpMachInfoJob *mJob = static_cast<PlpMachInfoJob *>(job);
+    KIO::TransferJob *mJob = static_cast<KIO::TransferJob *>(job);
 
     if (mJob->error())
 	job->showErrorDialog(d->props->dialog());
+    cout << "MachInfo job has finished" << endl;
 }
 
 class PlpOwnerPage::PlpOwnerPagePrivate
@@ -1022,16 +1026,6 @@ void PlpOwnerPage::slotSpecialFinished(KIO::Job *job) {
 		d->owneredit->setText((*it).m_str);
 	}
     }
-}
-
-PlpMachInfoJob::PlpMachInfoJob(const QByteArray &packedArgs)
-    : KIO::TransferJob(KURL("psion:/"), KIO::CMD_SPECIAL,
-		       packedArgs, QByteArray(), false) {
-}
-
-void PlpMachInfoJob::
-slotFinished() {
-    SimpleJob::slotFinished();
 }
 
 #include "plpprops.moc"

@@ -43,7 +43,7 @@
 #include <errno.h>
 
 SetupDialog::SetupDialog(QWidget *parent, rfsv *plpRfsv, rpcs *plpRpcs)
-    : KDialogBase(Tabbed, "Settings", Ok|Apply|Default|Cancel, Ok, parent,
+    : KDialogBase(Tabbed, i18n("Settings"), Ok|Apply|Default|Cancel, Ok, parent,
 		  "settingsDialog", true, true)
 {
     int i;

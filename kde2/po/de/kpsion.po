@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.7\n"
-"POT-Creation-Date: 2001-03-13 11:35+0100\n"
-"PO-Revision-Date: 2001-03-13 11:36CET\n"
+"POT-Creation-Date: 2001-03-28 13:43+0200\n"
+"PO-Revision-Date: 2001-03-28 13:45CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -47,59 +47,59 @@ msgstr "KPsionCheckListItem"
 msgid "KPsionBackupListView"
 msgstr "KPsionBackupListView"
 
-#: kpsionconfig.cpp:88
+#: kpsionconfig.cpp:91
 msgid "off"
 msgstr "aus"
 
-#: kpsionconfig.cpp:118
+#: kpsionconfig.cpp:121
 msgid "none"
 msgstr "keine"
 
-#: kpsionconfig.cpp:119
+#: kpsionconfig.cpp:122
 msgid "daily"
 msgstr "täglich"
 
-#: kpsionconfig.cpp:120
+#: kpsionconfig.cpp:123
 msgid "every 2 days"
 msgstr "alle 2 Tage"
 
-#: kpsionconfig.cpp:121
+#: kpsionconfig.cpp:124
 msgid "every 3 days"
 msgstr "alle 3 Tage"
 
-#: kpsionconfig.cpp:122
+#: kpsionconfig.cpp:125
 msgid "every 4 days"
 msgstr "alle 4 Tage"
 
-#: kpsionconfig.cpp:123
+#: kpsionconfig.cpp:126
 msgid "every 5 days"
 msgstr "alle 5 Tage"
 
-#: kpsionconfig.cpp:124
+#: kpsionconfig.cpp:127
 msgid "every 6 days"
 msgstr "alle 6 Tage"
 
-#: kpsionconfig.cpp:125
+#: kpsionconfig.cpp:128
 msgid "weekly"
 msgstr "wöchentlich"
 
-#: kpsionconfig.cpp:126
+#: kpsionconfig.cpp:129
 msgid "every 2 weeks"
 msgstr "alle 2 Wochen"
 
-#: kpsionconfig.cpp:127
+#: kpsionconfig.cpp:130
 msgid "every 3 weeks"
 msgstr "alle 3 Wochen"
 
-#: kpsionconfig.cpp:128
+#: kpsionconfig.cpp:131
 msgid "monthly"
 msgstr "monatlich"
 
-#: kpsion.cpp:65
+#: kpsion.cpp:60
 msgid "Idle"
 msgstr "Bereit"
 
-#: kpsion.cpp:125
+#: kpsion.cpp:122
 msgid ""
 "<qt>Here, you see your Psion's drives.<br/>Every drive is represented by an "
 "Icon. If you click on it, it gets selected for the next operation. E.g.: "
@@ -113,66 +113,66 @@ msgstr ""
 "abzuwählen.<br/>Wählen Sie beliebig viele Laufwerke und dann eine "
 "Operation.</qt>"
 
-#: kpsion.cpp:193
+#: kpsion.cpp:190
 msgid "Start &Format"
 msgstr "Starte &Formatierung"
 
-#: kpsion.cpp:195
+#: kpsion.cpp:192
 msgid "Start Full &Backup"
 msgstr "Starte &Komplett-Sicherung"
 
-#: kpsion.cpp:198
+#: kpsion.cpp:195
 msgid "Start &Incremental Backup"
 msgstr "Starte &inkrementelle Sicherung"
 
-#: kpsion.cpp:200
+#: kpsion.cpp:197
 msgid "Start &Restore"
 msgstr "Starte &Rücksicherung"
 
-#: kpsion.cpp:214
+#: kpsion.cpp:207
 msgid "Full backup of selected drive(s)"
 msgstr "Komplett-Sicherung der ausgewählten Laufwerke"
 
-#: kpsion.cpp:216
+#: kpsion.cpp:209
 msgid "Incremental backup of selected drive(s)"
 msgstr "Inkrementelle Sicherung der ausgewählten Laufwerke"
 
-#: kpsion.cpp:218
+#: kpsion.cpp:211
 msgid "Restore selected drive(s)"
 msgstr "Sichere ausgewählte Laufwerke zurück"
 
-#: kpsion.cpp:220
+#: kpsion.cpp:213
 msgid "Format selected drive(s)"
 msgstr "Formatiere ausgewählte Laufwerke"
 
-#: kpsion.cpp:291
+#: kpsion.cpp:285
 msgid "Retrieving machine info ..."
 msgstr "Ermittle Geräte-Info ..."
 
-#: kpsion.cpp:302
+#: kpsion.cpp:289
 msgid "Could not get Psion machine info"
 msgstr "Konnte Psion Geräteinfo nicht ermitteln"
 
-#: kpsion.cpp:318
+#: kpsion.cpp:304
 msgid "an unknown machine"
 msgstr "einem unbekannten Gerät"
 
-#: kpsion.cpp:329
+#: kpsion.cpp:315
 msgid "Retrieving drive list ..."
 msgstr "Ermittle Laufwerks-Liste ..."
 
-#: kpsion.cpp:332
+#: kpsion.cpp:318
 msgid "Could not get list of drives"
 msgstr "Konnte Liste der Laufwerke nicht ermitteln"
 
-#: kpsion.cpp:362 kpsion.cpp:634 kpsion.cpp:656 kpsion.cpp:679 kpsion.cpp:789
-#: kpsion.cpp:923 kpsion.cpp:1084 kpsion.cpp:1093 kpsion.cpp:1124
-#: kpsion.cpp:1142 kpsion.cpp:1153
+#: kpsion.cpp:349 kpsion.cpp:736 kpsion.cpp:758 kpsion.cpp:783 kpsion.cpp:901
+#: kpsion.cpp:1035 kpsion.cpp:1196 kpsion.cpp:1205 kpsion.cpp:1236
+#: kpsion.cpp:1254 kpsion.cpp:1265
 #, c-format
 msgid "Connected to %1"
 msgstr "Verbunden mit %1"
 
-#: kpsion.cpp:396
+#: kpsion.cpp:463
 msgid ""
 "<QT>The selected drive <B>Z:</B> is a <B>ROM</B> drive and therefore cannot "
 "be restored.</QT>"
@@ -180,7 +180,7 @@ msgstr ""
 "<QT>Das gewählte Laufwerk <B>Z:</B> ist ein <B>ROM</B> Laufwerk und kann "
 "deshalb nicht rückgesichert werden.</QT>"
 
-#: kpsion.cpp:443
+#: kpsion.cpp:515
 msgid ""
 "A backup is running.\n"
 "Do you really want to quit?"
@@ -188,7 +188,7 @@ msgstr ""
 "Eine Sicherung läuft.\n"
 "Wollen Sie wirklich das Programm beenden?"
 
-#: kpsion.cpp:445
+#: kpsion.cpp:517
 msgid ""
 "A restore is running.\n"
 "Do you really want to quit?"
@@ -196,7 +196,7 @@ msgstr ""
 "Eine Rücksicherung läuft.\n"
 "Wollen Sie wirklich das Programm beenden?"
 
-#: kpsion.cpp:447
+#: kpsion.cpp:519
 msgid ""
 "A format is running.\n"
 "Do you really want to quit?"
@@ -204,94 +204,94 @@ msgstr ""
 "Eine Formatierung läuft.\n"
 "Wollen Sie wirklich das Programm beenden?"
 
-#: kpsion.cpp:473
+#: kpsion.cpp:544
 msgid "Connecting ..."
 msgstr "Verbindungsaufbau ..."
 
-#: kpsion.cpp:475
+#: kpsion.cpp:550
 msgid "RFSV could not connect to ncpd at %1:%2. "
 msgstr "RFSV konnte ncpd auf %1:%2 nicht erreichen. "
 
-#: kpsion.cpp:478 kpsion.cpp:500 kpsion.cpp:523 kpsion.cpp:548
+#: kpsion.cpp:553 kpsion.cpp:579 kpsion.cpp:606 kpsion.cpp:635
 msgid " (Retry in %1 seconds.)"
 msgstr " (Wiederholung in %1 Sekunden.)"
 
-#: kpsion.cpp:495
+#: kpsion.cpp:574
 #, c-format
 msgid "RFSV could not establish link: %1."
 msgstr "RFSV konnte keine Verbindung aufbauen: %1."
 
-#: kpsion.cpp:516
+#: kpsion.cpp:599
 msgid "RPCS could not connect to ncpd at %1:%2."
 msgstr "RPCS konnte ncpd auf %1:%2 nicht erreichen."
 
-#: kpsion.cpp:539
+#: kpsion.cpp:626
 #, c-format
 msgid "RPCS could not establish link: %1."
 msgstr "RPCS konnte keine Verbindung aufbauen: %1."
 
-#: kpsion.cpp:638
+#: kpsion.cpp:740
 #, c-format
 msgid "Could not retrieve drive details for drive %1"
 msgstr "Konnte Details des Laufwerks %1 nicht ermitteln."
 
-#: kpsion.cpp:643
+#: kpsion.cpp:745
 #, c-format
 msgid "Scanning drive %1"
 msgstr "Durchsuche Laufwerk %1"
 
-#: kpsion.cpp:652
+#: kpsion.cpp:754
 msgid "%1 files need backup"
 msgstr "%1 Dateien müssen gesichert werden"
 
-#: kpsion.cpp:658
+#: kpsion.cpp:762
 msgid "No files need backup"
 msgstr "Keine Dateien zu sichern"
 
-#: kpsion.cpp:681
+#: kpsion.cpp:785
 #, c-format
 msgid "Could not create backup folder %1"
 msgstr "Konnte Sicherungs-Ordner %1 nicht anlegen."
 
-#: kpsion.cpp:705
+#: kpsion.cpp:809
 msgid "Backup %1% done"
 msgstr "Sicherung %1% beendet"
 
-#: kpsion.cpp:725
+#: kpsion.cpp:829
 msgid "<QT>Could not open<BR/><B>%1</B></QT>"
 msgstr "<QT>Konnte<BR/><B>%1</B><BR/>nicht öffnen</QT>"
 
-#: kpsion.cpp:745
+#: kpsion.cpp:849
 msgid "<QT>Could not read<BR/><B>%1</B></QT>"
 msgstr "<QT>Konnte<BR/><B>%1</B><BR/>nicht lesen</QT>"
 
-#: kpsion.cpp:758
+#: kpsion.cpp:862
 msgid "Resetting archive attributes"
 msgstr "Setze Archiv-Attribute zurück"
 
-#: kpsion.cpp:771
+#: kpsion.cpp:875
 msgid "<QT>Could not set attributes of<BR/><B>%1</B></QT>"
 msgstr "<QT>Konnte Attribute der Datei<BR/><B>%1</B><BR/>nicht setzen</QT>"
 
-#: kpsion.cpp:793
+#: kpsion.cpp:905
 msgid "Backup done"
 msgstr "Sicherung beendet"
 
-#: kpsion.cpp:807 kpsion.cpp:1037
+#: kpsion.cpp:919 kpsion.cpp:1149
 msgid "<QT>Could not get attributes of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 "<QT>Konnte Attribute der Datei<BR/><B>%1</B> nicht abfragen<BR/>Grund: "
 "%2</QT>"
 
-#: kpsion.cpp:836
+#: kpsion.cpp:948
 msgid "Overwrite"
 msgstr "Überschreiben"
 
-#: kpsion.cpp:839
+#: kpsion.cpp:951
 msgid "Overwrite &All"
 msgstr "Überschreibe &Alles"
 
-#: kpsion.cpp:852
+#: kpsion.cpp:964
 msgid ""
 "<QT>The file <B>%1</B> exists already on the Psion with different size "
 "and/or attributes.<P><B>On the Psion:</B><BR/>  Size: %2<BR/>  Date: %3<BR/> "
@@ -304,61 +304,61 @@ msgstr ""
 "%5<BR/>  Datum: %6<BR/>  Attribute: %7</P>Wollen Sie die Datei "
 "überschreiben?</QT>"
 
-#: kpsion.cpp:890
+#: kpsion.cpp:1002
 msgid "Reading backups ..."
 msgstr "Lese Sicherungsdaten ..."
 
-#: kpsion.cpp:895
+#: kpsion.cpp:1007
 msgid "Selecting backups ..."
 msgstr "Wähle Sicherungsdaten ..."
 
-#: kpsion.cpp:928 kpsion.cpp:976
+#: kpsion.cpp:1040 kpsion.cpp:1088
 msgid "Restore %1% done"
 msgstr "Rücksicherung %1% abgeschlossen"
 
-#: kpsion.cpp:992
+#: kpsion.cpp:1104
 msgid "<QT>Could not create directory<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr "<QT>Konnte den Ordner<BR/><B>%1</B> nicht anlegen.<BR/>Grund: %2</QT>"
 
-#: kpsion.cpp:1007
+#: kpsion.cpp:1119
 msgid "<QT>Could not create<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr "<QT>Konnte<BR/><B>%1</B> nicht anlegen<BR/>Grund: %2</QT>"
 
-#: kpsion.cpp:1029
+#: kpsion.cpp:1141
 msgid "<QT>Could not write to<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr "<QT>Konnte nicht auf <BR/><B>%1</B> schreiben<BR/>Grund: %2</QT>"
 
-#: kpsion.cpp:1055
+#: kpsion.cpp:1167
 msgid "<QT>Could not set attributes of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr "<QT>Konnte Attribute der Datei<BR/><B>%1</B>nicht setzen.<BR/>Grund: %2</QT>"
 
-#: kpsion.cpp:1068
+#: kpsion.cpp:1180
 msgid "<QT>Could not set modification time of<BR/><B>%1</B><BR/>Reason: %2</QT>"
 msgstr ""
 "<QT>Konnte Änderungsdatum der Datei<BR/><B>%1</B> nicht setzen<BR/>Grund: "
 "%2</QT>"
 
-#: kpsion.cpp:1095
+#: kpsion.cpp:1207
 msgid "Restore done"
 msgstr "Rücksicherung abgeschlossen"
 
-#: kpsion.cpp:1109
+#: kpsion.cpp:1221
 msgid "Formatting drive %1:"
 msgstr "Formatiere Laufwerk %1:"
 
-#: kpsion.cpp:1120
+#: kpsion.cpp:1232
 msgid "<QT>Could not format drive %1:<BR/>%2</QT>"
 msgstr "<QT>Konnte Laufwerk %1 nicht formatieren:<BR/>%2</QT>"
 
-#: kpsion.cpp:1137
+#: kpsion.cpp:1249
 msgid "<QT>Error during format of drive %1:<BR/>%2</QT>"
 msgstr "<QT>Fehler beim Formatieren von Laufwerk %1:<BR/>%2</QT>"
 
-#: kpsion.cpp:1155
+#: kpsion.cpp:1267
 msgid "Format done"
 msgstr "Formatierung beendet"
 
-#: kpsion.cpp:1161
+#: kpsion.cpp:1273
 msgid ""
 "<QT>This erases <B>ALL</B> data on the drive(s).<BR/>Do you really want to "
 "proceed?"
@@ -366,11 +366,11 @@ msgstr ""
 "<QT>Hierdurch werden <B>ALLE</B> Daten auf dem(den) Laufwerk(en) "
 "gelöscht.<BR/>Wollen Sie wirklich fortfahren?</QT>"
 
-#: kpsion.cpp:1182
+#: kpsion.cpp:1294
 msgid "Assign drive name"
 msgstr "Weise Laufwerksnamen zu"
 
-#: kpsion.cpp:1191
+#: kpsion.cpp:1303
 msgid ""
 "<QT>Formatting of drive %1: finished. Please assign a name for that "
 "drive.</QT>"
@@ -378,16 +378,16 @@ msgstr ""
 "<QT>Die Formatierung des Laufwerks %1 ist beendet. Bitte weisen Sie dem "
 "Laufwerk nun einen Namen zu.</QT>"
 
-#: kpsion.cpp:1195
+#: kpsion.cpp:1307
 msgid "New name of drive %1:"
 msgstr "Neuer Name für Laufwerk %1:"
 
-#: kpsion.cpp:1341
+#: kpsion.cpp:1453
 #, c-format
 msgid "Stopping %1"
 msgstr "Stoppe %1"
 
-#: kpsion.cpp:1359
+#: kpsion.cpp:1471
 msgid ""
 "<QT>Could not stop all processes.<BR/>Please stop running programs manually "
 "on the Psion, then klick <B>Ok</B>."
@@ -395,7 +395,7 @@ msgstr ""
 "<QT>Konnte nicht alle Prozesse stoppen.<BR/>Bitte beenden Sie laufende "
 "Progamme auf dem Psion manuell. Klickens Die dann <B>Ok</B>."
 
-#: kpsion.cpp:1382
+#: kpsion.cpp:1494
 #, c-format
 msgid "Starting %1"
 msgstr "Starte %1"
@@ -428,35 +428,35 @@ msgstr "Formatiere Laufwerk vor Rücksicherung"
 msgid "KPsionRestoreDialog"
 msgstr "KPsionRestoreDialog"
 
-#: main.cpp:49
+#: main.cpp:51
 msgid "perform scheduled backup"
 msgstr "Führe geplante Sicherung durch"
 
-#: main.cpp:51
+#: main.cpp:53
 msgid "perform backup"
 msgstr "Führe Sicherung durch"
 
-#: main.cpp:53
+#: main.cpp:55
 msgid "perform restore"
 msgstr "Führe Rücksicherung durch"
 
-#: main.cpp:55
+#: main.cpp:57
 msgid "format drive"
 msgstr "Formatiere Laufwerk"
 
-#: main.cpp:60
+#: main.cpp:62
 msgid "KPsion"
 msgstr "KPsion"
 
-#: main.cpp:61
+#: main.cpp:64
 msgid "Psion connectivity utility"
 msgstr "Werkzeug für Psion PDA"
 
-#: main.cpp:66
+#: main.cpp:69
 msgid "Original Developer/Maintainer"
 msgstr "Original Entwickler/Betreuer"
 
-#: main.cpp:104
+#: main.cpp:107
 msgid ""
 "The options are mutually exclusive. I.e. You cannot specify more than one "
 "action at once."
@@ -464,73 +464,228 @@ msgstr ""
 "Die Optionen schließen sich gegenseitig aus. D.h. sie können nicht mehrere "
 "unterschiedliche Aktionen gleichzeitig angeben."
 
-#: setupdialog.cpp:54
-msgid "Backup &folder"
-msgstr "Sicherungs &Ordner"
+#: setupdialog.cpp:46
+msgid "Settings"
+msgstr "Einstellungen"
 
-#: setupdialog.cpp:63 wizards.cpp:107
-msgid "Browse"
-msgstr "Durchsuchen"
+#: setupdialog.cpp:59
+msgid "&Backup"
+msgstr "&Sicherung"
 
-#: setupdialog.cpp:66 wizards.cpp:110
-msgid "This is the name of the backup folder."
-msgstr "Dies ist der Name des Sicherungs-Ordners."
-
-#: setupdialog.cpp:68 wizards.cpp:112
-msgid ""
-"Click here, for opening a dialog which lets you easily select the backup "
-"folder."
-msgstr ""
-"Aktivieren Sie diese Schaltfläche, um einen Dialog zu öffnen welcher es "
-"Ihnen auf einfache Weise erlaubt, den Sicherungs-Ordner zu wählen."
-
-#: setupdialog.cpp:76
-msgid "Backup &policy"
-msgstr "Sicherungs &Strategie"
-
-#: setupdialog.cpp:79 wizards.cpp:145
-msgid "&Incremental backup interval"
-msgstr "Invervall für &inkrementelle Sicherung"
-
-#: setupdialog.cpp:91 wizards.cpp:153
-msgid "&Full backup interval"
-msgstr "Intervall für &Komplett-Sicherung"
-
-#: setupdialog.cpp:102 wizards.cpp:161
-msgid "Backup &generations"
-msgstr "Sicherungs-&Generationen"
-
-#: setupdialog.cpp:114
-msgid "&Connection"
-msgstr "&Verbindung"
-
-#: setupdialog.cpp:117 wizards.cpp:205
-msgid "&Connection retry interval (sec.)"
-msgstr "&Verbindungsaufbau-Intervall (in sek.)"
-
-#: setupdialog.cpp:127 wizards.cpp:213
-msgid "Serial &device"
-msgstr "&Serielle Schnittstelle"
-
-#: setupdialog.cpp:146 wizards.cpp:222
-msgid "Serial &speed"
-msgstr "Schnittstellen-&Geschwindigkeit"
-
-#: setupdialog.cpp:185 wizards.cpp:279
+#: setupdialog.cpp:62 setupdialog.cpp:380 wizards.cpp:279
 msgid "Backup folder"
 msgstr "Sicherungs-Ordner"
 
-#: setupdialog.cpp:263 wizards.cpp:365
+#: setupdialog.cpp:73 wizards.cpp:107
+msgid "Browse"
+msgstr "Durchsuchen"
+
+#: setupdialog.cpp:76
+msgid ""
+"<QT>This is the name of the backup folder. Click on <B>Browse</B>, for "
+"opening a dialog which lets you easily select the backup folder. If the "
+"backup folder is changed and it already contains backups, these are moved to "
+"the new location.</QT>"
+msgstr ""
+"<QT>Dies ist der Name des Sicherungsordners. Klicken Sie auf "
+"<B>Durchsuchen</B>, um einen Dialog zu öffnen welcher es Ihnen auf einfache "
+"Weise erlaubt, den Sicherungsordner auszuwählen. Wenn beim Ändern des "
+"Sicherungsordners dieser bereits Sicherungen enthält, so werden diese an "
+"die neue Stelle verschoben.</QT>"
+
+#: setupdialog.cpp:82
+msgid ""
+"<QT>Click here, for opening a dialog which lets you easily select the backup "
+"folder. If the backup folder is changed and it already contains backups, "
+"these are moved to the new location.</QT>"
+msgstr ""
+"<QT>Klicken Sie hier, um einen Dialog zu öffnen welcher es Ihnen auf "
+"einfache Weise erlaubt, den Sicherungsordner auszuwählen. Wenn beim Ändern "
+"des Sicherungsordners dieser bereits Sicherungen enthält, so werden diese "
+"an die neue Stelle verschoben.</QT>"
+
+#: setupdialog.cpp:93
+msgid "Backup strategy"
+msgstr "Sicherungs-Strategie"
+
+#: setupdialog.cpp:97 wizards.cpp:145
+msgid "&Incremental backup interval"
+msgstr "Invervall für &inkrementelle Sicherung"
+
+#: setupdialog.cpp:101 setupdialog.cpp:114
+msgid ""
+"<QT>If you select an interval here, <B>KPsion</B> creates an entry in your "
+"Autostart directory which performs an incremental backup of selected drives. "
+"If your Psion is not connected at that time, nothing will happen.</QT>"
+msgstr ""
+"<QT>Wenn Sie hier ein Intervall wählen, legt <B>KPsion</B> einen Eintrag in "
+"Ihrem Autostart-Ordner an. Dieser Eintrag bewirkt, daß bei jedem Start von "
+"KDE <B>KPsion</B> überprüft, ob eine inkrementelle Sicherung nötig ist "
+"und diese ggf. durchführt. Wenn dabei kein Psion angeschlossen ist, wird "
+"die Prüfung übersprungen.</QT>"
+
+#: setupdialog.cpp:119 wizards.cpp:153
+msgid "&Full backup interval"
+msgstr "Intervall für &Komplett-Sicherung"
+
+#: setupdialog.cpp:122 setupdialog.cpp:135
+msgid ""
+"<QT>If you select an interval here, <B>KPsion</B> creates an entry in your "
+"Autostart directory which performs a full backup of selected drives. If your "
+"Psion is not connected at that time, nothing will happen.</QT>"
+msgstr ""
+"<QT>Wenn Sie hier ein Intervall wählen, legt <B>KPsion</B> einen Eintrag in "
+"Ihrem Autostart-Ordner an. Dieser Eintrag bewirkt, daß bei jedem Start von "
+"KDE <B>KPsion</B> überprüft, ob eine Vollsicherung nötig ist und diese "
+"ggf. durchführt. Wenn dabei kein Psion angeschlossen ist, wird die Prüfung "
+"übersprungen.</QT>"
+
+#: setupdialog.cpp:140 wizards.cpp:161
+msgid "Backup &generations"
+msgstr "Sicherungs-&Generationen"
+
+#: setupdialog.cpp:143 setupdialog.cpp:156
+msgid ""
+"<QT>Specify the number of backup generations you want to keep on your "
+"machine. One backup generation means a full backup of a drive plus "
+"eventually made incrmental backups of that drive. This is checked every "
+"time, a full backup is done and if the number of existing backups is "
+"exceeded, the oldest backup and its corresponding incremental backups are "
+"deleted.</QT>"
+msgstr ""
+"<QT>Geben Sie die gewünschte Anzahl der Sicherungs-Generationen die auf dem "
+"Rechner bereitgehalten werden sollen. Unter einer Sicherungs-Generation ist "
+"eine Vollsicherung, sowie eventuell darauf aufbauende inkrementelle "
+"Sicherungen zu verstehen. Jedesmal, wenn eine Vollsicherung durchgeführt "
+"wurde und dabei die Anzahl der Generationen überschritten wurde, wird die "
+"jeweils älteste Vollsicherung und die auf ihr aufbauenden inkrementellen "
+"Sicherungen gelöscht.</QT>"
+
+#: setupdialog.cpp:167
+msgid "&Connection"
+msgstr "&Verbindung"
+
+#: setupdialog.cpp:170 wizards.cpp:205
+msgid "&Connection retry interval (sec.)"
+msgstr "&Verbindungsaufbau-Intervall (in sek.)"
+
+#: setupdialog.cpp:174 setupdialog.cpp:183
+msgid "<QT>If this is not 0, <B>KPsion</B> attempts to retry connection setup.</QT>"
+msgstr ""
+"<QT>Wenn Sie hier eine Zahl ungleich 0 angeben, so wird <B>KPsion</B> beim "
+"Scheitern eines Verbindungsaufbaus weitere Verbindungsversuche im "
+"angegebenen Intervall ausführen.</QT>"
+
+#: setupdialog.cpp:186 wizards.cpp:213
+msgid "Serial &device"
+msgstr "&Serielle Schnittstelle"
+
+#: setupdialog.cpp:189 setupdialog.cpp:209
+msgid ""
+"<QT>If a device is selected here and the connection can not established at "
+"startup, <B>KPsion</B> will attempt to start the ncpd daemon with "
+"appropriate parameters.</QT>"
+msgstr ""
+"<QT>Wenn Sie hier eine Schnittstelle auswählen, so wird <B>KPSion</B> beim "
+"Scheitern eines Verbindungsaufbaus zunächst versuchen, den hierzu "
+"erforderlichen Hintergrund-Prozess <B>ncpd</B> mit den entsprechenden "
+"Parametern zu starten.</QT>"
+
+#: setupdialog.cpp:213 wizards.cpp:222
+msgid "Serial &speed"
+msgstr "Schnittstellen-&Geschwindigkeit"
+
+#: setupdialog.cpp:216 setupdialog.cpp:233
+msgid ""
+"<QT>If a device is selected at <B>Serial device</B> and the connection can "
+"not established at startup, <B>KPsion</B> will attempt to start the ncpd "
+"daemon with appropriate parameters.</QT>"
+msgstr ""
+"<QT>Wenn Sie in der Auswahlbox eine Schnittstelle auswählen, so wird "
+"<B>KPSion</B> beim Scheitern eines Verbindungsaufbaus zunächst versuchen, "
+"den hierzu erforderlichen Hintergrund-Prozess <B>ncpd</B> mit den "
+"entsprechenden Parametern zu starten.</QT>"
+
+#: setupdialog.cpp:241
+msgid "&Machines"
+msgstr "&Geräte"
+
+#: setupdialog.cpp:245
+msgid "Machine &UID"
+msgstr "Geräte &UID"
+
+#: setupdialog.cpp:248 setupdialog.cpp:260
+msgid ""
+"<QT>This shows the known machines. Select an entry here and you will be able "
+"to change its name and specify the drives that should be selected for "
+"automatic backups. You also can delete a machine which includes deleting all "
+"backups for it.</QT>"
+msgstr ""
+"<QT>Hier werden die <B>KPsion</B> bekannten Geräte angezeigt. Wenn Sie ein "
+"Gerät aus der Liste auswählen, so können Sie dessen Name ändern und die "
+"Laufwerke wählen, die für eine automatische Sicherung in Betracht kommen. "
+"Sie können auch ein Gerät aus der Liste löschen, was zur Folge hat, daß "
+"sämtliche Sicherungen dieses Geräts gelöscht werden.</QT>"
+
+#: setupdialog.cpp:266
+msgid "Machine &Name"
+msgstr "Geräte&name"
+
+#: setupdialog.cpp:269 setupdialog.cpp:276
+msgid ""
+"<QT>You can change the name of the machine here. The name is not used "
+"internally but only provided for display purposes.</QT>"
+msgstr ""
+"<QT>Hier können Sie den Namen des Geräts ändern. Der Name wird nur zum "
+"Zweck der Anzeige benutzt und hat ansonsten für das Programm keine "
+"Bedeutung.</QT>"
+
+#: setupdialog.cpp:279
+msgid "Delete"
+msgstr "Löschen"
+
+#: setupdialog.cpp:283
+msgid ""
+"<QT>Click here to delete the selected machine from the list of known "
+"machines. This includes deleting all backups of that machine.</QT>"
+msgstr ""
+"<QT>Klicken Sie hier, um das gewählte Gerät aus der Liste der bekannten "
+"Geräte zu entfernen. Dies schließt das Löschen sämtlicher Sicherungen "
+"dieses Geräts ein.</QT>"
+
+#: setupdialog.cpp:288
+msgid "Automatic backup drives"
+msgstr "Auto-Sicherungs-Laufwerke"
+
+#: setupdialog.cpp:298
+msgid ""
+"<QT>Here, you can select the drives which shall be included in atomatic "
+"backups.</QT>"
+msgstr ""
+"<QT>Wählen Sie hier die Laufwerke aus, welche bei automatischen Sicherungen "
+"berücksichtigt werden sollen.</QT>"
+
+#: setupdialog.cpp:354
+msgid ""
+"<QT>Removing a machine also removes all backups of this machine.<BR/><B>This "
+"can not be reverted!</B><BR/>Do you really want to remove the machine %1 "
+"(%2)?</QT>"
+msgstr ""
+"<QT>Mit dem Entfernen eines Geräts werden auch sämtliche Sicherungen "
+"dieses Geräts gelöscht.<BR/><B>Dies kann nicht rückgängig gemacht "
+"werden!</B><BR/>Wollen Sie wirklich das Gerät %1 (%2) löschen?</QT>"
+
+#: setupdialog.cpp:471 wizards.cpp:365
 msgid "<QT>The folder <B>%1</B> does <B>not</B> exist.<BR/>Shall it be created?</QT>"
 msgstr ""
 "<QT>Der Ordner <B>%1</B> existiert <B>nicht</B>.<BR/>Soll er angelegt "
 "werden?</QT>"
 
-#: setupdialog.cpp:268 wizards.cpp:370
+#: setupdialog.cpp:476 wizards.cpp:370
 msgid "<QT>The specified folder<BR/><B>%1</B><BR/>could <B>not</B> be created"
 msgstr "<QT>Der angegebene Ordner<BR/><B>%1</B><BR/>konnte nicht angelegt werden"
 
-#: setupdialog.cpp:273 wizards.cpp:375
+#: setupdialog.cpp:481 wizards.cpp:375
 msgid ""
 ", because you either don't have sufficient rights to do that, or the "
 "filesystem is readonly."
@@ -538,15 +693,15 @@ msgstr ""
 ", weil Sie entweder nicht die nötigen Rechte besitzen, oder das Dateisystem "
 "nur lesbar ist."
 
-#: setupdialog.cpp:277 wizards.cpp:379
+#: setupdialog.cpp:485 wizards.cpp:379
 msgid ", because the filesystem has not enough space."
 msgstr ", weil auf dem Dateisystem kein Platz mehr ist."
 
-#: setupdialog.cpp:283 wizards.cpp:385
+#: setupdialog.cpp:491 wizards.cpp:385
 msgid ", because there already exists another object with the same name."
 msgstr ", weil schon ein anderes Objekt mit dem selben Namen existiert."
 
-#: setupdialog.cpp:293 wizards.cpp:395
+#: setupdialog.cpp:501 wizards.cpp:395
 msgid ""
 ", because you specified a path which probably contains a dangling symbolic "
 "link."
@@ -554,7 +709,7 @@ msgstr ""
 ", weil Sie eine Pfad angegeben haben, der eine nicht aufgelöste symbolische "
 "Verknüpfung enthält."
 
-#: setupdialog.cpp:296 wizards.cpp:398
+#: setupdialog.cpp:504 wizards.cpp:398
 msgid ""
 ", because you specified a path which contains an element which is not a "
 "folder."
@@ -562,17 +717,17 @@ msgstr ""
 ", weil Sie eine Pfad angegeben haben, der ein Element enthält, welches kein "
 "Ordner ist."
 
-#: setupdialog.cpp:300 wizards.cpp:402
+#: setupdialog.cpp:508 wizards.cpp:402
 msgid ", because you specified a path which contains too many symbolic links."
 msgstr ""
 ", weil Sie eine Pfad angegeben haben, der zu viele symbolische "
 "Verknüpfungen enthält."
 
-#: setupdialog.cpp:307 wizards.cpp:409
+#: setupdialog.cpp:515 wizards.cpp:409
 msgid "<BR/>Please select another folder.</QT>"
 msgstr "<BR/>Bitte wählen Sie einen anderen Ordner.</QT>"
 
-#: setupdialog.cpp:330
+#: setupdialog.cpp:539
 msgid "Could not move existing backup for machine %1 to %2."
 msgstr "Konnte bestehende Sicherung für Gerät %1 nicht nach %2 verlagern."
 
@@ -641,6 +796,18 @@ msgstr ""
 "wählen. Bitte durchsuchen Sie existierende Ordner und wählen dabei eine "
 "adäquate Stelle oder akzeptieren Sie einfach die unten angezeigte "
 "Vorgabe.</QT>"
+
+#: wizards.cpp:110
+msgid "This is the name of the backup folder."
+msgstr "Dies ist der Name des Sicherungs-Ordners."
+
+#: wizards.cpp:112
+msgid ""
+"Click here, for opening a dialog which lets you easily select the backup "
+"folder."
+msgstr ""
+"Aktivieren Sie diese Schaltfläche, um einen Dialog zu öffnen welcher es "
+"Ihnen auf einfache Weise erlaubt, den Sicherungs-Ordner zu wählen."
 
 #: wizards.cpp:127
 msgid "<QT><BIG><B>Step 1</B></BIG> - Specify backup directory</QT>"
