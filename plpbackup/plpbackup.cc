@@ -63,7 +63,6 @@ bool full = false;
 bool S5mx = false;
 bool doRestore = false;
 bool doBackup = false;
-bool doFormat = false;
 bool skipError = false;
 bool doAbort = false;
 bool overWriteAll = false;
@@ -487,13 +486,9 @@ startMessage(const char *arch)
 {
     if (verbose >= 0) {
 	cout << _("Performing ");
-	if (doFormat)
-	    cout << _("format");
-	if (doRestore) {
-	    if (doFormat)
-		cout << _(" and ");
+	if (doRestore)
 	    cout << _("restore");
-	} else
+	else
 	    cout << (full ? _("full") : _("incremental")) << _(" backup");
 	cout << _(" of ");
 	if (driveList.empty())
@@ -529,12 +524,6 @@ tdiff(struct timeval *start, struct timeval *end)
     s += start->tv_usec;
     e += end->tv_usec;
     return (e - s) / 1000000.0;
-}
-
-static int
-runFormat()
-{
-    return 0;
 }
 
 static int
@@ -1422,7 +1411,6 @@ usage(ostream *hlp)
 	      "    -f, --full             Do a full backup (incremental otherwise).\n"
 	      "    -b, --backup[=TGZ]     Backup to specified archive TGZ.\n"
 	      "    -r, --restore=TGZ      Restore from specified archive TGZ.\n"
-	      "    -F, --format           Format drive (can be combined with restore) [UNIMPLEMENTED].\n"
 	      "\n"
 	      "  <drive> A drive character. If none given, scan all drives.\n"
 	      "\n");
@@ -1441,7 +1429,6 @@ static struct option opts[] = {
     { "quiet",   no_argument,       0, 'q' },
     { "backup",  optional_argument, 0, 'b' },
     { "restore", required_argument, 0, 'r' },
-    { "format",  no_argument,       0, 'F' },
     { "version", no_argument,       0, 'V' },
     { 0,         0,                 0, 0   },
 };
@@ -1522,9 +1509,6 @@ main(int argc, char **argv)
 		doRestore = true;
 		archList.push_back(optarg);
 		break;
-	    case 'F':
-		doFormat = true;
-		break;
 	    case 'p':
 		parse_destination(optarg, &host, &sockNum);
 		break;
@@ -1542,20 +1526,16 @@ main(int argc, char **argv)
 	}
 	driveList.push_back(argv[i]);
     }
-    if (doBackup && (doRestore || doFormat)) {
-	cerr << _("Backup mode can not be combined with format or restore.")
+    if (doBackup && doRestore) {
+	cerr << _("Backup mode can not be combined with restore.")
 	     << endl;
-	usage(&cerr);
-    }
-    if (doFormat && driveList.empty()) {
-	cerr << _("Format mode needs at least one drive specified.") << endl;
 	usage(&cerr);
     }
     if (doBackup && (archList.size() > 1)) {
 	cerr << _("Backup can only create one archive at a time.") << endl;
 	usage(&cerr);
     }
-    if (!(doBackup || doRestore || doFormat)) {
+    if (!(doBackup || doRestore)) {
 	cerr << _("No action specified.") << endl;
 	usage(&cerr);
     }
@@ -1602,8 +1582,6 @@ main(int argc, char **argv)
 	runBackup();
     if (doRestore)
 	runRestore();
-    if (doFormat)
-	runFormat();
     delete Rpcs;
     delete Rfsv;
     return 0;
