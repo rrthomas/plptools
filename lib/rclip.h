@@ -33,13 +33,27 @@ class bufferArray;
 /**
  * Remote ClipBoard services via PLP
  *
+ * This class implements access to the remote clipboard notification
+ * feature of the Psion. The Psion uses a file C:\System\Data\Clpboard.cbd
+ * for storing the content of its clipboard. This file can be accessed like
+ * any other regular file on the Psion using the @ref rfsv implementation.
+ * This class handles notification about changes of this file.
+ * There are two methods of notification implemented. Using @ref waitNotify ,
+ * a blocking method can be used and using @ref sendListen followed by
+ * @ref checkNotify , a polling approach (usable for GUI programs) can
+ * be implemented.
  */
 class rclip {
 public:
-    rclip(ppsocket *);
+    /**
+    * Constructs a new rclip object.
+    *
+    * @param skt The socket to be used by this object.
+    */
+    rclip(ppsocket *skt);
 
     /**
-    * Virtual destructor.
+    * destructor.
     */
     ~rclip();
 
@@ -65,14 +79,61 @@ public:
     */
     Enum<rfsv::errs> getStatus();
 
+    /**
+    * Send initialization frame.
+    *
+    * Must be called once after a new rclip object has
+    * be called. It sends an initialzation frame to the
+    * Psion's server and returns its status.
+    *
+    * @returns The connection status.
+    */
     Enum<rfsv::errs> initClipbd();
 
+    /**
+    * Send listen request.
+    *
+    * Calling this method arms the Psion's clipboard server.
+    * After that, every change of the Psion's clipboard file
+    * will be signaled. To poll the signal, subsequent calls
+    * to @ref checkNotify should be made.
+    *
+    * @returns The connection status.
+    */
     Enum<rfsv::errs> sendListen();
 
+    /**
+    * Check for clipboard notification.
+    *
+    * If the Psion has sent a notification, this method returns
+    * @ref rfsv::E_PSI_GEN_NONE . If there is no notification
+    * pending, this method returns @ref rfsv::E_PSI_FILE_EOF
+    * All other return values are to be treated as errors
+    *
+    * @returns The connection status.
+    */
     Enum<rfsv::errs> checkNotify();
 
+    /**
+    * Send listen request and wait for notification.
+    *
+    * This method is the blocking version of the two above methods.
+    * It first sends a listen request and then blocks until a
+    * notification has sent by the Psion or an error occured.
+    *
+    * @returns The connection status, rfsv::E_PSI_GEN_NONE if a
+    *          notification has been received.
+    */
     Enum<rfsv::errs> waitNotify();
 
+    /**
+    * Send a notification to the Psion.
+    *
+    * If the application wishes to notify the Psion after changing the
+    * clipboard file, this method can be used.
+    *
+    * @returns The connection status.
+    */
     Enum<rfsv::errs> notify();
 
 protected:
