@@ -20,7 +20,7 @@ Das psion-Modul stellt die Verbindung zum Psion unter Verwendung des
 ncpd Daemonen her. Daher ist es erforderlich, daß dieser Daemon auf dem
 entsprechenden Rechner am Laufen ist. Das psion-Modul, der Daemon sowie
 weitere Dienstprogramme für Psion-Konnektivität sind Teil des Packetes
-plptoos. Dieses Packet ist auf <ulink url="http://plptools.sourceforge.net/"
+plptools. Dieses Packet ist auf <ulink url="http://plptools.sourceforge.net/"
 >http://plptools.sourceforge.net/</ulink> erhältlich.
 </para>
 
