@@ -79,7 +79,7 @@ Requires: aaa_base >= 2001.10.19-1
 %if "%{isRH}" > "0"
 Requires: chkconfig >= 0.9
 %endif
-BuildRoot: /tmp/plputils-buildroot
+BuildRoot: %{_tmppath}/plputils-buildroot
 
 %package devel
 Summary: Static library and includes for psion series 5 communication.
