@@ -27,6 +27,7 @@
 #include <config.h>
 #endif
 
+#include <assert.h>
 #include <map>
 #include <string>
 
@@ -276,13 +277,13 @@ public:
  * // declaration of enumeration; somewhere
  * class rfsv {
  * [...]
- * 	enum PSI_ERROR_CODES { E_PSI_GEN_NONE, E_PSI_GEN_FAIL, E_PSI_GEN_ARG };
+ *	enum PSI_ERROR_CODES { E_PSI_GEN_NONE, E_PSI_GEN_FAIL, E_PSI_GEN_ARG };
  * [...]
  * };
  *
  * // definition of the Enum<E> with the appropriate string representations
  * ENUM_DEFINITION(rfsv::PSI_ERROR_CODES,
- *	 	   rfsv::E_PSI_GEN_NONE) {
+ *		   rfsv::E_PSI_GEN_NONE) {
  *	stringRep.add(rfsv::E_PSI_GEN_NONE,	"no error");
  *	stringRep.add(rfsv::E_PSI_GEN_FAIL,	"general");
  *	stringRep.add(rfsv::E_PSI_GEN_ARG,	"bad argument");
