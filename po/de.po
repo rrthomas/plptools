@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-16 19:30+0200\n"
-"PO-Revision-Date: 2002-07-08 00:06CET\n"
+"POT-Creation-Date: 2002-07-16 21:28+0200\n"
+"PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1424,14 +1424,16 @@ msgid "Could not run external editor"
 msgstr "Konnte externen Editor nicht starten"
 
 #: plpbackup/plpbackup.cc:794
-msgid ""
-"Archive skipped, because it does not contain any files on selected drives"
-msgstr ""
-"Archiv übersprungen, da es keine Dateien von den gewählten Lauferken enthält"
+msgid "Archive skipped, because it does not contain any files on selected drives"
+msgstr "Archiv übersprungen, da es keine Dateien von den gewählten Lauferken enthält"
+
+#: plpbackup/plpbackup.cc:838
+msgid "(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) "
+msgstr "(Ü)berschreiben, (A)lle überschreiben, Über(s)pringen? (Ü/A/S) "
 
 #: plpbackup/plpbackup.cc:839
 msgid "OAS"
-msgstr "OAS"
+msgstr "ÜAS"
 
 #: plpbackup/plpbackup.cc:880
 msgid "Could not get backup index"
@@ -1456,6 +1458,10 @@ msgstr "Entpacke tar-Archiv ..."
 #: plpbackup/plpbackup.cc:936
 msgid "Execution of "
 msgstr "Ausführen von "
+
+#: plpbackup/plpbackup.cc:936
+msgid " failed."
+msgstr " gescheitert."
 
 #: plpbackup/plpbackup.cc:945 plpbackup/plpbackup.cc:1032
 #: plpbackup/plpbackup.cc:1080
@@ -1645,14 +1651,13 @@ msgid "plpbackup: could not connect to ncpd"
 msgstr "plpbackup: Konnte ncpd nicht kontaktieren"
 
 #: sisinstall/sismain.cpp:33
-#, fuzzy
 msgid "Got an error, Press any key to exit."
-msgstr "Installation beendet. Beenden mit beliebiger Taste."
+msgstr "Ein Fehler ist aufgetreten, Beenden mit beliebiger Taste."
 
 #: sisinstall/sismain.cpp:38
 #, c-format
 msgid "Error %d on line %d: %s\n"
-msgstr ""
+msgstr "Fehler %d in Zeile %d: %s\n"
 
 #: sisinstall/sismain.cpp:57
 msgid ""
@@ -1663,7 +1668,7 @@ msgid ""
 " -h, --help              Display this text.\n"
 " -V, --version           Print version and exit.\n"
 " -v, --verbose=LEVEL     Set the verbosity level, by default 0.\n"
-" -n, --dry-run           Just parse file file.\n"
+" -n, --dry-run           Just parse the file.\n"
 " -w, --newt              Use the Newt interface.\n"
 msgstr ""
 "Anwendung: sisinstall [OPTIONEN]... SISDATEI\n"
@@ -1691,7 +1696,7 @@ msgstr ", nicht wirklich"
 
 #: sisinstall/sismain.cpp:147
 msgid "Missing SIS filename\n"
-msgstr ""
+msgstr "Fehlender SIS Dateiname\n"
 
 #: sisinstall/sismain.cpp:155
 #, c-format
@@ -1709,6 +1714,14 @@ msgstr "Konnte SIS-Datei nicht parsen.\n"
 #: sisinstall/sismain.cpp:200
 msgid "Installation complete. Press any key to exit."
 msgstr "Installation beendet. Beenden mit beliebiger Taste."
+
+#: ncpd/main.cc:79
+msgid "Got SIGTERM"
+msgstr "TERM signal erhalten"
+
+#: ncpd/main.cc:87
+msgid "Got SIGINT"
+msgstr "INT Signal erhalten"
 
 #: ncpd/main.cc:147
 msgid ""
@@ -1761,10 +1774,8 @@ msgid "                         Default: "
 msgstr "                         Vorgabe: "
 
 #: ncpd/main.cc:174
-msgid ""
-"                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n"
-msgstr ""
-"                         Vorgabe: Automatisch 115.2k, 57.6k 38.4k, 19.2k\n"
+msgid "                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n"
+msgstr "                         Vorgabe: Automatisch 115.2k, 57.6k 38.4k, 19.2k\n"
 
 #: ncpd/main.cc:177
 msgid ""
@@ -1783,6 +1794,18 @@ msgstr "Versuchen Sie `ncpd --help' für weitere Informationen."
 #: ncpd/main.cc:277
 msgid "ncpd Version "
 msgstr "ncpd Version "
+
+#: ncpd/main.cc:358
+msgid "daemon started. Listening at "
+msgstr "Daemon gestartet. Lausche auf "
+
+#: ncpd/main.cc:359
+msgid " using device "
+msgstr " unter Verwendung von Gerät "
+
+#: ncpd/main.cc:391
+msgid "terminating"
+msgstr "am Beenden"
 
 #: ncpd/link.cc:58
 msgid "SIBO"
@@ -1833,3 +1856,4 @@ msgstr "ncpd Version "
 #: plpprint/plpprintd.cc:1016
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: Konnte ncpd nicht kontaktieren."
+

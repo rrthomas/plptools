@@ -229,9 +229,9 @@ decodeControlMessage(bufferStore & buff)
 		controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
 		if (verbose & NCP_DEBUG_LOG)
 		    lout << "ncp: Link UP" << endl;
-		linf << "Connected with a S"
-		     << ((protocolVersion == PV_SERIES_5) ? 5 : 3) << " at "
-		     << getSpeed() << "baud" << endl;
+		linf << _("Connected with a S")
+		     << ((protocolVersion == PV_SERIES_5) ? 5 : 3) << _(" at ")
+		     << getSpeed() << _("baud") << endl;
 		// Create linkchan if it does not yet exist
 		if (!lChan) {
 		    if (verbose & NCP_DEBUG_LOG)

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"POT-Creation-Date: 2002-07-16 20:42+0200\n"
+"POT-Creation-Date: 2002-07-16 21:28+0200\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -1713,6 +1713,14 @@ msgstr "Kunde inte parsa sisfilen.\n"
 msgid "Installation complete. Press any key to exit."
 msgstr "Installationen klar. Tryck valfri tangent för att avsluta."
 
+#: ncpd/main.cc:79
+msgid "Got SIGTERM"
+msgstr ""
+
+#: ncpd/main.cc:87
+msgid "Got SIGINT"
+msgstr ""
+
 #: ncpd/main.cc:147
 msgid ""
 "Usage: ncpd [OPTIONS]...\n"
@@ -1761,6 +1769,20 @@ msgstr "Prova `ncpd --help' för mer information"
 #: ncpd/main.cc:277
 msgid "ncpd Version "
 msgstr ""
+
+#: ncpd/main.cc:358
+msgid "daemon started. Listening at "
+msgstr ""
+
+#: ncpd/main.cc:359
+#, fuzzy
+msgid " using device "
+msgstr "enheten finns inte"
+
+#: ncpd/main.cc:391
+#, fuzzy
+msgid "terminating"
+msgstr "avbruten"
 
 #: ncpd/link.cc:58
 msgid "SIBO"

@@ -76,7 +76,7 @@ ostream lerr(&elog);
 static RETSIGTYPE
 term_handler(int)
 {
-    linf << "Got SIGTERM" << endl;
+    linf << _("Got SIGTERM") << endl;
     signal(SIGTERM, term_handler);
     active = false;
 };
@@ -84,7 +84,7 @@ term_handler(int)
 static RETSIGTYPE
 int_handler(int)
 {
-    linf << "Got SIGINT" << endl;
+    linf << _("Got SIGINT") << endl;
     signal(SIGINT, int_handler);
     active = false;
 };
@@ -355,8 +355,8 @@ main(int argc, char **argv)
 		    dlog.setOn(true);
 		    elog.setOn(true);
 		    ilog.setOn(true);
-		    linf << "daemon started. Listening at " << host << ":"
-			 << sockNum << " using device " << serialDevice
+		    linf << _("daemon started. Listening at ") << host << ":"
+			 << sockNum << _(" using device ") << serialDevice
 			 << endl;
 		    setsid();
 		    chdir("/");
@@ -388,7 +388,7 @@ main(int argc, char **argv)
 		}
 		while (active)
 		    checkForNewSocketConnection();
-		linf << "terminating" << endl;
+		linf << _("terminating") << endl;
 		void *ret;
 		pthread_join(thr_a, &ret);
 		pthread_join(thr_b, &ret);
