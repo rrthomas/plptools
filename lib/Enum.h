@@ -140,7 +140,7 @@ protected:
  */
 template<typename E>
 class Enum : private EnumBase {
-private:
+public:
     struct sdata {
 	/**
 	 * The constructor of the static data part.
@@ -259,7 +259,8 @@ public:
     * XXX: throw OutOfRangeException ?
     */
     static E getValueFor(const std::string &s) {
-	return (E) staticData.stringRep.lookup(s.getCStr());
+//	return (E) staticData.stringRep.lookup(s.getCStr());
+	return (E) staticData.stringRep.lookup(s.c_str());
     }
 };
 
@@ -297,12 +298,12 @@ public:
  *
  * @author Henner Zeller
  */
+/**								
+  * The definition of the static variable holding the static	
+  * data for this Enumeration wrapper.				
+  */								
 #define ENUM_DEFINITION(EnumName, initWith)			\
-/**								\
-  * The definition of the static variable holding the static	\
-  * data for this Enumeration wrapper.				\
-  */								\
-Enum<EnumName>::sdata Enum<EnumName>::staticData;		\
+template < EnumName >  Enum< EnumName >::sdata Enum< EnumName >::staticData;	\
 /**								\
   * actual definition of the constructor for the static data.	\
   * This is called implicitly by the definition above.		\

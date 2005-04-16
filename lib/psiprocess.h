@@ -105,7 +105,7 @@ public:
     * The output is in human readable similar to the
     * output of a "ls" command.
     */
-    friend class std::ostream &operator<<(std::ostream &o, const PsiProcess &p);
+    friend std::ostream &operator<<(std::ostream &o, const PsiProcess &p);
 
 private:
     friend class rpcs;

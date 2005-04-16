@@ -130,7 +130,7 @@ public:
     *
     * @returns The stream.
     */
-    friend class std::ostream &operator<<(std::ostream &, const bufferStore &);
+    friend std::ostream &operator<<(std::ostream &, const bufferStore &);
 
     /**
     * Tests if the bufferStore is empty.
