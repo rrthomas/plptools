@@ -317,7 +317,7 @@ fi
 AC_OUTPUT(
 	Makefile
 	intl/Makefile
-	po/Makefile
+	po/Makefile.in
 	lib/Makefile
 	ncpd/Makefile
 	plpftp/Makefile
