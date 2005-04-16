@@ -546,7 +546,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 				char tim[32];
 #endif
 
-				debuglog("Mount succeded, making mtab entry.\n");
+				debuglog("Mount succeeded, making mtab entry.\n");
 
 #if defined(sun) && defined(__SVR4)	/*gec */
 				mnt.mnt_special = nfshost;
