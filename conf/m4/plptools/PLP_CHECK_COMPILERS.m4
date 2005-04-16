@@ -80,7 +80,7 @@ AC_DEFUN([PLP_CHECK_COMPILERS],
 
   if test "$GXX" = "yes"; then
     if test "$plp_use_debug_code" = "yes"; then
-      CXXFLAGS="-g -Wpointer-arith -Wmissing-prototypes $CXXFLAGS"
+      CXXFLAGS="-g -Wpointer-arith $CXXFLAGS"
 
       PLP_CHECK_COMPILER_FLAG(Wno-long-long,[CXXFLAGS="-Wno-long-long $CXXFLAGS"])
       PLP_CHECK_COMPILER_FLAG(Wnon-virtual-dtor,[CXXFLAGS="-Wnon-virtual-dtor $CXXFLAGS"])
@@ -88,7 +88,7 @@ AC_DEFUN([PLP_CHECK_COMPILERS],
 
       case $host in  dnl
       *-*-linux-gnu)
-        CXXFLAGS="-D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wbad-function-cast -Wcast-align -Wundef $CXXFLAGS"
+        CXXFLAGS="-D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wundef $CXXFLAGS"
         ;;
       esac
 
