@@ -31,7 +31,7 @@ devel: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 dist: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	autoconf
 	touch include/stamp-h.in
-	./configure --enable-kde
+	./configure # --enable-kde
 	$(MAKE) dist
 
 htmldoc:
