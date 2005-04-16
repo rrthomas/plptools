@@ -12,9 +12,6 @@
 /* Define this, if you have libreadline */
 #undef HAVE_LIBREADLINE
 
-/* Define if the C++ compiler supports BOOL */
-#undef HAVE_BOOL
-
 /* Define this, if you want NLS support */
 #undef ENABLE_NLS
 
@@ -64,18 +61,6 @@
 #ifdef _IBMR2
 # undef DONT_UPDATE_MTAB
 # define DONT_UPDATE_MTAB /* The mount table is obtained from the kernel (!?) */
-#endif
-
-#ifndef HAVE_BOOL
-# ifndef bool
-#  define bool int
-# endif
-# ifndef true
-#  define true 1
-# endif
-# ifndef false
-#  define false 0
-# endif
 #endif
 
 #endif /* _CONFIG_H_ */
