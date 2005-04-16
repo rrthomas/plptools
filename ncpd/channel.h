@@ -37,7 +37,7 @@ class ppsocket;
 class channel {
 public:
     channel(ncp *ncpController);
-    virtual ~channel();
+    virtual ~channel() = 0;
     void newNcpController(ncp *ncpController);
 
     void setNcpChannel(int chan);
@@ -45,22 +45,22 @@ public:
     void ncpSend(bufferStore &a);
     void setVerbose(short int _verbose);
     short int getVerbose();
-    virtual void ncpDataCallback(bufferStore &a) = NULL;
-    virtual char *getNcpRegisterName() = NULL;
+    virtual void ncpDataCallback(bufferStore &a) = 0;
+    virtual char *getNcpRegisterName() = 0;
     void ncpConnect();
     void ncpRegister();
     void ncpDoRegisterAck(int ch, const char *name);
-    virtual void ncpConnectAck() = NULL;
-    virtual void ncpConnectTerminate() = NULL;
-    virtual void ncpConnectNak() = NULL;
-    virtual void ncpRegisterAck() = NULL;
+    virtual void ncpConnectAck() = 0;
+    virtual void ncpConnectTerminate() = 0;
+    virtual void ncpConnectNak() = 0;
+    virtual void ncpRegisterAck() = 0;
     void ncpDisconnect();
     short int ncpProtocolVersion();
     const char *getNcpConnectName();
     void setNcpConnectName(const char *);
 
     // The following two calls are used for destructing an instance
-    virtual bool terminate(); // Mainloop will terminate this class if true
+    bool terminate(); // Mainloop will terminate this class if true
     void terminateWhenAsked();
 
     PcServer *ncpFindPcServer(const char *name);
