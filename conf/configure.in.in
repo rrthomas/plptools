@@ -316,6 +316,7 @@ fi
 
 AC_OUTPUT(
 	Makefile
+	intl/Makefile
 	po/Makefile
 	lib/Makefile
 	ncpd/Makefile
