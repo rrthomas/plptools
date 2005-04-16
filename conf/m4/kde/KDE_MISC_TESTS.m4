@@ -60,5 +60,4 @@ support])
     esac
 
    AC_REQUIRE([KDE_CHECK_LIBDL])
-   AC_CHECK_BOOL
 ])
