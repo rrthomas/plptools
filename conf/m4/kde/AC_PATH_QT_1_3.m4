@@ -46,7 +46,7 @@ AC_DEFUN([AC_TRY_PATH_QT],[
 
 	#try to guess Qt locations
 
-	qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt /usr/include /usr/lib/qt3/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt $x_includes"
+	qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt /usr/include/qt3 /usr/include /usr/lib/qt3/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt $x_includes"
 	test -n "$QTDIR" && qt_incdirs="$QTDIR/include $QTDIR $qt_incdirs"
 	qt_incdirs="$ac_qt_includes $qt_incdirs"
 
