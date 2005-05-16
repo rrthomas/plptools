@@ -17,14 +17,14 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *  Pie3DWidget was inspired by Christian Poulter's KDiskFree
- * 
+ *
  ****************************************************************************/
 
 #ifndef __PIE3DWIDGET_H
 #define __PIE3DWIDGET_H
 
 #include <qwidget.h>
-#include <qlist.h>
+#include <qptrlist.h>
 
 #include "pie3dpiece.h"
 
@@ -32,22 +32,22 @@
 class Pie3DWidget : public QWidget
 {
   public:
-  
+
     Pie3DWidget(QWidget *parent = 0L, const char *name = 0L);
     ~Pie3DWidget() {}
-    
+
             void   addPiece(int size, const QColor&);
-            
+
     virtual int    heightForWidth(int w) const;
     virtual QSize  minimumSizeHint()     const;
     virtual QSize  sizeHint()            const;
-  
+
   protected:
-  
+
     virtual void   paintEvent(QPaintEvent *);
-    
+
   private:
-  
+
     int                _totalsize;
     QList<Pie3DPiece>  _piecelist;
 };

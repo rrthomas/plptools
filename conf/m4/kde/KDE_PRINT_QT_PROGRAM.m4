@@ -4,8 +4,6 @@ AC_DEFUN([KDE_PRINT_QT_PROGRAM],[
 		#include "confdefs.h"
 		#include <qglobal.h>
 		#include <qapplication.h>
-		#include <qapp.h>
-		#include <qobjcoll.h>
 	EOF
 	if test "$kde_qtver" = "2"; then
 		cat >> conftest.$ac_ext <<-EOF

@@ -25,7 +25,7 @@
 #define _PLPPROPS_H_
 
 #include <qstring.h>
-#include <qlist.h>
+#include <qptrlist.h>
 #include <qgroupbox.h>
 #include <qmultilineedit.h>
 

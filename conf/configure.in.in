@@ -3,7 +3,6 @@ AC_REVISION($Revision$)dnl revision of this configure.in script
 AC_INIT(Makefile.am)
 AC_CONFIG_AUX_DIR(conf)
 AC_CANONICAL_SYSTEM
-PLP_CHECK_COMPILERS
 AM_CONFIG_HEADER(include/config.h)
 AM_INIT_AUTOMAKE(plptools, 0.13)
 AM_PROG_LIBTOOL
