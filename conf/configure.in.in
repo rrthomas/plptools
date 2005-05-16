@@ -22,28 +22,6 @@ AM_GNU_GETTEXT
 dnl Additional glibc-intl checks
 PLP_CHECK_INTL
 
-dnl This is stupid for two resaons:
-dnl
-dnl 1. It doesn't save and restore CFLAGS if it's _not_ Sun's cc
-dnl    (these have been set already in AC_CHECK_COMPILERS
-dnl 2. It assumes cc installed at a fixed path which may not be true
-dnl    pkgadd -r can install anywhere.
-dnl
-dnl A correct version should check by using cc's _behavior_, not path
-dnl and save and restore CFLAGS, if it's not Sun's cc.
-dnl
-dnl -> Commented out for now because i have gcc on Solaris, no Sun cc.
-dnl If somebody complains, (s)he should send me some cc output and i
-dnl can add a correct check to AC_CHECK_COMPILERS (where it belongs).
-dnl Apart from that, Sun's compiler is crap anyway: It doesn't compile
-dnl valid c++ code correctly.
-dnl
-dnl   -Fritz
-dnl
-dnl test "$GCC" = yes && CFLAGS="-O2 -Wall"
-dnl AC_PATH_PROG(CC_PATH, $CC)
-dnl test "$CC_PATH" = /opt/SUNWspro/bin/cc && CFLAGS="-xO2 -v"
-
 dnl checking for aix
 AC_MSG_CHECKING(for AIX)
 if test "`uname -s 2>/dev/null`" = AIX ; then
