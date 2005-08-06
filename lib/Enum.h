@@ -264,6 +264,8 @@ public:
     }
 };
 
+template<typename E> typename Enum<E>::sdata Enum<E>::staticData;
+
 /**
  * Helper macro to construct an enumeration wrapper Enum<E> for
  * a specific enum type.
@@ -303,12 +305,12 @@ public:
   * data for this Enumeration wrapper.				
   */								
 #define ENUM_DEFINITION(EnumName, initWith)			\
-template < EnumName >  Enum< EnumName >::sdata Enum< EnumName >::staticData;	\
+template Enum< EnumName >::sdata Enum< EnumName >::staticData;	\
 /**								\
   * actual definition of the constructor for the static data.	\
   * This is called implicitly by the definition above.		\
   */								\
-Enum<EnumName>::sdata::sdata() :				\
+template <> Enum<EnumName>::sdata::sdata() :				\
 name(#EnumName),defaultValue(initWith)
 
 /**
