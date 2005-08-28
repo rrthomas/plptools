@@ -28,7 +28,7 @@
 # include <config.h>
 #endif
 
-#include <kapp.h>
+#include <kapplication.h>
 #include <kmainwindow.h>
 #include <kpopupmenu.h>
 #include <kaboutapplication.h>

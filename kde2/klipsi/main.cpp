@@ -29,14 +29,14 @@
 #include <kcmdlineargs.h>
 #include <kwin.h>
 #include <kaboutdata.h>
-#include <kuniqueapp.h>
+#include <kuniqueapplication.h>
 
 int main(int argc, char *argv[])
 {
     KAboutData about("klipsi", I18N_NOOP("Klipsi"), VERSION,
 		     I18N_NOOP("Psion remote clipboard utility"),
 		     KAboutData::License_GPL,
-		     "(C) 2001, Fritz Elfert",
+		     "(C) 2001 Fritz Elfert",
 		     "Klipsi is part of plptools",
 		     "http://plptools.sourceforge.net",
 		     "plptools-developers@sourceforge.net");

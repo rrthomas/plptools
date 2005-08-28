@@ -30,7 +30,7 @@
 #include <qcursor.h>
 
 #include <kaction.h>
-#include <kapp.h>
+#include <kapplication.h>
 #include <klocale.h>
 #include <kwin.h>
 #include <kiconloader.h>
