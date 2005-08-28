@@ -391,7 +391,7 @@ msgstr ""
 #: kpsion.cpp:1769
 msgid ""
 "<QT>Could not stop all processes.<BR/>Please stop running programs manually "
-"on the Psion, then klick <B>Ok</B>."
+"on the Psion, then click <B>Ok</B>."
 msgstr ""
 
 #: kpsion.cpp:1792
