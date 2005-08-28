@@ -1772,7 +1772,7 @@ killSave() {
 	    KMessageBox::error(this, i18n(
 		"<QT>Could not stop all processes.<BR/>"
 		"Please stop running programs manually on the Psion, "
-		"then klick <B>Ok</B>."));
+		"then click <B>Ok</B>."));
 	    tstart = time(0) + 5;
 	}
     }

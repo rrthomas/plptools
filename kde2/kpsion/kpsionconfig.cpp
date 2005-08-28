@@ -24,7 +24,7 @@
 #include "kpsionconfig.h"
 
 #include <klocale.h>
-#include <kstddirs.h>
+#include <kstandarddirs.h>
 
 #include <iostream>
 
@@ -105,6 +105,10 @@ getConfigDevices() {
     l += QString("/dev/ttyS1");
     l += QString("/dev/ttyS2");
     l += QString("/dev/ttyS3");
+    l += QString("/dev/ttyUSB0");
+    l += QString("/dev/ttyUSB1");
+    l += QString("/dev/ttyUSB2");
+    l += QString("/dev/ttyUSB3");
     l += QString("/dev/ircomm0");
     l += QString("/dev/ircomm1");
     l += QString("/dev/ircomm2");

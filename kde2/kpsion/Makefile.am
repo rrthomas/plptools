@@ -18,7 +18,7 @@ DISTCLEANFILES = $(kpsion_METASOURCES) ./.deps/* ./.deps/.P
 lib_LTLIBRARIES = libkpsion.la
 bin_PROGRAMS	= kpsion
 
-libkpsion_la_LDFLAGS = $(PLP_LDFLAGS) $(KDE_LDFLAGS) $(LIBDEBUG) $(KDE_PLUGIN)
+libkpsion_la_LDFLAGS = $(X_LDFLAGS) $(PLP_LDFLAGS) $(KDE_LDFLAGS) $(LIBDEBUG) $(KDE_PLUGIN)
 libkpsion_la_SOURCES = kpsion.cpp setupdialog.cpp wizards.cpp \
 	statusbarprogress.cpp kpsionconfig.cpp kpsionbackuplistview.cpp \
 	kpsionrestoredialog.cpp
@@ -26,7 +26,7 @@ libkpsion_la_SOURCES = kpsion.cpp setupdialog.cpp wizards.cpp \
 libkpsion_la_LIBADD = $(LIB_PLP) $(LIB_KDECORE) $(LIB_KDEUI) $(LIB_KIO) $(LIB_KFILE) $(LIB_QT)
 
 kpsion_SOURCES	= main.cpp
-kpsion_LDFLAGS  = $(KDE_RPATH)
+kpsion_LDFLAGS  = $(KDE_RPATH) $(X_LDFLAGS)
 kpsion_LDADD	= libkpsion.la $(LIB_PLP) $(LIB_KDECORE) $(LIB_KDEUI) $(LIB_KIO) $(LIB_KFILE) $(LIB_QT)
 
 applnk_DATA = kpsion.desktop

@@ -32,7 +32,7 @@
 #include "kpsionconfig.h"
 #include "wizards.h"
 
-#include <kapp.h>
+#include <kapplication.h>
 #include <kdebug.h>
 #include <kdialog.h>
 #include <klocale.h>
@@ -134,9 +134,9 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
 	"<QT>"
 	"Next, please specify some information regarding "
 	"backup policy:<UL><LI>How many generations of backups "
-	"do you want to keep?</LI><LI>Shall i perform automatic "
-	"backups?</LI><LI>If yes, in what intervals do you want "
-	"to happen backups?</LI></UL>"
+	"do you want to keep?</LI><LI>Should I perform automatic "
+	"backups?</LI><LI>If yes, how often do you want backups"
+	"to happen?</LI></UL>"
 	"</QT>"
 	));
     grid->addMultiCellWidget(l, 1, 1, 1, 2, Qt::AlignTop);
@@ -251,12 +251,12 @@ FirstTimeWizard::FirstTimeWizard(QWidget *parent, const char *name)
     l->setText(i18n(
 	"<QT>"
 	"That's it!<BR/>"
-	"Next, i will start <B>KPsion</B> and if your Psion is already "
-	"connected and it's communication turned on (use "
-	"<B>Ctrl-T</B> at system level), then <B>KPsion</B> will "
-	"bring up a similar Dialog like this which lets you assing a "
-	"Name for it. After that, i suggest performing a full "
-	"Backup.<BR/>Please click <B>Finish</B> now.</QT>"
+	"Now I will start <B>KPsion</B> and if your Psion is already "
+	"connected and its communication link turned on (use"
+	"<B>Ctrl-L</B> on the System screen), then <B>KPsion</B> will "
+	"bring up a dialog similar to this which lets you assign it a "
+	"name. After that, I suggest you perform a full backup.<BR/>"
+	"Please click <B>Finish</B> now.</QT>"
 	));
     grid->addWidget(l, 1, 1, Qt::AlignTop);
 

@@ -27,7 +27,7 @@
 #include "kpsion.h"
 #include "kpsionconfig.h"
 #include "wizards.h"
-#include <kapp.h>
+#include <kapplication.h>
 #include <klocale.h>
 #include <kconfig.h>
 #include <kcmdlineargs.h>

@@ -27,14 +27,14 @@
 #include "kpsionconfig.h"
 #include "setupdialog.h"
 
-#include <kapp.h>
+#include <kapplication.h>
 #include <kconfig.h>
 #include <kdesktopfile.h>
 #include <kglobalsettings.h>
 #include <klocale.h>
 #include <kfiledialog.h>
 #include <kmessagebox.h>
-#include <kstddirs.h>
+#include <kstandarddirs.h>
 
 #include <qlayout.h>
 #include <qgroupbox.h>
@@ -523,7 +523,7 @@ checkBackupDir(QString &dir) {
 	QDir d(dir);
 	if (!d.exists()) {
 	    if (KMessageBox::questionYesNo(this,
-					   i18n("<QT>The folder <B>%1</B> does <B>not</B> exist.<BR/>Shall it be created?</QT>").arg(dir)) == KMessageBox::No) {
+					   i18n("<QT>The folder <B>%1</B> does <B>not</B> exist.<BR/>Should it be created?</QT>").arg(dir)) == KMessageBox::No) {
 		bdirLabel->setText(tmp);
 		return false;
 	    }
