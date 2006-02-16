@@ -32,7 +32,7 @@
 #include <kurl.h>
 #include <kfileitem.h>
 #include <kdialogbase.h>
-#include <kpropsdlg.h>
+#include <kpropertiesdialog.h>
 #include <krun.h>
 #include <kio/job.h>
 
