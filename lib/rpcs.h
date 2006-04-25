@@ -389,9 +389,9 @@ public:
      *
      * This function works with EPOC only. Using it with SIBO
      * machines, returns always an error code E_PSI_NOT_SIBO.
-     * It reads raw data from the scatch RAM of the Series 5.
+     * It reads raw data from the scratch RAM of the Series 5.
      *
-     * @param size   The amount of data to me read.
+     * @param size   The amount of data to be read.
      * @param data   The content of the scratch RAM is returned here.
      *
      * @returns A psion error code. 0 = Ok.
