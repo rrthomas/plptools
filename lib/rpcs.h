@@ -196,9 +196,9 @@ public:
     * devices.
     *
     * @param major The major part of the NCP version.
-    * 	Valid only if returned with no error.
+    *	Valid only if returned with no error.
     * @param minor The minor part of the NCP version.
-    * 	Valid only if returned with no error.
+    *	Valid only if returned with no error.
     *
     * @returns A psion error code. 0 = Ok.
     */
@@ -211,9 +211,9 @@ public:
     * devices.
     *
     * @param program The full path of the executable
-    * 	on the remote machine
+    *	on the remote machine
     * @param args The arguments for this program, separated
-    * 	by space.
+    *	by space.
     *
     * @returns A psion error code. 0 = Ok.
     */
@@ -270,7 +270,7 @@ public:
     * devices.
     *
     * @param owner A bufferArray, containing the lines
-    * 	of the owner info upon return.
+    *	of the owner info upon return.
     *
     * @returns A psion error code. 0 = Ok.
     */
@@ -284,7 +284,7 @@ public:
     * devices
     *
     * @param type The code describing the type of machine
-    * 	on the remote side is stored here on return.
+    *	on the remote side is stored here on return.
     *
     * @returns A psion error code. 0 = Ok.
     */
@@ -298,9 +298,9 @@ public:
     * devices
     *
     * @param name The full path of a file to be checked
-    * 	for beeing used by a program.
+    *	for being used by a program.
     * @param buf A buffer which gets filled with the
-    * 	program's name.
+    *	program's name.
     * @param maxlen The maximum capacity of the buffer.
     */
     Enum<rfsv::errs> fuser(const char *name, char *buf, int maxlen);
