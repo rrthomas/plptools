@@ -82,8 +82,8 @@ ENUM_DEFINITION(rpcs::languages, rpcs::PSI_LANG_TEST) {
     stringRep.add(rpcs::PSI_LANG_en_AU, N_("Australian"));
     stringRep.add(rpcs::PSI_LANG_fr_BE, N_("Belgish French"));
     stringRep.add(rpcs::PSI_LANG_de_AT, N_("Austrian"));
-    stringRep.add(rpcs::PSI_LANG_en_NZ, N_("New Zealand")); // FIXME: not shure about ISO code
-    stringRep.add(rpcs::PSI_LANG_fr_CA, N_("International French")); // FIXME: not shure about ISO code
+    stringRep.add(rpcs::PSI_LANG_en_NZ, N_("New Zealand English"));
+    stringRep.add(rpcs::PSI_LANG_fr_CA, N_("Canadian French"));
     stringRep.add(rpcs::PSI_LANG_cs_CZ, N_("Czech"));
     stringRep.add(rpcs::PSI_LANG_sk_SK, N_("Slovak"));
     stringRep.add(rpcs::PSI_LANG_pl_PL, N_("Polish"));
@@ -101,7 +101,6 @@ rpcs::~rpcs()
 void rpcs::
 reconnect(void)
 {
-    //skt->closeSocket();
     skt->reconnect();
     reset();
 }
