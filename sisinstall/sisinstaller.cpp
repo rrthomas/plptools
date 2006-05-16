@@ -1,4 +1,3 @@
-
 #include "sisinstaller.h"
 
 #include "sisfile.h"
@@ -453,7 +452,7 @@ SisRC
 SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 {
 	int n;
-	int lang;
+	long lang;
 	m_file = file;
 	m_buf = buf;
 #if HAVE_LIBNEWT
@@ -515,7 +514,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 				newtFormAddComponent(form, text);
 				newtFormAddComponent(form, listbox);
 				newtRunForm(form);
-				lang = (int)newtListboxGetCurrent(listbox);
+				lang = (long)newtListboxGetCurrent(listbox);
 				newtFormDestroy(form);
 				newtPopWindow();
 				}
@@ -580,7 +579,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 	// Check previous version.
 	//
 	if (logLevel >= 1)
-		fprintf(stderr, 
+		fprintf(stderr,
   "Checking if this app (uid %08x) exists with a version less than %d.%d.\n",
 		   m_file->m_header.m_uid1,
 		   m_file->m_header.m_major,
@@ -802,7 +801,7 @@ SISInstaller::selectDrive()
 			newtFormAddComponent(form, text);
 			newtFormAddComponent(form, listbox);
 			newtRunForm(form);
-			m_drive = 'A' + (int)newtListboxGetCurrent(listbox);
+			m_drive = 'A' + (long)newtListboxGetCurrent(listbox);
 			newtFormDestroy(form);
 			newtPopWindow();
 			}
@@ -910,4 +909,3 @@ SISInstaller::uninstallFile(SISFileRecord* fileRecord)
 			}
 		}
 }
-
