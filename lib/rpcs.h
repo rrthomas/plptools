@@ -381,7 +381,7 @@ public:
 	{ return rfsv::E_PSI_NOT_SIBO;}
     virtual Enum<rfsv::errs> regDelete(void)
 	{ return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> setTime(void)
+    virtual Enum<rfsv::errs> setTime(time_t time)
 	{ return rfsv::E_PSI_NOT_SIBO;}
 
     /**
@@ -495,7 +495,7 @@ protected:
     * If communication fails, a reconnect is triggered
     * and a second attempt to transmit the request
     * is attempted. If that second attempt fails,
-    * the function returns an error an sets rpcs::status
+    * the function returns an error and sets rpcs::status
     * to E_PSI_FILE_DISC.
     *
     * @param cc The command to execute on the remote side.
