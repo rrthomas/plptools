@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-04-16 17:37+0200\n"
+"POT-Creation-Date: 2006-05-16 12:54+0100\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -464,12 +464,14 @@ msgid "Austrian"
 msgstr "Österreichisch"
 
 #: lib/rpcs.cc:85
-msgid "New Zealand"
+#, fuzzy
+msgid "New Zealand English"
 msgstr "Neuseeländisch"
 
 #  FIXME: not shure about ISO code
 #: lib/rpcs.cc:86
-msgid "International French"
+#, fuzzy
+msgid "Canadian French"
 msgstr "Internationales Französisch"
 
 #  FIXME: not shure about ISO code
@@ -521,7 +523,7 @@ msgstr " Minuten "
 msgid " minute "
 msgstr " Minute "
 
-#: lib/psitime.h:81 plpftp/ftp.cc:822 plpftp/ftp.cc:824 plpftp/ftp.cc:907
+#: lib/psitime.h:81 plpftp/ftp.cc:829 plpftp/ftp.cc:831 plpftp/ftp.cc:914
 msgid " seconds"
 msgstr " Sekunden"
 
@@ -639,7 +641,7 @@ msgstr "Name %d (für %s) ist %.*s\n"
 #: lib/siscomponentrecord.cpp:92
 #, c-format
 msgid "%d .. %d (%d bytes): Name records\n"
-msgstr "%d .. %d (%d bytes): Namens-Einträge\n"
+msgstr "%d .. %d (%d Bytes): Namens-Einträge\n"
 
 #: lib/sisfile.cpp:58
 #, c-format
@@ -724,7 +726,7 @@ msgstr "%d Abhängigkeiten ermittelt\n"
 #: lib/sisfileheader.cpp:102
 #, c-format
 msgid "Selected language is %d\n"
-msgstr "Gewählte Sprache is %d\n"
+msgstr "Gewählte Sprache ist %d\n"
 
 #: lib/sisfileheader.cpp:105
 #, c-format
@@ -814,22 +816,22 @@ msgstr "Ziel-Dateiname %.*s ermittelt\n"
 #: lib/sisfilerecord.cpp:72
 #, c-format
 msgid "File is %d bytes long (at %d) (to %d)\n"
-msgstr "Datei is %d bytes groß (bei %d) (bis %d)\n"
+msgstr "Datei ist %d Bytes groß (bei %d) (bis %d)\n"
 
 #: lib/sisfilerecord.cpp:76
 #, c-format
 msgid "%d .. %d (%d bytes): Single file record type %d, %.*s\n"
-msgstr "%d .. %d (%d bytes): Einzelner Dateieintrag typ %d, %.*s\n"
+msgstr "%d .. %d (%d Bytes): Einzelner Dateieintragtyp %d, %.*s\n"
 
 #: lib/sisfilerecord.cpp:106
 #, c-format
 msgid "File %d (for %s) is %d bytes long (at %d)\n"
-msgstr "Datei %d (für %s) ist %d bytes groß (bei %d)\n"
+msgstr "Datei %d (für %s) ist %d Bytes groß (bei %d)\n"
 
 #: lib/sisfilerecord.cpp:112
 #, c-format
 msgid "%d .. %d (%d bytes): File record (%s) for %.*s\n"
-msgstr "%d .. %d (%d bytes): Dateieintrag (%s) für %.*s\n"
+msgstr "%d .. %d (%d Bytes): Dateieintrag (%s) für %.*s\n"
 
 #: lib/sisfilerecord.cpp:124
 #, c-format
@@ -844,7 +846,7 @@ msgstr "Sprache %d (%s) ermittelt\n"
 #: lib/sislangrecord.cpp:39
 #, c-format
 msgid "%d .. %d (%d bytes): Language record for %s\n"
-msgstr "%d .. %d (%d bytes): Sprach-Eintrag für %s\n"
+msgstr "%d .. %d (%d Bytes): Sprach-Eintrag für %s\n"
 
 #: lib/sisreqrecord.cpp:46
 #, c-format
@@ -874,7 +876,7 @@ msgstr "Name der Prärequisite für %s ist %.*s\n"
 #: lib/sisreqrecord.cpp:80
 #, c-format
 msgid "%d .. %d (%d bytes): Req record for uid %08x\n"
-msgstr "%d .. %d (%d bytes): Req eintrag für UID %08x\n"
+msgstr "%d .. %d (%d Bytes): Req eintrag für UID %08x\n"
 
 #: plpftp/main.cc:55
 msgid ""
@@ -950,361 +952,361 @@ msgstr "plpftp Version "
 msgid "plpftp: could not connect to ncpd"
 msgstr "plpftp: Konnte ncpd nicht kontaktieren."
 
-#: plpftp/ftp.cc:88
+#: plpftp/ftp.cc:89
 msgid "Known FTP commands:"
 msgstr "Bekannte FTP Kommandos:"
 
-#: plpftp/ftp.cc:114
+#: plpftp/ftp.cc:115
 msgid "Known RPC commands:"
 msgstr "Bekannte RPC Kommandos:"
 
-#: plpftp/ftp.cc:232
+#: plpftp/ftp.cc:234
 msgid "Connected to a "
 msgstr "Verbunden mit einem "
 
-#: plpftp/ftp.cc:232
+#: plpftp/ftp.cc:234
 msgid " at "
 msgstr " bei "
 
-#: plpftp/ftp.cc:233
+#: plpftp/ftp.cc:235
 msgid " baud, OwnerInfo:"
 msgstr " baud, Benutzerinfo:"
 
-#: plpftp/ftp.cc:239
+#: plpftp/ftp.cc:241
 msgid "OwnerInfo returned error "
 msgstr "OwnerInfo lieferte Fehler "
 
-#: plpftp/ftp.cc:259
+#: plpftp/ftp.cc:261
 msgid "FATAL: Couldn't find default Drive"
 msgstr "FATAL: Konnte Standard-Laufwerk nicht ermitteln"
 
-#: plpftp/ftp.cc:268
+#: plpftp/ftp.cc:270
 msgid "Psion dir is: \""
 msgstr "Psion Ordner ist: \""
 
-#: plpftp/ftp.cc:283
+#: plpftp/ftp.cc:285
 msgid "Prompting now "
 msgstr "Prompt ist nun "
 
-#: plpftp/ftp.cc:283 plpftp/ftp.cc:288
+#: plpftp/ftp.cc:285 plpftp/ftp.cc:290
 msgid "on"
 msgstr "an"
 
-#: plpftp/ftp.cc:283 plpftp/ftp.cc:288 plpftp/ftp.cc:800 plpftp/ftp.cc:803
-#: plpftp/ftp.cc:806
+#: plpftp/ftp.cc:285 plpftp/ftp.cc:290 plpftp/ftp.cc:807 plpftp/ftp.cc:810
+#: plpftp/ftp.cc:813
 msgid "off"
 msgstr "aus"
 
-#: plpftp/ftp.cc:288
+#: plpftp/ftp.cc:290
 msgid "Hash printing now "
 msgstr "Fortschrittsanzeige ist nun "
 
-#: plpftp/ftp.cc:293
+#: plpftp/ftp.cc:295
 msgid "Local dir: \""
 msgstr "Lokaler Ordner: \""
 
-#: plpftp/ftp.cc:294
+#: plpftp/ftp.cc:296
 msgid "Psion dir: \""
 msgstr "Psion Ordner: \""
 
-#: plpftp/ftp.cc:299 plpftp/ftp.cc:309 plpftp/ftp.cc:318 plpftp/ftp.cc:326
-#: plpftp/ftp.cc:334 plpftp/ftp.cc:344 plpftp/ftp.cc:356 plpftp/ftp.cc:406
-#: plpftp/ftp.cc:412 plpftp/ftp.cc:440 plpftp/ftp.cc:482 plpftp/ftp.cc:539
-#: plpftp/ftp.cc:562 plpftp/ftp.cc:588 plpftp/ftp.cc:625 plpftp/ftp.cc:653
-#: plpftp/ftp.cc:714 plpftp/ftp.cc:734 plpftp/ftp.cc:741 plpftp/ftp.cc:748
-#: plpftp/ftp.cc:788 plpftp/ftp.cc:871 plpftp/ftp.cc:881 plpftp/ftp.cc:944
-#: plpftp/ftp.cc:986 plpftp/ftp.cc:996 plpftp/ftp.cc:1017 plpftp/ftp.cc:1043
-#: plpftp/ftp.cc:1108
+#: plpftp/ftp.cc:301 plpftp/ftp.cc:311 plpftp/ftp.cc:320 plpftp/ftp.cc:328
+#: plpftp/ftp.cc:336 plpftp/ftp.cc:346 plpftp/ftp.cc:358 plpftp/ftp.cc:408
+#: plpftp/ftp.cc:414 plpftp/ftp.cc:442 plpftp/ftp.cc:484 plpftp/ftp.cc:541
+#: plpftp/ftp.cc:564 plpftp/ftp.cc:590 plpftp/ftp.cc:627 plpftp/ftp.cc:655
+#: plpftp/ftp.cc:716 plpftp/ftp.cc:736 plpftp/ftp.cc:743 plpftp/ftp.cc:750
+#: plpftp/ftp.cc:787 plpftp/ftp.cc:795 plpftp/ftp.cc:878 plpftp/ftp.cc:888
+#: plpftp/ftp.cc:951 plpftp/ftp.cc:993 plpftp/ftp.cc:1003 plpftp/ftp.cc:1024
+#: plpftp/ftp.cc:1050 plpftp/ftp.cc:1115
 msgid "Error: "
 msgstr "Fehler: "
 
-#: plpftp/ftp.cc:414
+#: plpftp/ftp.cc:416
 msgid " Entries"
 msgstr " Einträge"
 
-#: plpftp/ftp.cc:420
+#: plpftp/ftp.cc:422
 msgid "Drive Type Volname     Total     Free      UniqueID"
 msgstr "LW    Typ  Vol.Name    Total     Frei      Eind.ID"
 
-#: plpftp/ftp.cc:498
+#: plpftp/ftp.cc:500
 msgid "No such directory"
 msgstr "Kein solcher Ordner"
 
-#: plpftp/ftp.cc:499 plpftp/ftp.cc:540
+#: plpftp/ftp.cc:501 plpftp/ftp.cc:542
 msgid "Keeping original directory \""
 msgstr "Behalte ursprünglichen Ordner \""
 
-#: plpftp/ftp.cc:579 plpftp/ftp.cc:670
+#: plpftp/ftp.cc:581 plpftp/ftp.cc:672
 msgid "Transfer complete, ("
 msgstr "Übertragung abgeschlossen, ("
 
-#: plpftp/ftp.cc:580 plpftp/ftp.cc:671 plpbackup/plpbackup.cc:1193
+#: plpftp/ftp.cc:582 plpftp/ftp.cc:673 plpbackup/plpbackup.cc:1193
 msgid " bytes in "
 msgstr " Bytes in "
 
-#: plpftp/ftp.cc:581 plpftp/ftp.cc:672
+#: plpftp/ftp.cc:583 plpftp/ftp.cc:674
 msgid " secs = "
 msgstr " sek. = "
 
-#: plpftp/ftp.cc:601
+#: plpftp/ftp.cc:603
 msgid "Get \""
 msgstr "Hole \""
 
-#: plpftp/ftp.cc:630 plpftp/ftp.cc:719
+#: plpftp/ftp.cc:632 plpftp/ftp.cc:721
 msgid "Transfer complete\n"
 msgstr "Übertragung abgeschlossen\n"
 
-#: plpftp/ftp.cc:696
+#: plpftp/ftp.cc:698
 msgid "Put \""
 msgstr "Sende \""
 
-#: plpftp/ftp.cc:726
+#: plpftp/ftp.cc:728
 msgid "Error in directory name \""
 msgstr "Fehler in Ordner-Namen \""
 
-#: plpftp/ftp.cc:762
+#: plpftp/ftp.cc:764
 msgid "Starting subshell ...\n"
 msgstr "Starte Sub-Shell ...\n"
 
-#: plpftp/ftp.cc:792
+#: plpftp/ftp.cc:799
 msgid "Unknown setup info received"
 msgstr "Unbekannte Einstellungen empfangen"
 
-#: plpftp/ftp.cc:795
+#: plpftp/ftp.cc:802
 msgid "Setup information:"
 msgstr "Einstellungen:"
 
-#: plpftp/ftp.cc:796
+#: plpftp/ftp.cc:803
 msgid "  Screen contrast:                  "
 msgstr "  Anzeige Kontrast:                        "
 
-#: plpftp/ftp.cc:798
+#: plpftp/ftp.cc:805
 msgid "  Keyboard click:                   "
 msgstr "  Tastatur Klick:                          "
 
-#: plpftp/ftp.cc:800 plpftp/ftp.cc:803 plpftp/ftp.cc:806
+#: plpftp/ftp.cc:807 plpftp/ftp.cc:810 plpftp/ftp.cc:813
 msgid "high"
 msgstr "laut"
 
-#: plpftp/ftp.cc:800 plpftp/ftp.cc:803 plpftp/ftp.cc:806
+#: plpftp/ftp.cc:807 plpftp/ftp.cc:810 plpftp/ftp.cc:813
 msgid "low"
 msgstr "leise"
 
-#: plpftp/ftp.cc:801
+#: plpftp/ftp.cc:808
 msgid "  Screen click:                     "
 msgstr "  Bildschirm Klick:                        "
 
-#: plpftp/ftp.cc:804
+#: plpftp/ftp.cc:811
 msgid "  Error sound:                      "
 msgstr "  Fehlerton:                               "
 
-#: plpftp/ftp.cc:807
+#: plpftp/ftp.cc:814
 msgid "  Auto-switch off:                  "
 msgstr "  Automatisches Ausschalten:               "
 
-#: plpftp/ftp.cc:810 plpftp/ftp.cc:836
+#: plpftp/ftp.cc:817 plpftp/ftp.cc:843
 msgid "never"
 msgstr "nie"
 
-#: plpftp/ftp.cc:813
+#: plpftp/ftp.cc:820
 msgid "if running on battery power"
 msgstr "bei Batteriebetrieb"
 
-#: plpftp/ftp.cc:816 plpftp/ftp.cc:842
+#: plpftp/ftp.cc:823 plpftp/ftp.cc:849
 msgid "always"
 msgstr "immer"
 
-#: plpftp/ftp.cc:821
+#: plpftp/ftp.cc:828
 msgid "  Switch off after:                 "
 msgstr "  Ausschalten nach:                        "
 
-#: plpftp/ftp.cc:823
+#: plpftp/ftp.cc:830
 msgid "  Backlight off after:              "
 msgstr "  Hintergrundbeleuchtung ausschalten nach: "
 
-#: plpftp/ftp.cc:825
+#: plpftp/ftp.cc:832
 msgid "  Switch on when tapping on screen: "
 msgstr "  Einschalten beim Tippen auf die Anzeige: "
 
-#: plpftp/ftp.cc:826 plpftp/ftp.cc:828 plpftp/ftp.cc:830 plpftp/ftp.cc:832
-#: plpftp/ftp.cc:895 plpftp/ftp.cc:909 plpftp/ftp.cc:927
+#: plpftp/ftp.cc:833 plpftp/ftp.cc:835 plpftp/ftp.cc:837 plpftp/ftp.cc:839
+#: plpftp/ftp.cc:902 plpftp/ftp.cc:916 plpftp/ftp.cc:934
 msgid "yes"
 msgstr "ja"
 
-#: plpftp/ftp.cc:826 plpftp/ftp.cc:828 plpftp/ftp.cc:830 plpftp/ftp.cc:832
-#: plpftp/ftp.cc:895 plpftp/ftp.cc:909 plpftp/ftp.cc:927
+#: plpftp/ftp.cc:833 plpftp/ftp.cc:835 plpftp/ftp.cc:837 plpftp/ftp.cc:839
+#: plpftp/ftp.cc:902 plpftp/ftp.cc:916 plpftp/ftp.cc:934
 msgid "no"
 msgstr "nein"
 
-#: plpftp/ftp.cc:827
+#: plpftp/ftp.cc:834
 msgid "  Switch on when opening:           "
 msgstr "  Einschalten beim Öffnen:                 "
 
-#: plpftp/ftp.cc:829
+#: plpftp/ftp.cc:836
 msgid "  Switch off when closing:          "
 msgstr "  Ausschalten beim Schließen:              "
 
-#: plpftp/ftp.cc:831
+#: plpftp/ftp.cc:838
 msgid "  Ask for password on startup:      "
 msgstr "  Beim Einschalten nach Passwort fragen:   "
 
-#: plpftp/ftp.cc:833
+#: plpftp/ftp.cc:840
 msgid "  Show Owner info on startup:       "
 msgstr "  Beim Einschalten Eigentümer anzeigen:    "
 
-#: plpftp/ftp.cc:839
+#: plpftp/ftp.cc:846
 msgid "once a day"
 msgstr "einmal täglich"
 
-#: plpftp/ftp.cc:885
+#: plpftp/ftp.cc:892
 msgid "General:"
 msgstr "Allgemein:"
 
-#: plpftp/ftp.cc:886
+#: plpftp/ftp.cc:893
 msgid "  Machine Type: "
 msgstr "  Geräte Typ:     "
 
-#: plpftp/ftp.cc:887
+#: plpftp/ftp.cc:894
 msgid "  Machine Name: "
 msgstr "  Modell Name:    "
 
-#: plpftp/ftp.cc:888
+#: plpftp/ftp.cc:895
 msgid "  Machine UID:  "
 msgstr "  Geräte-ID:      "
 
-#: plpftp/ftp.cc:889
+#: plpftp/ftp.cc:896
 msgid "  UI Language:  "
 msgstr "  UI-Sprache:     "
 
-#: plpftp/ftp.cc:890
+#: plpftp/ftp.cc:897
 msgid "ROM:"
 msgstr "ROM:"
 
-#: plpftp/ftp.cc:891
+#: plpftp/ftp.cc:898
 msgid "  Version:      "
 msgstr "  Version:        "
 
-#: plpftp/ftp.cc:893 plpftp/ftp.cc:897
+#: plpftp/ftp.cc:900 plpftp/ftp.cc:904
 msgid "  Size:         "
 msgstr "  Größe:          "
 
-#: plpftp/ftp.cc:894
+#: plpftp/ftp.cc:901
 msgid "  Programmable: "
 msgstr "  Programmierbar: "
 
-#: plpftp/ftp.cc:896
+#: plpftp/ftp.cc:903
 msgid "RAM:"
 msgstr "RAM:"
 
-#: plpftp/ftp.cc:898
+#: plpftp/ftp.cc:905
 msgid "  Free:         "
 msgstr "  Frei:           "
 
-#: plpftp/ftp.cc:899
+#: plpftp/ftp.cc:906
 msgid "  Free max:     "
 msgstr "  Max frei:       "
 
-#: plpftp/ftp.cc:900
+#: plpftp/ftp.cc:907
 msgid "RAM disk size:  "
 msgstr "RAM Disk Größe:   "
 
-#: plpftp/ftp.cc:901
+#: plpftp/ftp.cc:908
 msgid "Registry size:  "
 msgstr "Registry-Größe:   "
 
-#: plpftp/ftp.cc:902
+#: plpftp/ftp.cc:909
 msgid "Display size:   "
 msgstr "Anzeige-Größe:    "
 
-#: plpftp/ftp.cc:904
+#: plpftp/ftp.cc:911
 msgid "Time:"
 msgstr "Zeit:"
 
-#: plpftp/ftp.cc:906
+#: plpftp/ftp.cc:913
 msgid "  Current time: "
 msgstr "  Aktuelle Zeit:  "
 
-#: plpftp/ftp.cc:907
+#: plpftp/ftp.cc:914
 msgid "  UTC offset:   "
 msgstr "  UTC-Abweichung: "
 
-#: plpftp/ftp.cc:908
+#: plpftp/ftp.cc:915
 msgid "  DST:          "
 msgstr "  Sommerzeit:     "
 
-#: plpftp/ftp.cc:910
+#: plpftp/ftp.cc:917
 msgid "  Timezone:     "
 msgstr "  Zeitzone:       "
 
-#: plpftp/ftp.cc:911
+#: plpftp/ftp.cc:918
 msgid "  Country Code: "
 msgstr "  Länder-Code:    "
 
-#: plpftp/ftp.cc:912
+#: plpftp/ftp.cc:919
 msgid "Main battery:"
 msgstr "Hauptbatterie:"
 
-#: plpftp/ftp.cc:914
+#: plpftp/ftp.cc:921
 msgid "  Changed at:   "
 msgstr "  Gewechselt am:  "
 
-#: plpftp/ftp.cc:915 plpftp/ftp.cc:928
+#: plpftp/ftp.cc:922 plpftp/ftp.cc:935
 msgid "  Used for:     "
 msgstr "  Benutzt:        "
 
-#: plpftp/ftp.cc:916 plpftp/ftp.cc:922
+#: plpftp/ftp.cc:923 plpftp/ftp.cc:929
 msgid "  Status:       "
 msgstr "  Status:         "
 
-#: plpftp/ftp.cc:917
+#: plpftp/ftp.cc:924
 msgid "  Current:      "
 msgstr "  Strom:          "
 
-#: plpftp/ftp.cc:918
+#: plpftp/ftp.cc:925
 msgid "  UsedPower:    "
 msgstr "  Verbrauch:      "
 
-#: plpftp/ftp.cc:919 plpftp/ftp.cc:923
+#: plpftp/ftp.cc:926 plpftp/ftp.cc:930
 msgid "  Voltage:      "
 msgstr "  Spannung:       "
 
-#: plpftp/ftp.cc:920 plpftp/ftp.cc:924
+#: plpftp/ftp.cc:927 plpftp/ftp.cc:931
 msgid "  Max. voltage: "
 msgstr "  Max. Spannung:  "
 
-#: plpftp/ftp.cc:921
+#: plpftp/ftp.cc:928
 msgid "Backup battery:"
 msgstr "Sicherungs-Batterie:"
 
-#: plpftp/ftp.cc:925
+#: plpftp/ftp.cc:932
 msgid "External power:"
 msgstr "Externe Stromversorgung:"
 
-#: plpftp/ftp.cc:926
+#: plpftp/ftp.cc:933
 msgid "  Supplied:     "
 msgstr "  Angeschlossen:  "
 
-#: plpftp/ftp.cc:937
+#: plpftp/ftp.cc:944
 msgid "Could not read processlist "
 msgstr "Konnte Prozessliste nicht lesen "
 
-#: plpftp/ftp.cc:945
+#: plpftp/ftp.cc:952
 msgid " is not a process list saved with killsave"
 msgstr " ist keine mit killsave gespeicherte Prozessliste"
 
-#: plpftp/ftp.cc:985
+#: plpftp/ftp.cc:992
 msgid "Could not start "
 msgstr "Konnte nicht starten: "
 
-#: plpftp/ftp.cc:1000
+#: plpftp/ftp.cc:1007
 msgid "Could not write processlist "
 msgstr "Konnte Prozessliste nicht schreiben "
 
-#: plpftp/ftp.cc:1036
+#: plpftp/ftp.cc:1043
 msgid "no such process"
 msgstr "Kein solcher Prozess"
 
-#: plpftp/ftp.cc:1052
+#: plpftp/ftp.cc:1059
 msgid "syntax error. Try \"help\""
 msgstr "Syntaxfehler. Probieren Sie \"help\""
 
@@ -1706,7 +1708,7 @@ msgstr "Fehlender SIS Dateiname\n"
 #: sisinstall/sismain.cpp:155
 #, c-format
 msgid "File is %d bytes long\n"
-msgstr "Datei ist %d bytes lang\n"
+msgstr "Datei ist %d Bytes lang\n"
 
 #: sisinstall/sismain.cpp:170
 #, c-format
@@ -1731,12 +1733,13 @@ msgid "Got SIGINT"
 msgstr "INT Signal erhalten"
 
 #: ncpd/main.cc:149
+#, fuzzy
 msgid ""
 "Usage: ncpd [OPTIONS]...\n"
 "\n"
 "Supported options:\n"
 "\n"
-" -d, --dontfork          Run in foreground don't fork\n"
+" -d, --dontfork          Run in foreground, don't fork\n"
 " -h, --help              Display this text.\n"
 " -V, --version           Print version and exit.\n"
 " -e, --autoexit          Exit after device is disconnected.\n"
@@ -1850,7 +1853,7 @@ msgstr ""
 " -D, --debug             Erhöhe Debug-Ebene\n"
 " -h, --help              Zeige diesen Text.\n"
 " -V, --version           Version ausgeben und beenden.\n"
-" -p, --port=[HOST:]PORT  Verbinde mot port PORT auf host HOST.\n"
+" -p, --port=[HOST:]PORT  Verbinde mit port PORT auf host HOST.\n"
 "                         Vorgabe für HOST ist 127.0.0.1\n"
 "                         Vorgabe für PORT ist "
 
