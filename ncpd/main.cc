@@ -150,7 +150,7 @@ help()
 	"\n"
 	"Supported options:\n"
 	"\n"
-        " -d, --dontfork          Run in foreground don't fork\n"
+        " -d, --dontfork          Run in foreground, don't fork\n"
 	" -h, --help              Display this text.\n"
 	" -V, --version           Print version and exit.\n"
 	" -e, --autoexit          Exit after device is disconnected.\n"
