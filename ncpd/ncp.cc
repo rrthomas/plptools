@@ -381,7 +381,7 @@ getFirstUnusedChan()
 bool ncp::
 isValidChannel(int channel)
 {
-    return (channelPtr[channel] && ((int)channelPtr[channel] != 0xdeadbeef));
+    return (channelPtr[channel] && ((long)channelPtr[channel] != 0xdeadbeef));
 }
 
 void ncp::
