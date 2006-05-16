@@ -169,6 +169,35 @@ regReadIter(u_int16_t handle)
 }
 
 Enum<rfsv::errs> rpcs32::
+setTime(time_t time)
+{
+    bufferStore a;
+    Enum<rfsv::errs> res;
+    PsiTime pt = PsiTime(time);
+    psi_timezone ptz;
+    rpcs::machineInfo mi;
+
+    //    cout << "settime" << endl;
+    a.addDWord(pt.getPsiTimeLo());
+    a.addDWord(pt.getPsiTimeHi());
+    if ((res = getMachineInfo(mi)) ==
+        rfsv::E_PSI_GEN_NONE) {
+        a.addDWord(mi.countryCode);
+        if (PsiZone::getInstance().getZone(ptz)) {
+            a.addDWord(ptz.utc_offset);
+            a.addDWord(ptz.dst_zones);
+            a.addDWord(ptz.home_zone);
+            //      cout << "a=" << a << endl;
+            if (!sendCommand(rpcs::SET_TIME, a))
+                return rfsv::E_PSI_FILE_DISC;
+            return rfsv::E_PSI_GEN_NONE;
+        } else
+            return rfsv::E_PSI_GEN_FAIL;
+    } else
+        return res;
+}
+
+Enum<rfsv::errs> rpcs32::
 configOpen(u_int16_t &handle, u_int32_t size)
 {
     bufferStore a;
