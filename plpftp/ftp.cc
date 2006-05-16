@@ -44,6 +44,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/stat.h>
@@ -119,6 +120,7 @@ void ftp::usage() {
     cout << "  runrestore <unixfile>" << endl;
     cout << "  machinfo" << endl;
     cout << "  ownerinfo" << endl;
+    cout << "  settime" << endl;
     cout << "  setupinfo" << endl;
 }
 
@@ -780,6 +782,11 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    continue;
 	}
 #endif
+	if (!strcmp(argv[0], "settime")) {
+	    if ((res = r.setTime(time(NULL))) != rfsv::E_PSI_GEN_NONE)
+		cerr << _("Error: ") << res << endl;
+            continue;
+        }
 	if (!strcmp(argv[0], "setupinfo")) {
 	    Enum<rfsv::errs> res;
 	    bufferStore db;
@@ -1071,7 +1078,7 @@ static char *all_commands[] = {
     "dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
     "del", "rm", "mkdir", "rmdir", "prompt", "bye", "cp", "volname",
     "ps", "kill", "killsave", "runrestore", "run", "machinfo",
-    "ownerinfo", "help", "setupinfo", NULL
+    "ownerinfo", "help", "settime", "setupinfo", NULL
 };
 
 static char *localfile_commands[] = {
