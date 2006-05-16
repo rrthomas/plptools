@@ -107,7 +107,7 @@ checkForNewSocketConnection()
 	if ((numScp >= theNCP->maxLinks()) || (!theNCP->gotLinkChannel())) {
 	    bufferStore a;
 
-	    // Give the client time to send it's version request.
+	    // Give the client time to send its version request.
 	    next->dataToGet(1, 0);
 	    next->getBufferStore(a, false);
 
