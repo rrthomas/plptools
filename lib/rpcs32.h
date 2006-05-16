@@ -47,11 +47,11 @@ class rpcs32 : public rpcs {
     Enum<rfsv::errs> closeHandle(u_int16_t);
     Enum<rfsv::errs> regOpenIter(u_int32_t uid, char *match, u_int16_t &handle);
     Enum<rfsv::errs> regReadIter(u_int16_t handle);
+    Enum<rfsv::errs> setTime(time_t time);
 #if 0
     Enum<rfsv::errs> regWrite(void);
     Enum<rfsv::errs> regRead(void);
     Enum<rfsv::errs> regDelete(void);
-    Enum<rfsv::errs> setTime(void);
     Enum<rfsv::errs> queryOpen(void);
     Enum<rfsv::errs> queryRead(void);
     Enum<rfsv::errs> quitServer(void);
