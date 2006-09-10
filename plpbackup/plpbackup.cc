@@ -863,7 +863,7 @@ runRestore()
     struct timeval start_tv, end_tv, cstart_tv, cend_tv;
 
     for (i = 0; i < archList.size(); i++) {
-	tarcmd << "tar --to-stdout -xzf " << archList[i]
+	tarcmd << "tar --to-stdout --wildcards -xzf " << archList[i]
 	       << " 'KPsion*Index'" << ends;
 	char backupType = '?';
 	FILE *f = popen(tarcmd.str().c_str(), "r");
