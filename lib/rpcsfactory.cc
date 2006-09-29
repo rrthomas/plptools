@@ -34,14 +34,14 @@
 #include <stdlib.h>
 #include <time.h>
 
-ENUM_DEFINITION(rpcsfactory::errs, rpcsfactory::FACERR_NONE) {
+ENUM_DEFINITION_BEGIN(rpcsfactory::errs, rpcsfactory::FACERR_NONE)
     stringRep.add(rpcsfactory::FACERR_NONE,           N_("no error"));
     stringRep.add(rpcsfactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
     stringRep.add(rpcsfactory::FACERR_AGAIN,          N_("try again"));
     stringRep.add(rpcsfactory::FACERR_NOPSION,        N_("no psion connected"));
     stringRep.add(rpcsfactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
     stringRep.add(rpcsfactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
-}
+ENUM_DEFINITION_END(rpcsfactory::errs)
 
 rpcsfactory::rpcsfactory(ppsocket *_skt)
 {

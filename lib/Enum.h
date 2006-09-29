@@ -304,14 +304,16 @@ template<typename E> typename Enum<E>::sdata Enum<E>::staticData;
   * The definition of the static variable holding the static	
   * data for this Enumeration wrapper.				
   */								
-#define ENUM_DEFINITION(EnumName, initWith)			\
-template Enum< EnumName >::sdata Enum< EnumName >::staticData;	\
+#define ENUM_DEFINITION_BEGIN(EnumName, initWith)			\
 /**								\
   * actual definition of the constructor for the static data.	\
   * This is called implicitly by the definition above.		\
   */								\
 template <> Enum<EnumName>::sdata::sdata() :				\
-name(#EnumName),defaultValue(initWith)
+    name(#EnumName),defaultValue(initWith) {
+
+#define ENUM_DEFINITION_END(EnumName) \
+} template Enum< EnumName >::sdata Enum< EnumName >::staticData;
 
 /**
  * Writes enumeration's string representation.

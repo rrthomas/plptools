@@ -55,11 +55,11 @@ extern "C" {
 
 using namespace std;
 
-ENUM_DEFINITION(Link::link_type, Link::LINK_TYPE_UNKNOWN) {
+ENUM_DEFINITION_BEGIN(Link::link_type, Link::LINK_TYPE_UNKNOWN)
     stringRep.add(Link::LINK_TYPE_UNKNOWN, N_("Unknown"));
     stringRep.add(Link::LINK_TYPE_SIBO,    N_("SIBO"));
     stringRep.add(Link::LINK_TYPE_EPOC,    N_("EPOC"));
-}
+ENUM_DEFINITION_END(Link::link_type)
 
 Link::Link(const char *fname, int baud, ncp *_ncp, unsigned short _verbose)
     : p(0)

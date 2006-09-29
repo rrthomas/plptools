@@ -33,7 +33,7 @@
 
 using namespace std;
 
-ENUM_DEFINITION(rfsv::errs, rfsv::E_PSI_GEN_NONE) {
+ENUM_DEFINITION_BEGIN(rfsv::errs, rfsv::E_PSI_GEN_NONE)
     stringRep.add(rfsv::E_PSI_GEN_NONE,        N_("no error"));
     stringRep.add(rfsv::E_PSI_GEN_FAIL,        N_("general"));
     stringRep.add(rfsv::E_PSI_GEN_ARG,         N_("bad argument"));
@@ -108,7 +108,8 @@ ENUM_DEFINITION(rfsv::errs, rfsv::E_PSI_GEN_NONE) {
     stringRep.add(rfsv::E_PSI_FILE_HANDLE,     N_("bad handle"));
     stringRep.add(rfsv::E_PSI_NOT_SIBO,        N_("invalid operation for RFSV16"));
     stringRep.add(rfsv::E_PSI_INTERNAL,        N_("libplp internal error"));
-}
+ENUM_DEFINITION_END(rfsv::errs)
+
 
 const char *rfsv::getConnectName(void) {
     return "SYS$RFSV";

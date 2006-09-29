@@ -37,14 +37,14 @@
 
 using namespace std;
 
-ENUM_DEFINITION(rfsvfactory::errs, rfsvfactory::FACERR_NONE) {
+ENUM_DEFINITION_BEGIN(rfsvfactory::errs, rfsvfactory::FACERR_NONE)
     stringRep.add(rfsvfactory::FACERR_NONE,           N_("no error"));
     stringRep.add(rfsvfactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
     stringRep.add(rfsvfactory::FACERR_AGAIN,          N_("try again"));
     stringRep.add(rfsvfactory::FACERR_NOPSION,        N_("no psion connected"));
     stringRep.add(rfsvfactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
     stringRep.add(rfsvfactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
-}
+ENUM_DEFINITION_END(rfsvfactory::errs)
 
 rfsvfactory::rfsvfactory(ppsocket *_skt) : serNum(0)
 {

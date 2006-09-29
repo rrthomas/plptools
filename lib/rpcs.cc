@@ -37,7 +37,7 @@
 
 using namespace std;
 
-ENUM_DEFINITION(rpcs::machs, rpcs::PSI_MACH_UNKNOWN) {
+ENUM_DEFINITION_BEGIN(rpcs::machs, rpcs::PSI_MACH_UNKNOWN)
     stringRep.add(rpcs::PSI_MACH_UNKNOWN,   N_("Unknown device"));
     stringRep.add(rpcs::PSI_MACH_PC,        N_("PC"));
     stringRep.add(rpcs::PSI_MACH_MC,        N_("MC"));
@@ -49,16 +49,17 @@ ENUM_DEFINITION(rpcs::machs, rpcs::PSI_MACH_UNKNOWN) {
     stringRep.add(rpcs::PSI_MACH_S3C,       N_("Series 3c"));
     stringRep.add(rpcs::PSI_MACH_S5,        N_("Series 5"));
     stringRep.add(rpcs::PSI_MACH_WINC,      N_("WinC"));
-}
+ENUM_DEFINITION_END(rpcs::machs)
 
-ENUM_DEFINITION(rpcs::batterystates, rpcs::PSI_BATT_DEAD) {
+ENUM_DEFINITION_BEGIN(rpcs::batterystates, rpcs::PSI_BATT_DEAD)
     stringRep.add(rpcs::PSI_BATT_DEAD,    N_("Empty"));
     stringRep.add(rpcs::PSI_BATT_VERYLOW, N_("Very Low"));
     stringRep.add(rpcs::PSI_BATT_LOW,     N_("Low"));
     stringRep.add(rpcs::PSI_BATT_GOOD,    N_("Good"));
-}
+ENUM_DEFINITION_END(rpcs::batterystates)
 
-ENUM_DEFINITION(rpcs::languages, rpcs::PSI_LANG_TEST) {
+
+ENUM_DEFINITION_BEGIN(rpcs::languages, rpcs::PSI_LANG_TEST)
     stringRep.add(rpcs::PSI_LANG_TEST,  N_("Test"));
     stringRep.add(rpcs::PSI_LANG_en_GB, N_("English"));
     stringRep.add(rpcs::PSI_LANG_de_DE, N_("German"));
@@ -88,7 +89,7 @@ ENUM_DEFINITION(rpcs::languages, rpcs::PSI_LANG_TEST) {
     stringRep.add(rpcs::PSI_LANG_sk_SK, N_("Slovak"));
     stringRep.add(rpcs::PSI_LANG_pl_PL, N_("Polish"));
     stringRep.add(rpcs::PSI_LANG_sl_SI, N_("Slovenian"));
-}
+ENUM_DEFINITION_END(rpcs::languages)
 
 rpcs::~rpcs()
 {
