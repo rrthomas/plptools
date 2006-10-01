@@ -954,11 +954,7 @@ doBackup() {
     strftime(tstr, sizeof(tstr), "%Y-%m-%d-%H-%M-%S.tmp.gz",
 	     localtime(&now));
     archiveName += tstr;
-#if KDE_VERSION >= 300
     backupTgz = new KTar(archiveName, "application/x-gzip");
-#else
-    backupTgz = new KTarGz(archiveName);
-#endif
     backupTgz->open(IO_WriteOnly);
     createIndex();
 
@@ -1137,11 +1133,7 @@ removeOldBackups(QStringList &drives) {
     while ((fi = it.current())) {
 	kapp->processEvents();
 
-#if KDE_VERSION >= 300
 	KTar tgz(fi->absFilePath());
-#else
-	KTarGz tgz(fi->absFilePath());
-#endif
 	const KTarEntry *te;
 
 	tgz.open(IO_ReadOnly);
@@ -1181,11 +1173,7 @@ removeOldBackups(QStringList &drives) {
     while ((fi = it.current())) {
 	kapp->processEvents();
 
-#if KDE_VERSION >= 300
 	KTar tgz(fi->absFilePath());
-#else
-	KTarGz tgz(fi->absFilePath());
-#endif
 	const KTarEntry *te;
 	bool valid = false;
 	bool del = false;
@@ -1365,11 +1353,7 @@ slotStartRestore() {
 	for (t = tars.begin(); t != tars.end(); t++) {
 	    PlpDir toRestore = restoreDialog.getRestoreList(*t);
 	    if (toRestore.size() > 0) {
-#if KDE_VERSION >= 300
 		KTar tgz(*t);
-#else
-		KTarGz tgz(*t);
-#endif
 		const KTarEntry *te;
 		QString pDir("");
 

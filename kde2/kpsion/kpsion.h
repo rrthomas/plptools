@@ -115,11 +115,7 @@ private:
     SetupDialog *setupDialog;
     KIconView *view;
     KPsionStatusBarProgress *progress;
-#if KDE_VERSION >= 300
     KTar *backupTgz;
-#else
-    KTarGz *backupTgz;
-#endif
     KCmdLineArgs *args;
 
     driveMap drives;
