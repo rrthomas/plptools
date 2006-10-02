@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-16 12:54+0100\n"
+"POT-Creation-Date: 2006-10-02 02:13+0100\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -370,123 +370,123 @@ msgstr "Låg"
 msgid "Good"
 msgstr "God"
 
-#: lib/rpcs.cc:62
+#: lib/rpcs.cc:63
 msgid "Test"
 msgstr ""
 
-#: lib/rpcs.cc:63
+#: lib/rpcs.cc:64
 msgid "English"
 msgstr "Engelska"
 
-#: lib/rpcs.cc:64
+#: lib/rpcs.cc:65
 msgid "German"
 msgstr "Tyska"
 
-#: lib/rpcs.cc:65
+#: lib/rpcs.cc:66
 msgid "French"
 msgstr "Franska"
 
-#: lib/rpcs.cc:66
+#: lib/rpcs.cc:67
 msgid "Spanish"
 msgstr "Spanska"
 
-#: lib/rpcs.cc:67
+#: lib/rpcs.cc:68
 msgid "Italian"
 msgstr "Italienska"
 
-#: lib/rpcs.cc:68
+#: lib/rpcs.cc:69
 msgid "Swedish"
 msgstr "Svenska"
 
-#: lib/rpcs.cc:69
+#: lib/rpcs.cc:70
 msgid "Danish"
 msgstr "Danska"
 
-#: lib/rpcs.cc:70
+#: lib/rpcs.cc:71
 msgid "Norwegian"
 msgstr "Norska"
 
-#: lib/rpcs.cc:71
+#: lib/rpcs.cc:72
 msgid "Finnish"
 msgstr "Finska"
 
-#: lib/rpcs.cc:72
+#: lib/rpcs.cc:73
 msgid "American"
 msgstr "Amerikanska"
 
-#: lib/rpcs.cc:73
+#: lib/rpcs.cc:74
 msgid "Swiss French"
 msgstr "Schweizisk Franska"
 
-#: lib/rpcs.cc:74
+#: lib/rpcs.cc:75
 msgid "Swiss German"
 msgstr "Schweizisk Tyska"
 
-#: lib/rpcs.cc:75
+#: lib/rpcs.cc:76
 msgid "Portugese"
 msgstr "Portugisiska"
 
-#: lib/rpcs.cc:76
+#: lib/rpcs.cc:77
 msgid "Turkish"
 msgstr "Turkiska"
 
-#: lib/rpcs.cc:77
+#: lib/rpcs.cc:78
 msgid "Icelandic"
 msgstr "Isländska"
 
-#: lib/rpcs.cc:78
+#: lib/rpcs.cc:79
 msgid "Russian"
 msgstr "Ryska"
 
-#: lib/rpcs.cc:79
+#: lib/rpcs.cc:80
 msgid "Hungarian"
 msgstr "Ungerska"
 
-#: lib/rpcs.cc:80
+#: lib/rpcs.cc:81
 msgid "Dutch"
 msgstr "Holländska"
 
-#: lib/rpcs.cc:81
+#: lib/rpcs.cc:82
 msgid "Belgian Flemish"
 msgstr "Belgisk Flamlndska"
 
-#: lib/rpcs.cc:82
+#: lib/rpcs.cc:83
 msgid "Australian"
 msgstr "Australiensk Engelska"
 
-#: lib/rpcs.cc:83
+#: lib/rpcs.cc:84
 msgid "Belgish French"
 msgstr "Belgisk Franska"
 
-#: lib/rpcs.cc:84
+#: lib/rpcs.cc:85
 msgid "Austrian"
 msgstr "Österrikiska"
 
-#: lib/rpcs.cc:85
+#: lib/rpcs.cc:86
 #, fuzzy
 msgid "New Zealand English"
 msgstr "Nya Zeeländska"
 
 #  FIXME: not shure about ISO code
-#: lib/rpcs.cc:86
+#: lib/rpcs.cc:87
 #, fuzzy
 msgid "Canadian French"
 msgstr "Internationell Franska"
 
 #  FIXME: not shure about ISO code
-#: lib/rpcs.cc:87
+#: lib/rpcs.cc:88
 msgid "Czech"
 msgstr "Tjeckoslovakiska"
 
-#: lib/rpcs.cc:88
+#: lib/rpcs.cc:89
 msgid "Slovak"
 msgstr "Slovakiska"
 
-#: lib/rpcs.cc:89
+#: lib/rpcs.cc:90
 msgid "Polish"
 msgstr "Polska"
 
-#: lib/rpcs.cc:90
+#: lib/rpcs.cc:91
 msgid "Slovenian"
 msgstr "Slovenska"
 
