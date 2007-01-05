@@ -173,21 +173,21 @@ setTime(time_t time)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
-    PsiTime pt = PsiTime(time);
+    PsiTime pt;
     psi_timezone ptz;
     rpcs::machineInfo mi;
 
-    //    cout << "settime" << endl;
-    a.addDWord(pt.getPsiTimeLo());
-    a.addDWord(pt.getPsiTimeHi());
-    if ((res = getMachineInfo(mi)) ==
-        rfsv::E_PSI_GEN_NONE) {
-        a.addDWord(mi.countryCode);
+    // cout << "settime" << endl;
+    if ((res = getMachineInfo(mi)) == rfsv::E_PSI_GEN_NONE) {
         if (PsiZone::getInstance().getZone(ptz)) {
+            pt = PsiTime(time + ptz.utc_offset);
+            a.addDWord(pt.getPsiTimeLo());
+            a.addDWord(pt.getPsiTimeHi());
+            a.addDWord(mi.countryCode);
             a.addDWord(ptz.utc_offset);
             a.addDWord(ptz.dst_zones);
             a.addDWord(ptz.home_zone);
-            //      cout << "a=" << a << endl;
+            // cout << "a=" << a << endl;
             if (!sendCommand(rpcs::SET_TIME, a))
                 return rfsv::E_PSI_FILE_DISC;
             return rfsv::E_PSI_GEN_NONE;
