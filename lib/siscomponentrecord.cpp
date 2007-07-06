@@ -27,11 +27,19 @@
 #include <stdio.h>
 #include <string.h>
 
+SISComponentNameRecord::SISComponentNameRecord()
+{
+	m_names = NULL;
+}
+
 SISComponentNameRecord::~SISComponentNameRecord()
 {
-	for (int i = 0; i < m_nameCount; ++i)
-		delete[] m_names[i];
-	delete[] m_names;
+	if (m_names)
+        	{
+		for (int i = 0; i < m_nameCount; ++i)
+			delete[] m_names[i];
+		delete[] m_names;
+		}
 }
 
 SisRC

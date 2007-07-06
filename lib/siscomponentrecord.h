@@ -40,6 +40,7 @@ class SISComponentNameRecord
 {
 public:
 
+	SISComponentNameRecord();
 	virtual ~SISComponentNameRecord();
 
 	/**
