@@ -26,7 +26,6 @@
 #endif
 
 #include <fstream>
-#include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -176,21 +175,8 @@ generateBackupName()
         }
     }
     strftime(tstr, sizeof(tstr), "-%Y-%m-%d-%H-%M-%S", localtime(&now));
-    sprintf(nbuf, "%s/plpbackup/%016llx/%c%s.tar.gz", getHomeDir(),
+    sprintf(nbuf, "%s/plpbackup/%016llx/%c%s", getHomeDir(),
 	    machineUID, full ? 'F' : 'I', tstr);
-    return nbuf;
-}
-
-static const char * const
-generateTmpDir()
-{
-    const char *tmpdir;
-    static char nbuf[4096];
-
-    if (!(tmpdir = getenv("TMPDIR")))
-	tmpdir = P_tmpdir;
-    sprintf(nbuf, "%s/plpbackup_%d", tmpdir, getpid());
-    mkdir(nbuf, S_IRWXU|S_IRGRP|S_IXGRP);
     return nbuf;
 }
 
@@ -296,10 +282,10 @@ startPrograms() {
 			int i;
 			for (i = 0; i < 26; i++) {
 			    if (devbits & (1 << i)) {
-				ostringstream tmp;
-				tmp << (char)('A' + i) << ":\\System\\Apps\\" <<
-                                  cmd << "\\" << cmd << ".app" << '\0';
-				res = Rpcs->execProgram(tmp.str().c_str(), "");
+                                string tmp;
+				tmp = (char)('A' + i) + ":\\System\\Apps\\" +
+                                  cmd + "\\" + cmd + ".app";
+				res = Rpcs->execProgram(tmp.c_str(), "");
                                 if (res == rfsv::E_PSI_GEN_NONE)
                                     break;
 			    }
@@ -858,18 +844,19 @@ runRestore()
 {
     unsigned int i;
     char indexbuf[40];
-    ostringstream tarcmd;
-    string dstPath;
+    string indexfile;
     struct timeval start_tv, end_tv, cstart_tv, cend_tv;
 
     for (i = 0; i < archList.size(); i++) {
-	tarcmd << "tar --to-stdout --wildcards -xzf " << archList[i]
-	       << " 'KPsion*Index'" << ends;
+	indexfile = archList[i] + "/KPsionFullIndex";
 	char backupType = '?';
-	FILE *f = popen(tarcmd.str().c_str(), "r");
+	FILE *f = fopen(indexfile.c_str(), "r");
 	if (!f) {
-	    perror(_("Could not get backup index"));
-	    continue;
+            indexfile = archList[i] + "/KPsionIncrementalIndex";
+            if (!f) {
+                perror(_("Could not get backup index"));
+                continue;
+            }
 	}
 	fgets(indexbuf, sizeof(indexbuf), f);
 	if (!strncmp(indexbuf, "#plpbackup index ", 17))
@@ -892,7 +879,6 @@ runRestore()
     }
     if (!toRestore.empty()) {
 	gettimeofday(&start_tv, NULL);
-	dstPath = "";
 	backupSize = backupCount = 0;
 	// Calculate number of files and total bytecount
 	for (i = 0; i < toRestore.size(); i++) {
@@ -916,27 +902,15 @@ runRestore()
 		(e.getPsiTime().getPsiTimeLo() == 0xdeadbeef) &&
 		(e.getPsiTime().getPsiTimeHi() == 0xdeadbeef)) {
 
-		if (!dstPath.empty())
-		    rmrf(dstPath.c_str());
-		dstPath = generateTmpDir();
-		tarcmd.seekp(0);
-		tarcmd << "tar xzCf " << dstPath << " " << fn << ends;
-		if (verbose > 0)
-		    cout << _("Extracting tar archive ...") << endl;
-		if (system(tarcmd.str().c_str()) != 0)
-		    cerr << _("Execution of ") << tarcmd.str() << _(" failed.")
-			 << endl;
 		continue;
 	    }
 	    if (checkAbort()) {
-		// remove temporary dir
-		rmrf(dstPath.c_str());
 		// restart previously killed programs
 		startPrograms();
 		cout << _("Restore aborted by user") << endl;
 		return;
 	    }
-	    dest = dstPath;
+	    dest = archList[i];
 	    dest += '/';
 	    dest += psion2unix(fn);
 	    fileSize = e.getSize();
@@ -1016,8 +990,6 @@ runRestore()
 		overWriteList.insert(string(fn));
 	    }
 	    if (checkAbort()) {
-		// remove temporary dir
-		rmrf(dstPath.c_str());
 		// restart previously killed programs
 		startPrograms();
 		cout << _("Restore aborted by user") << endl;
@@ -1064,8 +1036,6 @@ runRestore()
 				    break;
 				    res = Rfsv->copyToPsion(dest.c_str(), fn, NULL, cab);
 				    if (checkAbort()) {
-					// remove temporary dir
-					rmrf(dstPath.c_str());
 					// restart previously killed programs
 					startPrograms();
 					cout << _("Restore aborted by user")
@@ -1088,8 +1058,6 @@ runRestore()
 		}
 	    }
 	}
-	// remove temporary dir
-	rmrf(dstPath.c_str());
 	// restart previously killed programs
 	startPrograms();
 	gettimeofday(&end_tv, NULL);
@@ -1105,7 +1073,6 @@ runBackup()
 {
     vector<string>backupDrives;
     Enum<rfsv::errs> res;
-    string dstPath;
     string archPath;
     bool bErr = false;
     bool found;
@@ -1117,15 +1084,12 @@ runBackup()
 	archPath = generateBackupName();
     else
 	archPath = archList[0];
-    dstPath = generateTmpDir();
 
     startMessage(archPath.c_str());
 
     // Stop all programs on Psion
     stopPrograms();
     if (checkAbort()) {
-	// remove temporary dir
-	rmrf(dstPath.c_str());
 	// restart previously killed programs
 	startPrograms();
 	cout << _("Backup aborted by user") << endl;
@@ -1176,8 +1140,6 @@ runBackup()
     }
     gettimeofday(&send_tv, NULL);
     if (checkAbort()) {
-	// remove temporary dir
-	rmrf(dstPath.c_str());
 	// restart previously killed programs
 	startPrograms();
 	cout << _("Backup aborted by user") << endl;
@@ -1199,13 +1161,13 @@ runBackup()
 	string dest;
 
 	gettimeofday(&cstart_tv, NULL);
-	// copy all files to local temporary dir
+	// copy all files
 	for (i = 0; i < toBackup.size(); i++) {
 	    struct timeval fstart_tv, fend_tv;
 	    PlpDirent e = toBackup[i];
 	    const char *fn = e.getName();
 
-	    dest = dstPath;
+	    dest = archPath;
 	    dest += '/';
 	    dest += psion2unix(fn);
 	    fileSize = e.getSize();
@@ -1218,8 +1180,6 @@ runBackup()
 	    gettimeofday(&fstart_tv, NULL);
 	    res = Rfsv->copyFromPsion(fn, dest.c_str(), NULL, cab);
 	    if (checkAbort()) {
-		// remove temporary dir
-		rmrf(dstPath.c_str());
 		// restart previously killed programs
 		startPrograms();
 		cout << _("Backup aborted by user") << endl;
@@ -1267,8 +1227,6 @@ runBackup()
 				    break;
 				    res = Rfsv->copyFromPsion(fn, dest.c_str(), NULL, cab);
 				    if (checkAbort()) {
-					// remove temporary dir
-					rmrf(dstPath.c_str());
 					// restart previously killed programs
 					startPrograms();
 					cout << _("Backup aborted by user")
@@ -1298,7 +1256,7 @@ runBackup()
 	if (!bErr) {
 	    if (verbose > 0)
 		cout << _("Writing index ...") << endl;
-	    dest = dstPath;
+	    dest = archPath;
 	    dest += "/KPsion";
 	    dest += ((full) ? "Full" : "Incremental");
 	    dest += "Index";
@@ -1329,31 +1287,6 @@ runBackup()
 	    }
 	}
 
-	// tar it all up
-	if (!bErr) {
-	    ostringstream tarcmd;
-
-	    if (verbose > 0)
-		cout << _("Creating tar archive ...") << endl;
-
-	    tarcmd << "tar czCf";
-	    if (verbose > 1)
-		tarcmd << 'v';
-	    tarcmd << " " << dstPath << " " << archPath << " KPsion";
-	    tarcmd << (full ? "Full" : "Incremental") << "Index";
-	    for (i = 0; i < backupDrives.size(); i++)
-		tarcmd << " " << backupDrives[i];
-	    tarcmd << ends;
-
-	    mkdirp(archPath.c_str());
-	    if (system(tarcmd.str().c_str())) {
-		cerr << _("plpbackup: Error during execution of ")
-		     << tarcmd.str() << endl;
-		unlink(archPath.c_str());
-		bErr = true;
-	    }
-	}
-
 	// finally reset archive attributes
 	if (!bErr) {
 	    if (verbose > 0)
@@ -1371,9 +1304,6 @@ runBackup()
 	    }
 	}
     }
-
-    // remove temporary dir
-    rmrf(dstPath.c_str());
 
     if (bErr)
 	cerr << _("Backup aborted due to error") << endl;
@@ -1409,8 +1339,8 @@ usage(ostream *hlp)
 	      "    -v, --verbose          Increase verbosity.\n"
 	      "    -q, --quiet            Decrease verbosity.\n"
 	      "    -f, --full             Do a full backup (incremental otherwise).\n"
-	      "    -b, --backup[=TGZ]     Backup to specified archive TGZ.\n"
-	      "    -r, --restore=TGZ      Restore from specified archive TGZ.\n"
+	      "    -b, --backup[=DIR]     Backup to specified directory DIR.\n"
+	      "    -r, --restore=DIR      Restore from specified directory DIR.\n"
 	      "\n"
 	      "  <drive> A drive character. If none given, scan all drives.\n"
 	      "\n");
