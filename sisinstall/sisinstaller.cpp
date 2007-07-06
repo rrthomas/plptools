@@ -6,6 +6,7 @@
 #include "sisreqrecord.h"
 #include "psion.h"
 
+#include <cstdlib>
 #include <errno.h>
 #include <unistd.h>
 #include <stdio.h>

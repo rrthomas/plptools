@@ -40,6 +40,7 @@
 
 #include <psibitmap.h>
 
+#include <cstdlib>
 #include <iostream>
 
 #define QUIT_ITEM    50

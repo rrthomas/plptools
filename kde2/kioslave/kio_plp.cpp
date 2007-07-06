@@ -28,6 +28,7 @@
 #include <rpcsfactory.h>
 #include <bufferarray.h>
 
+#include <cstdlib>
 #include <iomanip>
 #include <string>
 
