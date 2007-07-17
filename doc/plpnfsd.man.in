@@ -21,10 +21,10 @@ plpnfsd \- Daemon to mount a Psion like an NFS file-system
 .BI [ long-options ]
 
 .SH DESCRIPTION
-plpnfsd is a daemon, which provides NFS-like access to your Psion.
+plpnfsd is a daemon which provides NFS-like access to your Psion.
 It automatically makes the Psion's file-systems available below
-an NFS-mounted directory (default @DMOUNTPOINT@).
-By default, plpnfsd is installed suid-root, so any normal user
+an NFS-mounted directory (default @DMOUNTPOINT@). It requires portmap.
+By default, plpnfsd is installed suid root, so any normal user
 can start it and gets the mounted directory owned by himself.
 As this program is usually used on single-user machines, this
 does not hurt security. Like the other front-ends, this program
@@ -36,7 +36,7 @@ You simply will get an "device not configured" error, when
 accessing a file on a previously connected psion which has been
 disconnected. After that, the mount-point will appear with the
 drives missing. As soon as the psion is connected again, the
-subdirectories will reappear (possibly with a few seconds delay).
+subdirectories will reappear (possibly with a few seconds' delay).
 
 
 .SH OPTIONS

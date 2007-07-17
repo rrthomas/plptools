@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-02 02:13+0100\n"
+"POT-Creation-Date: 2007-07-07 00:15+0100\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -623,22 +623,22 @@ msgstr "Formatierbar"
 msgid "write protected"
 msgstr "Schreibgeschützt"
 
-#: lib/siscomponentrecord.cpp:61
+#: lib/siscomponentrecord.cpp:69
 #, c-format
 msgid "Length too large for name record %d.\n"
 msgstr "Länge %d zu groß für einen Komponenten-Eintrag.\n"
 
-#: lib/siscomponentrecord.cpp:76
+#: lib/siscomponentrecord.cpp:84
 #, c-format
 msgid "Position/length too large for name record %d.\n"
 msgstr "Position/Länge %d zu groß für einen Namens-Eintrag.\n"
 
-#: lib/siscomponentrecord.cpp:81
+#: lib/siscomponentrecord.cpp:89
 #, c-format
 msgid "Name %d (for %s) is %.*s\n"
 msgstr "Name %d (für %s) ist %.*s\n"
 
-#: lib/siscomponentrecord.cpp:92
+#: lib/siscomponentrecord.cpp:100
 #, c-format
 msgid "%d .. %d (%d bytes): Name records\n"
 msgstr "%d .. %d (%d Bytes): Namens-Einträge\n"
@@ -1040,7 +1040,7 @@ msgstr "Behalte ursprünglichen Ordner \""
 msgid "Transfer complete, ("
 msgstr "Übertragung abgeschlossen, ("
 
-#: plpftp/ftp.cc:582 plpftp/ftp.cc:673 plpbackup/plpbackup.cc:1193
+#: plpftp/ftp.cc:582 plpftp/ftp.cc:673 plpbackup/plpbackup.cc:1155
 msgid " bytes in "
 msgstr " Bytes in "
 
@@ -1310,47 +1310,47 @@ msgstr "Kein solcher Prozess"
 msgid "syntax error. Try \"help\""
 msgstr "Syntaxfehler. Probieren Sie \"help\""
 
-#: plpbackup/plpbackup.cc:101
+#: plpbackup/plpbackup.cc:100
 msgid "Could not get user's home directory from /etc/passwd"
 msgstr "Konnte das persönliche Verzeichnis nicht ermitteln"
 
-#: plpbackup/plpbackup.cc:121
+#: plpbackup/plpbackup.cc:120
 msgid "Could not get machine UID"
 msgstr "Konnte Geräte-UID nicht ermitteln"
 
-#: plpbackup/plpbackup.cc:141
+#: plpbackup/plpbackup.cc:140
 msgid "Could not read SIBO UID file"
 msgstr "Konnte SIBO UID Datei nicht lesen"
 
-#: plpbackup/plpbackup.cc:146
+#: plpbackup/plpbackup.cc:145
 msgid "Could not get Psion owner info"
 msgstr "Konnte Geräte-Eigner nicht ermitteln"
 
-#: plpbackup/plpbackup.cc:173
+#: plpbackup/plpbackup.cc:172
 msgid "Could not write SIBO UID file "
 msgstr "Konnte SIBO UID Datei nicht schreiben "
 
-#: plpbackup/plpbackup.cc:203
+#: plpbackup/plpbackup.cc:189
 msgid "Got signal "
 msgstr "Empfang von Signal "
 
-#: plpbackup/plpbackup.cc:215
+#: plpbackup/plpbackup.cc:201
 msgid "Abort? (y/N) "
 msgstr "Abbruch? (j/N) "
 
-#: plpbackup/plpbackup.cc:216
+#: plpbackup/plpbackup.cc:202
 msgid "Y"
 msgstr "J"
 
-#: plpbackup/plpbackup.cc:232
+#: plpbackup/plpbackup.cc:218
 msgid "Stopping programs ..."
 msgstr "Stoppe Programme ..."
 
-#: plpbackup/plpbackup.cc:234
+#: plpbackup/plpbackup.cc:220
 msgid "plpbackup: Could not get process list: "
 msgstr "plpbackup: Konnte Prozessliste nicht lesen "
 
-#: plpbackup/plpbackup.cc:254
+#: plpbackup/plpbackup.cc:240
 msgid ""
 "Could not stop all processes. Please stop running\n"
 "programs manually on the Psion, then hit return."
@@ -1358,235 +1358,215 @@ msgstr ""
 "Konnte nicht alle Prozesse stoppen. Bitte beenden Sie\n"
 "laufende Programme manuell auf dem Psion. Drücken Sie dann RETURN."
 
-#: plpbackup/plpbackup.cc:269
+#: plpbackup/plpbackup.cc:255
 msgid "Restarting programs ..."
 msgstr "Starte Programme ..."
 
-#: plpbackup/plpbackup.cc:488
+#: plpbackup/plpbackup.cc:474
 msgid "Performing "
 msgstr "Ausführen von "
 
-#: plpbackup/plpbackup.cc:490
+#: plpbackup/plpbackup.cc:476
 msgid "restore"
 msgstr "Rücksicherung"
 
-#: plpbackup/plpbackup.cc:492
+#: plpbackup/plpbackup.cc:478
 msgid "full"
 msgstr "kompletter"
 
-#: plpbackup/plpbackup.cc:492
+#: plpbackup/plpbackup.cc:478
 msgid "incremental"
 msgstr "inkrementeller"
 
-#: plpbackup/plpbackup.cc:492
+#: plpbackup/plpbackup.cc:478
 msgid " backup"
 msgstr " Sicherung"
 
-#: plpbackup/plpbackup.cc:493
+#: plpbackup/plpbackup.cc:479
 msgid " of "
 msgstr " von "
 
-#: plpbackup/plpbackup.cc:495
+#: plpbackup/plpbackup.cc:481
 msgid "all drives"
 msgstr "allen Laufverken"
 
-#: plpbackup/plpbackup.cc:497
+#: plpbackup/plpbackup.cc:483
 msgid "Drive "
 msgstr "Laufwerk "
 
-#: plpbackup/plpbackup.cc:504 plpbackup/plpbackup.cc:713
+#: plpbackup/plpbackup.cc:490 plpbackup/plpbackup.cc:699
 msgid " and "
 msgstr " und "
 
-#: plpbackup/plpbackup.cc:510
+#: plpbackup/plpbackup.cc:496
 msgid " to "
 msgstr " nach "
 
-#: plpbackup/plpbackup.cc:512
+#: plpbackup/plpbackup.cc:498
 msgid " from "
 msgstr " von "
 
-#: plpbackup/plpbackup.cc:706
+#: plpbackup/plpbackup.cc:692
 msgid "It contains Backups of drive "
 msgstr "Es enthält Sicherungen von Laufwerk "
 
-#: plpbackup/plpbackup.cc:726
+#: plpbackup/plpbackup.cc:712
 msgid ""
 "Select (I)ndividual files, (W)hole archive, (N)one from this archive? (I/W/"
 "N) "
 msgstr "Wähle (I)ndividuelle Dateien, (G)esamtes Archiv, (N)ichts? (I/G/N) "
 
-#: plpbackup/plpbackup.cc:728
+#: plpbackup/plpbackup.cc:714
 msgid "IWA"
 msgstr "IGN"
 
-#: plpbackup/plpbackup.cc:752
+#: plpbackup/plpbackup.cc:738
 msgid "Could not run external editor"
 msgstr "Konnte externen Editor nicht starten"
 
-#: plpbackup/plpbackup.cc:785
+#: plpbackup/plpbackup.cc:771
 msgid ""
 "Archive skipped, because it does not contain any files on selected drives"
 msgstr ""
 "Archiv übersprungen, da es keine Dateien von den gewählten Lauferken enthält"
 
-#: plpbackup/plpbackup.cc:829
+#: plpbackup/plpbackup.cc:815
 msgid "(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) "
 msgstr "(Ü)berschreiben, (A)lle überschreiben, Über(s)pringen? (Ü/A/S) "
 
-#: plpbackup/plpbackup.cc:830
+#: plpbackup/plpbackup.cc:816
 msgid "OAS"
 msgstr "ÜAS"
 
-#: plpbackup/plpbackup.cc:871
+#: plpbackup/plpbackup.cc:857
 msgid "Could not get backup index"
 msgstr "Konnte Sicherungs-Index nicht einlesen"
 
-#: plpbackup/plpbackup.cc:879
+#: plpbackup/plpbackup.cc:866
 msgid "' is a full backup"
 msgstr " ist eine Komplett-Sicherung"
 
-#: plpbackup/plpbackup.cc:883
+#: plpbackup/plpbackup.cc:870
 msgid "' is an incremental backup"
 msgstr " ist eine inkrementelle Sicherung"
 
-#: plpbackup/plpbackup.cc:888
+#: plpbackup/plpbackup.cc:875
 msgid "' is NOT a plpbackup"
 msgstr " ist KEINE mit plpbackup erzeugte Sicherung"
 
-#: plpbackup/plpbackup.cc:925
-msgid "Extracting tar archive ..."
-msgstr "Entpacke tar-Archiv ..."
-
-#: plpbackup/plpbackup.cc:927
-msgid "Execution of "
-msgstr "Ausführen von "
-
-#: plpbackup/plpbackup.cc:927
-msgid " failed."
-msgstr " gescheitert."
-
-#: plpbackup/plpbackup.cc:936 plpbackup/plpbackup.cc:1023
-#: plpbackup/plpbackup.cc:1071
+#: plpbackup/plpbackup.cc:910 plpbackup/plpbackup.cc:995
+#: plpbackup/plpbackup.cc:1041
 msgid "Restore aborted by user"
 msgstr "Rücksicherung durch Benutzer abgebrochen"
 
-#: plpbackup/plpbackup.cc:944 plpbackup/plpbackup.cc:1063
+#: plpbackup/plpbackup.cc:918 plpbackup/plpbackup.cc:1035
 msgid "Restore "
 msgstr "Rücksichern "
 
-#: plpbackup/plpbackup.cc:957
+#: plpbackup/plpbackup.cc:931
 msgid "Could not create directory "
 msgstr "Fehler beim Anlegen von Verzeichnis "
 
-#: plpbackup/plpbackup.cc:973
+#: plpbackup/plpbackup.cc:947
 msgid "Could not create "
 msgstr "Konnte nicht anlegen "
 
-#: plpbackup/plpbackup.cc:983
+#: plpbackup/plpbackup.cc:957
 msgid "Could not get attributes of "
 msgstr "Fehler beim Lesen der Dateiattribute von "
 
-#: plpbackup/plpbackup.cc:1000
+#: plpbackup/plpbackup.cc:974
 msgid "Could not set attributes of"
 msgstr "Fehler beim Setzen der Dateiattribute von"
 
-#: plpbackup/plpbackup.cc:1012
+#: plpbackup/plpbackup.cc:986
 msgid "Could not set modification time of "
 msgstr "Fehler beim Setzen der Änderungszeit von "
 
-#: plpbackup/plpbackup.cc:1035 plpbackup/plpbackup.cc:1237
+#: plpbackup/plpbackup.cc:1007 plpbackup/plpbackup.cc:1197
 msgid "Skipping "
 msgstr "Überspringe "
 
-#: plpbackup/plpbackup.cc:1038 plpbackup/plpbackup.cc:1078
+#: plpbackup/plpbackup.cc:1010 plpbackup/plpbackup.cc:1048
 msgid "Error during restore of "
 msgstr "Fehler beim Rücksichern von "
 
 # This are the characters for valid answers
 # of the next message.
-#: plpbackup/plpbackup.cc:1044 plpbackup/plpbackup.cc:1246
+#: plpbackup/plpbackup.cc:1016 plpbackup/plpbackup.cc:1206
 msgid "STAR"
 msgstr "SDAW"
 
-#: plpbackup/plpbackup.cc:1046 plpbackup/plpbackup.cc:1248
+#: plpbackup/plpbackup.cc:1018 plpbackup/plpbackup.cc:1208
 msgid "(S)kip all, Skip (t)his, (A)bort, (R)etry: "
 msgstr "Über(S)pringe alle, Überspringe (D)iese, (A)bbruch, (W)iederholen: "
 
-#: plpbackup/plpbackup.cc:1097 plpbackup/plpbackup.cc:1385
+#: plpbackup/plpbackup.cc:1065 plpbackup/plpbackup.cc:1315
 msgid "Total time elapsed:     "
 msgstr "Gesamtzeit:     "
 
-#: plpbackup/plpbackup.cc:1131 plpbackup/plpbackup.cc:1183
-#: plpbackup/plpbackup.cc:1225 plpbackup/plpbackup.cc:1274
+#: plpbackup/plpbackup.cc:1095 plpbackup/plpbackup.cc:1145
+#: plpbackup/plpbackup.cc:1185 plpbackup/plpbackup.cc:1232
 msgid "Backup aborted by user"
 msgstr "Sicherung wegen Fehler abgebrochen"
 
-#: plpbackup/plpbackup.cc:1150 plpbackup/plpbackup.cc:1168
+#: plpbackup/plpbackup.cc:1114 plpbackup/plpbackup.cc:1132
 msgid "Scanning Drive "
 msgstr "Durchsuche Laufwerk "
 
-#: plpbackup/plpbackup.cc:1163
+#: plpbackup/plpbackup.cc:1127
 msgid "plpbackup: Couldn't get Drive list"
 msgstr "plpbackup: Konnte Laufwerks-Liste nicht ermitteln"
 
-#: plpbackup/plpbackup.cc:1193
+#: plpbackup/plpbackup.cc:1155
 msgid "Size of backup: "
 msgstr "Umfang der Sicherung: "
 
-#: plpbackup/plpbackup.cc:1194
+#: plpbackup/plpbackup.cc:1156
 msgid " files."
 msgstr " Dateien."
 
-#: plpbackup/plpbackup.cc:1197
+#: plpbackup/plpbackup.cc:1159
 msgid "Nothing to backup"
 msgstr "Nichts zu sichern"
 
-#: plpbackup/plpbackup.cc:1213 plpbackup/plpbackup.cc:1266
+#: plpbackup/plpbackup.cc:1175 plpbackup/plpbackup.cc:1226
 msgid "Backing up "
 msgstr "Sichere "
 
-#: plpbackup/plpbackup.cc:1240 plpbackup/plpbackup.cc:1281
+#: plpbackup/plpbackup.cc:1200 plpbackup/plpbackup.cc:1239
 msgid "Error during backup of "
 msgstr "Fehler beim Sichern von "
 
-#: plpbackup/plpbackup.cc:1300
+#: plpbackup/plpbackup.cc:1258
 msgid "Writing index ..."
 msgstr "Schreibe Index ..."
 
-#: plpbackup/plpbackup.cc:1327
+#: plpbackup/plpbackup.cc:1285
 msgid "plpbackup: Could not write index "
 msgstr "plpbackup: Konnte Index nicht schreiben "
 
-#: plpbackup/plpbackup.cc:1337
-msgid "Creating tar archive ..."
-msgstr "Lege tar-Archiv an ..."
-
-#: plpbackup/plpbackup.cc:1350
-msgid "plpbackup: Error during execution of "
-msgstr "plpbackup: Fehler beim Ausführen von "
-
-#: plpbackup/plpbackup.cc:1360
+#: plpbackup/plpbackup.cc:1293
 msgid "Resetting archive attributes ..."
 msgstr "Archiv-Attribute zurücksetzen ..."
 
-#: plpbackup/plpbackup.cc:1379
+#: plpbackup/plpbackup.cc:1309
 msgid "Backup aborted due to error"
 msgstr "Sicherung wegen Fehler abgebrochen"
 
-#: plpbackup/plpbackup.cc:1387
+#: plpbackup/plpbackup.cc:1317
 msgid "Time for scanning:      "
 msgstr "Zeit für Durchsuchen:     "
 
-#: plpbackup/plpbackup.cc:1390
+#: plpbackup/plpbackup.cc:1320
 msgid "Time for transfer:      "
 msgstr "Zeit für Übertragung:     "
 
-#: plpbackup/plpbackup.cc:1392
+#: plpbackup/plpbackup.cc:1322
 msgid "Average transfer speed: "
 msgstr "Durchschnittliche Übertragungsgeschwindigkeit: "
 
-#: plpbackup/plpbackup.cc:1403
+#: plpbackup/plpbackup.cc:1333
 #, fuzzy
 msgid ""
 "Usage: plpbackup OPTIONS [<drive>:] [<drive>:] ...\n"
@@ -1598,8 +1578,8 @@ msgid ""
 "    -v, --verbose          Increase verbosity.\n"
 "    -q, --quiet            Decrease verbosity.\n"
 "    -f, --full             Do a full backup (incremental otherwise).\n"
-"    -b, --backup[=TGZ]     Backup to specified archive TGZ.\n"
-"    -r, --restore=TGZ      Restore from specified archive TGZ.\n"
+"    -b, --backup[=DIR]     Backup to specified directory DIR.\n"
+"    -r, --restore=DIR      Restore from specified directory DIR.\n"
 "\n"
 "  <drive> A drive character. If none given, scan all drives.\n"
 "\n"
@@ -1623,34 +1603,34 @@ msgstr ""
 "Laufwerke.\n"
 "\n"
 
-#: plpbackup/plpbackup.cc:1419
+#: plpbackup/plpbackup.cc:1349
 msgid "Try 'plpbackup --help' for more information."
 msgstr "Versuchen Sie 'plpbackup --help' für weitere Informationen."
 
-#: plpbackup/plpbackup.cc:1489
+#: plpbackup/plpbackup.cc:1419
 msgid "plpbackup version "
 msgstr "plpbackup Version "
 
-#: plpbackup/plpbackup.cc:1524
+#: plpbackup/plpbackup.cc:1454
 msgid "Invalid drive argument "
 msgstr "Ungültiges Laufwerk "
 
-#: plpbackup/plpbackup.cc:1530
+#: plpbackup/plpbackup.cc:1460
 #, fuzzy
 msgid "Backup mode can not be combined with restore."
 msgstr ""
 "Sicherungs-Modus kann nicht mit Formatieren oder Rücksicherung kombiniert "
 "werden."
 
-#: plpbackup/plpbackup.cc:1535
+#: plpbackup/plpbackup.cc:1465
 msgid "Backup can only create one archive at a time."
 msgstr "Die Sicherung kann nur jeweils ein Archiv zu einer Zeit anlegen."
 
-#: plpbackup/plpbackup.cc:1539
+#: plpbackup/plpbackup.cc:1469
 msgid "No action specified."
 msgstr "Keine Aktion angegeben."
 
-#: plpbackup/plpbackup.cc:1548 plpbackup/plpbackup.cc:1553
+#: plpbackup/plpbackup.cc:1478 plpbackup/plpbackup.cc:1483
 msgid "plpbackup: could not connect to ncpd"
 msgstr "plpbackup: Konnte ncpd nicht kontaktieren"
 
@@ -1868,9 +1848,3 @@ msgstr "ncpd Version "
 #: plpprint/plpprintd.cc:1024
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: Konnte ncpd nicht kontaktieren."
-
-#~ msgid "format"
-#~ msgstr "Formatierung"
-
-#~ msgid "Format mode needs at least one drive specified."
-#~ msgstr "Formatier-Modus benötigt mindestens eine Laufwerksangabe."
