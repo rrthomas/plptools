@@ -58,7 +58,6 @@ extern "C"  {
 #if HAVE_LIBHISTORY
 #include <readline/history.h>
 #endif
-#include "rlcrap.h"
 }
 #endif
 
@@ -1240,12 +1239,7 @@ initReadline(void)
     rl_readline_name = "plpftp";
     rl_completion_entry_function = FUNCAST(null_completion);
     rl_attempted_completion_function = CPFUNCAST(do_completion);
-#if (READLINE_VERSION < 402)
-    rlcrap_setpointers(command_generator, filename_generator);
-#endif
-#if (READLINE_VERSION >= 402)
     rl_basic_word_break_characters = " \t\n\"\\'`@><=;|&{(";
-#endif
 #endif
 }
 
