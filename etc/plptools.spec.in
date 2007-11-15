@@ -398,7 +398,7 @@ then
 fi
 
 %files
-%doc COPYING INSTALL CHANGES ChangeLog README TODO etc/*magic patches
+%doc COPYING INSTALL CHANGES ChangeLog README TODO etc/*magic
 %{_bindir}/plpftp
 %{_bindir}/plpbackup
 %{_bindir}/sisinstall
