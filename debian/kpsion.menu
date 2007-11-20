@@ -1,7 +1,0 @@
-?package(kpsion):\
-        needs=x11\
-        section=Apps/Tools\
-        hints="KDE"\
-        kderemove="y"\
-        title="Psion backup/restore"\
-        command="/usr/bin/kpsion"

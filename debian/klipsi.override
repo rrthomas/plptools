@@ -1,2 +1,0 @@
-klipsi: no-shlibs-control-file usr/lib/klipsi.so
-klipsi: postinst-must-call-ldconfig usr/lib/klipsi.so

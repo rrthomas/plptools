@@ -1,4 +1,0 @@
-kpsion: menu-item-contains-unknown-tag kderemove /usr/lib/menu/kpsion:7
-kpsion: no-shlibs-control-file usr/lib/libkpsion.so
-kpsion: postinst-must-call-ldconfig usr/lib/libkpsion.so
-kpsion: postrm-should-call-ldconfig usr/lib/libkpsion.so

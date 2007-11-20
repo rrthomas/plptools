@@ -263,53 +263,6 @@ AC_SUBST(LIB_PLP)
 PLP_LDFLAGS='-L$(top_builddir)/lib/.libs'
 AC_SUBST(PLP_LDFLAGS)
 
-dnl KDE stuff
-PLP_HELP_MSG([Options for activating sub packages:])
-ac_enable_kde=no
-AM_CONDITIONAL(BUILD_KDE, false)
-AC_ARG_ENABLE(kde,
-	[  --enable-kde            build KDE stuff [no]],
-	if test "$enableval" = "yes" ; then
-		AC_MSG_RESULT([Will build KDE stuff])
-		ac_enable_kde=yes
-	fi
-)
-PLP_HELP_MSG([Options, only needed when building KDE stuff:])
-if test "x$ac_enable_kde" = "xyes" ; then
-	AC_ARG_WITH(kdedir,
-	[  --with-kdedir=DIR       specify KDE directory [${prefix:-${ac_default_prefix}}]],
-	[
-		kde_prefix=${withval}
-		kde_exec_prefix=${withval}
-	]
-	)
-	AC_PATH_KDE
-	if test -n "${kde_cv_path_kde_config}" ; then
-			kde_prefix=`${kde_cv_path_kde_config} --prefix`
-			kde_exec_prefix=`${kde_cv_path_kde_config} --prefix`
-	else
-		if test "${prefix}" != "NONE" ; then
-			kde_prefix=${prefix}
-		else
-			kde_prefix=$ac_default_prefix
-		fi
-		if test "${exec_prefix}" != "NONE" ; then
-			kde_exec_prefix=${exec_prefix}
-		else
-			kde_exec_prefix=${kde_prefix}
-		fi
-	fi
-	AC_MSG_RESULT(KDE stuff will be installed below $kde_prefix)
-	AC_SUBST(kde_prefix)
-	AC_SUBST(kde_exec_prefix)
-	AC_CHECK_KDEMAXPATHLEN
-	KDE_CHECK_FINAL
-	AM_KDE_WITH_NLS
-	KDE_PLUGIN="-avoid-version -module -no-undefined"
-	AC_SUBST(KDE_PLUGIN)
-	AM_CONDITIONAL(BUILD_KDE, true)
-fi
-
 AC_OUTPUT(
 	Makefile
 	intl/Makefile
@@ -318,21 +271,6 @@ AC_OUTPUT(
 	ncpd/Makefile
 	plpftp/Makefile
 	plpnfsd/Makefile
-	kde2/Makefile
-	kde2/kioslave/Makefile
-	kde2/plugins/Makefile
-	kde2/kpsion/Makefile
-	kde2/klipsi/Makefile
-	kde2/po/Makefile
-	kde2/po/de/Makefile
-	kde2/mime/Makefile
-	kde2/mime/icons/Makefile
-	kde2/doc/Makefile
-	kde2/doc/en/Makefile
-	kde2/doc/de/Makefile
-	kde2/doc/kioslave/Makefile
-	kde2/doc/kioslave/de/Makefile
-	kde2/doc/kioslave/en/Makefile
 	plpprint/Makefile
 	plpprint/prolog.ps
 	sisinstall/Makefile
@@ -347,6 +285,4 @@ AC_OUTPUT(
 	doc/plpftp.man
 	doc/sisinstall.man
 	doc/plpprintd.man
-	debian/kpsion.1.in
-	debian/klipsi.1.in
 )
