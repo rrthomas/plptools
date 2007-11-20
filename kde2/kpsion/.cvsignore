@@ -1,9 +1,0 @@
-Makefile.in
-Makefile
-.xvpics
-.libs
-.deps
-*.lo
-*.moc.cpp
-libkpsion*
-kpsion
