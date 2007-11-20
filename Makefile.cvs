@@ -18,11 +18,6 @@ build: devel
 	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug
 	${MAKE}
 
-buildnox: devel
-	rm -f config.cache
-	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug
-	${MAKE}
-
 devel: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	autoconf
 	touch include/stamp-h.in
