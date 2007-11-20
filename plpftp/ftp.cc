@@ -31,6 +31,8 @@
 #include <plpintl.h>
 #include <rfsv.h>
 #include <rpcs.h>
+#include <rclip.h>
+#include <ppsocket.h>
 #include <bufferarray.h>
 #include <bufferstore.h>
 #include <Enum.h>
@@ -50,6 +52,7 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <netdb.h>
 
 #include "ftp.h"
 
@@ -67,6 +70,8 @@ using namespace std;
 static char psionDir[1024];
 static rfsv *comp_a;
 static int continueRunning;
+
+#define CLIPFILE "C:/System/Data/Clpboard.cbd"
 
 
 void ftp::
@@ -115,6 +120,7 @@ void ftp::usage() {
     cout << endl << _("Known RPC commands:") << endl << endl;
     cout << "  ps" << endl;
     cout << "  kill <pid|'all'>" << endl;
+    cout << "  putclip <unixfile>" << endl;
     cout << "  run <psionfile> [args]" << endl;
     cout << "  killsave <unixfile>" << endl;
     cout << "  runrestore <unixfile>" << endl;
@@ -337,8 +343,159 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
     return 0;
 }
 
+bool
+ftp::checkClipConnection(rfsv &a, rclip & rc, ppsocket & rclipSocket)
+{
+    if (canClip == false)
+        return false;
+
+    if (a.getProtocolVersion() == 3) {
+        cerr << _("Clipboard protocol not supported by Psion Series 3.") << endl;
+        return false;
+    }
+
+    Enum<rfsv::errs> ret;
+    if ((ret = rc.initClipbd()) == rfsv::E_PSI_GEN_NONE)
+        return true;
+    else if (ret == rfsv::E_PSI_GEN_NSUP)
+        cerr << _("Your Psion does not support the clipboard protocol.\n\
+                The reason for that is usually a missing server library.\n\
+                Make sure that C:\\System\\Libs\\clipsvr.rsy exists.\n\
+                This file is part of PsiWin and usually gets copied to\n\
+                your Psion when you enable CopyAnywhere in PsiWin.\n\
+                You can also get it from a PsiWin installation directory\n\
+                and copy it to your Psion manually.") << endl;
+    return false;
+}
+
+static void
+psiText2ascii(char *buf, int len) {
+    char *p;
+
+    for (p = buf; len; len--, p++)
+	switch (*p) {
+	    case 6:
+	    case 7:
+		*p = '\n';
+		break;
+	    case 8:
+		*p = '\f';
+		break;
+	    case 10:
+		*p = '\t';
+		break;
+	    case 11:
+	    case 12:
+		*p = '-';
+		break;
+	    case 15:
+	    case 16:
+		*p = ' ';
+		break;
+	}
+}
+
+static void
+ascii2PsiText(char *buf, int len) {
+    char *p;
+
+    for (p = buf; len; len--, p++)
+	switch (*p) {
+            case '\0':
+                *p = ' ';
+	    case '\n':
+		*p = 6;
+		break;
+	    case '\f':
+		*p = 8;
+		break;
+	    case '-':
+		*p = 11;
+		break;
+	}
+}
+
+// FIXME: This is almost the same as getln. Ugh.
+static char *
+slurp(FILE *fp, size_t *final_len)
+{
+    size_t len = 256;
+    int c;
+    char *l = (char *)malloc(len), *s = l;
+    
+    assert(l);
+    for (c = getc(fp); c != EOF; c = getc(fp)) {
+        if (s == l + len) {
+            l = (char *)realloc(l, len * 2);
+            assert(l);
+            len *= 2;
+        }
+        *s++ = c;
+    }
+    if (s == l + len) {
+        l = (char *)realloc(l, len + 1);
+        assert(l);
+    }
+    *s++ = '\0';
+    
+    *final_len = s - l;
+    l = (char *)realloc(l, s - l);
+    assert(l);
+    return l;
+}
+
+int
+ftp::putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file)
+{
+    Enum<rfsv::errs> res;
+    u_int32_t fh;
+    u_int32_t l;
+    const unsigned char *p;
+    bufferStore b;
+    char *data;
+    FILE *fp;
+
+    if (!checkClipConnection(a, rc, rclipSocket))
+        return 1;
+
+    if ((fp = fopen(file, "r")) == NULL)
+        return 1;
+
+    size_t len;
+    data = slurp(fp, &len);
+    fclose(fp);
+    ascii2PsiText(data, len);
+        
+    res = a.freplacefile(0x200, CLIPFILE, fh);
+    if (res == rfsv::E_PSI_GEN_NONE) {
+	// Base Header
+	b.addDWord(0x10000037);   // @00 UID 0
+	b.addDWord(0x1000003b);   // @04 UID 1
+	b.addDWord(0);            // @08 UID 3
+	b.addDWord(0x4739d53b);   // @0c Checksum the above
+
+	// Section Table
+	b.addDWord(0x00000014);   // @10 Offset of Section Table
+	b.addByte(2);             // @14 Section Table, length in DWords
+	b.addDWord(0x10000033);   // @15 Section Type (ASCII)
+	b.addDWord(0x0000001d);   // @19 Section Offset
+
+	// Data
+	b.addDWord(strlen(data)); // @1e Section (String) length
+	b.addStringT(data);       // @22 Data (Psion Word seems to need a
+                                  //     terminating 0.
+
+	p = (const unsigned char *)b.getString(0);
+	a.fwrite(fh, p, b.getLen(), l);
+	a.fclose(fh);
+	a.fsetattr(CLIPFILE, 0x20, 0x07);
+    }
+
+    return 0;
+}
+
 int ftp::
-session(rfsv & a, rpcs & r, int xargc, char **xargv)
+session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char **xargv)
 {
     int argc;
     char *argv[10];
@@ -1075,6 +1232,11 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    stopPrograms(r, argv[1]);
 	    continue;
 	}
+        if (!strcmp(argv[0], "putclip") && (argc == 2)) {
+            if (putClipText(r, a, rc, rclipSocket, argv[1]))
+                cerr << _("Error setting clipboard") << endl;
+            continue;
+        }
 	if (!strcmp(argv[0], "kill") && (argc >= 2)) {
 	    processList tmp;
 	    bool anykilled = false;

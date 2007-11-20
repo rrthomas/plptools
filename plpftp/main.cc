@@ -31,6 +31,8 @@
 #include <rfsvfactory.h>
 #include <rpcs.h>
 #include <rpcsfactory.h>
+#include <rclip.h>
+#include <ppsocket.h>
 #include <bufferstore.h>
 
 #include <iostream>
@@ -132,6 +134,8 @@ main(int argc, char **argv)
     ppsocket *skt2;
     rfsv *a;
     rpcs *r;
+    ppsocket *rclipSocket;
+    rclip *rc;
     ftp f;
     const char *host = "127.0.0.1";
     int status = 0;
@@ -183,12 +187,21 @@ main(int argc, char **argv)
     rpcsfactory *rp = new rpcsfactory(skt2);
     a = rf->create(false);
     r = rp->create(false);
+    rclipSocket = new ppsocket();
+    rclipSocket->connect(NULL, sockNum);
+    if (rclipSocket)
+        rc = new rclip(rclipSocket);
+    f.canClip = rclipSocket && rc ? true : false;
     if ((a != NULL) && (r != NULL)) {
-	status = f.session(*a, *r, argc - optind, &argv[optind]);
+	status = f.session(*a, *r, *rc, *rclipSocket, argc - optind, &argv[optind]);
 	delete r;
 	delete a;
 	delete skt;
 	delete skt2;
+        if (rclipSocket)
+            delete rclipSocket;
+        if (rc)
+            delete rc;
     } else {
 	cerr << "plpftp: " << X_(rf->getError()) << endl;
 	status = 1;

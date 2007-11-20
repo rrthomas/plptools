@@ -38,11 +38,14 @@ class ftp {
 	public:
 	ftp();
 	~ftp();
-	int session(rfsv & a, rpcs & r, int xargc, char **xargv);
+        int session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char **xargv);
+        bool canClip;
 
-	 private:
+	private:
 	void getCommand(int &argc, char **argv);
 	void initReadline(void);
+        int putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *data);
+        bool checkClipConnection(rfsv &a, rclip & rc, ppsocket & rclipSocket);
 
 	// utilities
 	bool unixDirExists(const char *dir);
@@ -60,7 +63,6 @@ class ftp {
 #endif
 	char defDrive[9];
 	char localDir[1024];
-	// char psionDir[1024];
 };
 
 #endif
