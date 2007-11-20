@@ -13,7 +13,6 @@ lib/sisreqrecord.cpp
 
 plpftp/main.cc
 plpftp/ftp.cc
-plpbackup/plpbackup.cc
 sisinstall/sismain.cpp
 ncpd/main.cc
 ncpd/link.cc

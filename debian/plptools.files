@@ -1,5 +1,4 @@
 usr/sbin/*
-usr/bin/plpbackup
 usr/bin/plpftp
 usr/bin/sisinstall
 usr/lib/libplp.la

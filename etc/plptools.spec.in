@@ -100,7 +100,6 @@ disconnected, the contents of /mnt/psion will automatically
 disappear. Other programs included are:
  - plpftp, a program which allows you to transfer files in a ftp-like
    manner, view and modifiy processes on your psion.
- - plpbackup, a backup/restore utility.
  - plpprintd, a daemon for enabling printing from a Psion Series 5 via any
    accessible printer.
  - sisinstall, an installer for Psion's SIS software package format.
@@ -124,7 +123,6 @@ gezogen, so verschwindet der Inhalt dieses Verzeichnisses automatisch
 und erscheint erneuten Anschließen wieder. Weiterhin sind enthalten:
  - plpftp, ein Programm welches eine FTP-ähnliche Oberfläche für Dateitransfer
    bietet und Prozesse auf dem Psion stoppen und starten kann.
- - plpbackup, ein Backup/Restore Utility für die Kommandozeile.
  - plpprintd, ein Daemon welcher Ausdrucken von einem Psion Serie 5 über
    beliebige vefügbare Drucker ermöglicht
  - sisinstall, ein Installationsprogramm für das Psion-eigene SIS
@@ -400,7 +398,6 @@ fi
 %files
 %doc COPYING INSTALL CHANGES ChangeLog README TODO etc/*magic
 %{_bindir}/plpftp
-%{_bindir}/plpbackup
 %{_bindir}/sisinstall
 %{_sbindir}/*
 %{_mandir}/*/*

@@ -153,8 +153,7 @@ public:
 
     /**
     * Set the file name of a directory entry.
-    * This is currently used in plpbackup only for
-    * changing the name to the full path. It does NOT
+    * This is currently unused. It does NOT
     * change the name of the corresponding file on
     * the Psion.
     *

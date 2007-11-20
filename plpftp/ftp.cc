@@ -217,7 +217,7 @@ stopPrograms(rpcs & r, const char *file) {
     }
     fputs("#plpftp processlist\n", fp);
     if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
-	cerr << _("plpbackup: Could not get process list: ") << res << endl;
+	cerr << _("Could not get process list, Error: ") << res << endl;
 	return 1;
     } else {
 	for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {

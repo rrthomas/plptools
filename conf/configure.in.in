@@ -333,7 +333,6 @@ AC_OUTPUT(
 	kde2/doc/kioslave/Makefile
 	kde2/doc/kioslave/de/Makefile
 	kde2/doc/kioslave/en/Makefile
-	plpbackup/Makefile
 	plpprint/Makefile
 	plpprint/prolog.ps
 	sisinstall/Makefile
@@ -348,7 +347,6 @@ AC_OUTPUT(
 	doc/plpftp.man
 	doc/sisinstall.man
 	doc/plpprintd.man
-	doc/plpbackup.man
 	debian/kpsion.1.in
 	debian/klipsi.1.in
 )

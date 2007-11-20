@@ -43,7 +43,7 @@ Show license information
 End of options
 .SH SEE ALSO
 .TP
-ncpd(8), plpnfsd(8), plpprintd(8), plpbackup(1), plpftp(1), sisinstall(1) and kpsion(1)
+ncpd(8), plpnfsd(8), plpprintd(8), plpftp(1), sisinstall(1) and kpsion(1)
 .SH AUTHOR
 Fritz Elfert <felfert@users.sourceforge.net>
 .PP
