@@ -20,7 +20,6 @@ endif
 
 tmp = $(shell pwd)/debian/tmp
 ltmp = $(tmp)/usr/share/lintian/overrides
-hdir = $(shell kde-config --expandvars -install html)
 
 %.1: %.1.in
 	MANDATE=`grep CHECKIN $< | awk '{print $$4}'` ; \
@@ -31,8 +30,7 @@ configure-stamp:
 	dh_testdir
 	./configure $(confflags) --prefix=/usr \
 		--with-mountdir=/var/lib/plptools/mnt \
-		--mandir=/usr/share/man --with-initdir=none --enable-kde \
-		--disable-rpath
+		--mandir=/usr/share/man --with-initdir=none --disable-rpath
 	touch configure-stamp
 
 build: configure-stamp build-stamp
@@ -58,7 +56,6 @@ install: build debian/kpsion.1 debian/klipsi.1
 	dh_clean -k
 	dh_installdirs
 	# install into debian/tmp.
-	$(MAKE) DESTDIR=$(tmp) kde_htmldir=$(hdir) install
 	install -d $(tmp)/etc
 	install -d $(ltmp)
 	install -m 644 debian/plptools.conf $(tmp)/etc
@@ -75,9 +72,6 @@ install: build debian/kpsion.1 debian/klipsi.1
 	# Split into sub-packages
 	dh_movefiles -pplptools
 	dh_movefiles -pplptools-dev
-	dh_movefiles -pplptools-kde
-	dh_movefiles -pkpsion
-	dh_movefiles -pklipsi
 
 # Build architecture-independent files here.
 binary-indep: build install
