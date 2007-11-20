@@ -45,6 +45,7 @@ class ftp {
 	void getCommand(int &argc, char **argv);
 	void initReadline(void);
         int putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *data);
+        int getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file);
         bool checkClipConnection(rfsv &a, rclip & rc, ppsocket & rclipSocket);
 
 	// utilities

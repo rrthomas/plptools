@@ -120,6 +120,7 @@ void ftp::usage() {
     cout << endl << _("Known RPC commands:") << endl << endl;
     cout << "  ps" << endl;
     cout << "  kill <pid|'all'>" << endl;
+    cout << "  getclip <unixfile>" << endl;
     cout << "  putclip <unixfile>" << endl;
     cout << "  run <psionfile> [args]" << endl;
     cout << "  killsave <unixfile>" << endl;
@@ -491,6 +492,172 @@ ftp::putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
 	a.fsetattr(CLIPFILE, 0x20, 0x07);
     }
 
+    return 0;
+}
+
+// FIXME: Make this work as putclipimg
+
+// static QImage *putImage;
+
+// static int
+// getGrayPixel(int x, int y)
+// {
+//     return qGray(putImage->pixel(x, y));
+// }
+
+// void TopLevel::
+// putClipImage(QImage &img) {
+//     Enum<rfsv::errs> res;
+//     u_int32_t fh;
+//     u_int32_t l;
+//     const unsigned char *p;
+//     bufferStore b;
+
+//     res = rf->freplacefile(0x200, CLIPFILE, fh);
+//     if (res == rfsv::E_PSI_GEN_NONE) {
+// 	while ((res = rc->checkNotify()) != rfsv::E_PSI_GEN_NONE) {
+// 	    if (res != rfsv::E_PSI_FILE_EOF) {
+// 		rf->fclose(fh);
+// 		closeConnection();
+// 		return;
+// 	    }
+// 	}
+
+// 	// Base Header
+// 	b.addDWord(0x10000037);   // @00 UID 0
+// 	b.addDWord(0x1000003b);   // @04 UID 1
+// 	b.addDWord(0);            // @08 UID 3
+// 	b.addDWord(0x4739d53b);   // @0c Checksum the above
+
+// 	// Section Table
+// 	b.addDWord(0x00000014);   // @10 Offset of Section Table
+// 	b.addByte(2);             // @14 Section Table, length in DWords
+// 	b.addDWord(0x1000003d);   // @15 Section Type (Image)
+// 	b.addDWord(0x0000001d);   // @19 Section Offset
+
+// 	// Data
+// 	bufferStore ib;
+// 	putImage = &img;
+// 	encodeBitmap(img.width(), img.height(), getGrayPixel, false, ib);
+// 	b.addBuff(ib);
+
+// 	p = (const unsigned char *)b.getString(0);
+// 	rf->fwrite(fh, p, b.getLen(), l);
+// 	rf->fclose(fh);
+// 	rf->fsetattr(CLIPFILE, 0x20, 0x07);
+//     } else
+// 	closeConnection();
+// }
+
+// QImage *TopLevel::
+// decode_image(const unsigned char *p)
+// {
+//     bufferStore out;
+//     bufferStore hout;
+//     QImage *img = 0L;
+//     int xPixels;
+//     int yPixels;
+
+//     if (!decodeBitmap(p, xPixels, yPixels, out))
+// 	return img;
+
+//     QString hdr = QString("P5\n%1 %2\n255\n").arg(xPixels).arg(yPixels);
+//     hout.addString(hdr.latin1());
+//     hout.addBuff(out);
+
+//     img = new QImage(xPixels, yPixels, 8);
+//     if (!img->loadFromData((const uchar *)hout.getString(0), hout.getLen())) {
+// 	delete img;
+// 	img = 0L;
+//     }
+//     return img;
+// }
+
+int
+ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file) {
+    Enum<rfsv::errs> res;
+    PlpDirent de;
+    u_int32_t fh;
+    string clipText;
+
+    res = a.fgeteattr(CLIPFILE, de);
+    if (res == rfsv::E_PSI_GEN_NONE) {
+	if (de.getAttr() & rfsv::PSI_A_ARCHIVE) {
+	    u_int32_t len = de.getSize();
+	    char *buf = (char *)malloc(len);
+
+	    if (!buf) {
+		cerr << "Out of memory in getClipData" << endl;
+		return 1;
+	    }
+	    res = a.fopen(a.opMode(rfsv::PSI_O_RDONLY | rfsv::PSI_O_SHARE),
+			   CLIPFILE, fh);
+	    if (res == rfsv::E_PSI_GEN_NONE) {
+		u_int32_t tmp;
+		res = a.fread(fh, (unsigned char *)buf, len, tmp);
+		a.fclose(fh);
+
+		if ((res == rfsv::E_PSI_GEN_NONE) && (tmp == len)) {
+		    char *p = buf;
+		    int lcount;
+		    u_int32_t     *ti = (u_int32_t*)buf;
+
+		    // Check base header
+		    if (*ti++ != 0x10000037) {
+			free(buf);
+			return 1;
+		    }
+		    if (*ti++ != 0x1000003b) {
+			free(buf);
+			return 1;
+		    }
+		    if (*ti++ != 0) {
+			free(buf);
+			return 1;
+		    }
+		    if (*ti++ != 0x4739d53b) {
+			free(buf);
+			return 1;
+		    }
+
+		    // Start of section table
+		    p = buf + *ti;
+		    // Length of section table (in DWords)
+		    lcount = *p++;
+
+		    u_int32_t *td = (u_int32_t*)p;
+		    while (lcount > 0) {
+			u_int32_t sType = *td++;
+			if (sType == 0x10000033) {
+			    // An ASCII section
+			    p = buf + *td;
+			    len = *((u_int32_t*)p);
+			    p += 4;
+			    psiText2ascii(p, len);
+			    clipText += (char *)p;
+			}
+			if (sType == 0x1000003d) {
+// FIXME: Implement this
+// 			    // A paint data section
+// 			    p = buf + *td;
+// 			    if (clipImg)
+// 				delete clipImg;
+// 			    clipImg = decode_image((const unsigned char *)p);
+			}
+			td++;
+			lcount -= 2;
+		    }
+		}
+
+	    }
+	    free(buf);
+	}
+    }
+
+    FILE *fp = fopen(file, "w");
+    if (fp == NULL)
+        return 1;
+    fwrite(clipText.c_str(), 1, clipText.length(), fp);
     return 0;
 }
 
@@ -1235,6 +1402,11 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
         if (!strcmp(argv[0], "putclip") && (argc == 2)) {
             if (putClipText(r, a, rc, rclipSocket, argv[1]))
                 cerr << _("Error setting clipboard") << endl;
+            continue;
+        }
+        if (!strcmp(argv[0], "getclip") && (argc == 2)) {
+            if (getClipData(r, a, rc, rclipSocket, argv[1]))
+                cerr << _("Error getting clipboard") << endl;
             continue;
         }
 	if (!strcmp(argv[0], "kill") && (argc >= 2)) {
