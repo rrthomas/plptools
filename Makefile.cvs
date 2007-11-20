@@ -7,16 +7,15 @@ GETTEXTDEP = conf/Makefile.am.in conf/configure.in.in
 
 all:
 	@echo "Use make devel for development, make dist for distribution"
-	@echo $(KDEVER)
 
 strictbuild: devel
 	rm -f config.cache
-	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-kde --enable-strict
+	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-strict
 	${MAKE}
 
 build: devel
 	rm -f config.cache
-	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug --enable-kde
+	./configure --prefix=/usr --mandir=/usr/share/man --enable-debug
 	${MAKE}
 
 buildnox: devel
@@ -31,7 +30,7 @@ devel: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 dist: $(GETTEXT) $(LIBTOOLFILES) $(AUTOMAKEFILES)
 	autoconf
 	touch include/stamp-h.in
-	./configure --enable-kde
+	./configure
 	$(MAKE) dist
 
 htmldoc:
@@ -41,7 +40,7 @@ htmldoc:
 	done
 
 $(ACLOCAL):
-	aclocal -I conf/m4/plptools -I conf/m4/kde $(M4SUB)
+	aclocal -I conf/m4/plptools $(M4SUB)
 
 $(CONFIGHIN): acconfig.h configure.in
 	autoheader
@@ -60,4 +59,3 @@ $(GETTEXT): $(GETTEXTDEP)
 
 $(AUTOMAKEFILES): $(ACLOCAL) $(CONFIGHIN)
 	automake --add-missing
-	${MAKE} -C kde2 -f Makefile.am am_edit

@@ -5,6 +5,5 @@ EPOC devices, as well as backing them up, installing software, and
 setting the clock. See INSTALL for installation instructions and
 HISTORY for some history.
 
-The programs include KDE 2/3 Psion support, and plpnfsd, which allows
-the EPOC device's filesystem to be mounted in an NFS-like way (portmap
-is required for this).
+The programs plpnfsd, which allows the EPOC device's filesystem to be
+mounted in an NFS-like way (portmap is required for this).

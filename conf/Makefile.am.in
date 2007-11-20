@@ -1,17 +1,10 @@
 # $Id$
 #
 
-if BUILD_KDE
-KDESUB = kde2
-else
-KDESUB =
-endif
-
-SUBDIRS = intl po lib ncpd plpnfsd plpftp plpprint sisinstall \
-	$(KDESUB) doc .
+SUBDIRS = intl po lib ncpd plpnfsd plpftp plpprint sisinstall doc .
 
 EXTRA_DIST = CHANGES COPYING README TODO HISTORY INSTALL ABOUT-NLS include/*.h* \
-	etc/*magic etc/*.in etc/*.c etc/psidump* conf/m4/kde/*.m4 \
+	etc/*magic etc/*.in etc/*.c etc/psidump* \
 	conf/m4/plptools/*.m4 conf/[a-l]* conf/missing conf/mkinstalldirs \
 	debian/*
 DISTCLEANFILES = etc/psion etc/psion.SuSE etc/psion.SuSE8
@@ -38,15 +31,11 @@ install-data-local:
 		install -m 755 etc/psion $(DESTDIR)$(initdir)/psion || :
 
 dist-hook:
-	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile
-	$(MAKE) -C $(distdir)/kde2 -f Makefile.am am_edit
+	$(MAKE) TMPDEST=$(distdir)/ specfile
 	test -f CVS/Root && conf/cvs2cl -W 1800 -S --no-wrap --prune \
 		--gmt -f $(distdir)/ChangeLog || \
 		cp -f ChangeLog $(distdir)/ChangeLog
 	rm -rf $(distdir)/debian/CVS
-
-kdoc:
-	kdoc -d $(TMPDEST)doc/api -n libplp --strip-h-path $(TMPDEST)lib/*.h
 
 specfile:
 	sed -e "s/\@VERSION\@/$(VERSION)/" < $(TMPDEST)etc/plptools.spec.in \

@@ -24,29 +24,22 @@
 %if "%{REL}" >= "8.0"
 # Bug in SuSE8.0's rpm setup: _initrddir has wrong value
 %define _initrddir %{_sysconfdir}/init.d
-%define _kdedir /opt/kde3
 %else
 %define _initrddir %{_sysconfdir}/init.d
-%define _kdedir /opt/kde2
 %endif
 %define distro SuSE%{REL}
 %endif
 %if "%{isRH}" > "1"
 %define REL %(rpm -qf --queryformat '%%{version}' %{rrel})
 %define distro RH%{REL}
-%define _kdedir /usr
 # Old RH7.2 has QT in qt-2.x.x which is not autodetected in configure
 %define _qtdir %(test -n "$QTDIR" && echo \"--with-qt-dir=$QTDIR\" || :)
 %endif
 %if "%{isMDK}" > "0"
 %define REL %(rpm -qf --queryformat '%%{version}' %{mrel})
 %define distro mdk%{REL}
-%define _kdedir /usr
 %endif
 
-%define _kdebindir %{_kdedir}/bin
-%define _kdelibdir %{_kdedir}/lib
-%define _kdedatadir %{_kdedir}/share
 %define realrelease %{myrelease}%{distro}
 
 #
@@ -68,7 +61,7 @@ URL: http://plptools.sourceforge.net/
 Source0: http://download.sourceforge.net/plptools/plptools-%{version}.tar.gz
 Copyright: GPL
 Group: Networking/Utilities
-Buildrequires: readline-devel newt-devel kdelibs-devel >= 2.1
+Buildrequires: readline-devel newt-devel
 %if "%{isSUSE}" > "0"
 %if "%{REL}" >= "8.0"
 Requires: aaa_base >= 2002.3.27-0
@@ -84,11 +77,6 @@ BuildRoot: %{_tmppath}/plputils-buildroot
 %package devel
 Summary: Static library and includes for psion series 5 communication.
 Group: Development/Libraries
-Requires: %{name} = %{version}
-
-%package kde
-Summary: Psion support for KDE.
-Group: User Interface/Desktops
 Requires: %{name} = %{version}
 
 %description
@@ -108,13 +96,6 @@ disappear. Other programs included are:
 This package contains the static library and include files for building
 programs which can communicate with a Psion palmtop.
 
-%description kde
-This package provides support for a new protocol prefix "psion:/" for
-KDE. Any KDE application which uses KDE-conforming URLs, can access
-files on the Psion. Furthermore, a plugin for Konqueror's file-properties
-dialog provides access to Psions proprietary file attributes and information
-about the Psion's drives as well as generic machine information.
-
 %description -l de
 Dieses Packet enthält Programme zur Kommunikation mit einem Psion Palmtop.
 Das Dateisystem des Psion wird beim Anschließen automatisch unter
@@ -132,41 +113,10 @@ und erscheint erneuten Anschließen wieder. Weiterhin sind enthalten:
 Dieses Packet enthält die statische Bibliothek und include-Dateien
 zur Programm-Entwicklung von Kommunikations-software für den Psion.
 
-%description -l de kde
-Dieses Packet stellt Unterstützung für eine neues Protokoll-Präfix "psion:/"
-für KDE bereit. Jede KDE Anwendung, die KDE-konforme URLs benutzt, kann
-damit auf die Dateien eines Psion zugreifen. Weiterhin, liefert ein Plugin
-für Konqueror's Datei-Eigenschaften-Dialog Informationen über proprietäre
-Psion-Dateiattribute und stellt Informationen zum Gerät sowie seiner
-Laufwerke zur Verfügung.
-
-%package -n kpsion
-Summary: Psion utility for KDE.
-Group: User Interface/Desktops
-Requires: %{name} = %{version}
-
-%description -n kpsion
-This package contains a KDE utility program for backup, restore and formatting
-Psion drives.
-
-%description -l de -n kpsion
-Dieses Packet enthält ein KDE Werkzeug zum Backup, Restore und Formatieren
-von Psion Laufwerken.
-
-%package -n klipsi
-Summary: Psion remote clipboard utility for KDE.
-Group: User Interface/Desktops
-Requires: %{name} = %{version}
-
-%description -n klipsi
-This package contains a KDE utility for using the Psion's remote clipboard
-function.
-
-%description -l de -n klipsi
-Dieses Packet enthält ein KDE Werkzeug zum Transfer der Zwischenablage
-zwischen Psion und Rechner.
-
 %changelog
+* Tue Nov 20 2007 Reuben Thomas <rrt@sc3d.org>
+- Butchered out the KDE bits; no testing done afterwards
+
 * Fri May 25 2001 Fritz Elfert <fritz.elfert@to.com>
 - Added klipsi subpackage
 
@@ -216,21 +166,8 @@ chmod a+x find-requires
 %if "%{isSUSE}" > "0"
 # SuSE's libtools are breaking everything
 %define __libtoolize true
-%if "%{REL}" >= "8.0"
-%configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde3 %{_with_debug}
-%else
-%configure --enable-kde --with-initdir=%{_initrddir} --with-kdedir=/opt/kde2 %{_with_debug}
-%endif
-%endif
-%if "%{isMDK}" > "0"
-# Mandrake's libtool builds, but refuses to install kde modules into
-# a directory not ending with /usr/lib - kinda strange
-#
-%define __libtoolize true
-%endif
-%if "%{isRH}" > "0"
-QD=%{_qtdir}
-%configure --enable-kde $QD --with-initdir=%{_initrddir} %{_with_debug}
+%configure --with-initdir=%{_initrddir} %{_with_debug}
+%configure --with-initdir=%{_initrddir} %{_with_debug}
 %endif
 make
 
@@ -271,8 +208,6 @@ EOF
 %if "%{isMDK}" > "0"
 # Mandrake has a menu configurator
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/menu
-echo '?package(kpsion): needs="kde" kde_filename="kpsion" section="Office/PDA" title="KPsion" icon="psion_desktop.png" command="kpsion" kde_opt="\\nEncoding=UTF-8\\nGenericName=My Psion PDA\\nDocPath=kpsion/index.html\\nTerminal=0\\nX-KDE-StartupNotify=true"' > $RPM_BUILD_ROOT%{_libdir}/menu/kpsion
-echo '?package(klipsi): needs="kde" kde_filename="klipsi" section="Office/PDA" title="Klipsi" icon="klipsi.png" command="klipsi" kde_opt="\\nEncoding=UTF-8\\nGenericName=Psion Clipboard Utility\\nDocPath=klipsi/index.html\\nTerminal=0\\nX-KDE-StartupNotify=true"' > $RPM_BUILD_ROOT%{_libdir}/menu/klipsi
 %endif
 
 %clean
@@ -315,53 +250,6 @@ cp /etc/rc.config /etc/rc.config.old && mv /etc/rc.config.$$ /etc/rc.config
 %endif
 %endif
 
-%if "%{isRH}" > "1"
-%triggerin kde -- kdebase, kde-i18n-German
-perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
-%endif
-
-%if "%{isMDK}" > "0"
-%triggerin kde -- kdebase, kde-i18n-de
-perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
-%endif
-
-%if "%{isSUSE}" > "0"
-%if "%{REL}" >= "8.0"
-%triggerin kde -- kdebase3, kde-i18n-de
-export PATH=%{_kdebindir}:$PATH
-perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
-%else
-%triggerin kde -- kdebase, kde-i18n-de
-export PATH=%{_kdebindir}:$PATH
-perl %{_datadir}/%{name}/kiodoc-update.pl -a psion
-%endif
-%endif
-
-%if "%{isMDK}" > "0"
-%post -n kpsion
-update-menus
-
-%post -n klipsi
-update-menus
-%endif
-
-%post kde
-%if "%{isSUSE}" > "0"
-export PATH=%{_kdebindir}:$PATH
-%endif
-KONQRC=`%{_kdebindir}/kde-config --expandvars --install config`/konquerorrc
-if test -f $KONQRC && grep -q '\[Notification Messages\]' $KONQRC ; then
-	cp $KONQRC $KONQRC.$$
-	cat $KONQRC.$$ | grep -v "askSaveinode/x-psion-drive=No" | sed \
-		-e '/\[Notification Messages\]/a\' \
-		-e 'askSaveinode/x-psion-drive=No' > $KONQRC && \
-	rm -f $KONQRC.$$
-else
-cat>>$KONQRC<<EOF
-
-[Notification Messages]
-askSaveinode/x-psion-drive=No
-EOF
 fi
 
 %preun
@@ -378,21 +266,6 @@ then
 %if "%{isRH}" > "0"
 	/sbin/chkconfig --del psion
 %endif
-fi
-
-%preun kde
-%if "%{isSUSE}" > "0"
-export PATH=%{_kdebindir}:$PATH
-%endif
-if [ "$1" = 0 ]
-then
-	/usr/bin/perl %{_datadir}/%{name}/kiodoc-update.pl -r psion
-	KONQRC=`kde-config --expandvars --install config`/konquerorrc
-	if test -f $KONQRC ; then
-		cp $KONQRC $KONQRC.$$
-		grep -v 'askSaveinode/x-psion-drive=' $KONQRC.$$ > $KONQRC && \
-		rm -f $KONQRC.$$
-	fi
 fi
 
 %files
@@ -420,45 +293,3 @@ fi
 %{_libdir}/libplp.a
 %{_libdir}/libplp.so
 %{_includedir}/%{name}/*
-
-%files kde
-%{_kdelibdir}/kde*/kio_plp.so*
-%{_kdelibdir}/kde*/kio_plp.la
-%{_kdelibdir}/kde*/libplpprops.so*
-%{_kdelibdir}/kde*/libplpprops.la
-%{_kdedatadir}/services/*
-%{_kdedatadir}/icons/*/*/mimetypes/*
-%{_kdedatadir}/icons/*/*/devices/*
-%{_kdedatadir}/icons/*/*/apps/psion*
-%{_kdedatadir}/locale/*/LC_MESSAGES/libplpprops.mo
-%{_kdedatadir}/mimelnk/*/*
-%{_kdedatadir}/doc/HTML/*/kioslave/*
-%{_datadir}/%{name}/kiodoc-update.pl
-
-%files -n kpsion
-%{_kdebindir}/kpsion
-%{_kdelibdir}/libkpsion.so*
-%{_kdelibdir}/libkpsion.la
-%if "%{isMDK}" > "0"
-%{_libdir}/menu/kpsion
-%endif
-%{_kdedatadir}/applnk/*/kpsion*
-%{_kdedatadir}/apps/kpsion/*
-%{_kdedatadir}/apps/konqueror/*
-%{_kdedatadir}/icons/*/*/apps/kpsion*
-%{_kdedatadir}/icons/*/*/actions/psion*
-%{_kdedatadir}/locale/*/LC_MESSAGES/kpsion.mo
-%{_kdedatadir}/doc/HTML/*/kpsion
-
-%files -n klipsi
-%{_kdebindir}/klipsi
-%{_kdelibdir}/klipsi.so*
-%{_kdelibdir}/klipsi.la
-%if "%{isMDK}" > "0"
-%{_libdir}/menu/klipsi
-%endif
-%{_kdedatadir}/applnk/*/klipsi*
-%{_kdedatadir}/apps/klipsi/*
-%{_kdedatadir}/icons/*/*/apps/klipsi*
-%{_kdedatadir}/icons/*/*/actions/klipsi*
-%{_kdedatadir}/locale/*/LC_MESSAGES/klipsi.mo
