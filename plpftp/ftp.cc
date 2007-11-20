@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2006-2007 Reuben Thomas <rrt@sc3d.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -202,6 +203,138 @@ sigint_handler2(int i) {
     continueRunning = 0;
     fclose(stdin);
     signal(SIGINT, sigint_handler2);
+}
+
+static int
+stopPrograms(rpcs & r, const char *file) {
+    Enum<rfsv::errs> res;
+    processList tmp;
+    FILE *fp = fopen(file, "w");
+
+    if (fp == NULL) {
+        cerr << _("Could not open command list file ") << file << endl;
+        return 1;
+    }
+    fputs("#plpftp processlist\n", fp);
+    if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
+	cerr << _("plpbackup: Could not get process list: ") << res << endl;
+	return 1;
+    } else {
+	for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {
+	    fputs(i->getArgs(), fp);
+            fputc('\n', fp);
+	    r.stopProgram(i->getProcId());
+	}
+	time_t tstart = time(0) + 5;
+	while (true) {
+	    usleep(100000);
+	    if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
+		cerr << "Could not get process list, Error: " << res << endl;
+		return 1;
+	    }
+	    if (tmp.empty())
+		break;
+	    if (time(0) > tstart) {
+		cerr << _(
+                          "Could not stop all processes. Please stop running\n"
+                          "programs manually on the Psion, then hit return.") << flush;
+		cin.getline((char *)&tstart, 1);
+		tstart = time(0) + 5;
+	    }
+	}
+    }
+    fclose(fp);
+    return 0;
+}
+
+static char *
+getln(FILE *fp)
+{
+    size_t len = 256;
+    int c;
+    char *l = (char *)malloc(len), *s = l;
+    
+    assert(l);
+    for (c = getc(fp); c != '\n' && c != EOF; c = getc(fp)) {
+        if (s == l + len) {
+            l = (char *)realloc(l, len * 2);
+            assert(l);
+            len *= 2;
+        }
+        *s++ = c;
+    }
+    if (s == l + len) {
+        l = (char *)realloc(l, len + 1);
+        assert(l);
+    }
+    *s++ = '\0';
+    
+    l = (char *)realloc(l, s - l);
+    assert(l);
+    return l;
+}
+
+static int
+startPrograms(rpcs & r, rfsv & a, const char *file) {
+    Enum<rfsv::errs> res;
+    FILE *fp = fopen(file, "r");
+    string cmd;
+
+    if (fp == NULL) {
+        cerr << _("Could not open command list file ") << file << endl;
+        return 1;
+    }
+    cmd = string(getln(fp));
+    if (strcmp(cmd.c_str(), "#plpftp processlist")) {
+        fclose(fp);
+        cerr << _("Error: ") << file <<
+            _(" is not a process list saved with killsave") << endl;
+        return 1;
+    }
+    for (cmd = string(getln(fp)); cmd.length() > 0; cmd = string(getln(fp))) {
+	int firstBlank = cmd.find(' ');
+	string prog = string(cmd, 0, firstBlank);
+	string arg = string(cmd, firstBlank + 1);
+
+	if (!prog.empty()) {
+	    // Workaround for broken programs like Backlite. These do not store
+	    // the full program path. In that case we try running the arg1 which
+	    // results in starting the program via recog. facility.
+	    if ((arg.size() > 2) && (arg[1] == ':') && (arg[0] >= 'A') &&
+		(arg[0] <= 'Z'))
+		res = r.execProgram(arg.c_str(), "");
+	    else
+		res = r.execProgram(prog.c_str(), arg.c_str());
+	    if (res != rfsv::E_PSI_GEN_NONE) {
+		// If we got an error here, that happened probably because
+		// we have no path at all (e.g. Macro5) and the program is
+		// not registered in the Psion's path properly. Now try
+		// the usual \System\Apps\<AppName>\<AppName>.app
+		// on all drives.
+		if (prog.find('\\') == prog.npos) {
+		    u_int32_t devbits;
+		    if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
+			int i;
+			for (i = 0; i < 26; i++) {
+			    if (devbits & (1 << i)) {
+                                string tmp;
+				tmp = (char)('A' + i) + ":\\System\\Apps\\" +
+                                    prog + "\\" + prog + ".app";
+				res = r.execProgram(tmp.c_str(), "");
+                                if (res == rfsv::E_PSI_GEN_NONE)
+                                    break;
+			    }
+			}
+		    }
+		}
+	    }
+	    if (res != rfsv::E_PSI_GEN_NONE) {
+		cerr << "Could not start " << cmd << endl;
+		cerr << "Error: " << res << endl;
+	    }
+	}
+    }
+    return 0;
 }
 
 int ftp::
@@ -759,7 +892,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    if (strlen(cmd))
 		system(cmd);
 	    else {
-		char *sh;
+		const char *sh;
 		cout << _("Starting subshell ...\n");
 		sh = getenv("SHELL");
 		if (!sh)
@@ -935,85 +1068,11 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 	    continue;
 	}
 	if (!strcmp(argv[0], "runrestore") && (argc == 2)) {
-	    ifstream ip(argv[1]);
-	    char cmd[512];
-	    char arg[512];
-
-	    if (!ip) {
-		cerr << _("Could not read processlist ") << argv[1] << endl;
-		continue;
-	    }
-	    ip >> cmd >> arg;
-
-	    if (strcmp(cmd, "#plpftp") || strcmp(arg, "processlist")) {
-		ip.close();
-		cerr << _("Error: ") << argv[1] <<
-		    _(" is not a process list saved with killsave") << endl;
-		continue;
-	    }
-	    while (!ip.eof()) {
-		ip >> cmd >> arg;
-		ip.get(&arg[strlen(arg)], sizeof(arg) - strlen(arg), '\n');
-		// cout << "cmd=\"" << cmd << "\" arg=\"" << arg << "\"" << endl;
-		if (strlen(cmd) > 0) {
-		    // Workaround for broken programs like Backlite. These do not store
-		    // the full program path. In that case we try running the arg1 which
-		    // results in starting the program via recog. facility.
-		    if ((strlen(arg) > 2) && (arg[1] == ':') && (arg[0] >= 'A') &&
-			(arg[0] <= 'Z'))
-			res = r.execProgram(arg, "");
-		    else
-			res = r.execProgram(cmd, arg);
-		    if (res != rfsv::E_PSI_GEN_NONE) {
-			// If we got an error here, that happened probably because
-			// we have no path at all (e.g. Macro5) and the program is not
-			// registered in the Psion's path properly. Now try the ususal
-			// \System\Apps\<AppName>\<AppName>.app on all drives.
-			if (strchr(cmd, '\\') == NULL) {
-			    u_int32_t devbits;
-			    char tmp[512];
-			    if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
-				int i;
-				for (i = 0; i < 26; i++) {
-				    if (devbits & 1) {
-					sprintf(tmp,
-						"%c:\\System\\Apps\\%s\\%s.app",
-						'A' + i, cmd, cmd);
-					res = r.execProgram(tmp, "");
-				    }
-				    if (res == rfsv::E_PSI_GEN_NONE)
-					break;
-				}
-			    }
-			}
-		    }
-		    if (res != rfsv::E_PSI_GEN_NONE) {
-			cerr << _("Could not start ") << cmd << " " << arg << endl;
-			cerr << _("Error: ") << res << endl;
-		    }
-		}
-	    }
-	    ip.close();
-	    continue;
+            startPrograms(r, a, argv[1]);
+            continue;
 	}
 	if (!strcmp(argv[0], "killsave") && (argc == 2)) {
-	    processList tmp;
-	    if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE)
-		cerr << _("Error: ") << res << endl;
-	    else {
-		ofstream op(argv[1]);
-		if (!op) {
-		    cerr << _("Could not write processlist ") << argv[1] << endl;
-		    continue;
-		}
-		op << "#plpftp processlist" << endl;
-		processList::iterator i;
-		for (i = tmp.begin(); i != tmp.end(); i++) {
-		    op << i->getArgs() << endl;
-		    r.stopProgram(i->getProcId());
-		}
-		op.close();
-	    }
+	    stopPrograms(r, argv[1]);
 	    continue;
 	}
 	if (!strcmp(argv[0], "kill") && (argc >= 2)) {
@@ -1072,7 +1131,7 @@ session(rfsv & a, rpcs & r, int xargc, char **xargv)
 #define MATCHFUNCTION completion_matches
 #endif
 
-static char *all_commands[] = {
+static const char *all_commands[] = {
     "pwd", "ren", "touch", "gtime", "test", "gattr", "sattr", "devs",
     "dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
     "del", "rm", "mkdir", "rmdir", "prompt", "bye", "cp", "volname",
@@ -1080,11 +1139,11 @@ static char *all_commands[] = {
     "ownerinfo", "help", "settime", "setupinfo", NULL
 };
 
-static char *localfile_commands[] = {
+static const char *localfile_commands[] = {
     "lcd ", "put ", "mput ", "killsave ", "runrestore ", NULL
 };
 
-static char *remote_dir_commands[] = {
+static const char *remote_dir_commands[] = {
     "cd ", "rmdir ", NULL
 };
 
@@ -1145,7 +1204,7 @@ command_generator(
 		  int state)
 {
     static int idx, len;
-    char *name;
+    const char *name;
 
     if (!state) {
 	idx = 0;
@@ -1192,7 +1251,7 @@ do_completion(const char *text, int start, int end)
 	}
     else {
 	int idx = 0;
-	char *name;
+	const char *name;
 	char *p;
 
 	rl_filename_quoting_desired = 1;
