@@ -808,50 +808,50 @@ setVolumeName(const char drive , const char * const name)
 }
 
 static enum rfsv::errs e2psi[] = {
-    rfsv::E_PSI_FILE_DIRFULL,	// -43
-    rfsv::E_PSI_GEN_POWER,	// -42
-    rfsv::E_PSI_GEN_DIVIDE,	// -41
-    rfsv::E_PSI_FILE_TOOBIG,	// -40
-    rfsv::E_PSI_FILE_ABORT,	// -39
-    rfsv::E_PSI_GEN_DESCR,	// -38
-    rfsv::E_PSI_GEN_LIB,	// -37
-    rfsv::E_PSI_FILE_NDISC,	// -36
-    rfsv::E_PSI_FILE_DISC,	// -35
-    rfsv::E_PSI_FILE_CONNECT,	// -34
-    rfsv::E_PSI_FILE_RETRAN,	// -33
-    rfsv::E_PSI_FILE_PARITY,	// -32
-    rfsv::E_PSI_FILE_OVERRUN,	// -31
-    rfsv::E_PSI_FILE_FRAME,	// -30
-    rfsv::E_PSI_FILE_LINE,	// -29
-    rfsv::E_PSI_FILE_NAME,	// -28
-    rfsv::E_PSI_FILE_DRIVER,	// -27
-    rfsv::E_PSI_FILE_FULL,	// -26
-    rfsv::E_PSI_FILE_EOF,	// -25
-    rfsv::E_PSI_GEN_FSYS,	// -24
-    rfsv::E_PSI_FILE_WRITE,	// -23
-    rfsv::E_PSI_FILE_LOCKED,	// -22
-    rfsv::E_PSI_FILE_ACCESS,	// -21
-    rfsv::E_PSI_FILE_CORRUPT,	// -20
-    rfsv::E_PSI_FILE_UNKNOWN,	// -19
-    rfsv::E_PSI_FILE_NOTREADY,	// -18
-    rfsv::E_PSI_FILE_COMPLETION,	// -17
-    rfsv::E_PSI_GEN_BUSY,	// -16
-    rfsv::E_PSI_GEN_TERMINATED,	// -15
-    rfsv::E_PSI_GEN_INUSE,	// -14
-    rfsv::E_PSI_GEN_DIED,	// -13
-    rfsv::E_PSI_FILE_DIR,	// -12
-    rfsv::E_PSI_FILE_EXIST,	// -11
-    rfsv::E_PSI_GEN_UNDER,	// -10
-    rfsv::E_PSI_GEN_OVER,	// -9
-    rfsv::E_PSI_FILE_HANDLE,	// -8
-    rfsv::E_PSI_GEN_RANGE,	// -7
-    rfsv::E_PSI_GEN_ARG,	// -6
-    rfsv::E_PSI_GEN_NSUP,	// -5
-    rfsv::E_PSI_GEN_NOMEMORY,	// -4
-    rfsv::E_PSI_FILE_CANCEL,	// -3
-    rfsv::E_PSI_GEN_FAIL,	// -2
-    rfsv::E_PSI_FILE_NXIST,	// -1
-    rfsv::E_PSI_GEN_NONE	// 0
+    rfsv::E_PSI_FILE_DIRFULL,
+    rfsv::E_PSI_GEN_POWER,
+    rfsv::E_PSI_GEN_DIVIDE,
+    rfsv::E_PSI_FILE_TOOBIG,
+    rfsv::E_PSI_FILE_ABORT,
+    rfsv::E_PSI_GEN_DESCR,
+    rfsv::E_PSI_GEN_LIB,
+    rfsv::E_PSI_FILE_NDISC,
+    rfsv::E_PSI_FILE_DISC,
+    rfsv::E_PSI_FILE_CONNECT,
+    rfsv::E_PSI_FILE_RETRAN,
+    rfsv::E_PSI_FILE_PARITY,
+    rfsv::E_PSI_FILE_OVERRUN,
+    rfsv::E_PSI_FILE_FRAME,
+    rfsv::E_PSI_FILE_LINE,
+    rfsv::E_PSI_FILE_NAME,
+    rfsv::E_PSI_FILE_DRIVER,
+    rfsv::E_PSI_FILE_FULL,	
+    rfsv::E_PSI_FILE_EOF,
+    rfsv::E_PSI_GEN_FSYS,
+    rfsv::E_PSI_FILE_WRITE,
+    rfsv::E_PSI_FILE_LOCKED,
+    rfsv::E_PSI_FILE_ACCESS,
+    rfsv::E_PSI_FILE_CORRUPT,
+    rfsv::E_PSI_FILE_UNKNOWN,
+    rfsv::E_PSI_FILE_NOTREADY,
+    rfsv::E_PSI_FILE_COMPLETION,
+    rfsv::E_PSI_GEN_BUSY,
+    rfsv::E_PSI_GEN_TERMINATED,
+    rfsv::E_PSI_GEN_INUSE,
+    rfsv::E_PSI_GEN_DIED,
+    rfsv::E_PSI_FILE_DIR,
+    rfsv::E_PSI_FILE_EXIST,
+    rfsv::E_PSI_GEN_UNDER,
+    rfsv::E_PSI_GEN_OVER,
+    rfsv::E_PSI_FILE_HANDLE,
+    rfsv::E_PSI_GEN_RANGE,
+    rfsv::E_PSI_GEN_ARG,
+    rfsv::E_PSI_GEN_NSUP,
+    rfsv::E_PSI_GEN_NOMEMORY,
+    rfsv::E_PSI_FILE_CANCEL,
+    rfsv::E_PSI_GEN_FAIL,
+    rfsv::E_PSI_FILE_NXIST,
+    rfsv::E_PSI_GEN_NONE
 };
 
 Enum<rfsv::errs> rfsv32::
