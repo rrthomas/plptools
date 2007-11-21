@@ -40,6 +40,7 @@
 #define NFSMODE_LNK 0120000
 #define NFSMODE_SOCK 0140000
 #define NFSMODE_FIFO 0010000
+#define NFSMODE_MASK 07770000
 
 #if !defined(hpux) && !defined(__sgi)
 enum nfsstat {

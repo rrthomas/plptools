@@ -1001,7 +1001,7 @@ nfsproc_setattr_2(sattrargs *sa)
 		if (rfsv_isalive())
 			add_cache(&attrcache, inode->inode, fp);
 	}
-	if ((sa->attributes.mode != fp->mode) &&
+	if ((sa->attributes.mode != (fp->mode & ~NFSMODE_MASK)) &&
 	    (sa->attributes.mode != -1)) {
 		long psisattr, psidattr;
 		attr2pattr(sa->attributes.mode, fp->mode, &psisattr, &psidattr);
@@ -1017,7 +1017,8 @@ nfsproc_setattr_2(sattrargs *sa)
 				return &res;
 			}
 		}
-		fp->mode = sa->attributes.mode;
+		debuglog("changing mode from %o to %o\n", fp->mode, (fp->mode & NFSMODE_MASK) | sa->attributes.mode);
+		fp->mode = (fp->mode & NFSMODE_MASK) | sa->attributes.mode;
 		rem_cache(&attrcache, inode->inode);
 		if (rfsv_isalive() && !builtin)
 			add_cache(&attrcache, inode->inode, fp);
