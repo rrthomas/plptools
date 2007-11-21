@@ -13,7 +13,6 @@ plpnfsd \- Daemon to mount a Psion like an NFS file-system
 .B plpnfsd
 .B [-V]
 .B [-v]
-.B [-D]
 .B [-h]
 .BI "[-p [" host :] port ]
 .BI "[-d " mount-dir ]

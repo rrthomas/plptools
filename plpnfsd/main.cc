@@ -483,7 +483,6 @@ help()
         " -d, --mountpoint=DIR    Specify DIR as mountpoint\n"
 	" -u, --user=USER         Specify USER who owns mounted dir\n"
 	" -v, --verbose           Increase verbosity\n"
-	" -D, --debug             Increase debug level\n"
 	" -h, --help              Display this text\n"
 	" -V, --version           Print version and exit\n"
 	" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST\n"
@@ -500,7 +499,6 @@ usage() {
 static struct option opts[] = {
     {"help",       no_argument,       0, 'h'},
     {"verbose",    no_argument,       0, 'v'},
-    {"debug",      no_argument,       0, 'D'},
     {"version",    no_argument,       0, 'V'},
     {"port",       required_argument, 0, 'p'},
     {"user",       required_argument, 0, 'u'},
@@ -553,7 +551,7 @@ int main(int argc, char**argv) {
 	sockNum = ntohs(se->s_port);
 
     while (1) {
-	int c = getopt_long(argc, argv, "hvDVp:u:d:", opts, NULL);
+	int c = getopt_long(argc, argv, "hvVp:u:d:", opts, NULL);
 	if (c == -1)
 	    break;
 	switch (c) {
