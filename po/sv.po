@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-20 21:53+0000\n"
+"POT-Creation-Date: 2007-11-23 23:38+0000\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -1490,28 +1490,21 @@ msgstr ""
 msgid "EPOC"
 msgstr ""
 
-#: plpnfsd/main.cc:479
+#: plpnfsd/main.cc:481
 msgid ""
 "Usage: plpnfsd [OPTIONS]...\n"
 "\n"
 "Supported options:\n"
 "\n"
 " -d, --mountpoint=DIR    Specify DIR as mountpoint\n"
-" -u, --user=USER         Specify USER who owns mounted dir.\n"
-" -v, --verbose           Increase verbosity\n"
-" -D, --debug             Increase debug level\n"
-" -h, --help              Display this text.\n"
-" -V, --version           Print version and exit.\n"
-" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
-"                         Default for HOST is 127.0.0.1\n"
-"                         Default for PORT is "
+"                         Default for DIR is "
 msgstr ""
 
-#: plpnfsd/main.cc:497
+#: plpnfsd/main.cc:499
 msgid "Try `plpnfsd --help' for more information"
 msgstr "Prova 'plpnfsd --help' för mer information"
 
-#: plpnfsd/main.cc:564
+#: plpnfsd/main.cc:565
 msgid "plpnfsd Version "
 msgstr ""
 
