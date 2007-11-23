@@ -51,7 +51,7 @@ using namespace std;
 
 static rfsv *a;
 static rfsvfactory *rf;
-static char *a_filename = 0;
+static char *a_filename = NULL;
 static u_int32_t a_handle;
 static u_int32_t a_offset;
 static u_int32_t a_openmode;
@@ -280,7 +280,7 @@ long rfsv_closecached() {
 	return 0;
     a->fclose(a_handle);
     free(a_filename);
-    a_filename = 0;
+    a_filename = NULL;
     return 0;
 }
 
@@ -297,7 +297,7 @@ long rfsv_fclose(long handle) {
 	return -1;
     if (a_filename && (handle == a_handle)) {
 	free(a_filename);
-	a_filename = 0;
+	a_filename = NULL;
     }
     return a->fclose(handle);
 }
@@ -438,6 +438,8 @@ long rfsv_statdev(char letter) {
 long rfsv_rename(const char *oldname, const char *newname) {
     if (!a)
 	return -1;
+    if (a_filename && (!strcmp(a_filename, oldname) || !strcmp(a_filename, newname)))
+	rfsv_closecached();
     return a->rename(oldname, newname);
 }
 
@@ -451,7 +453,7 @@ long rfsv_drivelist(int *cnt, device **dlist) {
 	return -1;
     ret = a->devlist(devbits);
     if (ret == 0)
-	for (i = 0; i<26; i++) {
+	for (i = 0; i < 26; i++) {
 	    PlpDrive drive;
 
 	    if ((devbits & 1) &&
