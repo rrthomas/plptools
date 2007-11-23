@@ -1120,7 +1120,7 @@ nfsproc_statfs_2(struct nfs_fh *fh)
 	res.status = NFS_OK;
 
 	if (query_devices()) {
-		/* Allow to mount it whithout the psion attached */
+		/* Allow to mount it without the psion attached */
 		if (rfsv_isalive())
 			return &res;	/* res.status = NO_PSION;  Hmm */
 	}
@@ -1303,7 +1303,7 @@ addwritecache(struct cache *cp, int doff, int dlen, unsigned char *dp)
  * up to the last is exactly the same size.
  * A new problem:
  * Since I dunno how to seek to a point beyond the end of the file (psion),
- * I can't sopport the exact semantics of write. Such files will never be
+ * I can't support the exact semantics of write. Such files will never be
  * written completely. :-(
  *
  * Another dumb solaris (sysv?) problem: if the client is writing 512 byte
