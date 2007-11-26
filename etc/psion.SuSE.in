@@ -1,118 +1,102 @@
-#! /bin/sh
+#!/bin/sh
 #
-# /sbin/init.d/psion
-#
+### BEGIN INIT INFO
+# Provides:       psion
+# Required-Start: $syslog
+# Required-Stop:
+# Default-Start:  3 5
+# Default-Stop:   0 1 2 6
+# Description:    Start Psion support
+### END INIT INFO
 
-. /etc/rc.config
+# Source function library.
+. /etc/rc.status
 
-# Determine the base and follow a runlevel link name.
-base=${0##*/}
-link=${base#*[SK][0-9][0-9]}
+[ -f @prefix@/sbin/ncpd ] || exit 0
+[ -f @prefix@/sbin/plpnfsd ] || exit 0
+[ -f @prefix@/sbin/plpprintd ] || exit 0
+[ -f /etc/sysconfig/psion ] || exit 0
+. /etc/sysconfig/psion
 
-# Force execution if not called by a runlevel directory.
-test $link = $base && START_PSION=yes
-test "$START_PSION" = yes || exit 0
-
-test -f @prefix@/sbin/ncpd || exit 0
-test -f @prefix@/sbin/plpnfsd || exit 0
-test -f @prefix@/sbin/plpprintd || exit 0
-
-# The echo return value for success (defined in /etc/rc.config).
-showresult() {
-	test $RETVAL -eq 0 && echo -e $rc_done || echo -e $rc_failed
-}
-
-showstatus() {
-	## Check status with checkproc(8), if process is running
-	## checkproc will return with exit status 0.
-	checkproc @prefix@/sbin/$1 && \
-		echo -n "$1 running " ||  \
-		echo -n "No running $1 "
-}
+rc_reset
 
 start() {
 	echo "Starting Psion support ..."
-	RETVAL=0
-	if test "$START_NCPD" = "yes" ; then
+	if [ "$START_NCPD" = "yes" ] ; then
 		echo -n "  ncpd: "
-		/sbin/startproc @prefix@/sbin/ncpd $NCPD_ARGS
-		RETVAL=$?
-		showresult
+		startproc -f @prefix@/sbin/ncpd $NCPD_ARGS
+		rc_status -v
 	fi
-	if test "$START_PLPNFSD" = "yes" ; then
+	if [ "$START_PLPNFSD" = "yes" ] ; then
 		echo -n "  plpnfsd: "
-		/sbin/startproc @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
-		RETVAL=$?
-		showresult
+		startproc -f @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
+		rc_status -v
 	fi
-	if test "$START_PLPPRINTD" = "yes" ; then
+	if [ "$START_PLPPRINTD" = "yes" ] ; then
 		echo -n "  plpprintd: "
-		/sbin/startproc @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
-		RETVAL=$?
-		showresult
+		startproc -f @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
+		rc_status -v
 	fi
-	return $RETVAL
+	rc_status && touch /var/lock/subsys/psion
 }
 
 stop() {
 	echo "Stopping Psion support ..."
-	if test "$START_PLPNFSD" = "yes" ; then
+	if [ "$START_PLPNFSD" = "yes" ] ; then
 		echo -n "  plpnfsd: "
-		/sbin/killproc -HUP plpnfsd
+		killproc -HUP @prefix@/sbin/plpnfsd
 		WAIT=5
 		while test $WAIT -gt 0 ; do
-			test -z "`pidof plpnfsd`" && break;
+			test -z "`pidofproc plpnfsd`" && break;
 			sleep 1 # allow plpnfsd flushing it's cache
 			WAIT=`expr $WAIT - 1`
 		done
-		test -z "`pidof plpnfsd`" || killproc plpnfsd
-		RETVAL=$?
-		showresult
+		test -z "`pidofproc plpnfsd`" || \
+			killproc -TERM @prefix@/sbin/plpnfsd
+		rc_status -v
 	fi
-	if test "$START_PLPPRINTD" = "yes" ; then
+	if [ "$START_PLPPRINTD" = "yes" ] ; then
 		echo -n "  plpprintd: "
-		/sbin/killproc -TERM plpprintd
-		RETVAL=$?
-		showresult
+		killproc -TERM @prefix@/sbin/plpprintd
+		rc_status -v
 	fi
-	if test "$START_NCPD" = "yes" ; then
+	if [ "$START_NCPD" = "yes" ] ; then
 		echo -n "  ncpd: "
-		/sbin/killproc -TERM ncpd
-		RETVAL=$?
-		showresult
+		killproc -TERM @prefix@/sbin/ncpd
+		rc_status -v
 	fi
-	return $RETVAL
+	rc_status && rm -f /var/lock/subsys/psion
 }
 
+restart() {
+	stop
+	start
+}
+
+# See how we were called.
 case "$1" in
-    start)
-    	start
+  start)
+  	start
 	;;
-
-    stop)
-    	stop
+  stop)
+  	stop
 	;;
-
-    reload|restart)
-	## If first returns OK call the second, if first or
-	## second command fails, set echo return value.
-	$0 stop  &&  $0 start  ||  return=$rc_failed
+  status)
+	echo -n "Checking for service psion: "
+	checkproc @prefix@/sbin/plpnfsd && \
+		checkproc @prefix@/sbin/plpprintd && \
+		checkproc @prefix@/sbin/ncpd
+	rc_status -v
 	;;
-
-    status)
-	echo -n "Checking for Psion support: "
-	showstatus ncpd
-	showstatus plpnfsd
-	showstatus plpprintd
+  restart|reload)
+  	restart
 	;;
-
-    *)
-	echo "Usage: $0 {start|stop|status|restart}"
+  condrestart)
+  	test -f /var/lock/subsys/psion && restart || :
+	;;
+  *)
+	echo "Usage: psion {start|stop|status|restart|reload|condrestart}"
 	exit 1
-	;;
 esac
 
-# Inform the caller not only verbosely and set an exit status.
-test "$return" = "$rc_done" || exit 1
-exit 0
-
+rc_exit
