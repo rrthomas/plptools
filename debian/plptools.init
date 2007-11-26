@@ -46,7 +46,12 @@ case "$1" in
   stop)
 	if test "$START_PLPNFSD" = "yes" ; then
 		echo -n "Stopping $DESC ($DAEMON2): "
-		start-stop-daemon --stop --schedule HUP/5/TERM/1 --quiet \
+# 	Stop the daemon more gently
+		if test -e /var/lib/plptools/mnt/proc/exit ; then
+		echo "stop" > /var/lib/plptools/mnt/proc/exit
+		sleep 1
+		fi
+		start-stop-daemon --stop --retry HUP/5/TERM/1 --quiet \
 				--exec $DAEMON2 && \
 			echo -n "done" || echo -n "already stopped"
 		echo "."
