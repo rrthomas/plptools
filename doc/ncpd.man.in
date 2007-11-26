@@ -38,7 +38,7 @@ Display the version and exit
 Display a short help text and exit.
 .TP
 .B \-e, --autoexit
-Exit automatically, if the device is disconnected. Furthermore, use the
+Exit automatically if the device is disconnected. Furthermore, use the
 current tty as I/O device. This option is intended for starting ncpd on
 demand using mgetty's auto-detect function. (A patch for mgetty is needed
 for that).

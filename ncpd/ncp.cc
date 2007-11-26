@@ -338,7 +338,7 @@ decodeControlMessage(bufferStore & buff)
 		b.addDWord(time(NULL));
 		controlChannel(0, NCON_MSG_NCP_INFO, b);
 	    } else {
-		lout << "ALERT!!!! Unexpected Protocol Version!! (No Series 5/3?)!" << endl;
+		lout << "ALERT!!!! Unexpected Protocol Version!! (Not Series 3/5?)!" << endl;
 		failed = true;
 	    }
 	    break;
