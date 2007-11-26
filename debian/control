@@ -1,5 +1,5 @@
 Source: plptools
-Build-Depends: debhelper (>= 4.0.2), automake (>= 1:1.4-p4-1.1) | automake1.6, autoconf, libtool, gettext, libncurses5-dev, libreadline4-dev, libnewt-dev
+Build-Depends: debhelper (>= 4.0.2), automake (>= 1:1.4-p4-1.1) | automake1.6, autoconf, libtool, gettext, libncurses5-dev, libreadline4-dev, libnewt-dev, kdoc
 Section: otherosfs
 Priority: optional
 Maintainer: John Lines <john@paladin.demon.co.uk>

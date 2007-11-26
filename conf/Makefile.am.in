@@ -31,11 +31,14 @@ install-data-local:
 		install -m 755 etc/psion $(DESTDIR)$(initdir)/psion || :
 
 dist-hook:
-	$(MAKE) TMPDEST=$(distdir)/ specfile
+	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile
 	test -f CVS/Root && conf/cvs2cl -W 1800 -S --no-wrap --prune \
 		--gmt -f $(distdir)/ChangeLog || \
 		cp -f ChangeLog $(distdir)/ChangeLog
 	rm -rf $(distdir)/debian/CVS
+
+kdoc:
+	kdoc -d $(TMPDEST)doc/api -n libplp --strip-h-path $(TMPDEST)lib/*.h
 
 specfile:
 	sed -e "s/\@VERSION\@/$(VERSION)/" < $(TMPDEST)etc/plptools.spec.in \
