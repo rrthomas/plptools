@@ -1,5 +1,2 @@
-# udev rules to start and stop plptools when USB serial device is
-# added/removed
-
-ACTION=="add", SUBSYSTEM=="usb-serial", RUN+="/etc/init.d/plptools start"
+ACTION=="add", SUBSYSTEMS=="usb-serial", DRIVERS=="pl2303", RUN+="/etc/init.d/plptools start"
 ACTION=="remove", SUBSYSTEM=="usb-serial", RUN+="/etc/init.d/plptools stop"
