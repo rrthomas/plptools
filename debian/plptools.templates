@@ -1,6 +1,6 @@
 Template: plptools/customize
 Type: note
-Description: Customize /etc/plptools.conf
+_Description: Customize /etc/plptools.conf
  In addition to plptools' main daemon "ncpd", plptools provides two optional
  daemons:
  .
@@ -13,7 +13,7 @@ Description: Customize /etc/plptools.conf
 Template: plptools/ncpd/start
 Type: boolean
 Default: true
-Description: Should ncpd being started during boot?
+_Description: Should ncpd be started during boot?
  Normally, ncpd - the daemon which handles the serial connection to a
  Psion - is started on boot-up. If you intend to connect your Psion to
  another machine on the net and NEVER will use it locally, you can
@@ -22,14 +22,14 @@ Description: Should ncpd being started during boot?
 Template: plptools/ncpd/serial
 Type: string
 Default: /dev/ttyS0
-Description: Specify serial line to be used
+_Description: Specify serial line to be used
  By default, the Psion is expected to be connected to the first serial
  line (COM1:) of your machine. You can change this here.
 
 Template: plptools/ncpd/listenat
 Type: string
 Default: 127.0.0.1
-Description: Specify the IP address and port for ncpd
+_Description: Specify the IP address and port for ncpd
  If you intend to use the plptools front-ends from other machines, you
  can specify 0.0.0.0 or the IP address of your machine here. Normal
  users should keep the default 127.0.0.1!
@@ -41,7 +41,7 @@ Description: Specify the IP address and port for ncpd
 Template: plptools/plpnfsd/start
 Type: boolean
 Default: false
-Description: Should plpnfsd being started during boot?
+_Description: Should plpnfsd be started during boot?
  If plpnfsd is started during boot-up, it will wait for a Psion being
  connected and then automatically mount that Psion. Since this is
  done as root, non-privileged users will not have access to the
@@ -51,7 +51,7 @@ Description: Should plpnfsd being started during boot?
 Template: plptools/plpnfsd/suid
 Type: boolean
 Default: false
-Description: Set SUID-root bit of plpnfsd?
+_Description: Set SUID-root bit of plpnfsd?
  For convenience on a single-user machine, plpnfsd can be installed with
  the setuid bit enabled. This allows any local user to mount and unmount
  a connected Psion. Be warned, that THIS IS A SECURITY THREAT to your
@@ -60,7 +60,7 @@ Description: Set SUID-root bit of plpnfsd?
 Template: plptools/plpprintd/start
 Type: boolean
 Default: false
-Description: Should plpprintd being started during boot?
+_Description: Should plpprintd be started during boot?
  If you intend to use the Psion's "Print via PC" feature, you can
  enable this option. You must have a working print queue which
  is capable of printing Postscript in order to use this feature.
@@ -68,13 +68,13 @@ Description: Should plpprintd being started during boot?
 Template: plptools/plpprintd/printqueue
 Type: string
 Default: psion
-Description: Specify the print queue to be used
+_Description: Specify the print queue to be used
  Please enter the name of the print queue you want to use for
  printing from the Psion.
 
 Template: plptools/frontends/remoteaddr
 Type: string
-Description: Specify remote host to be contacted
+_Description: Specify remote host to be contacted
  Since you have ncpd either disabled or listening on a non-standard
- address, you should specify the address for the frontents again.
+ address, you should specify the address for the frontends again.
 

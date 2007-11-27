@@ -1,2 +1,2 @@
-?package(plptools):needs=text section=Apps/Tools\
+?package(plptools):needs="text" section="Apps/Tools"\
   title="plpftp" command="/usr/bin/plpftp"

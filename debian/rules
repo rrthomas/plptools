@@ -6,7 +6,7 @@
 export DH_VERBOSE=1
 
 # This is the debhelper compatability version to use.
-export DH_COMPAT=3
+export DH_COMPAT=5
 
 # Set config options
 export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
@@ -30,7 +30,9 @@ configure-stamp:
 	dh_testdir
 	./configure $(confflags) --prefix=/usr \
 		--with-mountdir=/var/lib/plptools/mnt \
-		--mandir=/usr/share/man --with-initdir=none --disable-rpath
+		--mandir=/usr/share/man --with-initdir=none \
+		--with-serial=/dev/ttyS0 \
+		--disable-rpath
 	touch configure-stamp
 
 build: configure-stamp build-stamp
@@ -44,13 +46,10 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-	-$(MAKE) maintainer-clean
+	-$(MAKE) distclean
 	dh_clean
 
-man-install: debian/kpsion.1 debian/klipsi.1
-	install -m 644 $^ $(tmp)/usr/share/man/man1
-
-install: build debian/kpsion.1 debian/klipsi.1
+install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
@@ -59,18 +58,17 @@ install: build debian/kpsion.1 debian/klipsi.1
 	install -d $(tmp)/etc
 	install -d $(ltmp)
 	install -m 644 debian/plptools.conf $(tmp)/etc
-	install -m 644 debian/kpsion.1 $(tmp)/usr/share/man/man1
-	install -m 644 debian/klipsi.1 $(tmp)/usr/share/man/man1
 	cp CHANGES obsolete-changes
 	cp ChangeLog changelog
 	for i in debian/*.override ; do \
-		mv $$i $(ltmp)/`basename $$i .override` ; \
+		cp -a $$i $(ltmp)/`basename $$i .override` ; \
 	done
 	for i in `find debian/ -type l -name "common"`; do \
 		rm -f $$i && ln -s ../common $$i ; \
 	done
 	# Split into sub-packages
 	dh_movefiles -pplptools
+	dh_movefiles -plibplpc2a
 	dh_movefiles -pplptools-dev
 
 # Build architecture-independent files here.

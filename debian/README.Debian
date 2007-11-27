@@ -12,4 +12,5 @@ the file /usr/share/doc/etc/udev-usbserial-plptools.rules
 The Debian version of plpnfsd mounts the EPOC disks under
 /var/lib/plptools/mnt
 
- -- John Lines <john@paladin.demon.co.uk>, Sat Nov 10 13:10:45 GMT 2001
+
+ -- John Lines <john@paladin.demon.co.uk>, Sun Aug 20 06:59:58 BST 2006
