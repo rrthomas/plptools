@@ -1,11 +1,15 @@
 plptools for Debian
 ----------------------
 
-This version defaults to connecting the Psion to /dev/ttyS0 - if you
-connect to a different serial line you will need to change the plptools
-init script (e.g. /etc/init.d/plptools if you use SV5 init)
+This version defaults to connecting the EPOC device to /dev/ttyS0 - if
+you connect to a different serial line you will need to change the
+plptools init script (e.g. /etc/init.d/plptools if you use SV5 init).
 
-The Debian version of plpnfsd mounts the Psion disks to /var/lib/plptools/mnt
+If you connect your EPOC device via a USB serial device, you may want to
+use udev to start and stop plptools instead. Sample rules are given in
+the file /usr/share/doc/etc/udev-usbserial-plptools.rules
 
+The Debian version of plpnfsd mounts the EPOC disks under
+/var/lib/plptools/mnt
 
  -- John Lines <john@paladin.demon.co.uk>, Sat Nov 10 13:10:45 GMT 2001

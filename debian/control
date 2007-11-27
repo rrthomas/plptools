@@ -1,5 +1,5 @@
 Source: plptools
-Build-Depends: debhelper (>= 4.0.2), automake (>= 1:1.4-p4-1.1) | automake1.6, autoconf, libtool, gettext, libncurses5-dev, libreadline4-dev, libnewt-dev, kdoc
+Build-Depends: debhelper (>= 4.0.2), automake (>= 1:1.4-p4-1.1) | automake1.6, autoconf, libtool, gettext, libncurses5-dev, libreadline5-dev, libnewt-dev, kdoc
 Section: otherosfs
 Priority: optional
 Maintainer: John Lines <john@paladin.demon.co.uk>
@@ -9,13 +9,11 @@ Package: plptools
 Architecture: any
 Depends: ${shlibs:Depends}, debconf (>= 1.0)
 Description: Access a Psion PDA over a serial link 
- This package lets you access Psion drives over a serial link. You
- can mount them, pseudo NFS style, access them FTP-like, use a local
- printer from the Psion (Psion S5 only) and perform backup/restore.
+ This package lets you access EPOC devices' drives over a serial link.
+ You can mount them NFS-style, access them FTP-style, and use a local 
+ printer from the remote device (EPOC32 only).
  .
- The software is partially based on p3nfs, which is also packed for
- Debian, but plptools uses the native Psion protocol, whereas p3nfs
- requires a program to be installed on the Psion.
+ Homepage: http://plptools.sourceforge.net/
 
 Package: plptools-dev
 Architecture: any
