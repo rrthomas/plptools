@@ -231,6 +231,17 @@ long rfsv_isalive() {
     return (a->getStatus() == rfsv::E_PSI_GEN_NONE);
 }
 
+long rfsv_closecached() {
+    if (!a)
+	return -1;
+    if (!a_filename)
+	return 0;
+    a->fclose(a_handle);
+    free(a_filename);
+    a_filename = NULL;
+    return 0;
+}
+
 long rfsv_dir(const char *file, dentry **e) {
     PlpDir entries;
     dentry *tmp;
@@ -264,6 +275,7 @@ long rfsv_dircount(const char *file, u_int32_t *count) {
 long rfsv_rmdir(const char *name) {
     if (!a)
 	return -1;
+    rfsv_closecached(); /* Just in case we're caching stuff in this dir */
     return a->rmdir(name);
 }
 
@@ -271,17 +283,6 @@ long rfsv_mkdir(const char *file) {
     if (!a)
 	return -1;
     return a->mkdir(file);
-}
-
-long rfsv_closecached() {
-    if (!a)
-	return -1;
-    if (!a_filename)
-	return 0;
-    a->fclose(a_handle);
-    free(a_filename);
-    a_filename = NULL;
-    return 0;
 }
 
 long rfsv_remove(const char *file) {
@@ -438,8 +439,9 @@ long rfsv_statdev(char letter) {
 long rfsv_rename(const char *oldname, const char *newname) {
     if (!a)
 	return -1;
-    if (a_filename && (!strcmp(a_filename, oldname) || !strcmp(a_filename, newname)))
-	rfsv_closecached();
+    /* We could be renaming a directory containing the cached item, so
+       always flush */
+    rfsv_closecached();
     return a->rename(oldname, newname);
 }
 

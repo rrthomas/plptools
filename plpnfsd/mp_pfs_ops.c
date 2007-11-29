@@ -675,7 +675,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 	int builtin = 0;
 	int l;
 
-	debuglog("getattr:'%s',%d\n", inode->name, inode->inode);
+	debuglog("getattr: '%s',%d\n", inode->name, inode->inode);
 	res.status = NFS_OK;
 
 	if ((cp = search_cache(attrcache, inode->inode))) {
@@ -688,13 +688,13 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 
 	if (inode->inode == root_fattr.fileid) {
 		/* It's the root inode */
-		debuglog("getattr:root inode (%#o)\n", root_fattr.mode);
+		debuglog("getattr: root inode (%#o)\n", root_fattr.mode);
 
 		if (query_devices())	/* root inode and proc is always there */
 			root_fattr.nlink = 3;
 		*fp = root_fattr;
 	} else if (l == 2 && inode->name[1] == ':') {
-		debuglog("getattr:device\n");
+		debuglog("getattr: device\n");
 		res.status = NO_PSION;
 		if (!query_devices()) {
 			device *dp;
@@ -742,7 +742,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 		}
 
 		if (!builtin) {
-			debuglog("getattr:fileordir\n");
+			debuglog("getattr: fileordir\n");
 			/* It's a normal file/dir */
 			debuglog("RFSV getattr %s\n", inode->name);
 			if (rfsv_getattr(inode->name, &pattr, &psize, &ptime)) {
@@ -1205,7 +1205,7 @@ nfsproc_read_2(struct readargs *ra)
 	}
 	fp = &res.readres_u.reply.attributes;
 	if (!cp) {
-		// Problem: if an epoc process is enlarging the file, we wont recognize it
+		// Problem: if an EPOC process is enlarging the file, we won't recognize it
 		debuglog("RFSV getattr %s\n", inode->name);
 		if (builtin) {
 			pattr = bn->attr;
