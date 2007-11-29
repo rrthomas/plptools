@@ -96,7 +96,7 @@ char *name;
 	if (!ptr)
 		ptr = newinode(name, nextinode++);
 	if (debug > 1)
-		debuglog("get_nam(``%s'') returns %08x->inode = %d\n",
+		debuglog("get_nam(\"%s\") returns %08x -> inode = %d\n",
 		       name, (unsigned int) ptr, ptr->inode);
 	return ptr;
 }
