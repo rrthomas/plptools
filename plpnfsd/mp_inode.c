@@ -287,6 +287,7 @@ char *
 build_path(dir, file)
 char *dir, *file;
 {
+	/* FIXME: Buffer overflow */
 	static char namebuf[300];
 
 	if (!strcmp(dir, ""))
