@@ -415,7 +415,7 @@ builtin_node *register_builtin(char *parent, builtin_node *node) {
 }
 
 /*
- * Nfsd returned NFSERR_STALE if the psion wasn't present, but I didn't like
+ * nfsd returned NFSERR_STALE if the Psion wasn't present, but I didn't like
  * it because the kernel returns the same when the nfsd itself is absent
  */
 
@@ -656,7 +656,8 @@ mp_dircount(p_inode *inode, long *count)
 		o = e;
 		e = e->next;
 		free(o);
-		(*count)++;
+		if (fp.type == NFDIR)
+			(*count)++;
 	}
 	return 0;
 }
@@ -675,7 +676,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 	int builtin = 0;
 	int l;
 
-	debuglog("getattr: '%s',%d\n", inode->name, inode->inode);
+	debuglog("getattr: '%s', %d\n", inode->name, inode->inode);
 	res.status = NFS_OK;
 
 	if ((cp = search_cache(attrcache, inode->inode))) {
@@ -705,7 +706,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 				if (dp->letter == inode->name[0])
 					break;
 			}
-			debuglog("device: %s exists\n", (dp)?"":"not");
+			debuglog("device: %s\n", dp ? "exists" : "does not exist");
 			if (dp) {
 				res.status = NFS_OK;
 				*fp = root_fattr;
@@ -717,7 +718,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 					res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 					return &res;
 				}
-				if (fp->nlink != (dcount + 2))
+				if (fp->nlink != dcount + 2)
 					fp->mtime.seconds = time(0);
 				fp->nlink = dcount + 2;
 			}
@@ -756,7 +757,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 				return &res;
 			}
-			if (fp->nlink != (dcount + 2))
+			if (fp->nlink != dcount + 2)
 				fp->mtime.seconds = time(0);
 			fp->nlink = dcount + 2;
 		}
@@ -779,7 +780,7 @@ nfsproc_lookup_2(diropargs *da)
 		res.status = NO_PSION;
 		return &res;
 	}
-	debuglog("lookup: in '%s'(%d) searching '%s'\n",
+	debuglog("lookup: in '%s' (%d) finding '%s'\n",
 		       inode->name, inode->inode, da->name);
 	if (!strcmp(da->name, "."))
 		inode2fh(fh2inode(da->dir.data), fp);
@@ -956,7 +957,7 @@ nfsproc_setattr_2(sattrargs *sa)
 		res.status = NO_PSION;
 		return &res;
 	}
-	debuglog("setattr %s called\n", inode->name);
+	debuglog("setattr '%s'\n", inode->name);
 	res = *nfsproc_getattr_2(&sa->file);
 	if (res.status != NFS_OK)
 		return &res;
@@ -1005,7 +1006,7 @@ nfsproc_setattr_2(sattrargs *sa)
 	    (sa->attributes.mode != -1)) {
 		long psisattr, psidattr;
 		attr2pattr(sa->attributes.mode, fp->mode, &psisattr, &psidattr);
-		debuglog("RFSV setattr %s %d %d\n", inode->name, psisattr, psidattr);
+		debuglog("RFSV setattr '%s' %d %d\n", inode->name, psisattr, psidattr);
 		if (builtin) {
 			if ((bn->sattr == NULL) || bn->sattr(bn, psisattr, psidattr)) {
 				res.status = NFSERR_ACCES;
@@ -1075,6 +1076,7 @@ nfsproc_rename_2(renameargs *ra)
 	static nfsstat res;
 	p_inode *from = get_num(fh2inode(ra->from.dir.data));
 	p_inode *to = get_num(fh2inode(ra->to.dir.data));
+	/* FIXME: Buffer overflow */
 	char ldata[300], *old, c;
 
 	if (!from || !to) {
@@ -1206,7 +1208,7 @@ nfsproc_read_2(struct readargs *ra)
 	fp = &res.readres_u.reply.attributes;
 	if (!cp) {
 		// Problem: if an EPOC process is enlarging the file, we won't recognize it
-		debuglog("RFSV getattr %s\n", inode->name);
+		debuglog("RFSV getattr '%s'\n", inode->name);
 		if (builtin) {
 			pattr = bn->attr;
 			psize = (bn->getsize) ? bn->getsize(bn) : bn->size;
