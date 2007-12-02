@@ -1036,7 +1036,7 @@ remove_it(diropargs *da, int isdir)
 	long rfsv_res;
 
 	if (!inode) {
-		debuglog("setattr: stale fh\n");
+		debuglog("remove_it: stale fh\n");
 		res = NO_PSION;
 		return &res;
 	}
