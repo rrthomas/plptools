@@ -71,7 +71,7 @@ long param_getsize(builtin_node *node) {
 long exit_write(builtin_node *node, char *buf, unsigned long offset, long len) {
 	if (len >= 4 && offset == 0) {
 		if (!strncmp(buf, "stop", 4))
-			exiting = 5; /* Lets try it 5 times (10 sec) */
+			exiting = 5; /* Let's try it 5 times (10 sec) */
 	}
 	return len;
 }
@@ -659,6 +659,7 @@ mp_dircount(p_inode *inode, long *count)
 		if (fp.type == NFDIR)
 			(*count)++;
 	}
+	debuglog("count %d\n", *count);
 	return 0;
 }
 
@@ -753,6 +754,7 @@ nfsproc_getattr_2(struct nfs_fh *fh)
 		}
 		pattr2attr(pattr, psize, ptime, fp, fh2inode((char *) fh->data));
 		if (fp->type == NFDIR) {
+			debuglog("%s is a dir\n", inode->name);
 			if (mp_dircount(inode, &dcount)) {
 				res.status = rfsv_isalive() ? NFSERR_NOENT : NO_PSION;
 				return &res;
@@ -812,19 +814,6 @@ addentry(readdirargs *ra, entry ***where, int *searchi, int inode, char *name)
 		return;
 
 	/*
-	 * From ddan@au.stratus.com Wed Feb  8 04:14 MET 1995
-	 * Modifed in pl7.a by Dan Danz to fix problem of missing files in readdir
-	 *
-	 * In a shotgun attempt at fixing this, I surmised that perhaps addentry
-	 * was putting one too many entries in the result, so I increased
-	 * the number of bytes for each entry by +8  ... my reasoning was that
-	 * you need to account for the filename pointer and for the cookie int ...
-	 * but in retrospect, I'm not sure about this reasoning.  HOWEVER, it appears
-	 * that this fixes the problem.
-	 * FIXED: See next comment (Rudi)
-	 */
-
-	/*
 	 * Count the bytes needed for the xdr encoded data. Xdr is trickier than
 	 * one (me :-) might think: Xdr converts a string into
 	 * length (4 bytes) + data (rounded up to 4 bytes).
@@ -856,7 +845,6 @@ nfsproc_readdir_2(readdirargs *ra)
 	static readdirres res;
 	p_inode *inode = get_num(fh2inode(ra->dir.data));
 	entry *centry, *fentry, **cp;
-	char *bp;
 	int searchinode;
 
 	if (!inode) {
@@ -923,8 +911,11 @@ nfsproc_readdir_2(readdirargs *ra)
 			fattr fp;
 			dentry *o;
 			int ni;
-	
+			char *bp;
+
 			bp = filname(e->name);
+			if (debug > 1)
+				debuglog("  %s\n", bp);
 			ni = get_nam(build_path(inode->name, bp))->inode;
 			addentry(ra, &cp, &searchinode, ni, (char *) bp);
 			free(e->name);
@@ -1042,6 +1033,7 @@ remove_it(diropargs *da, int isdir)
 	}
 	debuglog("remove_it: in %s: %s (%d)\n", inode->name, da->name, isdir);
 
+	rem_cache(&attrcache, inode->inode);
 	if (isdir) {
 		debuglog("RFSV rmdir %s\n", build_path(inode->name, da->name));
 		rfsv_res = rfsv_rmdir(build_path(inode->name, da->name));
@@ -1053,7 +1045,6 @@ remove_it(diropargs *da, int isdir)
 		res = rfsv_isalive() ? NFSERR_ACCES : NO_PSION;
 		return &res;
 	}
-	rem_cache(&attrcache, inode->inode);
 	res = NFS_OK;
 	return &res;
 }
@@ -1354,6 +1345,7 @@ nfsproc_write_2(writeargs *wa)
 		}
 	}
 	/* fetch attributes */
+	/* FIXME: Cope without cache */
 	if ((cp = search_cache(attrcache, inode->inode)) == 0) {
 		gres = nfsproc_getattr_2((struct nfs_fh *) wa->file.data);
 		if (gres->status != NFS_OK) {
@@ -1379,7 +1371,7 @@ nfsproc_write_2(writeargs *wa)
 		res.status = NFS_OK;
 		return &res;
 	}
-/* Write out as many blocks from the cache as we can */
+	/* Write out as many blocks from the cache as we can */
 	for (;;) {
 		if (debug > 2)
 			for (dcp = cp->dcache; dcp; dcp = dcp->next)
@@ -1431,7 +1423,7 @@ void *
 nfsproc_null_2()
 {
 	static char res;
-	debuglog("null.\n");
+	debuglog("null (NFS operation)\n");
 	res = (char) NFSERR_FBIG;
 	return (void *) &res;
 }
@@ -1455,7 +1447,7 @@ nfsproc_link_2(linkargs *la)
 {
 	static nfsstat res;
 
-	debuglog("link..\n");
+	debuglog("link: not supported\n");
 	res = NFSERR_ACCES;
 	return &res;
 }
@@ -1466,7 +1458,7 @@ nfsproc_readlink_2(struct nfs_fh *fh)
 {
 	static readlinkres res;
 
-	debuglog("readlink...\n");
+	debuglog("readlink: not supported\n");
 	res.status = NFSERR_ACCES;
 	return &res;
 }
@@ -1477,7 +1469,7 @@ nfsproc_symlink_2(symlinkargs *sa)
 {
 	static nfsstat res;
 
-	debuglog("symlink..\n");
+	debuglog("symlink: not supported\n");
 	res = NFSERR_ACCES;
 	return &res;
 }
