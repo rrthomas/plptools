@@ -1,6 +1,7 @@
 AC_REVISION($Revision$)dnl revision of this configure.in script
 
 AC_INIT(Makefile.am)
+AC_GNU_SOURCE
 AC_CONFIG_AUX_DIR(conf)
 AC_CANONICAL_SYSTEM
 AM_CONFIG_HEADER(include/config.h)
@@ -12,6 +13,7 @@ dnl Enable Maintainer stuff
 AM_MAINTAINER_MODE
 
 dnl checks for programs
+AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
 AC_PROG_AWK
 AC_PATH_PROG(SED,sed)
@@ -40,6 +42,10 @@ ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
 dnl Additional glibc-intl checks
 PLP_CHECK_INTL
+
+dnl Large File Support
+AC_SYS_LARGEFILE
+AC_FUNC_FSEEKO
 
 dnl checking for aix
 AC_MSG_CHECKING(for AIX)
@@ -263,6 +269,29 @@ AC_SUBST(LIB_PLP)
 PLP_LDFLAGS='-L$(top_builddir)/lib/.libs'
 AC_SUBST(PLP_LDFLAGS)
 
+dnl Extra definitions for config.h
+AH_BOTTOM([
+/* Define this, if libc provides bind_textdomain_codeset */
+#undef HAVE_BIND_TEXTDOMAIN_CODESET
+
+/* Define to 401 or 402, depending on readline version 4.1 or 4.2 */
+#define READLINE_VERSION 401
+
+/* Some reasonable defaults */
+
+#ifndef PSIONHOSTNAME
+# define PSIONHOSTNAME "localhost"
+#endif
+
+/* misc tweaks */
+
+#ifdef _IBMR2
+# undef DONT_UPDATE_MTAB
+# define DONT_UPDATE_MTAB /* The mount table is obtained from the kernel (!?) */
+#endif
+])
+
+
 AC_OUTPUT(
 	Makefile
 	intl/Makefile
@@ -278,7 +307,6 @@ AC_OUTPUT(
 	doc/api/Makefile
 	etc/psion
 	etc/psion.SuSE
-	etc/psion.SuSE8
 	etc/plptools.spec
 	doc/ncpd.man
 	doc/plpnfsd.man

@@ -37,7 +37,7 @@ htmldoc:
 $(ACLOCAL):
 	aclocal -I conf/m4/plptools $(M4SUB)
 
-$(CONFIGHIN): acconfig.h configure.in
+$(CONFIGHIN): configure.in
 	autoheader
 
 $(LIBTOOLFILES):
