@@ -241,7 +241,7 @@ void cache_flush() {
 	 * Solaris sends blocks in a way which is not very pleasent
 	 * for us. It sends blocks 0,1,2,3,4,5,6, then 9,10,11 and
 	 * do on. A little bit later block 7 and 8 arrives. This "bit"
-	 * is more that 2 seconds, it is about 6 seconds. It occurs,
+	 * is more that 2 seconds, it is about 6 seconds. It occurs
 	 * if we're rewriting a file. We set MAXWRITE to 15, meaning
 	 * that we are waiting for 30 seconds to receive the missing
 	 * blocks.
