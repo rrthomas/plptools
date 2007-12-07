@@ -200,8 +200,6 @@ evalOffset(psi_timezone ptz, time_t time, bool valid) {
 
     if (valid) {
 	offset = ptz.utc_offset;
-	if (!(ptz.dst_zones & 0x40000000) || (ptz.dst_zones & ptz.home_zone))
-	    offset -= 3600;
     } else {
 	/**
 	* Fallback. If no Psion zone given, use
