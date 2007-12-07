@@ -1455,15 +1455,9 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 }
 
 #if HAVE_LIBREADLINE
-#if (READLINE_VERSION >= 402)
 #define FUNCAST(f) f
 #define CPFUNCAST(f) f
 #define MATCHFUNCTION rl_completion_matches
-#else
-#define FUNCAST(f) (Function *)f
-#define CPFUNCAST(f) (CPPFunction *)f
-#define MATCHFUNCTION completion_matches
-#endif
 
 static const char *all_commands[] = {
     "pwd", "ren", "touch", "gtime", "test", "gattr", "sattr", "devs",
@@ -1487,11 +1481,7 @@ static char cplPath[1024];
 
 static char*
 filename_generator(
-#if (READLINE_VERSION >= 402)
 				   const char *text,
-#else
-				   char *text,
-#endif
 				   int state)
 {
     static int len;
@@ -1530,11 +1520,7 @@ filename_generator(
 
 static char *
 command_generator(
-#if (READLINE_VERSION >= 402)
 		  const char *text,
-#else
-		  char *text,
-#endif
 		  int state)
 {
     static int idx, len;
@@ -1552,15 +1538,9 @@ command_generator(
     return NULL;
 }
 
-#if (READLINE_VERSION >= 402)
 static char * null_completion(const char *, int) {
     return "";
 }
-#else
-static int null_completion() {
-    return 0;
-}
-#endif
 
 static char **
 do_completion(const char *text, int start, int end)
@@ -1569,18 +1549,11 @@ do_completion(const char *text, int start, int end)
 
     rl_completion_entry_function = FUNCAST(null_completion);
     rl_completion_append_character = ' ';
-#if (READLINE_VERSION >= 402)
     rl_attempted_completion_over = 1;
-#endif
     if (start == 0)
 	{
 #if HAVE_LIBREADLINE
-# if (READLINE_VERSION >= 402)
 	matches = MATCHFUNCTION(text, command_generator);
-# else
-	char* txt = (char*)text;
-	matches = MATCHFUNCTION(txt, (CPFunction*)command_generator);
-# endif
 #endif
 	}
     else {
@@ -1611,14 +1584,7 @@ do_completion(const char *text, int start, int end)
 	}
 
 #if HAVE_LIBREADLINE
-# if (READLINE_VERSION >= 402)
 	matches = MATCHFUNCTION(text, filename_generator);
-# else
-	{
-	char* txt = (char*)text;
-	matches = MATCHFUNCTION(txt, (CPFunction*)filename_generator);
-	}
-# endif
 #endif
     }
     return matches;

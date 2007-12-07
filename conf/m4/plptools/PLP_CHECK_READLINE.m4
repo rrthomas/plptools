@@ -53,28 +53,5 @@ AC_DEFUN([PLP_CHECK_READLINE],
 	AC_SUBST(LIBREADLINE)
 	if test "${ac_cv_readline_libs}" != "" ; then
 		AC_DEFINE_UNQUOTED(HAVE_LIBREADLINE,1,$rl_desc)
-		PLP_READLINE_VERSION
-	fi
-])
-
-dnl
-dnl Check for readline version.
-dnl Those readline developers change their API too frequently
-dnl and don't provide a version number in the headers :-(
-dnl
-AC_DEFUN([PLP_READLINE_VERSION],
-[
-	AC_MSG_CHECKING(for readline version)
-	saved_libs=$LIBS
-	LIBS="$LIBS $LIBREADLINE"
-	rl42=false
-	AC_TRY_LINK(,[extern void rl_set_prompt(void); rl_set_prompt();],rl42=true)
-	LIBS="$saved_LIBS"
-	if $rl42 ; then
-		AC_MSG_RESULT(4.2 or greater)
-		AC_DEFINE_UNQUOTED(READLINE_VERSION,402)
-	else
-		AC_DEFINE_UNQUOTED(READLINE_VERSION,401)
-		AC_MSG_RESULT(4.1 or less)
 	fi
 ])
