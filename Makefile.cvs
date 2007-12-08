@@ -1,7 +1,6 @@
 LIBTOOLFILES = conf/config.guess conf/config.sub conf/ltconfig conf/ltmain.sh
 AUTOMAKEFILES = conf/mkinstalldirs conf/missing conf/install-sh
 CONFIGHIN = include/config.h.in
-ACLOCAL = conf/aclocal.m4
 GETTEXT = intl/Makefile.in
 GETTEXTDEP = conf/Makefile.am.in conf/configure.in.in
 
@@ -33,9 +32,6 @@ htmldoc:
 		o=../web/htdocs/`basename $$f`.html; \
 		man2html -H plptools.sourceforge.net -M "" $$f > $$o; \
 	done
-
-$(ACLOCAL):
-	aclocal -I conf/m4/plptools $(M4SUB)
 
 $(CONFIGHIN): configure.in
 	autoheader

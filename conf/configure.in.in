@@ -7,7 +7,12 @@ AC_CANONICAL_SYSTEM
 AM_CONFIG_HEADER(include/config.h)
 AM_INIT_AUTOMAKE(plptools, 0.19)
 AM_PROG_LIBTOOL
-PLP_SET_LIBVERSION
+
+dnl Set library version
+maj=$(echo ${VERSION} | cut -d. -f1)
+min=$(echo ${VERSION} | cut -d. -f2)
+LIBVERSION=${maj}:${min}:${maj}
+AC_SUBST(LIBVERSION)
 
 dnl Enable Maintainer stuff
 AM_MAINTAINER_MODE
@@ -41,7 +46,18 @@ dnl NLS support
 ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
 dnl Additional glibc-intl checks
-PLP_CHECK_INTL
+if test "${USE_NLS}" = "yes" ; then
+	if test "${USE_INCLUDED_LIBINTL}" = "yes" ; then
+		plp_have_bind_textdomain_codeset=no
+	else
+		AC_CHECK_LIB(c, bind_textdomain_codeset,
+			plp_have_bind_textdomain_codeset=yes,
+			plp_have_bind_textdomain_codeset=no)
+	fi
+	if test "${plp_have_bind_textdomain_codeset}" = yes ; then
+		AC_DEFINE(HAVE_BIND_TEXTDOMAIN_CODESET)
+	fi
+fi
 
 dnl Large File Support
 AC_SYS_LARGEFILE
@@ -63,8 +79,6 @@ dnl checks for libraries
 
 dnl readline and history for plpftp
 ac_enable_readline=yes
-AM_CONDITIONAL(HAVE_LIBREADLINE, false)
-AM_CONDITIONAL(ADD_LIBCURSES, false)
 AC_ARG_ENABLE(readline,
 	[  --disable-readline      disable libreadline support [no]],
 	if test "$enableval" = "no" ; then
@@ -73,7 +87,14 @@ AC_ARG_ENABLE(readline,
 	fi
 )
 if test "x$ac_enable_readline" = "xyes" ; then
-	PLP_CHECK_READLINE
+	AC_MSG_CHECKING(for readline in -lreadline)
+        LIBREADLINE=
+        AC_CHECK_LIB([readline], [main],
+              [AC_SUBST([LIBREADLINE], ["-lreadline -lncurses"])
+               AC_DEFINE([HAVE_LIBREADLINE], [1],
+                         [Define if you have libreadline])
+              ],
+              , -lncurses)
 fi
 
 ac_enable_history=yes
@@ -133,7 +154,13 @@ AC_ARG_ENABLE(mnttab,
 )
 if test "x$ac_enable_mnttab" = "xyes" ; then
         AC_MSG_CHECKING(for mount table)
-        PLP_FIND_FILE(/etc/mnttab /etc/mtab, MTAB)
+       	MTAB=NO
+	for i in /etc/mnttab /etc/mtab; do
+		if test -r "$i" ; then
+			MTAB=$i
+			break 2
+		fi
+	done
         AC_MSG_RESULT($MTAB)
         if test "$MTAB" = "NO" ; then
                 AC_DEFINE_UNQUOTED(DONT_UPDATE_MTAB,1,
@@ -167,18 +194,14 @@ AC_CHECK_HEADERS(
 )
 
 dnl special options for customization
-PLP_HELP_MSG([Options for overriding builtin defaults:])
 
 AC_ARG_WITH(serial,
     [  --with-serial=DEV       override default serial line],
-    [  DDEV="$withval"
-      AC_MSG_RESULT(Overriding serial line: $DDEV)
+    [ DDEV="$withval"
+      AC_MSG_RESULT(Overriding default serial device: $DDEV)
     ],
-    [ AC_MSG_CHECKING(for default serial line)
-      PLP_FIND_CDEV(/dev/psion /dev/tty0p0 /dev/tty00 /dev/ttyS0 /dev/term/a /dev/ttyfa /dev/ttya /dev/tty0 /dev/ttyf1 /dev/cuaa1, DDEV)
-      AC_MSG_RESULT($DDEV)
-      test "$DDEV" = "NO" && AC_MSG_ERROR(NO serial lines. Use --with-serial.)
-    ]
+    [ DDEV="/dev/ttyS0"
+      AC_MSG_RESULT(Using default serial device: $DDEV)]
 )
 AC_DEFINE_UNQUOTED(DDEV,"$DDEV",[Define this to your serial device node])
 AC_SUBST(DDEV)
@@ -274,17 +297,12 @@ AH_BOTTOM([
 /* Define this, if libc provides bind_textdomain_codeset */
 #undef HAVE_BIND_TEXTDOMAIN_CODESET
 
-/* Define to 401 or 402, depending on readline version 4.1 or 4.2 */
-#define READLINE_VERSION 401
-
 /* Some reasonable defaults */
-
 #ifndef PSIONHOSTNAME
 # define PSIONHOSTNAME "localhost"
 #endif
 
 /* misc tweaks */
-
 #ifdef _IBMR2
 # undef DONT_UPDATE_MTAB
 # define DONT_UPDATE_MTAB /* The mount table is obtained from the kernel (!?) */
