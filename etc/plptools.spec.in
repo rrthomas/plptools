@@ -175,10 +175,7 @@ make
 mkdir -p $RPM_BUILD_ROOT/%{_prefix} $RPM_BUILD_ROOT%{_initrddir} \
 # rpm's makeinstall doesn't work here!
 make DESTDIR=$RPM_BUILD_ROOT install
-install -m 644 conf/kiodoc-update.pl \
-	$RPM_BUILD_ROOT%{_datadir}/%{name}/kiodoc-update.pl
 %if "%{isSUSE}" > "0"
-%if "%{REL}" >= "8.0"
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 cat>$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/psion<<EOF
 START_NCPD=yes
@@ -188,10 +185,7 @@ PLPNFSD_ARGS=
 START_PLPPRINTD=yes
 PLPPRINTD_ARGS=
 EOF
-install -m755 etc/psion.SuSE8 $RPM_BUILD_ROOT%{_initrddir}/psion
-%else
 install -m755 etc/psion.SuSE $RPM_BUILD_ROOT%{_initrddir}/psion
-%endif
 %endif
 %if "%{isRH}" > "0"
 install -m755 etc/psion $RPM_BUILD_ROOT%{_initrddir}/psion
