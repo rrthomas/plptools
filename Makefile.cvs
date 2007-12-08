@@ -1,8 +1,9 @@
-LIBTOOLFILES = conf/config.guess conf/config.sub conf/ltconfig conf/ltmain.sh
-AUTOMAKEFILES = conf/mkinstalldirs conf/missing conf/install-sh
+LIBTOOLFILES = config.guess config.sub ltconfig ltmain.sh
+AUTOMAKEFILES = mkinstalldirs missing install-sh
 CONFIGHIN = include/config.h.in
+ACLOCAL = aclocal.m4
 GETTEXT = intl/Makefile.in
-GETTEXTDEP = conf/Makefile.am.in conf/configure.in.in
+GETTEXTDEP = Makefile.am.in configure.in.in
 
 all:
 	@echo "Use make devel for development, make dist for distribution"
@@ -33,6 +34,9 @@ htmldoc:
 		man2html -H plptools.sourceforge.net -M "" $$f > $$o; \
 	done
 
+$(ACLOCAL):
+	aclocal
+
 $(CONFIGHIN): configure.in
 	autoheader
 
@@ -40,8 +44,8 @@ $(LIBTOOLFILES):
 	libtoolize --force
 
 $(GETTEXT): $(GETTEXTDEP)
-	cp conf/configure.in.in configure.in
-	cp conf/Makefile.am.in Makefile.am
+	cp configure.in.in configure.in
+	cp Makefile.am.in Makefile.am
 	mkdir -p intl
 	echo n | gettextize --force --intl --no-changelog
 	test -e po/Makevars || cp po/Makevars.template po/Makevars
