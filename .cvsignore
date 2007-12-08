@@ -9,10 +9,10 @@ libtool
 config.status
 config.cache
 config.log
+config.rpath
 plptools-*.tar.gz
 intl
 m4
 .vimsession
-.emacs.desktop
 ABOUT-NLS
 ChangeLog
