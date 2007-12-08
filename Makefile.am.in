@@ -12,27 +12,13 @@ AUTOMAKE_OPTIONS = foreign
 
 TMPDEST=
 
-#
-# remove all intermediate files that can be recreated using
-# Makefile.cvs
-#
-maintainer-clean-local:
-	rm -f configure aclocal.m4 Makefile.in libtool \
-	Makefile.am configure.in \
-	conf/config.guess conf/config.sub conf/install-sh conf/ltconfig \
-	conf/ltmain.sh conf/missing conf/mkinstalldirs \
-	etc/*.spec ABOUT-NLS
-	find . -name "*~" -exec rm -f {} \;
-	find . -name "\.\#*" -exec rm -f {} \;
-	sh conf/intlclean
-
 install-data-local:
 	test "$(initdir)" != "none" && \
 		install -m 755 etc/psion $(DESTDIR)$(initdir)/psion || :
 
 dist-hook:
 	$(MAKE) TMPDEST=$(distdir)/ kdoc specfile
-	test -f CVS/Root && conf/cvs2cl -W 1800 -S --no-wrap --prune \
+	test -f CVS/Root && cvs2cl -W 1800 -S --no-wrap --prune \
 		--gmt -f $(distdir)/ChangeLog || \
 		cp -f ChangeLog $(distdir)/ChangeLog
 	rm -rf $(distdir)/debian/CVS
