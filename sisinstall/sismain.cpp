@@ -13,28 +13,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#if HAVE_LIBNEWT
-# include <newt.h>
-#endif
-
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
 #include <getopt.h>
 
-bool usenewt = false;
-
 static void error(int line)
 {
-#if HAVE_LIBNEWT
-	if (usenewt)
-		{
-		newtPopHelpLine();
-		newtPushHelpLine(_("Got an error, Press any key to exit."));
-		newtWaitForKey();
-		newtFinished();
-		}
-#endif
 	fprintf(stderr, _("Error %d on line %d: %s\n"), errno, line,
 		strerror(errno));
 	exit(1);
@@ -45,9 +30,6 @@ static struct option opts[] = {
 	{ "version",  no_argument,       0, 'V' },
 	{ "verbose", required_argument, 0, 'v' },
 	{ "dry-run",  no_argument,       0, 'n' },
-#if HAVE_LIBNEWT
-	{ "newt",     no_argument,       0, 'w' },
-#endif
 	{ NULL,       0,                 0, 0 },
 };
 
@@ -62,9 +44,6 @@ void printHelp()
 	" -V, --version           Print version and exit.\n"
 	" -v, --verbose=LEVEL     Set the verbosity level, by default 0.\n"
 	" -n, --dry-run           Just parse the file.\n"
-#if HAVE_LIBNEWT
-	" -w, --newt              Use the Newt interface.\n"
-#endif
 	));
 }
 
@@ -82,11 +61,7 @@ int main(int argc, char* argv[])
 	while (1)
 		{
 		option = getopt_long(argc, argv,
-#if HAVE_LIBNEWT
-							 "hnv:Vw"
-#else
 							 "hnv:V"
-#endif
 							 , opts, NULL);
 		if (option == -1)
 			break;
@@ -102,48 +77,19 @@ int main(int argc, char* argv[])
 			case 'n':
 				dryrun = true;
 				break;
-#if HAVE_LIBNEWT
-			case 'w':
-				usenewt = true;
-				break;
-#endif
 			case 'V':
 				printf(_("sisinstall version 0.1\n"));
 				exit(0);
 			}
 		}
-#if HAVE_LIBNEWT
-	if (usenewt)
-		{
-		newtInit();
-		newtCls();
-		}
-#endif
 	if (optind < argc)
 	{
 		filename = argv[optind];
-#if HAVE_LIBNEWT
-		if (usenewt)
-			{
-			char helpline[256];
-			sprintf(helpline,
-					_("Installing sis file %s%s.\n"),
-					filename,
-				   dryrun ? _(", not really") : "");
-			newtPushHelpLine(helpline);
-//			newtWaitForKey();
-			}
-		else
-#endif
-			printf(_("Installing sis file %s%s.\n"), filename,
-				   dryrun ? _(", not really") : "");
+                printf(_("Installing sis file %s%s.\n"), filename,
+                       dryrun ? _(", not really") : "");
 	}
 	else
 	{
-#if HAVE_LIBNEWT
-	    if (usenewt)
-		newtFinished();
-#endif
 	    fprintf(stderr, _("Missing SIS filename\n"));
 	    exit(1);
 	}
@@ -180,9 +126,6 @@ int main(int argc, char* argv[])
 				{
 				SISInstaller installer;
 				installer.setPsion(psion);
-#if HAVE_LIBNEWT
-				installer.useNewt(usenewt);
-#endif
 				installer.run(&sisFile, buf, len);
 				}
 			}
@@ -193,15 +136,6 @@ int main(int argc, char* argv[])
 		psion->disconnect();
 		}
 
-#if HAVE_LIBNEWT
-	if (usenewt)
-		{
-		newtPopHelpLine();
-		newtPushHelpLine(_("Installation complete. Press any key to exit."));
-		newtWaitForKey();
-		newtFinished();
-		}
-#endif
 	return 0;
 }
 

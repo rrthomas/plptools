@@ -116,26 +116,6 @@ fi
 LIBHISTORY=${ac_cv_libhistory}
 AC_SUBST(LIBHISTORY)
 
-ac_enable_newt=yes
-ac_cv_libnewt=
-AC_ARG_ENABLE(newt,
-	[  --disable-newt          disable libnewt support [no]],
-	if test "$enableval" = "no" ; then
-		AC_MSG_RESULT([support for libnewt disabled])
-		ac_enable_newt=no
-	fi
-)
-if test "x$ac_enable_newt" = "xyes" ; then
-	AC_CHECK_LIB(newt, newtInit,
-	[
-		AC_DEFINE_UNQUOTED(HAVE_LIBNEWT,1,
-			[Define this, if you have libnewt])
-		ac_cv_libnewt=-lnewt
-	])
-fi
-LIBNEWT=${ac_cv_libnewt}
-AC_SUBST(LIBNEWT)
-
 dnl these three are for solaris
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(nsl, gethostbyname)

@@ -3,10 +3,6 @@
 
 #include "sistypes.h"
 
-#if HAVE_LIBNEWT
-# include <newt.h>
-#endif
-
 #include <sys/types.h>
 
 class Psion;
@@ -50,16 +46,6 @@ public:
 	 */
 	void setPsion(Psion* psion);
 
-#if HAVE_LIBNEWT
-	/**
-	 * Shall we do use feedback via newt?
-	 */
-	void useNewt(bool usenewt)
-		{
-		m_useNewt = usenewt;
-		}
-#endif
-
 private:
 
 	char m_drive;
@@ -77,10 +63,6 @@ private:
 	int m_lastSisFile;
 
 	bool m_ownInstalled;
-
-#if HAVE_LIBNEWT
-	bool m_useNewt;
-#endif
 
 	enum {
 		FILE_OK,

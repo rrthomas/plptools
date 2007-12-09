@@ -21,12 +21,7 @@
 %define _qtdir ""
 %if "%{isSUSE}" > "0"
 %define REL %(grep VERSION %{srel} | sed -e 's/VERSION = //')
-%if "%{REL}" >= "8.0"
-# Bug in SuSE8.0's rpm setup: _initrddir has wrong value
 %define _initrddir %{_sysconfdir}/init.d
-%else
-%define _initrddir %{_sysconfdir}/init.d
-%endif
 %define distro SuSE%{REL}
 %endif
 %if "%{isRH}" > "1"
@@ -61,13 +56,9 @@ URL: http://plptools.sourceforge.net/
 Source0: http://download.sourceforge.net/plptools/plptools-%{version}.tar.gz
 Copyright: GPL
 Group: Networking/Utilities
-Buildrequires: readline-devel newt-devel
+Buildrequires: readline-devel
 %if "%{isSUSE}" > "0"
-%if "%{REL}" >= "8.0"
 Requires: aaa_base >= 2002.3.27-0
-%else
-Requires: aaa_base >= 2001.10.19-1
-%endif
 %endif
 %if "%{isRH}" > "0"
 Requires: chkconfig >= 0.9
@@ -214,34 +205,7 @@ test ! -d /mnt/psion && mkdir -p /mnt/psion
 /sbin/chkconfig --add psion
 %endif
 %if "%{isSUSE}" > "0"
-%if "%{REL}" >= "8.0"
 /sbin/chkconfig --add psion
-%else
-(
-	grep -v START_PSION /etc/rc.config | \
-		grep -v START_NCPD | grep -v NCPD_ARGS | \
-		grep -v START_PLPNFSD | grep -v PLPNFSD_ARGS | \
-		grep -v START_PLPPRINTD | grep -v PLPPRINTD_ARGS
-	cat<<-EOF
-	# Set START_PSION to yes to start Psion support
-	START_PSION=yes
-	# Set START_NCPD to yes to start ncpd
-	START_NCPD=yes
-	# Specify parameters for ncpd in NCPD_ARGS (if any)
-	NCPD_ARGS=
-	# Set START_PLPNFSD to yes to start plpnfsd
-	START_PLPNFSD=no
-	# Specify parameters for plpnfsd in PLPNFSD_ARGS (if any)
-	PLPNFSD_ARGS=
-	# Set START_PLPPRINTD to yes to start plpprintd
-	START_PLPPRINTD=yes
-	# Specify parameters for plpprintd in PLPPRINTD_ARGS (if any)
-	PLPPRINTD_ARGS=
-	EOF
-) > /etc/rc.config.$$
-cp /etc/rc.config /etc/rc.config.old && mv /etc/rc.config.$$ /etc/rc.config
-/sbin/insserv -d psion
-%endif
 %endif
 
 fi
@@ -251,11 +215,7 @@ if [ "$1" = 0 ]
 then
 	%{_initrddir}/psion stop >/dev/null 2>&1
 %if "%{isSUSE}" > "0"
-%if "%{REL}" >= "8.0"
 	/sbin/chkconfig --del psion
-%else
-	/sbin/insserv -r -d psion
-%endif
 %endif
 %if "%{isRH}" > "0"
 	/sbin/chkconfig --del psion
@@ -274,9 +234,7 @@ fi
 %{_datadir}/%{name}/*
 %{_initrddir}/psion
 %if "%{isSUSE}" > "0"
-%if "%{REL}" >= "8.0"
 %config %{_sysconfdir}/sysconfig/psion
-%endif
 %endif
 %if "%{isRH}" > "0"
 %config %{_sysconfdir}/sysconfig/psion
