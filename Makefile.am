@@ -28,3 +28,5 @@ kdoc:
 specfile:
 	sed -e "s/\@VERSION\@/$(VERSION)/" < $(TMPDEST)etc/plptools.spec.in \
 		> $(TMPDEST)etc/plptools.spec
+
+ACLOCAL_AMFLAGS = -I m4

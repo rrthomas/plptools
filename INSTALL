@@ -57,5 +57,9 @@ Basic Installation
  ldconfig after installation. Another option is to run configure
  with the option --prefix=/usr
 
+
+ To build from CVS, you will first need to run
+
+ autoreconf -i
+
 Have fun.
- -Fritz
