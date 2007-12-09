@@ -1,14 +1,4 @@
-Makefile.in.in
-Makefile.in
 Makefile
-Makevars
-Makevars.template
-stamp-po
 POTFILES
-*.c
 *.gmo
 *.pot
-*.sed
-*.sin
-*.header
-Rules-quot
