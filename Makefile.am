@@ -1,6 +1,3 @@
-# $Id$
-#
-
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = intl po lib ncpd plpnfsd plpfuse plpftp plpprint sisinstall doc
