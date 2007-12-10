@@ -145,7 +145,7 @@ long generic_getdents(builtin_node *node, dentry **e) {
 
 	while (cp) {
 		if ((cp->node->flags & BF_EXISTS_ALWAYS) || rfsv_isalive()) {
-			dentry *tmp = (dentry *)malloc(sizeof(dentry));
+			dentry *tmp = (dentry *)calloc(1, sizeof(dentry));
 			if (!tmp)
 				return -1;
 			tmp->time = time(0);
@@ -210,7 +210,7 @@ static long proc_getdents(builtin_node *node, dentry **e) {
 
 	while (cp) {
 		if ((cp->node->flags & BF_EXISTS_ALWAYS) || rfsv_isalive()) {
-			dentry *tmp = (dentry *)malloc(sizeof(dentry));
+			dentry *tmp = (dentry *)calloc(1, sizeof(dentry));
 			if (!tmp)
 				return -1;
 			tmp->time = time(0);
