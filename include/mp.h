@@ -19,7 +19,7 @@ typedef struct p_inode {
  */
 typedef struct p_device {
 	char *name;  /* Volume-Name */
-	char letter; /* Drive-Number (zero-based, i.e. 0 = A, 1 = B, 2 = C ...) */
+	char letter; /* Drive-Letter */
 	long attrib; /* Device-Attribs */
 	long total;  /* Total capacity in bytes */
 	long free;   /* Free space in bytes */
