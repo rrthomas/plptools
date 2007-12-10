@@ -1345,7 +1345,6 @@ nfsproc_write_2(writeargs *wa)
 		}
 	}
 	/* fetch attributes */
-	/* FIXME: Cope without cache */
 	if ((cp = search_cache(attrcache, inode->inode)) == 0) {
 		gres = nfsproc_getattr_2((struct nfs_fh *) wa->file.data);
 		if (gres->status != NFS_OK) {
