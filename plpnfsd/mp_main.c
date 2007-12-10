@@ -180,22 +180,6 @@ mp_main(int verbose, char *dir, char *user)
     if (debug)
 	printf("plpnfsd: version %s, mounting on %s ...\n", VERSION, dir);
 
-    /* Check if mountdir is empty (or else you can overmount e.g /etc)
-       It is done here, because exit hangs, if hardware flowcontrol is
-       not present. Bugreport Nov 28 1996 by Olaf Flebbe */
-    if (!(dirp = opendir(dir))) {
-	perror(dir);
-	return 1;
-    }
-    i = 0;
-    while ((diep = readdir(dirp)) != 0)
-	if (strcmp(diep->d_name, ".") && strcmp(diep->d_name, ".."))
-	    i++;
-    closedir(dirp);
-    if (i) {
-	fprintf(stderr, "Sorry, directory %s is not empty, exiting.\n", dir);
-	return 1;
-    }
     openlog("plpnfsd", LOG_PID|LOG_CONS, LOG_DAEMON);
     rp = get_nam("");
     inode2fh(rp->inode, root_fh.data);
