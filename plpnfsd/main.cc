@@ -254,7 +254,7 @@ long rfsv_dir(const char *file, dentry **e) {
     for (int i = 0; i < entries.size(); i++) {
 	PlpDirent pe = entries[i];
 	tmp = *e;
-	*e = (dentry *)malloc(sizeof(dentry));
+	*e = (dentry *)calloc(1, sizeof(dentry));
 	if (!*e)
 	    return -1;
 	(*e)->time = pe.getPsiTime().getTime();
@@ -479,7 +479,7 @@ long rfsv_drivelist(int *cnt, device **dlist) {
 static void
 help()
 {
-    cout << _(
+    cerr << _(
 	"Usage: plpnfsd [OPTIONS]...\n"
 	"\n"
 	"Supported options:\n"
@@ -564,16 +564,13 @@ int main(int argc, char**argv) {
 		usage();
 		return -1;
 	    case 'V':
-		cout << _("plpnfsd Version ") << VERSION << endl;
+		cerr << _("plpnfsd Version ") << VERSION << endl;
 		return 0;
 	    case 'h':
 		help();
 		return 0;
 	    case 'v':
 		verbose++;
-		break;
-	    case 'D':
-		debug++;
 		break;
 	    case 'd':
 		mdir = optarg;
