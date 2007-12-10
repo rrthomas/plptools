@@ -1,10 +1,10 @@
-AC_REVISION($Revision$)dnl revision of this configure.in script
-
-AC_INIT(Makefile.am)
-AC_GNU_SOURCE
+AC_INIT(plptools, 0.19, plptools-developers@lists.sourceforge.net)
 AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE
+
+dnl Basic settings
+AC_GNU_SOURCE
 AM_CONFIG_HEADER(include/config.h)
-AM_INIT_AUTOMAKE(plptools, 0.19)
 AM_PROG_LIBTOOL
 
 dnl Set library version
@@ -12,9 +12,6 @@ maj=$(echo ${VERSION} | cut -d. -f1)
 min=$(echo ${VERSION} | cut -d. -f2)
 LIBVERSION=${maj}:${min}:${maj}
 AC_SUBST(LIBVERSION)
-
-dnl Enable Maintainer stuff
-AM_MAINTAINER_MODE
 
 dnl checks for programs
 AM_PROG_CC_C_O
@@ -289,7 +286,7 @@ AH_BOTTOM([
 ])
 
 
-AC_OUTPUT(
+AC_CONFIG_FILES(
 	Makefile
 	intl/Makefile
 	po/Makefile.in
@@ -311,3 +308,4 @@ AC_OUTPUT(
 	doc/sisinstall.man
 	doc/plpprintd.man
 )
+AC_OUTPUT
