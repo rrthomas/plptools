@@ -372,7 +372,7 @@ mount_and_run(char *dir, void (*proc)(), nfs_fh *root_fh)
 		errorlog("Cannot connect to plpnfsd: %m\n");
 		exit(1);
 	}
-	mount_flags = MS_MGC_VAL;	/* | MS_SYNC | MS_RDONLY | MS_NOEXEC | MS_NODEV | MS_NOSUID */
+	mount_flags = MS_MGC_VAL;	/* | MS_SYNCHRONOUS | MS_RDONLY | MS_NOEXEC | MS_NODEV | MS_NOSUID */
 
 #endif
 
