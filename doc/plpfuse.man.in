@@ -1,0 +1,61 @@
+.\" Manual page for plpfuse
+.\" $Id$
+.\" CHECKIN $Date$
+.\"
+.\" Process this file with
+.\" groff -man -Tascii plpfuse.8 for ASCII output, or
+.\" groff -man -Tps plpfuse.8 for Postscript output
+.\"
+.TH plpfuse 8 "@MANDATE@" "plptools @VERSION@" "System administration commands"
+.SH NAME
+plpfuse \- Daemon to mount an EPOC device as a file system
+.SH SYNOPSIS
+.B plpfuse
+.B [-V]
+.B [-v]
+.B [-h]
+.BI "[-p [" host :] port ]
+.BI [ long-options ]
+
+.SH DESCRIPTION
+plpfuse is a file system which provides file system access to your EPOC device.
+It mounts the EPOC device's file systems in to your computer's file system.
+Like the other front-ends, this program
+auto-reconnects after a link-failure, so you can keep the
+EPOC device mounted all the time, even when it is not connected.
+Due to Rudolf Koenig's clever error-handling, you don't need to
+worry about blocked I/O-processes if the psion isn't available.
+You simply will get an "device not configured" error, when
+accessing a file on a previously connected psion which has been
+disconnected. After that, the mount-point will appear with the
+drives missing. As soon as the psion is connected again, the
+subdirectories will reappear (possibly with a few seconds' delay).
+
+.SH OPTIONS
+.TP
+.B \-V, --version
+Display the version and exit
+.TP
+.B \-h, --help
+Display a short help text and exit.
+.TP
+.B \-v, --verbose
+Produce verbose logging output. Can be specified more than once to increase the
+debug level (up to 3 times)
+.TP
+.BI "\-p, --port=[" host :] port
+Specify the host and port to connect to (e.g. the port where ncpd is listening
+on) - by default the host is 127.0.0.1 and the port is looked up in
+/etc/services. If it is not found there, a fall-back builtin of
+.I @DPORT@.
+
+.SH SEE ALSO
+ncpd(8), plpprintd(8), plpftp(1) and sisinstall(1)
+
+.SH AUTHOR
+Reuben Thomas, based on plpnfsd by Fritz Elfert, and FUSE example code by Miklos Szeredi (miklos@szeredi.hu).
+.br
+plpnfsd itself was heavily based on p3nfsd by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
+and plp_1_7 by Philip Proudman (phil@proudman51.freeserve.co.uk), with patches from Matt Gumbley (matt@gumbley.demon.co.uk).
+.br
+Man page by Reuben Thomas <rrt@sc3d.org>, based on the man page for plpnfsd by John Lines (john+plpman@paladin.demon.co.uk).
