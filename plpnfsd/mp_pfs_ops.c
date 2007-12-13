@@ -501,9 +501,9 @@ attr2pattr(long oattr, long nattr, long *psisattr, long *psidattr)
 	*psisattr = *psidattr = 0;
 	if ((oattr & 0400) != (nattr & 0400)) {
 		if (nattr & 0400)		/* readable */
-			*psidattr |= PSI_A_READ;
-		else
 			*psisattr |= PSI_A_READ;
+		else
+			*psidattr |= PSI_A_READ;
 	}
 	if ((oattr & 0200) != (nattr & 0200)) {
 		if (nattr & 0200)		/* readonly */
