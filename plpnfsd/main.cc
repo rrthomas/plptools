@@ -412,7 +412,7 @@ long rfsv_setattr(const char *name, long sattr, long dattr) {
 	return -1;
     if (a_filename && !strcmp(name, a_filename))
 	rfsv_closecached();
-    return a->fsetattr(name, dattr, sattr);
+    return a->fsetattr(name, sattr, dattr);
 }
 
 long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
