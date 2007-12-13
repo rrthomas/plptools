@@ -11,7 +11,7 @@
 #   I    is a flag for Italic (0 or 1)
 #   PSFN is the corresponding PostScript font to use
 #
-# Lines, starting with a hash or empty lines are ignored.
+# Lines starting with a hash and empty lines are ignored.
 #
 Times New Roman:0:0:Times-Roman
 Times New Roman:1:0:Times-Bold
