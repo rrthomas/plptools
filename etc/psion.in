@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# psion        Starts ncpd/plpnfsd.
+# psion        Starts ncpd/plpfuse.
 #
 # chkconfig: 2345 45 10
 # description: This facility enables connectivity to a Psion series 5.
@@ -9,7 +9,6 @@
 . /etc/rc.d/init.d/functions
 
 [ -f @prefix@/sbin/ncpd ] || exit 0
-[ -f @prefix@/sbin/plpnfsd ] || exit 0
 [ -f @prefix@/sbin/plpprintd ] || exit 0
 [ -f /etc/sysconfig/psion ] || exit 0
 . /etc/sysconfig/psion
@@ -24,12 +23,6 @@ start() {
 		echo
 	fi
 	if [ $RETVAL -eq 0 ] ; then
-		if test "$START_PLPNFSD" = "yes" ; then
-			echo -n "  plpnfsd: "
-			daemon @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
-			RETVAL=$?
-			echo
-		fi
 		if test "$START_PLPPRINTD" = "yes" ; then
 			echo -n "  plpprintd: "
 			daemon @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
@@ -44,18 +37,6 @@ start() {
 stop() {
 	echo "Stopping Psion support ..."
 	RETVAL=0
-	if test "$START_PLPNFSD" = "yes" ; then
-		echo -n "  plpnfsd: "
-		killproc plpnfsd -HUP
-		WAIT=5
-		while test $WAIT -gt 0 ; do
-			test -z "`pidofproc plpnfsd`" && break;
-			sleep 1 # allow plpnfsd flushing it's cache
-			WAIT=`expr $WAIT - 1`
-		done
-		test -z "`pidofproc plpnfsd`" || killproc plpnfsd
-		echo
-	fi
 	if test "$START_PLPPRINTD" = "yes" ; then
 		echo -n "  plpprintd: "
 		killproc plpprintd
@@ -86,7 +67,6 @@ case "$1" in
 	;;
   status)
 	status ncpd
-	status plpnfsd
 	status plpprintd
 	;;
   restart|reload)

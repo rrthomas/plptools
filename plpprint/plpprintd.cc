@@ -165,7 +165,7 @@ init_fontmap() {
     fontmap_entry *new_fontmap = NULL;
     fontmap_entry *fe;
 
-    if ((f = fopen(PKGDATA "/fontmap", "r"))) {
+    if ((f = fopen(PKGDATADIR "/fontmap", "r"))) {
 	char *p;
 	int bold;
 	int italic;
@@ -216,7 +216,7 @@ init_fontmap() {
 	fontmap = new_fontmap;
     else {
 	errorlog("No fontmap found in %s/fontmap, using builtin mapping",
-		 PKGDATA);
+		 PKGDATADIR);
 	fe = default_fontmap;
 	while (fe->psifont) {
 	    fontmap_entry *nfe = (fontmap_entry *)malloc(sizeof(fontmap_entry));
@@ -333,7 +333,7 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
 	    "%%EndComments\n"
 	    "%%BeginProlog\n", f);
 	char pbuf[1024];
-	FILE *pf = fopen(PKGDATA "/prolog.ps", "r");
+	FILE *pf = fopen(PKGDATADIR "/prolog.ps", "r");
 	while (fgets(pbuf, sizeof(pbuf), pf))
 	    fputs(pbuf, f);
 	fclose(pf);

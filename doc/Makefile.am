@@ -1,9 +1,9 @@
 SUBDIRS = api
 
-EXTRA_DIST = ncpd.man.in plpnfsd.man.in plpftp.man.in sisinstall.man.in \
+EXTRA_DIST = ncpd.man.in plpfuse.man.in plpftp.man.in sisinstall.man.in \
 	plpprintd.man.in
 
-man_MANS = ncpd.8 plpnfsd.8 plpftp.1 sisinstall.1 plpprintd.8
+man_MANS = ncpd.8 plpfuse.8 plpftp.1 sisinstall.1 plpprintd.8
 
 %.1: %.man
 	MANDATE=`grep CHECKIN $< | $(AWK) '{print $$4}'` ; \
@@ -13,9 +13,5 @@ man_MANS = ncpd.8 plpnfsd.8 plpftp.1 sisinstall.1 plpprintd.8
 	MANDATE=`grep CHECKIN $< | $(AWK) '{print $$4}'` ; \
 	$(SED) -e "s%@MANDATE@%$$MANDATE%g" $< > $@
 
-#
-# remove all intermediate files that can be recreated using
-# Makefile.cvs
-#
 maintainer-clean-local:
-	rm -f Makefile.in *.1 *.8
+	rm -f *.1 *.8

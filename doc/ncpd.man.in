@@ -24,7 +24,7 @@ ncpd \- Daemon which handles the serial link to a Psion
 .SH DESCRIPTION
 ncpd is the daemon which handles the serial link to your Psion.
 It listens at port @DPORT@ for local connections and provides
-basic PLP/NCP services for plpnfsd and plpftp and other front-ends.
+basic PLP/NCP services for plpfuse and plpftp and other front-ends.
 It auto-connects to the psion, even after unplugging/switching off
 therefore it can run always in background (if you have a spare
 serial-device)
@@ -98,7 +98,7 @@ is specified, ncpd cycles through baud-rates of 115200, 57600, 38400, 19200
 and 9600 baud. Default setting is @DSNAME@.
 
 .SH SEE ALSO
-ncpd(8), plpnfsd(8), plpprintd(8), plpftp(1) and sisinstall(1)
+plpfuse(8), plpprintd(8), plpftp(1) and sisinstall(1)
 
 .SH AUTHOR
 Fritz Elfert

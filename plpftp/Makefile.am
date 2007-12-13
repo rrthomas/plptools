@@ -6,6 +6,3 @@ bin_PROGRAMS = plpftp
 plpftp_LDADD = $(LIB_PLP) $(LIBREADLINE) $(LIBHISTORY) $(INTLLIBS)
 plpftp_SOURCES = ftp.cc main.cc
 EXTRA_DIST = ftp.h
-
-maintainer-clean-local:
-	rm -f Makefile.in

@@ -59,18 +59,6 @@ dnl Large File Support
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
 
-dnl checking for aix
-AC_MSG_CHECKING(for AIX)
-if test "`uname -s 2>/dev/null`" = AIX ; then
-  AC_MSG_RESULT(yes)
-  AC_CHECK_LIB(bsd, hostname)
-  EXTRA_OBJS=mount_aix.o
-  AC_DEFINE([_ALL_SOURCE], [], [Define _ALL_SOURCE on AIX])
-else
-  AC_MSG_RESULT(no)
-fi
-AC_SUBST(EXTRA_OBJS)
-
 dnl checks for libraries
 
 dnl readline and history for plpftp
@@ -113,49 +101,41 @@ fi
 LIBHISTORY=${ac_cv_libhistory}
 AC_SUBST(LIBHISTORY)
 
+# FUSE for plpfuse
+AC_CHECK_HEADER(fuse.h,,
+    [AC_MSG_ERROR([
+	Can't find fuse.h - add the search path to CPPFLAGS and
+	rerun configure, eg:
+	export CPPFLAGS=-I/usr/local/include ])])
+AC_CHECK_LIB(fuse,fuse_new, [FUSE_LIBS="-lfuse"],
+    [AC_MSG_ERROR([
+	Can't find libfuse.a - add the search path to LDFLAGS
+	and rerun configure, eg:
+	export LDFLAGS=-L/usr/local/lib ])],)
+
+# check for a supported version of FUSE
+AC_MSG_CHECKING([For supported FUSE API version])
+AC_RUN_IFELSE([ 
+    AC_LANG_PROGRAM([[
+    #define FUSE_USE_VERSION 26
+    #include <fuse.h>]],
+[[
+    if (FUSE_MAJOR_VERSION == 2 && FUSE_MINOR_VERSION >= 6)
+	return 0;
+    else
+	return -1;
+]])], 
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])
+    AC_MSG_FAILURE([plpfuse requires FUSE 2.5 or newer.])
+    ]
+)
+
 dnl these three are for solaris
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(nsl, gethostbyname)
 ac_save_LDFLAGS=$LDFLAGS; LDFLAGS="-L/usr/ucblib -R/usr/ucblib $LDFLAGS"
 AC_CHECK_LIB(rpcsoc, svcudp_create,,LDFLAGS=$ac_save_LDFLAGS)
-
-dnl checks for mount table - if desired
-ac_enable_mnttab=yes
-AC_ARG_ENABLE(mnttab,
-        [  --disable-mnttab        disable mnttab writing [no]],
-        if test "$enableval" = "no" ; then
-                AC_MSG_RESULT([support for mnttab disabled])
-                ac_enable_mnttab=no
-        fi
-)
-if test "x$ac_enable_mnttab" = "xyes" ; then
-        AC_MSG_CHECKING(for mount table)
-       	MTAB=NO
-	for i in /etc/mnttab /etc/mtab; do
-		if test -r "$i" ; then
-			MTAB=$i
-			break 2
-		fi
-	done
-        AC_MSG_RESULT($MTAB)
-        if test "$MTAB" = "NO" ; then
-                AC_DEFINE_UNQUOTED(DONT_UPDATE_MTAB,1,
-	                [Define this this if you want to prevent plpnfsd from updating mtab])
-        else
-                AC_DEFINE_UNQUOTED(MTAB_PATH,"$MTAB",
-			[Define this to your mtab's path])
-	        ac_cv_mtab_tmp="${MTAB}~"
-                case "$target_alias" in
-                        *linux*)
-                                ;;
-                        *)
-                                ac_cv_mtab_tmp="${MTAB}.plpnfsd"
-                                ;;
-                esac
-                AC_DEFINE_UNQUOTED(MTAB_TMP,"${ac_cv_mtab_tmp}",
-			[Define this to your temporary mtab's path])
-	fi
-fi
 
 dnl Check, if bot time.h and sys/time.h may be included
 AC_HEADER_TIME
@@ -237,22 +217,6 @@ AC_ARG_WITH(basedir,
 AC_DEFINE_UNQUOTED(DBASEDIR,"$DBASEDIR",
 	[Define this to your default directory on your Psion])
 
-AC_ARG_WITH(mountdir,
-    [  --with-mountdir=DIR     override default mount point [/mnt/psion]],
-    [ DMOUNTPOINT="$withval"
-      AC_MSG_RESULT(Overriding mount point: $DMOUNTPOINT) ],
-    [ DMOUNTPOINT="/mnt/psion"
-      AC_MSG_RESULT(Using default mount point: $DMOUNTPOINT)
-    ]
-)
-AC_DEFINE_UNQUOTED(DMOUNTPOINT,"$DMOUNTPOINT",
-	[Define this to your default mountpoint for plpnfsd])
-AC_SUBST(DMOUNTPOINT)
-test "x$prefix" = xNONE && prefix="$ac_default_prefix"
-eval PKGDATA="${datadir}/${PACKAGE}"
-AC_DEFINE_UNQUOTED(PKGDATA,"$PKGDATA",[This defines the dir for support files])
-AC_SUBST(PKGDATA)
-
 AC_ARG_WITH(initdir,
     [  --with-initdir=DIR      override default init dir [/etc/rc.d/init.d]],
     [ initdir="$withval"
@@ -278,11 +242,8 @@ AH_BOTTOM([
 # define PSIONHOSTNAME "localhost"
 #endif
 
-/* misc tweaks */
-#ifdef _IBMR2
-# undef DONT_UPDATE_MTAB
-# define DONT_UPDATE_MTAB /* The mount table is obtained from the kernel (!?) */
-#endif
+/* Select version of FUSE API */
+#define FUSE_USE_VERSION 26
 ])
 
 
@@ -293,7 +254,7 @@ AC_CONFIG_FILES(
 	lib/Makefile
 	ncpd/Makefile
 	plpftp/Makefile
-	plpnfsd/Makefile
+        plpfuse/Makefile
 	plpprint/Makefile
 	plpprint/prolog.ps
 	sisinstall/Makefile
@@ -303,7 +264,7 @@ AC_CONFIG_FILES(
 	etc/psion.SuSE
 	etc/plptools.spec
 	doc/ncpd.man
-	doc/plpnfsd.man
+	doc/plpfuse.man
 	doc/plpftp.man
 	doc/sisinstall.man
 	doc/plpprintd.man

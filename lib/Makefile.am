@@ -19,6 +19,3 @@ pkginclude_HEADERS = bufferarray.h bufferstore.h iowatch.h ppsocket.h \
 	rpcsfactory.h psitime.h Enum.h plpdirent.h wprt.h plpintl.h rclip.h \
 	siscomponentrecord.h sisfile.h sisfileheader.h sisfilerecord.h \
 	sislangrecord.h sisreqrecord.h sistypes.h psibitmap.h psiprocess.h
-
-maintainer-clean-local:
-	rm -f Makefile.in

@@ -171,8 +171,8 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 cat>$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/psion<<EOF
 START_NCPD=yes
 NCPD_ARGS=
-START_PLPNFSD=no
-PLPNFSD_ARGS=
+START_PLPFUSE=no
+PLPFUSE_ARGS=
 START_PLPPRINTD=yes
 PLPPRINTD_ARGS=
 EOF
@@ -184,8 +184,8 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 cat>$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/psion<<EOF
 START_NCPD=yes
 NCPD_ARGS=
-START_PLPNFSD=no
-PLPNFSD_ARGS=
+START_PLPFUSE=no
+PLPFUSE_ARGS=
 START_PLPPRINTD=yes
 PLPPRINTD_ARGS=
 EOF

@@ -13,7 +13,6 @@
 . /etc/rc.status
 
 [ -f @prefix@/sbin/ncpd ] || exit 0
-[ -f @prefix@/sbin/plpnfsd ] || exit 0
 [ -f @prefix@/sbin/plpprintd ] || exit 0
 [ -f /etc/sysconfig/psion ] || exit 0
 . /etc/sysconfig/psion
@@ -27,11 +26,6 @@ start() {
 		startproc -f @prefix@/sbin/ncpd $NCPD_ARGS
 		rc_status -v
 	fi
-	if [ "$START_PLPNFSD" = "yes" ] ; then
-		echo -n "  plpnfsd: "
-		startproc -f @prefix@/sbin/plpnfsd $PLPNFSD_ARGS
-		rc_status -v
-	fi
 	if [ "$START_PLPPRINTD" = "yes" ] ; then
 		echo -n "  plpprintd: "
 		startproc -f @prefix@/sbin/plpprintd $PLPPRINTD_ARGS
@@ -42,19 +36,6 @@ start() {
 
 stop() {
 	echo "Stopping Psion support ..."
-	if [ "$START_PLPNFSD" = "yes" ] ; then
-		echo -n "  plpnfsd: "
-		killproc -HUP @prefix@/sbin/plpnfsd
-		WAIT=5
-		while test $WAIT -gt 0 ; do
-			test -z "`pidofproc plpnfsd`" && break;
-			sleep 1 # allow plpnfsd flushing it's cache
-			WAIT=`expr $WAIT - 1`
-		done
-		test -z "`pidofproc plpnfsd`" || \
-			killproc -TERM @prefix@/sbin/plpnfsd
-		rc_status -v
-	fi
 	if [ "$START_PLPPRINTD" = "yes" ] ; then
 		echo -n "  plpprintd: "
 		killproc -TERM @prefix@/sbin/plpprintd
@@ -83,8 +64,7 @@ case "$1" in
 	;;
   status)
 	echo -n "Checking for service psion: "
-	checkproc @prefix@/sbin/plpnfsd && \
-		checkproc @prefix@/sbin/plpprintd && \
+	checkproc @prefix@/sbin/plpprintd && \
 		checkproc @prefix@/sbin/ncpd
 	rc_status -v
 	;;
