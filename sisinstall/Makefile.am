@@ -1,5 +1,3 @@
-# $Id$
-#
 INCLUDES=-I$(top_srcdir)/lib
 
 bin_PROGRAMS = sisinstall

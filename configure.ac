@@ -4,7 +4,7 @@ AM_INIT_AUTOMAKE
 
 dnl Basic settings
 AC_GNU_SOURCE
-AM_CONFIG_HEADER(include/config.h)
+AM_CONFIG_HEADER(config.h)
 AM_PROG_LIBTOOL
 
 dnl Set library version

@@ -1,5 +1,3 @@
-# $Id$
-#
 INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)/intl
 
 bin_PROGRAMS = plpftp
