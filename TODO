@@ -1,7 +1,6 @@
 plpprintd:
  Fix pattern stuff
 
-Speed up plpnfsd.
 getty-style locking of the serial-line in a manner that it can be
 used with other devices/programs without stopping/starting ncpd
 all the time.
