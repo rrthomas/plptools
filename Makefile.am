@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = intl po lib ncpd plpfuse plpftp plpprint sisinstall doc
 
-EXTRA_DIST = AUTHORS COPYING INSTALL NEWS README TODO HISTORY ABOUT-NLS include/*.h* \
+EXTRA_DIST = AUTHORS COPYING INSTALL NEWS README TODO HISTORY ABOUT-NLS \
 	etc/*magic etc/*.in etc/*.c etc/psidump* etc/udev-usbserial-plptools.rules \
 	etc/plptools.spec
 
