@@ -27,7 +27,7 @@ Basic Installation
   --with-port=portnum
 
        overrides the default port number, where ncpd listens
-       and plpftp resp. plpnfsd connects to.
+       and plpftp and plpfuse connect to.
 
   --with-drive=drivespec
 
@@ -42,15 +42,6 @@ Basic Installation
        which means the root-dir. Note: directory-separators have to
        be specified as C-like backslashes and if you consider shell's
        escape-mechanism, these in turn have to be escaped with backslashes ;-)
-
-  --disable-mnttab
-
-       By default, configure checks for existence of /etc/mtab or /etc/mnttab
-       and configures plpnfsd to update that file every time when it
-       mounts or unmounts the psion. If plpnfsd crashes or is killed during
-       that update, /etc/mtab resp. /etc/mnttab can be corrupted. Since
-       this file on some operating systems is vital for functionality
-       of mount/umount, this update can be disabled with the above option.
 
  By default, the install-prefix is /usr/local, so you probably
  should add /usr/local/lib to your /etc/ld.so.conf and then run
