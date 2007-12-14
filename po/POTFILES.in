@@ -16,6 +16,6 @@ plpftp/ftp.cc
 sisinstall/sismain.cpp
 ncpd/main.cc
 ncpd/link.cc
-plpnfsd/main.cc
+plpfuse/main.cc
 plpprint/plpprintd.cc
 
