@@ -22,7 +22,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#undef EXPERIMENTAL
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1226,18 +1225,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    continue;
 	}
 	// RPCS commands
-#ifdef EXPERIMENTAL
-	if (!strcmp(argv[0], "x")) {
-	    u_int16_t hhh;
-	    if (r.regOpenIter((u_int32_t)-1, "%PDF-", hhh)
-		== rfsv::E_PSI_GEN_NONE) {
-		Enum<rfsv::errs> res;
-		while ((res = r.regReadIter(hhh)) == rfsv::E_PSI_GEN_NONE)
-			;;
-	    }
-	    continue;
-	}
-#endif
 	if (!strcmp(argv[0], "settime")) {
 	    if ((res = r.setTime(time(NULL))) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
