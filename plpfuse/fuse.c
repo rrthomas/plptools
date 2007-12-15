@@ -24,10 +24,8 @@
 #include <errno.h>
 #include <syslog.h>
 
-#include <fuse.h>
-#include "rfsv_api.h"
-
 #include "plpfuse.h"
+#include "rfsv_api.h"
 
 #define NO_PSION	ENOMEDIUM
 
@@ -39,8 +37,8 @@ debuglog(char *fmt, ...)
   va_list ap;
   char *buf;
 
-  //if (!debug)
-  //	return 0;
+  if (!debug)
+    return 0;
   va_start(ap, fmt);
   vasprintf(&buf, fmt, ap);
   syslog(LOG_DEBUG, "%s", buf);

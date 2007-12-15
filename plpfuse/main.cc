@@ -49,6 +49,8 @@
 #endif
 #include <getopt.h>
 
+#include <fuse/fuse_lowlevel.h>
+
 using namespace std;
 
 static rfsv *a;
@@ -277,11 +279,6 @@ help()
 	) << DPORT << "\n\n";
 }
 
-static void
-usage() {
-    cerr << _("Try `plpfuse --help' for more information") << endl;
-}
-
 static struct option opts[] = {
     {"help",       no_argument,       0, 'h'},
     {"debug",      no_argument,       0, 'd'},
@@ -320,12 +317,30 @@ parse_destination(const char *arg, const char **host, int *port)
 	*port = atoi(pp);
 }
 
+int fuse(int argc, char *argv[])
+{
+    struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
+    struct fuse_chan *ch;
+    char *mountpoint;
+    int err = -1;
+
+    if (fuse_parse_cmdline(&args, &mountpoint, NULL, NULL) != -1 &&
+        (ch = fuse_mount(mountpoint, &args)) != NULL) {
+        struct fuse *fp = fuse_new(ch, &args, &plp_oper, sizeof(plp_oper), NULL);
+        if (fp != NULL)
+            err = fuse_loop(fp);
+        fuse_unmount(mountpoint, ch);
+    }
+    fuse_opt_free_args(&args);
+
+    return err ? 1 : 0;
+}
+
 int main(int argc, char**argv) {
     ppsocket *skt;
     ppsocket *skt2;
     const char *host = "127.0.0.1";
     int sockNum = DPORT;
-    int status = 0;
     int i, c;
 
     struct servent *se = getservbyname("psion", "tcp");
@@ -333,48 +348,45 @@ int main(int argc, char**argv) {
     if (se != 0L)
 	sockNum = ntohs(se->s_port);
 
-//     while ((c = getopt_long(argc, argv, "hVp:d", opts, NULL)) != -1) {
-// 	switch (c) {
-//         case 'V':
-//             cerr << _("plpfuse version ") << VERSION << endl;
-//             return 0;
-//         case 'h':
-//             help();
-//             break;
-//         case 'd':
-//             debug++;
-//             break;
-//         case 'p':
-//             parse_destination(optarg, &host, &sockNum);
-//             break;
-// 	}
-//     }
+    opterr = 0; // Suppress errors from unknown options
+    while ((c = getopt_long(argc, argv, "hVp:d", opts, NULL)) != -1) {
+	switch (c) {
+        case 'V':
+            cerr << _("plpfuse version ") << VERSION << endl;
+            break;
+        case 'h':
+            help();
+            break;
+        case 'd':
+            debug++;
+            break;
+        case 'p':
+            parse_destination(optarg, &host, &sockNum);
+            for (i = optind; i < argc - 1; i++)
+              argv[i] = argv[i + 2];
+            argc -= 2;
+            break;
+	}
+    }
 
     skt = new ppsocket();
     if (!skt->connect(host, sockNum)) {
-	cerr << "plpfuse: could not connect to ncpd" << endl;
-	status = 1;
+        cerr << _("plpfuse: could not connect to ncpd") << endl;
+	return 1;
     }
     skt2 = new ppsocket();
     if (!skt2->connect(host, sockNum)) {
-	cerr << "plpfuse: could not connect to ncpd" << endl;
-	status = 1;
+        cerr << _("plpfuse: could not connect to ncpd") << endl;
+        return 1;
     }
-    if (status == 0) {
-	rf = new rfsvfactory(skt);
-	rp = new rpcsfactory(skt2);
-	a = rf->create(true);
-	r = rp->create(true);
-	if (a != NULL && r != NULL)
-	    debuglog("plpfuse: connected, status is %d", status);
-	else
-	    debuglog("plpfuse: could not create rfsv or rpcs object, connect delayed");
-//         for (i = 0; i < optind; i++)
-//             argv[i + 1] = argv[i + optind];
-//         argc -= optind - 1;
-	status = fuse_main(argc, argv, &plp_oper, NULL);
-	delete a;
-	delete r;
-    }
-    exit(status);
+
+    rf = new rfsvfactory(skt);
+    rp = new rpcsfactory(skt2);
+    a = rf->create(true);
+    r = rp->create(true);
+    if (a != NULL && r != NULL)
+        debuglog("plpfuse: connected");
+    else
+        debuglog("plpfuse: could not create rfsv or rpcs object, connect delayed");
+    return fuse(argc, argv);
 }
