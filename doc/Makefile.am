@@ -13,5 +13,5 @@ man_MANS = ncpd.8 plpfuse.8 plpftp.1 sisinstall.1 plpprintd.8
 	MANDATE=`grep CHECKIN $< | $(AWK) '{print $$4}'` ; \
 	$(SED) -e "s%@MANDATE@%$$MANDATE%g" $< > $@
 
-maintainer-clean-local:
+distclean-local:
 	rm -f *.1 *.8

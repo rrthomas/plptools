@@ -218,10 +218,10 @@ AC_DEFINE_UNQUOTED(DBASEDIR,"$DBASEDIR",
 	[Define this to your default directory on your Psion])
 
 AC_ARG_WITH(initdir,
-    [  --with-initdir=DIR      override default init dir [/etc/rc.d/init.d]],
+    [  --with-initdir=DIR      override default init dir [PREFIX/etc/rc.d/init.d]],
     [ initdir="$withval"
       AC_MSG_RESULT(Overriding initdir: $initdir) ],
-    [ initdir="/etc/rc.d/init.d"
+    [ initdir="${sysconfdir}/rc.d/init.d"
       AC_MSG_RESULT(Using default init dir: $initdir)
     ]
 )

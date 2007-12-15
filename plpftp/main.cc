@@ -25,13 +25,12 @@
 #include <config.h>
 #endif
 
-#include <plpintl.h>
-#include <ppsocket.h>
 #include <rfsv.h>
 #include <rfsvfactory.h>
 #include <rpcs.h>
 #include <rpcsfactory.h>
 #include <rclip.h>
+#include <plpintl.h>
 #include <ppsocket.h>
 #include <bufferstore.h>
 

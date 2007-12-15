@@ -27,10 +27,10 @@
 #include "config.h"
 #endif
 
-#include <plpintl.h>
 #include <rfsv.h>
 #include <rpcs.h>
 #include <rclip.h>
+#include <plpintl.h>
 #include <ppsocket.h>
 #include <bufferarray.h>
 #include <bufferstore.h>
