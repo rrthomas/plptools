@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-12-14 00:24+0000\n"
+"POT-Creation-Date: 2007-12-15 13:57+0000\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -1481,7 +1481,7 @@ msgstr ""
 msgid "EPOC"
 msgstr ""
 
-#: plpfuse/main.cc:266
+#: plpfuse/main.cc:268
 #, fuzzy
 msgid ""
 "Usage: plpfuse [OPTION...] MOUNTPOINT\n"
@@ -1511,11 +1511,11 @@ msgstr ""
 "                        Om inget är angivet är VÄRD 127.0.0.1\n"
 "                        och PORT är "
 
-#: plpfuse/main.cc:333
+#: plpfuse/main.cc:355
 msgid "plpfuse version "
 msgstr ""
 
-#: plpfuse/main.cc:352 plpfuse/main.cc:357
+#: plpfuse/main.cc:374 plpfuse/main.cc:379
 #, fuzzy
 msgid "plpfuse: could not connect to ncpd"
 msgstr "plpftp: kunde inte få kontakt med ncpd"

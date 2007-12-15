@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-12-14 00:24+0000\n"
+"POT-Creation-Date: 2007-12-15 13:57+0000\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -1506,7 +1506,7 @@ msgstr "SIBO"
 msgid "EPOC"
 msgstr "EPOC"
 
-#: plpfuse/main.cc:266
+#: plpfuse/main.cc:268
 #, fuzzy
 msgid ""
 "Usage: plpfuse [OPTION...] MOUNTPOINT\n"
@@ -1535,12 +1535,12 @@ msgstr ""
 "                         Vorgabe für HOST ist 127.0.0.1\n"
 "                         Vorgabe für PORT ist "
 
-#: plpfuse/main.cc:333
+#: plpfuse/main.cc:355
 #, fuzzy
 msgid "plpfuse version "
 msgstr "ncpd Version "
 
-#: plpfuse/main.cc:352 plpfuse/main.cc:357
+#: plpfuse/main.cc:374 plpfuse/main.cc:379
 #, fuzzy
 msgid "plpfuse: could not connect to ncpd"
 msgstr "plpftp: Konnte ncpd nicht kontaktieren."
