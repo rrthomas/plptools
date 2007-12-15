@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-23 23:38+0000\n"
+"Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
+"POT-Creation-Date: 2007-12-14 00:24+0000\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -988,7 +988,7 @@ msgstr ""
 #: plpftp/ftp.cc:997 plpftp/ftp.cc:1020 plpftp/ftp.cc:1046 plpftp/ftp.cc:1083
 #: plpftp/ftp.cc:1111 plpftp/ftp.cc:1172 plpftp/ftp.cc:1192 plpftp/ftp.cc:1199
 #: plpftp/ftp.cc:1206 plpftp/ftp.cc:1243 plpftp/ftp.cc:1251 plpftp/ftp.cc:1334
-#: plpftp/ftp.cc:1344 plpftp/ftp.cc:1416 plpftp/ftp.cc:1442 plpftp/ftp.cc:1507
+#: plpftp/ftp.cc:1344 plpftp/ftp.cc:1416 plpftp/ftp.cc:1442 plpftp/ftp.cc:1497
 msgid "Error: "
 msgstr "Fehler: "
 
@@ -1342,17 +1342,13 @@ msgstr "Kein solcher Prozess"
 msgid "syntax error. Try \"help\""
 msgstr "Syntaxfehler. Probieren Sie \"help\""
 
-#: sisinstall/sismain.cpp:33
-msgid "Got an error, Press any key to exit."
-msgstr "Ein Fehler ist aufgetreten, Beenden mit beliebiger Taste."
-
-#: sisinstall/sismain.cpp:38
+#: sisinstall/sismain.cpp:23
 #, c-format
 msgid "Error %d on line %d: %s\n"
 msgstr "Fehler %d in Zeile %d: %s\n"
 
-#: sisinstall/sismain.cpp:57
-#, c-format
+#: sisinstall/sismain.cpp:39
+#, fuzzy, c-format
 msgid ""
 "Usage: sisinstall [OPTIONS]... SISFILE\n"
 "\n"
@@ -1362,7 +1358,6 @@ msgid ""
 " -V, --version           Print version and exit.\n"
 " -v, --verbose=LEVEL     Set the verbosity level, by default 0.\n"
 " -n, --dry-run           Just parse the file.\n"
-" -w, --newt              Use the Newt interface.\n"
 msgstr ""
 "Anwendung: sisinstall [OPTIONEN]... SISDATEI\n"
 "\n"
@@ -1374,43 +1369,39 @@ msgstr ""
 " -n, --dry-run           Nur parsen; keine Installation.\n"
 " -w, --newt              Benutze NEWT Oberfläche.\n"
 
-#: sisinstall/sismain.cpp:111
+#: sisinstall/sismain.cpp:81
 #, c-format
 msgid "sisinstall version 0.1\n"
 msgstr "Installationsprogramm, Version 0.1\n"
 
-#: sisinstall/sismain.cpp:130 sisinstall/sismain.cpp:138
+#: sisinstall/sismain.cpp:88
 #, c-format
 msgid "Installing sis file %s%s.\n"
 msgstr "Installiere SIS-Datei %s%s.\n"
 
-#: sisinstall/sismain.cpp:132 sisinstall/sismain.cpp:139
+#: sisinstall/sismain.cpp:89
 msgid ", not really"
 msgstr ", nicht wirklich"
 
-#: sisinstall/sismain.cpp:147
+#: sisinstall/sismain.cpp:93
 #, c-format
 msgid "Missing SIS filename\n"
 msgstr "Fehlender SIS Dateiname\n"
 
-#: sisinstall/sismain.cpp:155
+#: sisinstall/sismain.cpp:101
 #, c-format
 msgid "File is %d bytes long\n"
 msgstr "Datei ist %d Bytes lang\n"
 
-#: sisinstall/sismain.cpp:170
+#: sisinstall/sismain.cpp:116
 #, c-format
 msgid "Couldn't connect with the Psion\n"
 msgstr "Konnte nicht mit dem Psion verbinden\n"
 
-#: sisinstall/sismain.cpp:191
+#: sisinstall/sismain.cpp:134
 #, c-format
 msgid "Could not parse the sis file.\n"
 msgstr "Konnte SIS-Datei nicht parsen.\n"
-
-#: sisinstall/sismain.cpp:200
-msgid "Installation complete. Press any key to exit."
-msgstr "Installation beendet. Beenden mit beliebiger Taste."
 
 #: ncpd/main.cc:81
 msgid "Got SIGTERM"
@@ -1515,57 +1506,57 @@ msgstr "SIBO"
 msgid "EPOC"
 msgstr "EPOC"
 
-#: plpnfsd/main.cc:481
+#: plpfuse/main.cc:266
+#, fuzzy
 msgid ""
-"Usage: plpnfsd [OPTIONS]...\n"
+"Usage: plpfuse [OPTION...] MOUNTPOINT\n"
 "\n"
 "Supported options:\n"
 "\n"
-" -d, --mountpoint=DIR    Specify DIR as mountpoint\n"
-"                         Default for DIR is "
+" -u, --user=USER         Specify USER who owns mounted dir\n"
+" -d, --debug             Increase debugging\n"
+" -h, --help              Display this text\n"
+" -V, --version           Print version and exit\n"
+" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST\n"
+"                         Default for HOST is 127.0.0.1\n"
+"                         Default for PORT is "
 msgstr ""
+"Anwendung: plpnfsd [OPTIONEN]...\n"
+"\n"
+"Unterstützte Optionen:\n"
+"\n"
+" -d, --mountpoint=DIR    Verwende DIR als Einhängepunkt.\n"
+" -u, --user=USER         Bestimme Eigner des eingehängten Verzeichnisses.\n"
+" -v, --verbose           Erhöhe Log-Ebene\n"
+" -D, --debug             Erhöhe Debug-Ebene\n"
+" -h, --help              Zeige diesen Text.\n"
+" -V, --version           Version ausgeben und beenden.\n"
+" -p, --port=[HOST:]PORT  Verbinde mit port PORT auf host HOST.\n"
+"                         Vorgabe für HOST ist 127.0.0.1\n"
+"                         Vorgabe für PORT ist "
 
-#: plpnfsd/main.cc:499
-msgid "Try `plpnfsd --help' for more information"
-msgstr "Versuchen Sie `plpnfsd --help' für weitere Informationen."
-
-#: plpnfsd/main.cc:565
-msgid "plpnfsd Version "
+#: plpfuse/main.cc:333
+#, fuzzy
+msgid "plpfuse version "
 msgstr "ncpd Version "
+
+#: plpfuse/main.cc:352 plpfuse/main.cc:357
+#, fuzzy
+msgid "plpfuse: could not connect to ncpd"
+msgstr "plpftp: Konnte ncpd nicht kontaktieren."
 
 #: plpprint/plpprintd.cc:1024
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: Konnte ncpd nicht kontaktieren."
 
-#~ msgid ""
-#~ "Usage: plpnfsd [OPTIONS]...\n"
-#~ "\n"
-#~ "Supported options:\n"
-#~ "\n"
-#~ " -d, --mountpoint=DIR    Specify DIR as mountpoint\n"
-#~ " -u, --user=USER         Specify USER who owns mounted dir.\n"
-#~ " -v, --verbose           Increase verbosity\n"
-#~ " -D, --debug             Increase debug level\n"
-#~ " -h, --help              Display this text.\n"
-#~ " -V, --version           Print version and exit.\n"
-#~ " -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
-#~ "                         Default for HOST is 127.0.0.1\n"
-#~ "                         Default for PORT is "
-#~ msgstr ""
-#~ "Anwendung: plpnfsd [OPTIONEN]...\n"
-#~ "\n"
-#~ "Unterstützte Optionen:\n"
-#~ "\n"
-#~ " -d, --mountpoint=DIR    Verwende DIR als Einhängepunkt.\n"
-#~ " -u, --user=USER         Bestimme Eigner des eingehängten "
-#~ "Verzeichnisses.\n"
-#~ " -v, --verbose           Erhöhe Log-Ebene\n"
-#~ " -D, --debug             Erhöhe Debug-Ebene\n"
-#~ " -h, --help              Zeige diesen Text.\n"
-#~ " -V, --version           Version ausgeben und beenden.\n"
-#~ " -p, --port=[HOST:]PORT  Verbinde mit port PORT auf host HOST.\n"
-#~ "                         Vorgabe für HOST ist 127.0.0.1\n"
-#~ "                         Vorgabe für PORT ist "
+#~ msgid "Got an error, Press any key to exit."
+#~ msgstr "Ein Fehler ist aufgetreten, Beenden mit beliebiger Taste."
+
+#~ msgid "Installation complete. Press any key to exit."
+#~ msgstr "Installation beendet. Beenden mit beliebiger Taste."
+
+#~ msgid "Try `plpnfsd --help' for more information"
+#~ msgstr "Versuchen Sie `plpnfsd --help' für weitere Informationen."
 
 #~ msgid "Could not start "
 #~ msgstr "Konnte nicht starten: "

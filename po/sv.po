@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-23 23:38+0000\n"
+"Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
+"POT-Creation-Date: 2007-12-14 00:24+0000\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -989,7 +989,7 @@ msgstr ""
 #: plpftp/ftp.cc:997 plpftp/ftp.cc:1020 plpftp/ftp.cc:1046 plpftp/ftp.cc:1083
 #: plpftp/ftp.cc:1111 plpftp/ftp.cc:1172 plpftp/ftp.cc:1192 plpftp/ftp.cc:1199
 #: plpftp/ftp.cc:1206 plpftp/ftp.cc:1243 plpftp/ftp.cc:1251 plpftp/ftp.cc:1334
-#: plpftp/ftp.cc:1344 plpftp/ftp.cc:1416 plpftp/ftp.cc:1442 plpftp/ftp.cc:1507
+#: plpftp/ftp.cc:1344 plpftp/ftp.cc:1416 plpftp/ftp.cc:1442 plpftp/ftp.cc:1497
 msgid "Error: "
 msgstr "Fel: "
 
@@ -1343,17 +1343,13 @@ msgstr "ingen sådan process"
 msgid "syntax error. Try \"help\""
 msgstr "syntax error. Prova \"help\""
 
-#: sisinstall/sismain.cpp:33
-msgid "Got an error, Press any key to exit."
-msgstr "Fick ett fel, Tryck en tangent för att avsluta."
-
-#: sisinstall/sismain.cpp:38
+#: sisinstall/sismain.cpp:23
 #, c-format
 msgid "Error %d on line %d: %s\n"
 msgstr "Fel %d på rad %d: %s\n"
 
-#: sisinstall/sismain.cpp:57
-#, c-format
+#: sisinstall/sismain.cpp:39
+#, fuzzy, c-format
 msgid ""
 "Usage: sisinstall [OPTIONS]... SISFILE\n"
 "\n"
@@ -1363,7 +1359,6 @@ msgid ""
 " -V, --version           Print version and exit.\n"
 " -v, --verbose=LEVEL     Set the verbosity level, by default 0.\n"
 " -n, --dry-run           Just parse the file.\n"
-" -w, --newt              Use the Newt interface.\n"
 msgstr ""
 "Användning: sisinstall [OPTIONS]... SISFILE\n"
 "\n"
@@ -1375,43 +1370,39 @@ msgstr ""
 " -n, --dry-run           Läs bara igenom filen.\n"
 " -w, --newt              Använd Newt-gränssnittet.\n"
 
-#: sisinstall/sismain.cpp:111
+#: sisinstall/sismain.cpp:81
 #, c-format
 msgid "sisinstall version 0.1\n"
 msgstr ""
 
-#: sisinstall/sismain.cpp:130 sisinstall/sismain.cpp:138
+#: sisinstall/sismain.cpp:88
 #, c-format
 msgid "Installing sis file %s%s.\n"
 msgstr "Installerar sisfil %s%s.\n"
 
-#: sisinstall/sismain.cpp:132 sisinstall/sismain.cpp:139
+#: sisinstall/sismain.cpp:89
 msgid ", not really"
 msgstr ", inte egentligen"
 
-#: sisinstall/sismain.cpp:147
+#: sisinstall/sismain.cpp:93
 #, c-format
 msgid "Missing SIS filename\n"
 msgstr "Saknar SIS-filnamn\n"
 
-#: sisinstall/sismain.cpp:155
+#: sisinstall/sismain.cpp:101
 #, c-format
 msgid "File is %d bytes long\n"
 msgstr "Filen är %d bytes lång\n"
 
-#: sisinstall/sismain.cpp:170
+#: sisinstall/sismain.cpp:116
 #, c-format
 msgid "Couldn't connect with the Psion\n"
 msgstr "Kunde inte få kontakt med Psionen\n"
 
-#: sisinstall/sismain.cpp:191
+#: sisinstall/sismain.cpp:134
 #, c-format
 msgid "Could not parse the sis file.\n"
 msgstr "Kunde inte parsa sisfilen.\n"
-
-#: sisinstall/sismain.cpp:200
-msgid "Installation complete. Press any key to exit."
-msgstr "Installationen klar. Tryck valfri tangent för att avsluta."
 
 #: ncpd/main.cc:81
 msgid "Got SIGTERM"
@@ -1490,27 +1481,57 @@ msgstr ""
 msgid "EPOC"
 msgstr ""
 
-#: plpnfsd/main.cc:481
+#: plpfuse/main.cc:266
+#, fuzzy
 msgid ""
-"Usage: plpnfsd [OPTIONS]...\n"
+"Usage: plpfuse [OPTION...] MOUNTPOINT\n"
 "\n"
 "Supported options:\n"
 "\n"
-" -d, --mountpoint=DIR    Specify DIR as mountpoint\n"
-"                         Default for DIR is "
+" -u, --user=USER         Specify USER who owns mounted dir\n"
+" -d, --debug             Increase debugging\n"
+" -h, --help              Display this text\n"
+" -V, --version           Print version and exit\n"
+" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST\n"
+"                         Default for HOST is 127.0.0.1\n"
+"                         Default for PORT is "
+msgstr ""
+"Användning: plpftp [OPTIONER]... [FTPKOMMANDO]\n"
+"\n"
+"Om FTPKOMMANDO är angivet, koppla upp; kör FTPKOMMANDO och\n"
+"avsluta efteråt. Om inget FTPKOMMANDO är angivet, starta\n"
+"i interaktivt läge. För mer information om tillgängliga\n"
+"FTPKOMMANDOn, använd `?' eller `help' som FTPKOMMANDO.\n"
+"\n"
+"Tillgängliga optioner:\n"
+"\n"
+" -h, --help          Visa den här texten.\n"
+" -V, --version       Visa versionsnummer och avsluta.\n"
+" -p, --port=[VRD:]PORT Ta kontakt med port PORT på maskin VÄRD.\n"
+"                        Om inget är angivet är VÄRD 127.0.0.1\n"
+"                        och PORT är "
+
+#: plpfuse/main.cc:333
+msgid "plpfuse version "
 msgstr ""
 
-#: plpnfsd/main.cc:499
-msgid "Try `plpnfsd --help' for more information"
-msgstr "Prova 'plpnfsd --help' för mer information"
-
-#: plpnfsd/main.cc:565
-msgid "plpnfsd Version "
-msgstr ""
+#: plpfuse/main.cc:352 plpfuse/main.cc:357
+#, fuzzy
+msgid "plpfuse: could not connect to ncpd"
+msgstr "plpftp: kunde inte få kontakt med ncpd"
 
 #: plpprint/plpprintd.cc:1024
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: kunde inte få kontakt med ncpd"
+
+#~ msgid "Got an error, Press any key to exit."
+#~ msgstr "Fick ett fel, Tryck en tangent för att avsluta."
+
+#~ msgid "Installation complete. Press any key to exit."
+#~ msgstr "Installationen klar. Tryck valfri tangent för att avsluta."
+
+#~ msgid "Try `plpnfsd --help' for more information"
+#~ msgstr "Prova 'plpnfsd --help' för mer information"
 
 #~ msgid "Could not start "
 #~ msgstr "Kunde inte starta "
