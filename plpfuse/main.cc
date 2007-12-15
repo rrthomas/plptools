@@ -267,15 +267,14 @@ help()
     cerr << _(
 	"Usage: plpfuse [OPTION...] MOUNTPOINT\n"
 	"\n"
-	"Supported options:\n"
+	"plpfuse options:\n"
 	"\n"
-	" -u, --user=USER         Specify USER who owns mounted dir\n"
-	" -d, --debug             Increase debugging\n"
-	" -h, --help              Display this text\n"
-	" -V, --version           Print version and exit\n"
-	" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST\n"
-	"                         Default for HOST is 127.0.0.1\n"
-	"                         Default for PORT is "
+	"    -d, --debug             Increase debugging level\n"
+	"    -h, --help              Display this text\n"
+	"    -V, --version           Print version and exit\n"
+	"    -p, --port=[HOST:]PORT  Connect to port PORT on host HOST\n"
+	"                            Default for HOST is 127.0.0.1\n"
+	"                            Default for PORT is "
 	) << DPORT << "\n\n";
 }
 
@@ -284,7 +283,6 @@ static struct option opts[] = {
     {"debug",      no_argument,       0, 'd'},
     {"version",    no_argument,       0, 'V'},
     {"port",       required_argument, 0, 'p'},
-    {"user",       required_argument, 0, 'u'},
     {NULL,       0,                 0,  0 }
 };
 
@@ -337,17 +335,20 @@ int fuse(int argc, char *argv[])
 }
 
 int main(int argc, char**argv) {
-    ppsocket *skt;
-    ppsocket *skt2;
+    ppsocket *skt, *skt2;
     const char *host = "127.0.0.1";
-    int sockNum = DPORT;
-    int i, c;
+    int sockNum = DPORT, i, c, oldoptind = 1;
 
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
     if (se != 0L)
 	sockNum = ntohs(se->s_port);
 
+    /* N.B. Option handling is kludged. Most of the options are shared
+       with FUSE, except for -p/--port, which has to be removed from
+       argv so that FUSE doesn't see it. Hence, we don't complain
+       about unknown options, but leave that to FUSE, and similarly we
+       don't quit after issuing a version or help message. */
     opterr = 0; // Suppress errors from unknown options
     while ((c = getopt_long(argc, argv, "hVp:d", opts, NULL)) != -1) {
 	switch (c) {
@@ -362,9 +363,9 @@ int main(int argc, char**argv) {
             break;
         case 'p':
             parse_destination(optarg, &host, &sockNum);
-            for (i = optind; i < argc - 1; i++)
-              argv[i] = argv[i + 2];
-            argc -= 2;
+            for (i = oldoptind; i < argc - (optind - oldoptind); i++)
+              argv[i] = argv[i + (optind - oldoptind)];
+            argc -= optind - oldoptind;
             break;
 	}
     }
