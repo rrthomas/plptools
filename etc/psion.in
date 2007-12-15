@@ -9,6 +9,7 @@
 . /etc/rc.d/init.d/functions
 
 [ -f @prefix@/sbin/ncpd ] || exit 0
+[ -f @prefix@/sbin/plpfuse ] || exit 0
 [ -f @prefix@/sbin/plpprintd ] || exit 0
 [ -f /etc/sysconfig/psion ] || exit 0
 . /etc/sysconfig/psion
@@ -21,6 +22,14 @@ start() {
 		daemon @prefix@/sbin/ncpd $NCPD_ARGS
 		RETVAL=$?
 		echo
+	fi
+        if [ $RETVAL -eq 0 ] ; then
+		if test "$START_PLPFUSE" = "yes" ; then
+			echo -n "  plpfuse: "
+			daemon @prefix@/sbin/plpfuse $PLPFUSE_ARGS
+                	RETVAL=$?
+			echo
+		fi
 	fi
 	if [ $RETVAL -eq 0 ] ; then
 		if test "$START_PLPPRINTD" = "yes" ; then
@@ -40,6 +49,11 @@ stop() {
 	if test "$START_PLPPRINTD" = "yes" ; then
 		echo -n "  plpprintd: "
 		killproc plpprintd
+		echo
+	fi
+	if test "$START_PLPFUSE" = "yes" ; then
+		echo -n "  plpfuse: "
+		fusermount -u /mnt/psion
 		echo
 	fi
 	if test "$START_NCPD" = "yes" ; then
