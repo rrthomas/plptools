@@ -1,9 +1,10 @@
+ncpd:
+ getty-style locking of the serial-line in a manner that it can be
+ used with other devices/programs without stopping/starting ncpd
+ all the time.
+
 plpprintd:
  Fix pattern stuff
-
-getty-style locking of the serial-line in a manner that it can be
-used with other devices/programs without stopping/starting ncpd
-all the time.
 
 Sisinstall:
  - Use rpm-style arguments.
@@ -11,4 +12,3 @@ Sisinstall:
  - Check file crc.
  - Create a unique name of the residual sis file, if
    the provided name already exists.
-
