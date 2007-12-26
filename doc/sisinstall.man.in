@@ -51,9 +51,9 @@ Level 2 is rather verbose, and is mostly meant for debugging.
 Ignores dependency records in the sis file.
 
 .SH SEE ALSO
-ncpd(8), plpfuse(8), plpprintd(8) and plpftp(1)
+ncpd(8), plpfuse(8), plpprintd(8), plpftp(1)
 
 .SH AUTHOR
 Written by Daniel Brahneborg (basic@chello.se).
+.br
 Psion communication based on plpftp by Fritz Elfert (felfert@to.com).
-

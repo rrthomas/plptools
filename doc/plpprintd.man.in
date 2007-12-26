@@ -76,7 +76,7 @@ can not be found in this file, a builtin default Courier is used.
 Using patterns in diagrams gives ugly results.
 
 .SH SEE ALSO
-ncpd(8), plpfuse(8), plpftp(1) and sisinstall(1)
+ncpd(8), plpfuse(8), plpftp(1), sisinstall(1)
 
 .SH AUTHOR
 Fritz Elfert

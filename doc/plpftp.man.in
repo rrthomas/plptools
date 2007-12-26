@@ -45,12 +45,13 @@ plpftp enters non interactive mode and terminates after executing the
 command.
 
 .SH SEE ALSO
-ncpd(8), plpfuse(8), plpprintd(8) and sisinstall(1)
+ncpd(8), plpfuse(8), plpprintd(8), sisinstall(1)
 
 .SH AUTHOR
 Fritz Elfert
+.br
 Heavily based on p3nfsd by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
 and
 plp_1_7 by Philip Proudman (phil@proudman51.freeserve.co.uk)
+.br
 Man page by John Lines (john+plpman@paladin.demon.co.uk)
-
