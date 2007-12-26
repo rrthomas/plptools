@@ -56,7 +56,7 @@ connected, which is highly likely, then characters which are
 differently encoded between the two characters sets will not translate
 between the two systems. it is usually safe to use 7-bit ASCII
 characters, avoiding colon (invalid on EPOC) and slash (invalid on
-UNIX).
+UNIX). This problem may be fixed in future.
 
 .SH SEE ALSO
 ncpd(8), plpprintd(8), plpftp(1), sisinstall(1), fusermount(1)
