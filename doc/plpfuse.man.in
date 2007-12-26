@@ -50,7 +50,7 @@ on) - by default the host is 127.0.0.1 and the port is looked up in
 .I @DPORT@.
 
 .SH SEE ALSO
-ncpd(8), plpprintd(8), plpftp(1) and sisinstall(1)
+ncpd(8), plpprintd(8), plpftp(1), sisinstall(1), fusermount(1)
 
 .SH AUTHOR
 Reuben Thomas, based on plpnfsd by Fritz Elfert, and FUSE example code by Miklos Szeredi (miklos@szeredi.hu).
