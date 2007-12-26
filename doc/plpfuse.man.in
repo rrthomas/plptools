@@ -49,6 +49,15 @@ on) - by default the host is 127.0.0.1 and the port is looked up in
 /etc/services. If it is not found there, a fall-back builtin of
 .I @DPORT@.
 
+.SH BUGS
+Because UNIX file names are simply byte strings, if your EPOC device
+uses a different character set from the computer to which it is
+connected, which is highly likely, then characters which are
+differently encoded between the two characters sets will not translate
+between the two systems. it is usually safe to use 7-bit ASCII
+characters, avoiding colon (invalid on EPOC) and slash (invalid on
+UNIX).
+
 .SH SEE ALSO
 ncpd(8), plpprintd(8), plpftp(1), sisinstall(1), fusermount(1)
 
