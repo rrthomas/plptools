@@ -1,4 +1,4 @@
-AC_INIT(plptools, 0.19, plptools-developers@lists.sourceforge.net)
+AC_INIT(plptools, 0.20, plptools-developers@lists.sourceforge.net)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE
 
@@ -103,15 +103,9 @@ AC_SUBST(LIBHISTORY)
 
 # FUSE for plpfuse
 AC_CHECK_HEADER(fuse.h,,
-    [AC_MSG_ERROR([
-	Can't find fuse.h - add the search path to CPPFLAGS and
-	rerun configure, eg:
-	export CPPFLAGS=-I/usr/local/include ])])
-AC_CHECK_LIB(fuse,fuse_new, [FUSE_LIBS="-lfuse"],
-    [AC_MSG_ERROR([
-	Can't find libfuse.a - add the search path to LDFLAGS
-	and rerun configure, eg:
-	export LDFLAGS=-L/usr/local/lib ])],)
+    [AC_MSG_ERROR([Need fuse.h to build plpfuse])])
+AC_CHECK_LIB(fuse,fuse_new,,
+    [AC_MSG_ERROR([Need libfuse to build plpfuse])])
 
 # check for a supported version of FUSE
 AC_MSG_CHECKING([For supported FUSE API version])
@@ -127,9 +121,15 @@ AC_RUN_IFELSE([
 ]])], 
     [AC_MSG_RESULT([yes])],
     [AC_MSG_RESULT([no])
-    AC_MSG_FAILURE([plpfuse requires FUSE 2.5 or newer.])
+    AC_MSG_FAILURE([plpfuse requires FUSE 2.6 or newer.])
     ]
 )
+
+# check for libattr for plpfuse
+AC_CHECK_HEADER(attr/attributes.h,,
+    [AC_MSG_ERROR([Need libattr to build plpfuse])])
+AC_CHECK_LIB(attr,attr_set,,
+    [AC_MSG_ERROR([Need libattr to build plpfuse])])
 
 dnl these three are for solaris
 AC_CHECK_LIB(socket, socket)
@@ -137,7 +137,7 @@ AC_CHECK_LIB(nsl, gethostbyname)
 ac_save_LDFLAGS=$LDFLAGS; LDFLAGS="-L/usr/ucblib -R/usr/ucblib $LDFLAGS"
 AC_CHECK_LIB(rpcsoc, svcudp_create,,LDFLAGS=$ac_save_LDFLAGS)
 
-dnl Check, if bot time.h and sys/time.h may be included
+dnl Check whether both time.h and sys/time.h may be included
 AC_HEADER_TIME
 
 dnl Type of sighandlers
