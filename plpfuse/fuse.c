@@ -1,13 +1,13 @@
 /*
-  FUSE: Filesystem in Userspace
+  plpfuse: Expose EPOC's file system via FUSE
   Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
-  Copyright (C) 2007 Reuben Thomas <rrt@sc3d.org>
+  Copyright (C) 2007-2008  Reuben Thomas <rrt@sc3d.org>
 
   This program can be distributed under the terms of the GNU GPL.
   See the file COPYING.
 */
 
-// FIXME: Map errors sensibly from EPOC to UNIX
+/* FIXME: Map errors sensibly from EPOC to UNIX */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -23,11 +23,19 @@
 #include <sys/time.h>
 #include <errno.h>
 #include <syslog.h>
+#include <attr/xattr.h>
+#include <attr/attributes.h>
 
 #include "plpfuse.h"
 #include "rfsv_api.h"
 
 #define NO_PSION	ENOMEDIUM
+
+/* Name of our extended attribute */
+#define XATTR_NAME "user.psion"
+
+/* Maximum length of a generated psion xattr string */
+#define XATTR_MAXLEN 3
 
 int debug;
 
@@ -48,39 +56,22 @@ debuglog(char *fmt, ...)
 }
 
 static void
-attr2pattr(long oattr, long nattr, long *psisattr, long *psidattr)
+xattr2pattr(long *psisattr, long *psidattr, const char *oxattr, const char *nxattr)
 {
-  /*
-   * Following flags have to be set in order to let backups
-   * work properly
-   */
-  *psisattr = *psidattr = 0;
-  if ((oattr & 0400) != (nattr & 0400)) {
-    if (nattr & 0400)		/* readable */
-      *psisattr |= PSI_A_READ;
-    else
-      *psidattr |= PSI_A_READ;
-  }
-  if ((oattr & 0200) != (nattr & 0200)) {
-    if (nattr & 0200)		/* Not writable   -> readonly */
-      *psidattr |= PSI_A_RDONLY;
-    else
-      *psisattr |= PSI_A_RDONLY;
-  }
-  if ((oattr & 0020) != (nattr & 0020)) {
-    if (nattr & 0020)		/* group-write    -> archive */
+  if ((strchr(oxattr, 'a') == NULL) != (strchr(nxattr, 'a') == NULL)) { /* a = archive */
+    if (strchr(nxattr, 'a'))
       *psisattr |= PSI_A_ARCHIVE;
     else
       *psidattr |= PSI_A_ARCHIVE;
   }
-  if ((oattr & 0004) != (nattr & 0004)) {
-    if (nattr & 0004)		/* Not world-read -> hidden  */
+  if ((strchr(oxattr, 'h') == NULL) != (strchr(nxattr, 'h') == NULL)) { /* h = hidden */
+    if (strchr(nxattr, 'h'))
       *psidattr |= PSI_A_HIDDEN;
     else
       *psisattr |= PSI_A_HIDDEN;
   }
-  if ((oattr & 0002) != (nattr & 0002)) {
-    if (nattr & 0002)		/* world-write    -> system */
+  if ((strchr(oxattr, 's') == NULL) != (strchr(nxattr, 's') == NULL)) { /* s = system */
+    if (strchr(nxattr, 's'))
       *psisattr |= PSI_A_SYSTEM;
     else
       *psidattr |= PSI_A_SYSTEM;
@@ -88,12 +79,43 @@ attr2pattr(long oattr, long nattr, long *psisattr, long *psidattr)
 }
 
 static void
-pattr2attr(long psiattr, long size, long ftime, struct stat *st)
+attr2pattr(long oattr, long nattr, char *oxattr, char *nxattr, long *psisattr, long *psidattr)
+{
+  *psisattr = *psidattr = 0;
+  if ((oattr & 0400) != (nattr & 0400)) {
+    if (nattr & 0400) /* readable */
+      *psisattr |= PSI_A_READ;
+    else
+      *psidattr |= PSI_A_READ;
+  }
+  if ((oattr & 0200) != (nattr & 0200)) {
+    if (nattr & 0200) /* Not writable   -> readonly */
+      *psidattr |= PSI_A_RDONLY;
+    else
+      *psisattr |= PSI_A_RDONLY;
+  }
+  xattr2pattr(psisattr, psidattr, oxattr, nxattr);
+}
+
+static void
+pattr2xattr(long psiattr, char *xattr)
+{
+  *xattr = '\0';
+
+  if (psiattr & PSI_A_HIDDEN)
+    strcat(xattr, "h");
+  if (psiattr & PSI_A_SYSTEM)
+    strcat(xattr, "s");
+  if (psiattr & PSI_A_ARCHIVE)
+    strcat(xattr, "a");
+}
+
+static void
+pattr2attr(long psiattr, long size, long ftime, struct stat *st, char *xattr)
 {
   struct fuse_context *ct = fuse_get_context();
 
   memset(st, 0, sizeof(*st));
-
   st->st_uid = ct->uid;
   st->st_gid = ct->gid;
 
@@ -101,41 +123,26 @@ pattr2attr(long psiattr, long size, long ftime, struct stat *st)
     st->st_mode = 0700 | S_IFDIR;
     st->st_blocks = 1;
     st->st_size = BLOCKSIZE;
-    st->st_nlink = 2; /* Call dircount for more accurate count */
+    st->st_nlink = 2; /* Call getlinks for more accurate count */
   } else {
     st->st_blocks = (size + BLOCKSIZE - 1) / BLOCKSIZE;
     st->st_size = size;
     st->st_nlink = 1;
     st->st_mode = S_IFREG;
 
-    /*
-     * Following flags have to be set in order to let backups
-     * work properly
-     */
     if (psiattr & PSI_A_READ)
-      st->st_mode |= 0400;	/* File readable (?) */
+      st->st_mode |= 0400;	/* File readable */
     if (!(psiattr & PSI_A_RDONLY))
       st->st_mode |= 0200;	/* File writeable  */
-    /* st->st_mode |= 0100;		   File executable */
-    if (!(psiattr & PSI_A_HIDDEN))
-      st->st_mode |= 0004;	/* Not Hidden  <-> world read */
-    if (psiattr & PSI_A_SYSTEM)
-      st->st_mode |= 0002;	/* System      <-> world write */
-    if (psiattr & PSI_A_VOLUME)
-      st->st_mode |= 0001;	/* Volume      <-> world exec */
-    if (psiattr & PSI_A_ARCHIVE)
-      st->st_mode |= 0020;	/* Modified    <-> group write */
-    /* st->st_mode |= 0040;	 Byte        <-> group read */
-    /* st->st_mode |= 0010;	 Text        <-> group exec */
   }
-
   st->st_mtime = st->st_ctime = st->st_atime = ftime;
+  pattr2xattr(psiattr, xattr);
 }
 
 static device *devices;
 
 static int
-query_devices()
+query_devices(void)
 {
   device *dp, *np;
   int link_count = 2;	/* set the root link count */
@@ -151,7 +158,7 @@ query_devices()
   return 0;
 }
 
-char *
+static char *
 dirname(const char *dir)
 {
   static char *namebuf = NULL;
@@ -161,7 +168,7 @@ dirname(const char *dir)
   return namebuf;
 }
 
-const char *
+static const char *
 filname(const char *dir)
 {
   char *p;
@@ -185,7 +192,8 @@ dircount(const char *path, long *count)
   while (e) {
     struct stat st;
     dentry *o = e;
-    pattr2attr(e->attr, e->size, e->time, &st);
+    char xattr[XATTR_MAXLEN + 1];
+    pattr2attr(e->attr, e->size, e->time, &st, xattr);
     free(e->name);
     e = e->next;
     free(o);
@@ -209,10 +217,12 @@ static int getlinks(const char *path, struct stat *st)
 
 static int plp_getattr(const char *path, struct stat *st)
 {
+  char xattr[XATTR_MAXLEN + 1];
+
   debuglog("plp_getattr `%s'", ++path);
 
   if (strcmp(path, "") == 0) {
-    pattr2attr(PSI_A_DIR, 0, 0, st);
+    pattr2attr(PSI_A_DIR, 0, 0, st, xattr);
     if (!query_devices()) {
       device *dp;
                 
@@ -236,7 +246,7 @@ static int plp_getattr(const char *path, struct stat *st)
             break;
         }
         debuglog("device: %s", dp ? "exists" : "does not exist");
-        pattr2attr(PSI_A_DIR, 0, 0, st);
+        pattr2attr(PSI_A_DIR, 0, 0, st, xattr);
         return getlinks(path, st);
       } else
         return rfsv_isalive() ? -ENOENT : -NO_PSION;
@@ -246,8 +256,8 @@ static int plp_getattr(const char *path, struct stat *st)
     if (rfsv_getattr(path, &pattr, &psize, &ptime))
       return rfsv_isalive() ? -ENOENT : -NO_PSION;
     else {
-      pattr2attr(pattr, psize, ptime, st);
-      debuglog(" attrs Psion: %x %d %d, UNIX modes: %o", pattr, psize, ptime, st->st_mode);
+      pattr2attr(pattr, psize, ptime, st, xattr);
+      debuglog(" attrs Psion: %x %d %d, UNIX modes: %o, xattrs: ", pattr, psize, ptime, st->st_mode, xattr);
       if (st->st_nlink > 1)
         return getlinks(path, st);
     }
@@ -259,12 +269,15 @@ static int plp_getattr(const char *path, struct stat *st)
 
 static int plp_access(const char *path, int mask)
 {
+  (void)mask;
   debuglog("plp_access `%s'", ++path);
   return 0;
 }
 
 static int plp_readlink(const char *path, char *buf, size_t size)
 {
+  (void)buf;
+  (void)size;
   debuglog("plp_readlink `%s'", ++path);
   return -EINVAL;
 }
@@ -274,8 +287,8 @@ static int plp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                        off_t offset, struct fuse_file_info *fi)
 {
   device *dp;
-  int ret;
   dentry *e = NULL;
+  char xattr[XATTR_MAXLEN + 1];
 
   debuglog("plp_readdir `%s'", ++path);
 
@@ -286,15 +299,14 @@ static int plp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     debuglog("readdir root");
     if (query_devices() == 0) {
       for (dp = devices; dp; dp = dp->next) {
-        dentry *o;
         struct stat st;
         unsigned char name[3];
 
         name[0] = dp->letter;
         name[1] = ':';
         name[2] = '\0';
-        pattr2attr(dp->attrib, 1, 0, &st);
-        if (filler(buf, name, &st, 0))
+        pattr2attr(dp->attrib, 1, 0, &st, xattr);
+        if (filler(buf, (char *)name, &st, 0))
           break;
       }
     }
@@ -309,7 +321,7 @@ static int plp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
       struct stat st;
       const char *name = filname(e->name);
 
-      pattr2attr(e->attr, e->size, e->time, &st);
+      pattr2attr(e->attr, e->size, e->time, &st, xattr);
       debuglog("  %s %o %d %d", name, st.st_mode, st.st_size, st.st_mtime);
       if (filler(buf, name, &st, 0))
         break;
@@ -397,13 +409,14 @@ static int plp_chmod(const char *path, mode_t mode)
 {
   long psisattr, psidattr, pattr, psize, ptime;
   struct stat st;
+  char xattr[XATTR_MAXLEN + 1];
 
   debuglog("plp_chmod `%s'", ++path);
 
   if (rfsv_getattr(path, &pattr, &psize, &ptime))
     return rfsv_isalive() ? -ENOENT : -NO_PSION;
-  pattr2attr(pattr, psize, ptime, &st);
-  attr2pattr(st.st_mode, mode, &psisattr, &psidattr);
+  pattr2attr(pattr, psize, ptime, &st, xattr);
+  attr2pattr(st.st_mode, mode, "", "", &psisattr, &psidattr);
   debuglog("  UNIX old, new: %o, %o; Psion set, clear: %x, %x", st.st_mode, mode, psisattr, psidattr);
   if (rfsv_setattr(path, psisattr, psidattr))
     return rfsv_isalive() ? -EACCES : -NO_PSION;
@@ -412,14 +425,71 @@ static int plp_chmod(const char *path, mode_t mode)
   return 0;
 }
 
+static int plp_getxattr(const char *path, const char *name, char *value, size_t size)
+{
+  debuglog("plp_getxattr `%s'", ++path);
+  if (strcmp(name, XATTR_NAME) == 0) {
+    if (size >= XATTR_MAXLEN) {
+      long pattr, psize, ptime;
+      if (rfsv_getattr(path, &pattr, &psize, &ptime))
+        return rfsv_isalive() ? -ENOENT : -NO_PSION;
+      pattr2xattr(pattr, value);
+      return 0;
+    } else
+      return -ERANGE;
+  } else
+    return -ENOATTR;
+}
+
+static int plp_setxattr(const char *path, const char *name, const char *value, size_t size, int flags)
+{
+  long psidattr, pattr, psize, ptime;
+  char oxattr[XATTR_MAXLEN + 1];
+
+  (void)flags;
+  debuglog("plp_setxattr `%s'", ++path);
+  if (strcmp(name, XATTR_NAME) == 0 && value[size] == '\0') {
+    if (rfsv_getattr(path, &pattr, &psize, &ptime))
+      return rfsv_isalive() ? -ENOENT : -NO_PSION;
+    plp_getxattr(path, name, oxattr, XATTR_MAXLEN);
+    psidattr = pattr;
+    xattr2pattr(&pattr, &psidattr, oxattr, value);
+    return 0;
+  } else
+    return -ENOTSUP;
+}
+
+static int plp_listxattr(const char *path, char *list, size_t size)
+{
+  debuglog("plp_listxattr `%s'", ++path);
+  if (size > sizeof(XATTR_NAME))
+    strcpy(list, XATTR_NAME);
+  return sizeof(XATTR_NAME);
+}
+
+static int plp_removexattr(const char *path, const char *name)
+{
+  debuglog("plp_removexattr `%s'", ++path);
+  if (strcmp(name, XATTR_NAME) == 0) {
+    if (rfsv_setattr(path, 0, PSI_A_HIDDEN | PSI_A_SYSTEM | PSI_A_ARCHIVE))
+      return rfsv_isalive() ? -EACCES : -NO_PSION;
+  }
+
+  debuglog("removexattr succeeded");
+  return 0;
+}
+
 static int plp_chown(const char *path, uid_t uid, gid_t gid)
 {
+  (void)uid;
+  (void)gid;
   debuglog("plp_chown `%s'", ++path);
   return -EPERM;
 }
 
 static int plp_truncate(const char *path, off_t size)
 {
+  (void)size;
   debuglog("plp_truncate `%s'", ++path);
 
   if (rfsv_setsize(path, 0))
@@ -430,8 +500,6 @@ static int plp_truncate(const char *path, off_t size)
 
 static int plp_utimens(const char *path, const struct timespec ts[2])
 {
-  struct timeval tv[2];
-
   debuglog("plp_utimens `%s'", ++path);
 
   if (rfsv_setmtime(path, ts[1].tv_sec))
@@ -480,6 +548,7 @@ static int plp_statfs(const char *path, struct statvfs *stbuf)
 {
   device *dp;
 
+  (void)path;
   debuglog("plp_statfs");
 
   stbuf->f_bsize = BLOCKSIZE;
@@ -516,6 +585,10 @@ struct fuse_operations plp_oper = {
   .rename	= plp_rename,
   .link		= plp_link,
   .chmod	= plp_chmod,
+  .setxattr	= plp_setxattr,
+  .getxattr	= plp_getxattr,
+  .listxattr	= plp_listxattr,
+  .removexattr	= plp_removexattr,
   .chown	= plp_chown,
   .truncate	= plp_truncate,
   .utimens	= plp_utimens,
