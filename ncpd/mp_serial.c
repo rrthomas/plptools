@@ -38,9 +38,7 @@
 #ifdef sun
 #include <sys/ttold.h>		/* sun has TIOCEXCL there */
 #endif
-#if defined (__SVR4)
 #include <stdlib.h>
-#endif
 
 #ifndef hpux
 #define mflag int
@@ -49,12 +47,8 @@
 #include <sys/modem.h>
 #endif
 
+#include "mp_serial.h"
 
-/*
-   #if !defined(CRTSCTS) && defined(_IBMR2)
-   #define CRTSCTS 0x80000000
-   #endif
- */
 
 #ifdef __sgi
 #define CRTSCTS CNEW_RTSCTS
