@@ -257,7 +257,7 @@ static int plp_getattr(const char *path, struct stat *st)
       return rfsv_isalive() ? -ENOENT : -NO_PSION;
     else {
       pattr2attr(pattr, psize, ptime, st, xattr);
-      debuglog(" attrs Psion: %x %d %d, UNIX modes: %o, xattrs: ", pattr, psize, ptime, st->st_mode, xattr);
+      debuglog(" attrs Psion: %x %d %d, UNIX modes: %o, xattrs: %s", pattr, psize, ptime, st->st_mode, xattr);
       if (st->st_nlink > 1)
         return getlinks(path, st);
     }
@@ -434,7 +434,7 @@ static int plp_getxattr(const char *path, const char *name, char *value, size_t 
       if (rfsv_getattr(path, &pattr, &psize, &ptime))
         return rfsv_isalive() ? -ENOENT : -NO_PSION;
       pattr2xattr(pattr, value);
-      debuglog("getxattr succeeded");
+      debuglog("getxattr succeeded: %s", value);
       return 0;
     } else {
       debuglog("only gave %d bytes, need %d", size, XATTR_MAXLEN);
