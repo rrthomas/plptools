@@ -38,6 +38,11 @@ fi
 AC_MSG_RESULT(no)
 ])
 
+dnl Turn on additional compiler warnings
+if test "$GCC" = "yes"; then
+  CFLAGS="$CFLAGS -Wall -W -Wmissing-prototypes -Wstrict-prototypes -pedantic"
+fi
+
 dnl NLS support
 ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
@@ -128,7 +133,7 @@ AC_RUN_IFELSE([
 # check for libattr for plpfuse
 AC_CHECK_HEADER(attr/attributes.h,,
     [AC_MSG_ERROR([Need libattr to build plpfuse])])
-AC_CHECK_LIB(attr,attr_set,,
+AC_CHECK_LIB(attr, attr_set,,
     [AC_MSG_ERROR([Need libattr to build plpfuse])])
 
 dnl these three are for solaris
