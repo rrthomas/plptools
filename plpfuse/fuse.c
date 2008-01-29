@@ -435,7 +435,7 @@ static int plp_getxattr(const char *path, const char *name, char *value, size_t 
         return rfsv_isalive() ? -ENOENT : -NO_PSION;
       pattr2xattr(pattr, value);
       debuglog("getxattr succeeded: %s", value);
-      return 0;
+      return strlen(value);
     } else {
       debuglog("only gave %d bytes, need %d", size, XATTR_MAXLEN);
       return XATTR_MAXLEN;
@@ -462,9 +462,15 @@ static int plp_setxattr(const char *path, const char *name, const char *value, s
     nxattr[XATTR_MAXLEN] = '\0';
     if (rfsv_getattr(path, &pattr, &psize, &ptime))
       return rfsv_isalive() ? -ENOENT : -NO_PSION;
-    plp_getxattr(path, name, oxattr, XATTR_MAXLEN);
+    /* Need to undo earlier increment of path when calling plp_getxattr */
+    plp_getxattr(path - 1, name, oxattr, XATTR_MAXLEN);
     psidattr = pattr;
     xattr2pattr(&pattr, &psidattr, oxattr, value);
+    debuglog("attrs set %x delete %x; %s, %s", pattr, psidattr, oxattr, value);
+    if (rfsv_setattr(path, pattr, psidattr))
+      return rfsv_isalive() ? -EACCES : -NO_PSION;
+
+    debuglog("setxattr succeeded");
     return 0;
   } else {
     if (flags & XATTR_REPLACE)
