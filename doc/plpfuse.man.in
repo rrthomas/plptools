@@ -12,7 +12,7 @@ plpfuse \- Daemon to mount an EPOC device as a file system
 .SH SYNOPSIS
 .B plpfuse
 .B [-V]
-.B [-v]
+.B [-d]
 .B [-h]
 .BI "[-p [" host :] port ]
 .BI [ long-options ]
@@ -48,9 +48,9 @@ Display the version and exit
 .B \-h, --help
 Display a short help text and exit.
 .TP
-.B \-v, --verbose
-Produce verbose logging output. Can be specified more than once to increase the
-debug level (up to 3 times)
+.B \-d, --debug
+Produce debugging logs. Can be specified more than once to increase the
+debug level (up to 3 times).
 .TP
 .BI "\-p, --port=[" host :] port
 Specify the host and port to connect to (e.g. the port where ncpd is listening
