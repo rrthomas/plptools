@@ -434,29 +434,45 @@ static int plp_getxattr(const char *path, const char *name, char *value, size_t 
       if (rfsv_getattr(path, &pattr, &psize, &ptime))
         return rfsv_isalive() ? -ENOENT : -NO_PSION;
       pattr2xattr(pattr, value);
+      debuglog("getxattr succeeded");
       return 0;
-    } else
-      return -ERANGE;
-  } else
-    return -ENOATTR;
+    } else {
+      debuglog("only gave %d bytes, need %d", size, XATTR_MAXLEN);
+      return XATTR_MAXLEN;
+    }
+  } else {
+    errno = ENOATTR;
+    return -1;
+  }
 }
 
 static int plp_setxattr(const char *path, const char *name, const char *value, size_t size, int flags)
 {
-  long psidattr, pattr, psize, ptime;
-  char oxattr[XATTR_MAXLEN + 1];
-
-  (void)flags;
   debuglog("plp_setxattr `%s'", ++path);
-  if (strcmp(name, XATTR_NAME) == 0 && value[size] == '\0') {
+  if (strcmp(name, XATTR_NAME) == 0) {
+    long psidattr, pattr, psize, ptime;
+    char oxattr[XATTR_MAXLEN + 1], nxattr[XATTR_MAXLEN + 1];
+
+    if (flags & XATTR_CREATE) {
+      errno = EEXIST;
+      return -1;
+    }
+
+    strncpy(nxattr, value, size < XATTR_MAXLEN ? size : XATTR_MAXLEN);
+    nxattr[XATTR_MAXLEN] = '\0';
     if (rfsv_getattr(path, &pattr, &psize, &ptime))
       return rfsv_isalive() ? -ENOENT : -NO_PSION;
     plp_getxattr(path, name, oxattr, XATTR_MAXLEN);
     psidattr = pattr;
     xattr2pattr(&pattr, &psidattr, oxattr, value);
     return 0;
-  } else
-    return -ENOTSUP;
+  } else {
+    if (flags & XATTR_REPLACE)
+      errno = ENOATTR;
+    else
+      errno = ENOTSUP;
+    return -1;
+  }
 }
 
 static int plp_listxattr(const char *path, char *list, size_t size)
@@ -470,13 +486,8 @@ static int plp_listxattr(const char *path, char *list, size_t size)
 static int plp_removexattr(const char *path, const char *name)
 {
   debuglog("plp_removexattr `%s'", ++path);
-  if (strcmp(name, XATTR_NAME) == 0) {
-    if (rfsv_setattr(path, 0, PSI_A_HIDDEN | PSI_A_SYSTEM | PSI_A_ARCHIVE))
-      return rfsv_isalive() ? -EACCES : -NO_PSION;
-  }
-
-  debuglog("removexattr succeeded");
-  return 0;
+  errno = ENOTSUP;
+  return -1;
 }
 
 static int plp_chown(const char *path, uid_t uid, gid_t gid)
