@@ -109,7 +109,7 @@ AC_SUBST(LIBHISTORY)
 # FUSE for plpfuse
 AC_CHECK_HEADER(fuse.h,,
     [AC_MSG_ERROR([Need fuse.h to build plpfuse])])
-AC_CHECK_LIB(fuse,fuse_new,,
+AC_CHECK_LIB(fuse,fuse_new, [true],
     [AC_MSG_ERROR([Need libfuse to build plpfuse])])
 
 # check for a supported version of FUSE
@@ -133,7 +133,7 @@ AC_RUN_IFELSE([
 # check for libattr for plpfuse
 AC_CHECK_HEADER(attr/attributes.h,,
     [AC_MSG_ERROR([Need libattr to build plpfuse])])
-AC_CHECK_LIB(attr, attr_set,,
+AC_CHECK_LIB(attr, attr_set, [true],
     [AC_MSG_ERROR([Need libattr to build plpfuse])])
 
 dnl these three are for solaris
