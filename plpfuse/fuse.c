@@ -66,9 +66,9 @@ xattr2pattr(long *psisattr, long *psidattr, const char *oxattr, const char *nxat
   }
   if ((strchr(oxattr, 'h') == NULL) != (strchr(nxattr, 'h') == NULL)) { /* h = hidden */
     if (strchr(nxattr, 'h'))
-      *psidattr |= PSI_A_HIDDEN;
-    else
       *psisattr |= PSI_A_HIDDEN;
+    else
+      *psidattr |= PSI_A_HIDDEN;
   }
   if ((strchr(oxattr, 's') == NULL) != (strchr(nxattr, 's') == NULL)) { /* s = system */
     if (strchr(nxattr, 's'))
@@ -427,7 +427,7 @@ static int plp_chmod(const char *path, mode_t mode)
 
 static int plp_getxattr(const char *path, const char *name, char *value, size_t size)
 {
-  debuglog("plp_getxattr `%s'", ++path);
+  debuglog("plp_getxattr `%s' %s", ++path, name);
   if (strcmp(name, XATTR_NAME) == 0) {
     if (size >= XATTR_MAXLEN) {
       long pattr, psize, ptime;
@@ -440,10 +440,8 @@ static int plp_getxattr(const char *path, const char *name, char *value, size_t 
       debuglog("only gave %d bytes, need %d", size, XATTR_MAXLEN);
       return XATTR_MAXLEN;
     }
-  } else {
-    errno = ENOATTR;
-    return -1;
-  }
+  } 
+  return 0;
 }
 
 static int plp_setxattr(const char *path, const char *name, const char *value, size_t size, int flags)
