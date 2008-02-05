@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-12-15 16:33+0000\n"
+"POT-Creation-Date: 2008-02-05 01:02+0000\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -1472,6 +1472,27 @@ msgstr " använder enhet "
 #: ncpd/main.cc:393
 msgid "terminating"
 msgstr "avbruten"
+
+#: ncpd/main.cc:396
+msgid "joined Link thread"
+msgstr ""
+
+#: ncpd/main.cc:398
+msgid "joined Socket thread"
+msgstr ""
+
+#: ncpd/main.cc:400
+msgid "shut down NCP"
+msgstr ""
+
+#: ncpd/main.cc:403
+#, fuzzy
+msgid "socket closed"
+msgstr "resursen låst"
+
+#: ncpd/main.cc:411
+msgid "normal exit"
+msgstr ""
 
 #: ncpd/link.cc:60
 msgid "SIBO"
