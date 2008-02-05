@@ -53,4 +53,7 @@ Basic Installation
 
  autoreconf -i
 
+ To make a release automatically, you need woger, from
+ http://rrt.sc3d.org/Software/woger
+
 Have fun.
