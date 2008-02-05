@@ -135,7 +135,7 @@ pollSocketConnections(void *)
 	        numScp--;
 	        for (int j = i; j < numScp; j++)
 		    scp[j] = scp[j + 1];
-	        i--;
+		i--;
 	    }
         }
     }
@@ -383,7 +383,7 @@ main(int argc, char **argv)
 		    lerr << "Could not create Link thread" << endl;
 		    exit(-1);
 		}
-		if (pthread_create(&thr_a, NULL,
+		if (pthread_create(&thr_b, NULL,
 				   pollSocketConnections, NULL) != 0) {
 		    lerr << "Could not create Socket thread" << endl;
 		    exit(-1);
@@ -393,10 +393,14 @@ main(int argc, char **argv)
 		linf << _("terminating") << endl;
 		void *ret;
 		pthread_join(thr_a, &ret);
+                linf << _("joined Link thread") << endl;
 		pthread_join(thr_b, &ret);
+                linf << _("joined Socket thread") << endl;
 		delete theNCP;
+                linf << _("shut down NCP") << endl;
 	    }
 	    skt.closeSocket();
+            linf << _("socket closed") << endl;
 	    break;
 	case -1:
 	    lerr << "fork: " << strerror(errno) << endl;
@@ -404,6 +408,8 @@ main(int argc, char **argv)
 	default:
 	    exit(0);
     }
+    linf << _("normal exit") << endl;
+    return 0;
 }
 
 /*
