@@ -1,5 +1,5 @@
 #!/bin/bash
-# psidump - backup psion files
+# psidump - backup EPOC files
 # Copyright (C) 2001  Alain Trembleau <alain@platodesigns.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -42,11 +42,11 @@ function usage () {
     echo "Usage : psidump [-fivV] [-D <disk>] [-m <mount_dir>] [-d <dump_dir>]"
     if [[ $detail ]]; then
         echo "Options:"
-        echo " d <dir>  unix dump directory"
-        echo " D <disk> psion disks to be backed up"
+        echo " d <dir>  Unix dump directory"
+        echo " D <disk> EPOC disks to be backed up"
         echo " f        forces a full backup"
         echo " i        perform an incremental backup"
-        echo " m <dir>  psion mount point"
+        echo " m <dir>  EPOC mount point"
         echo " v        verbose output"
         echo " V        display the version and exit"
     fi
@@ -79,9 +79,9 @@ function create_dirs () {
         mkdir  "$localdir"/backups/tarfiles
     fi
 
-    if [[ ! -f "$localdir"/etc/psitab ]] ; then
-        cat >  "$localdir"/etc/psitab << END1
-# psitab
+    if [[ ! -f "$localdir"/etc/epoctab ]] ; then
+        cat >  "$localdir"/etc/epoctab << END1
+# epoctab
 #
 # This file is a table of the different EPOC machines which have connected
 # to this machine.  The first entry is the machine id, and the second
@@ -173,7 +173,7 @@ function dump_drive () {
     fi
 
     tar -c -g "$localdir"/etc/dumpinfo."$machine_name"."$drive_name" -v -z \
-      -f "$localdir"/backups/tarfiles/psion."$machine_name"."$drive_name".$timestamp.tgz \
+      -f "$localdir"/backups/tarfiles/epoc."$machine_name"."$drive_name".$timestamp.tgz \
       -C "$psidir"/$drive \
       .
 #      . \
@@ -207,15 +207,15 @@ function restore_drive () {
     # Now restore the files to an appropriate location.
     tar -x -g $localdir/etc/dumpinfo."$machine_name"."$drive_name" -v -z \
       -C $localdir/backups/"$machine_name"/"$drive_name" \
-      -f $localdir/backups/tarfiles/psion."$machine_name"."$drive_name".$timestamp.tgz
+      -f $localdir/backups/tarfiles/epoc."$machine_name"."$drive_name".$timestamp.tgz
 #      | tee -a "$localdir"/etc/dumplog
 }
 
 ## Main Program
 
 # Default settings
-psidir="/mnt/psion"
-localdir="$HOME/psion"
+psidir="/mnt/epoc"
+localdir="$HOME/epoc"
 dump_drive_list="CDE"
 full_backup=0
 verbose=0
@@ -238,7 +238,7 @@ while getopts ":d:D:fim:vV" option; do
         full_backup=0
         ;;
 
-    m)  # Set the mount point where the psion files are to be found
+    m)  # Set the mount point where the EPOC files are to be found
         psidir=$OPTARG
         ;;
 
@@ -266,7 +266,7 @@ fi
 # Check whether all the appropriate directories and files exist
 create_dirs "$localdir"
 
-# Determine which psion
+# Determine which EPOC device
 machine_id=`
   plpftp machinfo |
   awk -F: '$1=="  Machine UID" { print $2 }' |
@@ -274,21 +274,21 @@ machine_id=`
 `
 
 machine_name=`
-  grep -v "^#" $HOME/psion/etc/psitab |
+  grep -v "^#" $HOME/epoc/etc/epoctab |
   awk -F"\t" '$1=="'$machine_id'" {print $2}'
 `
 
 # Deal with the possibility of no name entry
 if [[ -z $machine_name ]] ; then
-    echo "This is the first time this Psion has been backed up"
+    echo "This is the first time this device has been backed up"
     echo "on this machine."
     echo "Please enter a machine name - eg: My Psion"
     read -p "Machine name: " machine_name
 
     # Should have a check to make sure this name hasn't already been used.
 
-    echo "#"                           >> $localdir/etc/psitab
-    echo "$machine_id	$machine_name" >> $localdir/etc/psitab
+    echo "#"                           >> $localdir/etc/epoctab
+    echo "$machine_id	$machine_name" >> $localdir/etc/epoctab
 fi
 
 if [[ ! -d "$localdir"/backups/"$machine_name" ]] ; then

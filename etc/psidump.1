@@ -18,7 +18,7 @@ psidump \- This is an example of a sample man page
 
 .SH DESCRIPTION
 .I psidump
-is a command to back up files from a psion or EPOC machine to your linux box.
+is a command to back up files from an EPOC device to your PC.
 By default, it will only backup those files that have changed since it
 was last backed up.
 
@@ -42,51 +42,46 @@ Performs an incremental back up - only backs up the files that have
 changed since the last backup.  This is the default.
 .TP
 .BI "\-D " disk(s)
-Specify the psion disks to be backed up.  This defaults to the 'C' and
+Specify the EPOC disks to be backed up.  This defaults to the 'C' and
 'D' drives.  For reasons of completeness, the 'Z' (ROM drive) can also
 be specified for backup (but there probably isn't any need to - unless
-you plan to do unspeakable things to the insides of you psion!!).
+you plan to do unspeakable things to the insides of your PDA!).
 .TP
 .BI "\-m " mount_dir
 Specify the mount directory.  This defaults to the directory specified
-is your psion configuration - usually /mnt/psion.
+is your plptools configuration - usually /mnt/epoc.
 .TP
 .BI "\-d " dump_dir
-Specify the dump directory.  This defaults to $HOME/psion/backups.
+Specify the dump directory.  This defaults to $HOME/epoc/backups.
 
 .SH ENVIRONMENT
 .TP
-$HOME/psion
-Default directory where psion psion configuration and dump information
+$HOME/epoc
+Default directory where configuration and dump information
 is stored.
 .TP
-$HOME/psion/etc
-Configuration information about your psion(s) is stored here.
+$HOME/epoc/etc
+Configuration information about your PDA(s) is stored here.
 .TP
-$HOME/psion/backups
+$HOME/epoc/backups
 All backups are stored under this directory.
 
 .SH FILES
-All files that are used are located in $HOME/psion.  The directories
+All files that are used are located in $HOME/epoc.  The directories
 are:
 .TP
-$HOME/psion/etc/psitab
+$HOME/epoc/etc/plptab
 This file is a table of the different EPOC machines which have connected
 to this machine.  The first entry is the machine id, and the second
 entry is the machine name.
 Note that there must be a <tab> between the two fields!                                           
-Any lins starting with a '#' are comments.
+Any lines starting with a '#' are comments.
 .TP
-$HOME/psion/backups
+$HOME/epoc/backups
 Executable files
 .TP
-$HOME/psion/man
+$HOME/epoc/man
 Man pages
-
-.SH SEE ALSO
-.BR man (1),
-.BR groff (1),
-.BR groff_man (7)
 
 .SH AUTHOR
 Alain Trembleau <alain@platodesigns.com>

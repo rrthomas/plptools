@@ -1,9 +1,9 @@
 #!/bin/sh
 #
-# psion        Starts ncpd/plpfuse.
+# plptools        Starts ncpd/plpfuse.
 #
 # chkconfig: 2345 45 10
-# description: This facility enables connectivity to a Psion series 5.
+# description: This facility enables connectivity to an EPOC PDA.
 
 # Source function library.
 . /etc/rc.d/init.d/functions
@@ -11,11 +11,11 @@
 [ -f @prefix@/sbin/ncpd ] || exit 0
 [ -f @prefix@/sbin/plpfuse ] || exit 0
 [ -f @prefix@/sbin/plpprintd ] || exit 0
-[ -f /etc/sysconfig/psion ] || exit 0
-. /etc/sysconfig/psion
+[ -f /etc/sysconfig/plptools ] || exit 0
+. /etc/sysconfig/plptools
 
 start() {
-	echo "Starting Psion support ..."
+	echo "Starting EPOC support ..."
 	RETVAL=0
 	if test "$START_NCPD" = "yes" ; then
 		echo -n "  ncpd: "
@@ -39,12 +39,12 @@ start() {
 			echo
 		fi
 	fi
-	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/psion
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/plptools
 	return $RETVAL
 }
 
 stop() {
-	echo "Stopping Psion support ..."
+	echo "Stopping EPOC support ..."
 	RETVAL=0
 	if test "$START_PLPPRINTD" = "yes" ; then
 		echo -n "  plpprintd: "
@@ -53,7 +53,7 @@ stop() {
 	fi
 	if test "$START_PLPFUSE" = "yes" ; then
 		echo -n "  plpfuse: "
-		fusermount -u /mnt/psion
+		fusermount -u /mnt/epoc
 		echo
 	fi
 	if test "$START_NCPD" = "yes" ; then
@@ -62,7 +62,7 @@ stop() {
 		RETVAL=$?
 		echo
 	fi
-	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/psion
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/plptools
 	return $RETVAL
 }
 
@@ -87,10 +87,10 @@ case "$1" in
   	restart
 	;;
   condrestart)
-  	test -f /var/lock/subsys/psion && restart || :
+  	test -f /var/lock/subsys/plptools && restart || :
 	;;
   *)
-	echo "Usage: psion {start|stop|status|restart|reload|condrestart}"
+	echo "Usage: plptools {start|stop|status|restart|reload|condrestart}"
 	exit 1
 esac
 
