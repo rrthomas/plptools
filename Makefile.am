@@ -3,14 +3,14 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = intl po lib ncpd plpfuse plpftp plpprint sisinstall doc
 
 EXTRA_DIST = AUTHORS COPYING INSTALL NEWS README TODO HISTORY ABOUT-NLS \
-	etc/s5magic etc/s5kdemagic etc/psion.in etc/psion.SuSE.in \
+	etc/s5magic etc/s5kdemagic etc/plptools.in \
 	etc/ttytap.c etc/psidump etc/psidump.1 \
-	etc/udev-usbserial-plptools.rules etc/plptools.spec
+	etc/udev-usbserial-plptools.rules
 
-DISTCLEANFILES = etc/psion etc/psion.SuSE
+DISTCLEANFILES = etc/plptools
 
 install-exec-local:
-	install -D $(top_builddir)/etc/psion $(DESTDIR)$(initdir)/psion
+	install -D $(top_builddir)/etc/plptools $(DESTDIR)$(initdir)/plptools
 
 dist-local:
 	kdoc -d doc/api -n libplp --strip-h-path lib/*.h

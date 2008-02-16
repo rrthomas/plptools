@@ -1,4 +1,4 @@
-AC_INIT(plptools, 0.20, plptools-developers@lists.sourceforge.net)
+AC_INIT(plptools, 0.21, plptools-developers@lists.sourceforge.net)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE
 
@@ -201,26 +201,26 @@ AC_DEFINE_UNQUOTED(DPORT,$DPORT,
 AC_SUBST(DPORT)
 
 AC_ARG_WITH(drive,
-    [  --with-drive=DRIVE      override default Psion drive [AUTO]],
+    [  --with-drive=DRIVE      override default EPOC drive [AUTO]],
     [ DDRIVE="$withval"
       AC_MSG_RESULT(Overriding drive: $DDRIVE) ],
     [ DDRIVE='AUTO'
-      AC_MSG_RESULT(Using default Psion drive: $DDRIVE)
+      AC_MSG_RESULT(Using default EPOC drive: $DDRIVE)
     ]
 )
 AC_DEFINE_UNQUOTED(DDRIVE,"$DDRIVE",
-	[Define this to your default drive on your Psion])
+	[Define this to your default drive on your EPOC device])
 
 AC_ARG_WITH(basedir,
-    [  --with-basedir=DIR      override default Psion directory [\\\\]],
+    [  --with-basedir=DIR      override default EPOC directory [\\\\]],
     [ DBASEDIR="$withval"
       AC_MSG_RESULT(Overriding directory: $DBASEDIR) ],
     [ DBASEDIR='\\'
-      AC_MSG_RESULT(Using default Psion directory: $DBASEDIR)
+      AC_MSG_RESULT(Using default EPOC directory: $DBASEDIR)
     ]
 )
 AC_DEFINE_UNQUOTED(DBASEDIR,"$DBASEDIR",
-	[Define this to your default directory on your Psion])
+	[Define this to your default directory on your EPOC device])
 
 AC_ARG_WITH(initdir,
     [  --with-initdir=DIR      override default init dir [PREFIX/etc/rc.d/init.d]],
@@ -242,11 +242,6 @@ AH_BOTTOM([
 /* Define this, if libc provides bind_textdomain_codeset */
 #undef HAVE_BIND_TEXTDOMAIN_CODESET
 
-/* Some reasonable defaults */
-#ifndef PSIONHOSTNAME
-# define PSIONHOSTNAME "localhost"
-#endif
-
 /* Select version of FUSE API */
 #define FUSE_USE_VERSION 26
 ])
@@ -265,9 +260,7 @@ AC_CONFIG_FILES(
 	sisinstall/Makefile
 	doc/Makefile
 	doc/api/Makefile
-	etc/psion
-	etc/psion.SuSE
-	etc/plptools.spec
+	etc/plptools
 	doc/ncpd.man
 	doc/plpfuse.man
 	doc/plpftp.man
