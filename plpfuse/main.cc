@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "rfsv_api.h"
 
@@ -60,21 +61,103 @@ static rpcs *r;
 static rpcsfactory *rp;
 static bufferStore owner;
 
-long rfsv_isalive() {
+/* Translate EPOC/SIBO error to UNIX error code, leaving positive
+   numbers alone */
+int epocerr_to_errno(long epocerr) {
+  int unixerr = (int)epocerr;
+
+  if (epocerr < 0) {
+    switch (epocerr) {
+    case rfsv::E_PSI_GEN_NONE:
+      unixerr = 0;
+      break;
+    case rfsv::E_PSI_FILE_EXIST:
+      unixerr = -EEXIST;
+      break;
+    case rfsv::E_PSI_FILE_NXIST:
+    case rfsv::E_PSI_FILE_DIR:
+      unixerr = -ENOENT;
+      break;
+    case rfsv::E_PSI_FILE_WRITE:
+    case rfsv::E_PSI_FILE_READ:
+    case rfsv::E_PSI_FILE_EOF: // Can't err = EOF as it's not an error code
+    case rfsv::E_PSI_FILE_ALLOC: // FIXME: No idea what this is
+    case rfsv::E_PSI_FILE_UNKNOWN:
+    case rfsv::E_PSI_FILE_DIRFULL:
+      unixerr = -EPERM;
+      break;
+    case rfsv::E_PSI_FILE_FULL:
+      unixerr = -ENOSPC;
+      break;
+    case rfsv::E_PSI_FILE_NAME:
+    case rfsv::E_PSI_FILE_RECORD:
+    case rfsv::E_PSI_FILE_VOLUME:
+      unixerr = -EINVAL;
+      break;
+    case rfsv::E_PSI_FILE_ACCESS:
+    case rfsv::E_PSI_FILE_LOCKED:
+    case rfsv::E_PSI_FILE_RDONLY:
+    case rfsv::E_PSI_FILE_PROTECT:
+      unixerr = -EACCES;
+      break;
+    case rfsv::E_PSI_GEN_INUSE:
+    case rfsv::E_PSI_FILE_DEVICE:
+    case rfsv::E_PSI_FILE_PENDING:
+    case rfsv::E_PSI_FILE_NOTREADY:
+      unixerr = -EBUSY;
+      break;
+    case rfsv::E_PSI_FILE_INV:
+    case rfsv::E_PSI_FILE_RETRAN:
+    case rfsv::E_PSI_FILE_LINE:
+    case rfsv::E_PSI_FILE_INACT:
+    case rfsv::E_PSI_FILE_PARITY:
+    case rfsv::E_PSI_FILE_FRAME:
+    case rfsv::E_PSI_FILE_OVERRUN:
+    case rfsv::E_PSI_FILE_CORRUPT:
+    case rfsv::E_PSI_FILE_INVALID:
+    case rfsv::E_PSI_FILE_ABORT:
+    case rfsv::E_PSI_FILE_ERASE:
+    case rfsv::E_PSI_FILE_NDISC:
+    case rfsv::E_PSI_FILE_DRIVER:
+    case rfsv::E_PSI_FILE_COMPLETION:
+    default:
+      unixerr = -EIO;
+      break;
+    case rfsv::E_PSI_FILE_CANCEL:
+      unixerr = -EINTR;
+      break;
+    case rfsv::E_PSI_FILE_DISC:
+    case rfsv::E_PSI_FILE_CONNECT:
+      unixerr = -ENODEV;
+      break;
+    case rfsv::E_PSI_FILE_TOOBIG:
+      unixerr = -EFBIG;
+      break;
+    case rfsv::E_PSI_FILE_HANDLE:
+      unixerr = -EBADF;
+      break;
+    }
+  }
+
+  debuglog("EPOC error %ld became UNIX code %d", epocerr, unixerr);
+  return unixerr;
+}
+
+int rfsv_isalive(void) {
     if (!a) {
 	if (!(a = rf->create(true)))
 	    return 0;
     }
-    return (a->getStatus() == rfsv::E_PSI_GEN_NONE);
+    return a->getStatus() == rfsv::E_PSI_GEN_NONE;
 }
 
-long rfsv_dir(const char *file, dentry **e) {
+int rfsv_dir(const char *file, dentry **e) {
     PlpDir entries;
     dentry *tmp;
     long ret;
 
     if (!a)
-	return -1;
+	return -ENODEV;
     ret = a->dir(file, entries);
 
     for (int i = 0; i < entries.size(); i++) {
@@ -82,76 +165,76 @@ long rfsv_dir(const char *file, dentry **e) {
 	tmp = *e;
 	*e = (dentry *)calloc(1, sizeof(dentry));
 	if (!*e)
-	    return -1;
+	    return -ENODEV;
 	(*e)->time = pe.getPsiTime().getTime();
 	(*e)->size = pe.getSize();
 	(*e)->attr = pe.getAttr();
 	(*e)->name = strdup(pe.getName());
 	(*e)->next = tmp;
     }
-    return ret;
+    return epocerr_to_errno(ret);
 }
 
-long rfsv_dircount(const char *file, u_int32_t *count) {
+int rfsv_dircount(const char *file, u_int32_t *count) {
     if (!a)
-	return -1;
-    return a->dircount(file, *count);
+	return -ENODEV;
+    return epocerr_to_errno(a->dircount(file, *count));
 }
 
-long rfsv_rmdir(const char *name) {
+int rfsv_rmdir(const char *name) {
     if (!a)
-	return -1;
-    return a->rmdir(name);
+	return -ENODEV;
+    return epocerr_to_errno(a->rmdir(name));
 }
 
-long rfsv_mkdir(const char *file) {
+int rfsv_mkdir(const char *file) {
     if (!a)
-	return -1;
-    return a->mkdir(file);
+	return -ENODEV;
+    return epocerr_to_errno(a->mkdir(file));
 }
 
-long rfsv_remove(const char *file) {
+int rfsv_remove(const char *file) {
     if (!a)
-	return -1;
-    return a->remove(file);
+	return -ENODEV;
+    return epocerr_to_errno(a->remove(file));
 }
 
-long rfsv_fclose(long handle) {
+int rfsv_fclose(long handle) {
     if (!a)
-	return -1;
-    return a->fclose(handle);
+	return -ENODEV;
+    return epocerr_to_errno(a->fclose(handle));
 }
 
-long rfsv_fcreate(long attr, const char *file, u_int32_t *handle) {
+int rfsv_fcreate(long attr, const char *file, u_int32_t *handle) {
     u_int32_t ph;
     long ret;
 
     if (!a)
-	return -1;
+	return -ENODEV;
     ret = a->fcreatefile(attr, file, ph);
     *handle = ph;
-    return ret;
+    return epocerr_to_errno(ret);
 }
 
-long rfsv_open(const char *name, long mode, u_int32_t *handle) {
+int rfsv_open(const char *name, long mode, u_int32_t *handle) {
     long ret, retry;
 
     if (!a)
-	return -1;
+	return -ENODEV;
     if (mode == O_RDONLY)
         mode = rfsv::PSI_O_RDONLY;
     else
         mode = rfsv::PSI_O_RDWR;
     for (retry = 100; retry > 0 && (ret = a->fopen(a->opMode(mode), name, *handle)) != rfsv::E_PSI_GEN_NONE; retry--)
         usleep(20000);
-    return ret;
+    return epocerr_to_errno(ret);
 }
 
-long rfsv_read(char *buf, long offset, long len, const char *name) {
+int rfsv_read(char *buf, long offset, long len, const char *name) {
     u_int32_t ret = 0, r_offset, handle;
 
     if (!a)
-	return -1;
+	return -ENODEV;
     if ((ret = rfsv_open(name, O_RDONLY, &handle)))
         return ret;
     if (a->fseek(handle, offset, rfsv::PSI_SEEK_SET, r_offset) != rfsv::E_PSI_GEN_NONE ||
@@ -159,14 +242,14 @@ long rfsv_read(char *buf, long offset, long len, const char *name) {
         a->fread(handle, (unsigned char *)buf, len, ret) != rfsv::E_PSI_GEN_NONE)
 	ret = -1;
     rfsv_fclose(handle);
-    return ret;
+    return epocerr_to_errno(ret);
 }
 
-long rfsv_write(const char *buf, long offset, long len, const char *name) {
+int rfsv_write(const char *buf, long offset, long len, const char *name) {
     u_int32_t ret = 0, r_offset, handle;
 
     if (!a)
-	return -1;
+	return -ENODEV;
     if ((ret = rfsv_open(name, O_RDWR, &handle)))
         return ret;
     if (a->fseek(handle, offset, rfsv::PSI_SEEK_SET, r_offset) != rfsv::E_PSI_GEN_NONE ||
@@ -174,70 +257,62 @@ long rfsv_write(const char *buf, long offset, long len, const char *name) {
         a->fwrite(handle, (unsigned char *)buf, len, ret) != rfsv::E_PSI_GEN_NONE)
 	ret = -1;
     rfsv_fclose(handle);
-    return ret;
+    return epocerr_to_errno(ret);
 }
 
-long rfsv_setmtime(const char *name, long time) {
+int rfsv_setmtime(const char *name, long time) {
     if (!a)
-	return -1;
-    return a->fsetmtime(name, PsiTime(time));
+	return -ENODEV;
+    return epocerr_to_errno(a->fsetmtime(name, PsiTime(time)));
 }
 
-long rfsv_setsize(const char *name, long size) {
+int rfsv_setsize(const char *name, long size) {
     u_int32_t ph;
     long ret;
 
     if (!a)
-	return -1;
+	return -ENODEV;
     ret = a->fopen(a->opMode(rfsv::PSI_O_RDWR), name, ph);
     if (!ret) {
 	ret = a->fsetsize(ph, size);
 	a->fclose(ph);
     }
-    return ret;
+    return epocerr_to_errno(ret);
 }
 
-long rfsv_setattr(const char *name, long sattr, long dattr) {
+int rfsv_setattr(const char *name, long sattr, long dattr) {
     if (!a)
-	return -1;
-    return a->fsetattr(name, sattr, dattr);
+	return -ENODEV;
+    return epocerr_to_errno(a->fsetattr(name, sattr, dattr));
 }
 
-long rfsv_getattr(const char *name, long *attr, long *size, long *time) {
+int rfsv_getattr(const char *name, long *attr, long *size, long *time) {
     long res;
     PlpDirent e;
 
     if (!a)
-	return -1;
+	return -ENODEV;
     res = a->fgeteattr(name, e);
     *attr = e.getAttr();
     *size = e.getSize();
     *time = e.getPsiTime().getTime();
-    return res;
+    return epocerr_to_errno(res);
 }
 
-long rfsv_statdev(char letter) {
-    PlpDrive drive;
-
+int rfsv_rename(const char *oldname, const char *newname) {
     if (!a)
-	return -1;
-    return (a->devinfo(letter, drive) != rfsv::E_PSI_GEN_NONE);
+	return -ENODEV;
+    return epocerr_to_errno(a->rename(oldname, newname));
 }
 
-long rfsv_rename(const char *oldname, const char *newname) {
-    if (!a)
-	return -1;
-    return a->rename(oldname, newname);
-}
-
-long rfsv_drivelist(int *cnt, device **dlist) {
+int rfsv_drivelist(int *cnt, device **dlist) {
     *dlist = NULL;
     u_int32_t devbits;
     long ret;
     int i;
 
     if (!a)
-	return -1;
+	return -ENODEV;
     ret = a->devlist(devbits);
     if (ret == 0)
 	for (i = 0; i < 26; i++) {
@@ -258,7 +333,7 @@ long rfsv_drivelist(int *cnt, device **dlist) {
 	    }
 	    devbits >>= 1;
 	}
-    return ret;
+    return epocerr_to_errno(ret);
 }
 
 static void

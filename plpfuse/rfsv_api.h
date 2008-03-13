@@ -29,24 +29,24 @@ extern "C" {
 
 #include "plpfuse.h"
 
-extern long rfsv_dir(const char *name, dentry **e);
-extern long rfsv_mkdir(const char *name);
-extern long rfsv_rmdir(const char *name);
-extern long rfsv_remove(const char *name);
-extern long rfsv_rename(const char *oldname, const char *newname);
-extern long rfsv_open(const char *name, long mode, u_int32_t *handle);
-extern long rfsv_fclose(long handle);
-extern long rfsv_fcreate(long attr, const char *name, u_int32_t *handle);
-extern long rfsv_read(char *buf, long offset, long len, const char *name);
-extern long rfsv_write(const char *buf, long offset, long len, const char *name);
-extern long rfsv_getattr(const char *name, long *attr, long *size, long *time);
-extern long rfsv_setattr(const char *name, long sattr, long dattr);
-extern long rfsv_setsize(const char *name, long size);
-extern long rfsv_setmtime(const char *name, long time);
-extern long rfsv_drivelist(int *cnt, device **devlist);
-extern long rfsv_dircount(const char *name, long *count);
-extern long rfsv_statdev(char letter);
-extern long rfsv_isalive(void);
+extern int psierr_to_errno(long psierr);
+extern int rfsv_dir(const char *name, dentry **e);
+extern int rfsv_mkdir(const char *name);
+extern int rfsv_rmdir(const char *name);
+extern int rfsv_remove(const char *name);
+extern int rfsv_rename(const char *oldname, const char *newname);
+extern int rfsv_open(const char *name, long mode, u_int32_t *handle);
+extern int rfsv_fclose(long handle);
+extern int rfsv_fcreate(long attr, const char *name, u_int32_t *handle);
+extern int rfsv_read(char *buf, long offset, long len, const char *name);
+extern int rfsv_write(const char *buf, long offset, long len, const char *name);
+extern int rfsv_getattr(const char *name, long *attr, long *size, long *time);
+extern int rfsv_setattr(const char *name, long sattr, long dattr);
+extern int rfsv_setsize(const char *name, long size);
+extern int rfsv_setmtime(const char *name, long time);
+extern int rfsv_drivelist(int *cnt, device **devlist);
+extern int rfsv_dircount(const char *name, long *count);
+extern int rfsv_isalive(void);
 
 /* File attributes, C-style */
 #define	PSI_A_RDONLY		0x0001

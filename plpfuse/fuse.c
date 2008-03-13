@@ -7,8 +7,6 @@
   See the file COPYING.
 */
 
-/* FIXME: Map errors sensibly from EPOC to UNIX */
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -21,15 +19,12 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/time.h>
-#include <errno.h>
 #include <syslog.h>
 #include <attr/xattr.h>
 #include <attr/attributes.h>
 
 #include "plpfuse.h"
 #include "rfsv_api.h"
-
-#define NO_PSION	ENOMEDIUM
 
 /* Name of our extended attribute */
 #define XATTR_NAME "user.psion"
@@ -187,7 +182,7 @@ dircount(const char *path, long *count)
   *count = 0;
   debuglog("dircount: %s", path);
   debuglog("RFSV dir %s", path);
-  if ((ret = rfsv_dir(dirname(path), &e)))
+  if ((ret = rfsv_dir(dirname(path), &e)) != 0)
     return ret;
   while (e) {
     struct stat st;
@@ -208,16 +203,16 @@ dircount(const char *path, long *count)
 static int getlinks(const char *path, struct stat *st)
 {
   long dcount;
-
-  if (dircount(path, &dcount))
-    return rfsv_isalive() ? -ENOENT : -NO_PSION;
-  st->st_nlink = dcount + 2;
-  return 0;
+  int ret = dircount(path, &dcount);
+  if (ret == 0)
+    st->st_nlink = dcount + 2;
+  return ret;
 }
 
 static int plp_getattr(const char *path, struct stat *st)
 {
   char xattr[XATTR_MAXLEN + 1];
+  int ret = 0;
 
   debuglog("plp_getattr `%s'", ++path);
 
@@ -230,7 +225,7 @@ static int plp_getattr(const char *path, struct stat *st)
         st->st_nlink++;
       debuglog("root has %d links", st->st_nlink);
     } else
-      return rfsv_isalive() ? -ENOENT : -NO_PSION;
+      return rfsv_isalive() ? -ENOENT : -ENOMEDIUM;
   } else {
     long pattr, psize, ptime;
 
@@ -249,22 +244,20 @@ static int plp_getattr(const char *path, struct stat *st)
         pattr2attr(PSI_A_DIR, 0, 0, st, xattr);
         return getlinks(path, st);
       } else
-        return rfsv_isalive() ? -ENOENT : -NO_PSION;
+        return rfsv_isalive() ? -ENOENT : -ENOMEDIUM;
     }
 
     debuglog("getattr: fileordir");
-    if (rfsv_getattr(path, &pattr, &psize, &ptime))
-      return rfsv_isalive() ? -ENOENT : -NO_PSION;
-    else {
+    if ((ret = rfsv_getattr(path, &pattr, &psize, &ptime)) == 0) {
       pattr2attr(pattr, psize, ptime, st, xattr);
       debuglog(" attrs Psion: %x %d %d, UNIX modes: %o, xattrs: %s", pattr, psize, ptime, st->st_mode, xattr);
       if (st->st_nlink > 1)
-        return getlinks(path, st);
+        ret = getlinks(path, st);
     }
   }
 
-  debuglog("getattr: return OK");
-  return 0;
+  debuglog("getattr: returned %d", ret);
+  return ret;
 }
 
 static int plp_access(const char *path, int mask)
@@ -311,9 +304,10 @@ static int plp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
       }
     }
   } else {
+    int ret;
     debuglog("RFSV dir `%s'", dirname(path));
-    if (rfsv_dir(dirname(path), &e))
-      return rfsv_isalive() ? -ENOENT : -NO_PSION;
+    if ((ret = rfsv_dir(dirname(path), &e)) != 0)
+      return ret;
 
     debuglog("scanning contents");
     while (e) {
@@ -338,48 +332,35 @@ static int plp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
 static int plp_mknod(const char *path, mode_t mode, dev_t dev)
 {
-  u_int32_t phandle;
+  int ret = -EINVAL;
 
   debuglog("plp_mknod `%s' %o", ++path, mode);
 
   if (S_ISREG(mode) && dev == 0) {
-    if (rfsv_fcreate(0x200, path, &phandle))
-      return rfsv_isalive() ? -ENAMETOOLONG : -NO_PSION;
-    rfsv_fclose(phandle);
-  } else
-    return -EINVAL;
+    u_int32_t phandle;
+    if ((ret = rfsv_fcreate(0x200, path, &phandle)) == 0)
+      rfsv_fclose(phandle);
+  }
 
-  return 0;
+  return ret;
 }
 
 static int plp_mkdir(const char *path, mode_t mode)
 {
   debuglog("plp_mkdir `%s' %o", ++path, mode);
-
-  if (rfsv_mkdir(path))
-    return rfsv_isalive() ? -ENAMETOOLONG : -NO_PSION;
-
-  return 0;
+  return rfsv_mkdir(path);
 }
 
 static int plp_unlink(const char *path)
 {
   debuglog("plp_unlink `%s'", ++path);
-
-  if (rfsv_remove(path))
-    return rfsv_isalive() ? -EACCES : -NO_PSION;
-
-  return 0;
+  return rfsv_remove(path);
 }
 
 static int plp_rmdir(const char *path)
 {
   debuglog("plp_rmdir `%s'", ++path);
-
-  if (rfsv_rmdir(path))
-    return rfsv_isalive() ? -EACCES : -NO_PSION;
-
-  return 0;
+  return rfsv_rmdir(path);
 }
 
 static int plp_symlink(const char *from, const char *to)
@@ -391,12 +372,8 @@ static int plp_symlink(const char *from, const char *to)
 static int plp_rename(const char *from, const char *to)
 {
   debuglog("plp_rename `%s' -> `%s'", ++from, ++to);
-
   rfsv_remove(to);
-  if (rfsv_rename(from, to))
-    return rfsv_isalive() ? -EACCES : -NO_PSION;
-
-  return 0;
+  return rfsv_rename(from, to);
 }
 
 static int plp_link(const char *from, const char *to)
@@ -407,22 +384,22 @@ static int plp_link(const char *from, const char *to)
 
 static int plp_chmod(const char *path, mode_t mode)
 {
+  int ret;
   long psisattr, psidattr, pattr, psize, ptime;
   struct stat st;
   char xattr[XATTR_MAXLEN + 1];
 
   debuglog("plp_chmod `%s'", ++path);
 
-  if (rfsv_getattr(path, &pattr, &psize, &ptime))
-    return rfsv_isalive() ? -ENOENT : -NO_PSION;
-  pattr2attr(pattr, psize, ptime, &st, xattr);
-  attr2pattr(st.st_mode, mode, "", "", &psisattr, &psidattr);
-  debuglog("  UNIX old, new: %o, %o; Psion set, clear: %x, %x", st.st_mode, mode, psisattr, psidattr);
-  if (rfsv_setattr(path, psisattr, psidattr))
-    return rfsv_isalive() ? -EACCES : -NO_PSION;
+  if ((ret = rfsv_getattr(path, &pattr, &psize, &ptime)) == 0) {
+    pattr2attr(pattr, psize, ptime, &st, xattr);
+    attr2pattr(st.st_mode, mode, "", "", &psisattr, &psidattr);
+    debuglog("  UNIX old, new: %o, %o; Psion set, clear: %x, %x", st.st_mode, mode, psisattr, psidattr);
+    if ((ret = rfsv_setattr(path, psisattr, psidattr)) == 0)
+      debuglog("chmod succeeded");
+  }
 
-  debuglog("chmod succeeded");
-  return 0;
+  return ret;
 }
 
 static int plp_getxattr(const char *path, const char *name, char *value, size_t size)
@@ -431,11 +408,13 @@ static int plp_getxattr(const char *path, const char *name, char *value, size_t 
   if (strcmp(name, XATTR_NAME) == 0) {
     if (size >= XATTR_MAXLEN) {
       long pattr, psize, ptime;
-      if (rfsv_getattr(path, &pattr, &psize, &ptime))
-        return rfsv_isalive() ? -ENOENT : -NO_PSION;
-      pattr2xattr(pattr, value);
-      debuglog("getxattr succeeded: %s", value);
-      return strlen(value);
+      int ret;
+      if ((ret = rfsv_getattr(path, &pattr, &psize, &ptime)) == 0) {
+        pattr2xattr(pattr, value);
+        debuglog("getxattr succeeded: %s", value);
+        return strlen(value);
+      } else
+        return ret;
     } else {
       debuglog("only gave %d bytes, need %d", size, XATTR_MAXLEN);
       return XATTR_MAXLEN;
@@ -448,13 +427,12 @@ static int plp_setxattr(const char *path, const char *name, const char *value, s
 {
   debuglog("plp_setxattr `%s'", ++path);
   if (strcmp(name, XATTR_NAME) == 0) {
+    int ret;
     long psisattr, psidattr;
     char oxattr[XATTR_MAXLEN + 1], nxattr[XATTR_MAXLEN + 1];
 
-    if (flags & XATTR_CREATE) {
-      errno = EEXIST;
-      return -1;
-    }
+    if (flags & XATTR_CREATE)
+      return -EEXIST;
 
     strncpy(nxattr, value, size < XATTR_MAXLEN ? size : XATTR_MAXLEN);
     nxattr[XATTR_MAXLEN] = '\0';
@@ -463,17 +441,16 @@ static int plp_setxattr(const char *path, const char *name, const char *value, s
     psisattr = psidattr = 0;
     xattr2pattr(&psisattr, &psidattr, oxattr, value);
     debuglog("attrs set %x delete %x; %s, %s", psisattr, psidattr, oxattr, value);
-    if (rfsv_setattr(path, psisattr, psidattr))
-      return rfsv_isalive() ? -EACCES : -NO_PSION;
+    if ((ret = rfsv_setattr(path, psisattr, psidattr)) != 0)
+      return ret;
 
     debuglog("setxattr succeeded");
     return 0;
   } else {
     if (flags & XATTR_REPLACE)
-      errno = ENOATTR;
+      return -ENOATTR;
     else
-      errno = ENOTSUP;
-    return -1;
+      return -ENOTSUP;
   }
 }
 
@@ -488,8 +465,8 @@ static int plp_listxattr(const char *path, char *list, size_t size)
 static int plp_removexattr(const char *path, const char *name)
 {
   debuglog("plp_removexattr `%s'", ++path);
-  errno = ENOTSUP;
-  return -1;
+  (void)name;
+  return -ENOTSUP;
 }
 
 static int plp_chown(const char *path, uid_t uid, gid_t gid)
@@ -502,23 +479,14 @@ static int plp_chown(const char *path, uid_t uid, gid_t gid)
 
 static int plp_truncate(const char *path, off_t size)
 {
-  (void)size;
   debuglog("plp_truncate `%s'", ++path);
-
-  if (rfsv_setsize(path, 0))
-    return rfsv_isalive() ? -EPERM : -NO_PSION;
-
-  return 0;
+  return rfsv_setsize(path, size);
 }
 
 static int plp_utimens(const char *path, const struct timespec ts[2])
 {
   debuglog("plp_utimens `%s'", ++path);
-
-  if (rfsv_setmtime(path, ts[1].tv_sec))
-    return rfsv_isalive() ? -EPERM : -NO_PSION;
-
-  return 0;
+  return rfsv_setmtime(path, ts[1].tv_sec);
 }
 
 static int plp_open(const char *path, struct fuse_file_info *fi)
@@ -535,11 +503,8 @@ static int plp_read(const char *path, char *buf, size_t size, off_t offset,
 
   (void)fi;
   debuglog("plp_read `%s' offset %lld size %ld", ++path, offset, size);
-
-  if ((read = rfsv_read(buf, (long)offset, size, path)) < 0)
-    return rfsv_isalive() ? -ENOENT : -NO_PSION;
-
-  debuglog("read %ld bytes", read);
+  read = rfsv_read(buf, (long)offset, size, path);
+  debuglog("read returned %ld", read);
   return read;
 }
 
@@ -550,10 +515,8 @@ static int plp_write(const char *path, const char *buf, size_t size,
 
   (void)fi;
   debuglog("plp_write `%s' offset %lld size %ld", ++path, offset, size);
-  if ((written = rfsv_write(buf, offset, size, path)) < 0)
-    return rfsv_isalive() ? -ENOSPC : -NO_PSION;
-
-  debuglog("wrote %ld bytes", written);
+  written = rfsv_write(buf, offset, size, path);
+  debuglog("write returned %ld", written);
   return written;
 }
 
