@@ -113,7 +113,7 @@ AC_CHECK_LIB(fuse,fuse_new, [true],
     [AC_MSG_ERROR([Need libfuse to build plpfuse])])
 
 # check for a supported version of FUSE
-AC_MSG_CHECKING([For supported FUSE API version])
+AC_MSG_CHECKING([for supported FUSE API version])
 AC_RUN_IFELSE([ 
     AC_LANG_PROGRAM([[
     #define FUSE_USE_VERSION 26
