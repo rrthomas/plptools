@@ -254,14 +254,14 @@ stopPrograms(rpcs & r, const char *file) {
 }
 
 static char *
-getln(FILE *fp)
+get_upto(FILE *fp, const char *term, size_t *final_len)
 {
     size_t len = 256;
     int c;
     char *l = (char *)malloc(len), *s = l;
     
     assert(l);
-    for (c = getc(fp); c != '\n' && c != EOF; c = getc(fp)) {
+    for (c = getc(fp); c != EOF && strchr(term, c) == NULL; c = getc(fp)) {
         if (s == l + len) {
             l = (char *)realloc(l, len * 2);
             assert(l);
@@ -275,9 +275,17 @@ getln(FILE *fp)
     }
     *s++ = '\0';
     
+    if (final_len)
+        *final_len = s - l;
     l = (char *)realloc(l, s - l);
     assert(l);
     return l;
+}
+
+static char*
+getln(FILE *fp)
+{
+    return get_upto(fp, "\n", NULL);
 }
 
 static int
@@ -415,33 +423,10 @@ ascii2PsiText(char *buf, int len) {
 	}
 }
 
-// FIXME: This is almost the same as getln. Ugh.
 static char *
 slurp(FILE *fp, size_t *final_len)
 {
-    size_t len = 256;
-    int c;
-    char *l = (char *)malloc(len), *s = l;
-    
-    assert(l);
-    for (c = getc(fp); c != EOF; c = getc(fp)) {
-        if (s == l + len) {
-            l = (char *)realloc(l, len * 2);
-            assert(l);
-            len *= 2;
-        }
-        *s++ = c;
-    }
-    if (s == l + len) {
-        l = (char *)realloc(l, len + 1);
-        assert(l);
-    }
-    *s++ = '\0';
-    
-    *final_len = s - l;
-    l = (char *)realloc(l, s - l);
-    assert(l);
-    return l;
+    return get_upto(fp, "", final_len);
 }
 
 int
