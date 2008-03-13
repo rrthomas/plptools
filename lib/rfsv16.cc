@@ -357,7 +357,7 @@ devlist(u_int32_t &devbits)
 	if ((version < 1) || (version > 2)) {
 	    cerr << "devlist: not version 1 or 2" << endl;
 	    fclose(fileHandle);
-	    return E_PSI_GEN_FAIL; // FIXME
+	    return E_PSI_GEN_FAIL;
 	}
 	char drive = a.getByte(64);
 	if (drive >= 'A' && drive <= 'Z') {
