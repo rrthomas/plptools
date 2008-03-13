@@ -22,12 +22,12 @@ ncpd \- Daemon which handles the serial link to a Psion
 .BI [ long-options ]
 
 .SH DESCRIPTION
-ncpd is the daemon which handles the serial link to your Psion.
-It listens at port @DPORT@ for local connections and provides
-basic PLP/NCP services for plpfuse and plpftp and other front-ends.
-It auto-connects to the psion, even after unplugging/switching off
-therefore it can run always in background (if you have a spare
-serial-device)
+ncpd is the daemon which handles the serial link to your Psion. It
+listens at port @DPORT@ for local connections and provides basic
+PLP/NCP services for plpfuse and plpftp and other front-ends. It
+auto-connects to the psion, even after unplugging/switching off
+therefore it can run all the time if you can dedicate a serial device
+to it.
 
 .SH OPTIONS
 .TP
@@ -84,8 +84,7 @@ Specify the port to listen on - by default the value for the host is
 127.0.0.1 and the value for the port is looked up in /etc/services using
 the key
 .B psion/tcp.
-If it is not found there, a builtin value of @DPORT@
-is used.
+If it is not found there, a default value of @DPORT@ is used.
 .TP
 .BI "\-s, --serial=" device
 Specify the serial device to use to connect to the Psion - this defaults to
@@ -102,9 +101,11 @@ plpfuse(8), plpprintd(8), plpftp(1), sisinstall(1)
 
 .SH AUTHOR
 Fritz Elfert
+.br
 Heavily based on p3nfsd by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
 and
 plp_1_7 by Philip Proudman (phil@proudman51.freeserve.co.uk)
+.br
 Patches from Matt Gumbley (matt@gumbley.demon.co.uk)
+.br
 Man page by John Lines (john+plpman@paladin.demon.co.uk)
-
