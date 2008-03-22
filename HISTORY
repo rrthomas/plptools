@@ -1,36 +1,40 @@
  $Id$
 
- This package is heavily based on two other packages:
+Fritz Elfert wrote plptools, heavily based on two other packages:
 
-   - p3nfsd-5.4 by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
-     an nfs daemon for Psion series 3 and 5
-   - plp_1_7 by Philip Proudman (phil@proudman51.freeserve.co.uk)
+  - p3nfsd-5.4 by Rudolf Koenig (rfkoenig@immd4.informatik.uni-erlangen.de)
+    an nfs daemon for Psion series 3 and 5
+  - plp_1_7 by Philip Proudman (phil@proudman51.freeserve.co.uk)
+
+He writes:
 
  I want to thank both authors for their nice packages and for making
- these available under GPL which makes it possible for me to
- create this package (which of course is distributed under GPL as well)
-
- What i did:
+ these available under GPL which makes it possible for me to create
+ this package (which of course is distributed under GPL as well).
 
  I modified and improved Philip's code to support more (nearly all?)
- rfsv32 commands and to gain speed (approx 4 times) and stability
+ rfsv32 commands and to gain speed (approx. 4 times) and stability
  (properly reconnects on lost serial link).
+
  Rudolf's code originally used a homegrown protocol which needs a
- separate program running on the Psion. I changed his code to use
- the socket-based client-code from Philip's rfsv program thus
- eliminating the need for any software beeing run on the Psion.
- The rfsv code and some other stuff went into a lib (both shared
- and static available). I also removed all Psion-3 related stuff,
- because a) i can't test it and b) Sibo support is dropped by
- Psion.
+ separate program running on the Psion. I changed his code to use the
+ socket-based client-code from Philip's rfsv program thus eliminating
+ the need for any software beeing run on the Psion. The rfsv code and
+ some other stuff went into a lib (both shared and static available).
+ I also removed all Psion 3 related stuff, because a) I can't test it
+ and b) Psion no longer supported SIBO.
 
- Since version 0.5, there is also starting support for RPC-service
- on the Psion. Note the new commands "ps", "kill" and "run" in
- plpftp. This support was only possible because of Alexander Thoukydides'
- excellent documentation at
+ Support for the RPC mechanism was added in version 0.5. This support
+ was only possible because of Alexander Thoukydides' excellent
+ documentation at
  http://www.btinternet.com/~thouky/software/psifs/plp.html
- Thanks a lot for that. Also Psion-3 support is now added by Matt Gumbley
- (matt@gumbley.demon.co.uk)
+ Thanks a lot for that.
 
-Have fun.
- -Fritz
+ Psion 3 support was added by Matt Gumbley (matt@gumbley.demon.co.uk).
+
+ Have fun. -Fritz
+
+Reuben Thomas has maintained plptools since version 0.13. He fixed
+many bugs, updated the KDE utilities to work with KDE 3, but finally
+removed them with the approach of KDE 4, enhanced plpftp and replaced
+the rather flaky plpnfsd with plpfuse.
