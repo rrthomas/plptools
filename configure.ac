@@ -1,4 +1,4 @@
-AC_INIT(plptools, 1.0.0, plptools-developers@lists.sourceforge.net)
+AC_INIT(plptools, 1.0.1, plptools-developers@lists.sourceforge.net)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE
 
@@ -107,10 +107,8 @@ LIBHISTORY=${ac_cv_libhistory}
 AC_SUBST(LIBHISTORY)
 
 # FUSE for plpfuse
-AC_CHECK_HEADER(fuse.h,,
-    [AC_MSG_ERROR([Need fuse.h to build plpfuse])])
-AC_CHECK_LIB(fuse,fuse_new, [true],
-    [AC_MSG_ERROR([Need libfuse to build plpfuse])])
+AC_CHECK_HEADER(fuse.h,, enable_fuse=no)
+AC_CHECK_LIB(fuse,fuse_new, [true], enable_fuse=no)
 
 # check for a supported version of FUSE
 AC_MSG_CHECKING([for supported FUSE API version])
@@ -126,17 +124,17 @@ AC_RUN_IFELSE([
 ]])], 
     [AC_MSG_RESULT([yes])],
     [AC_MSG_RESULT([no])
-    AC_MSG_FAILURE([plpfuse requires FUSE 2.6 or newer.])
+    enable_fuse=no
     ]
 )
 
 # check for libattr for plpfuse
-AC_CHECK_HEADER(attr/attributes.h,,
-    [AC_MSG_ERROR([Need libattr to build plpfuse])])
-AC_CHECK_LIB(attr, attr_set, [true],
-    [AC_MSG_ERROR([Need libattr to build plpfuse])])
+AC_CHECK_HEADER(attr/attributes.h,, enable_fuse=no)
+AC_CHECK_LIB(attr, attr_set, [true], enable_fuse=no)
 
-dnl these three are for solaris
+AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_plpfuse = xyes)
+
+dnl these three are for Solaris
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(nsl, gethostbyname)
 ac_save_LDFLAGS=$LDFLAGS; LDFLAGS="-L/usr/ucblib -R/usr/ucblib $LDFLAGS"
