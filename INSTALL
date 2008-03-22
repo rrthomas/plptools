@@ -1,19 +1,36 @@
-Basic Installation
- $Id$
+Installation instructions for plptools
+--------------------------------------
 
- How to install:
+Prerequisites
+-------------
 
- ./configure
- make
- make install
+To build plpfuse, FUSE and libattr are required:
 
- In addition to the usual options, configure understands the following
- stuff for customization to your environment:
+  http://fuse.sourceforge.net/
+  ftp://oss.sgi.com/projects/xfs/download/
+
+Development packages come with most Linux distributions.
+
+If FUSE and libattr are not installed, plpfuse will not be built, but
+the rest of plptools will still work.
+
+
+Installation
+------------
+
+plptools uses GNU autotools, so the usual sequence of commands work:
+
+./configure
+make
+make install
+
+In addition to the usual options, configure understands the following
+stuff for customization to your environment:
 
   --enable-debug
 
-       Adds -g to CFLAGS, so you will get debugging-versions of
-       the programs and libplp
+       Adds -g to CFLAGS, so you will get debugging-versions of the
+       programs and libplp
 
   --with-serial=/dev/sometty
 
@@ -26,34 +43,36 @@ Basic Installation
 
   --with-port=portnum
 
-       overrides the default port number, where ncpd listens
-       and plpftp and plpfuse connect to.
+       overrides the default port number, where ncpd listens and
+       plpftp and plpfuse connect to.
 
   --with-drive=drivespec
 
        overrides the default drive for plpftp. The default "AUTO"
-       triggers a drive-scan on the psion and sets the drive to
-       the first drive found. If you don't want that, specify
-       C: for example.
+       triggers a drive-scan on the psion and sets the drive to the
+       first drive found. If you don't want that, specify C: for
+       example.
 
   --with-basedir=dirspec
 
        overrides the default directory for plpftp. The default is \\
-       which means the root-dir. Note: directory-separators have to
-       be specified as C-like backslashes and if you consider shell's
-       escape-mechanism, these in turn have to be escaped with backslashes ;-)
+       which means the root-dir. Note: directory-separators have to be
+       specified as C-like backslashes and if you consider shell's
+       escape-mechanism, these in turn have to be escaped with
+       backslashes ;-)
 
- By default, the install-prefix is /usr/local, so you probably
- should add /usr/local/lib to your /etc/ld.so.conf and then run
- ldconfig after installation. Another option is to run configure
- with the option --prefix=/usr
+By default, the install-prefix is /usr/local, so you probably should
+add /usr/local/lib to your /etc/ld.so.conf and then run ldconfig after
+installation. Another option is to run configure with the option
+--prefix=/usr
 
 
- To build from CVS, you will first need to run
+Information for developers
+--------------------------
+
+To build from CVS, you will first need to run
 
  autoreconf -i
 
- To make a release automatically, you need woger, from
- http://rrt.sc3d.org/Software/woger
-
-Have fun.
+To make a release automatically, you need woger, from
+http://rrt.sc3d.org/Software/woger
