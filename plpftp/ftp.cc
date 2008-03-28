@@ -223,33 +223,32 @@ stopPrograms(rpcs & r, const char *file) {
     }
     fputs("#plpftp processlist\n", fp);
     if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
-	cerr << _("Could not get process list, Error: ") << res << endl;
-	return 1;
-    } else {
-	for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {
-	    fputs(i->getArgs(), fp);
-            fputc('\n', fp);
-	    r.stopProgram(i->getProcId());
-	}
-	time_t tstart = time(0) + 5;
-	while (true) {
-	    usleep(100000);
-	    if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
-		cerr << "Could not get process list, Error: " << res << endl;
-		return 1;
-	    }
-	    if (tmp.empty())
-		break;
-	    if (time(0) > tstart) {
-		cerr << _(
-                          "Could not stop all processes. Please stop running\n"
-                          "programs manually on the Psion, then hit return.") << flush;
-		cin.getline((char *)&tstart, 1);
-		tstart = time(0) + 5;
-	    }
-	}
+        cerr << _("Could not get process list, Error: ") << res << endl;
+        return 1;
+    }
+    for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {
+        fputs(i->getArgs(), fp);
+        fputc('\n', fp);
     }
     fclose(fp);
+    time_t tstart = time(0) + 5;
+    while (!tmp.empty()) {
+        for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {
+            r.stopProgram(i->getProcId());
+        }
+        usleep(100000);
+        if (time(0) > tstart) {
+            cerr << _(
+                      "Could not stop all processes. Please stop running\n"
+                      "programs manually on the Psion, then hit return.") << flush;
+            cin.getline((char *)&tstart, 1);
+            tstart = time(0) + 5;
+        }
+        if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
+            cerr << _("Could not get process list, Error: ") << res << endl;
+            return 1;
+        }
+    }
     return 0;
 }
 
@@ -326,14 +325,16 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
 		// the usual \System\Apps\<AppName>\<AppName>.app
 		// on all drives.
 		if (prog.find('\\') == prog.npos) {
+                    cerr << "No name" << endl;
 		    u_int32_t devbits;
 		    if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 			int i;
 			for (i = 0; i < 26; i++) {
 			    if (devbits & (1 << i)) {
-                                string tmp;
-				tmp = (char)('A' + i) + ":\\System\\Apps\\" +
-                                    prog + "\\" + prog + ".app";
+                                string tmp = string();
+                                tmp += ('A' + i);
+                                tmp += ":\\System\\Apps\\" + prog + "\\" + prog + ".app";
+                                cerr << "trying " << i << " " << tmp << endl;
 				res = r.execProgram(tmp.c_str(), "");
                                 if (res == rfsv::E_PSI_GEN_NONE)
                                     break;
@@ -343,8 +344,8 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
 		}
 	    }
 	    if (res != rfsv::E_PSI_GEN_NONE) {
-		cerr << "Could not start " << cmd << endl;
-		cerr << "Error: " << res << endl;
+		cerr << _("Could not start ") << cmd << endl;
+		cerr << _("Error: ") << res << endl;
 	    }
 	}
     }
