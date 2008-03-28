@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
- *  Copyright (C) 2006-2007 Reuben Thomas <rrt@sc3d.org>
+ *  Copyright (C) 2006-2008 Reuben Thomas <rrt@sc3d.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
