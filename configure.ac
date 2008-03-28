@@ -1,4 +1,4 @@
-AC_INIT(plptools, 1.0.1, plptools-developers@lists.sourceforge.net)
+AC_INIT(plptools, 1.0.2, plptools-developers@lists.sourceforge.net)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE
 

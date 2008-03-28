@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
-"POT-Creation-Date: 2008-03-13 23:31+0000\n"
+"POT-Creation-Date: 2008-03-28 20:07+0000\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -522,7 +522,7 @@ msgstr " minuter "
 msgid " minute "
 msgstr " minut "
 
-#: lib/psitime.h:81 plpftp/ftp.cc:1257 plpftp/ftp.cc:1259 plpftp/ftp.cc:1342
+#: lib/psitime.h:81 plpftp/ftp.cc:1258 plpftp/ftp.cc:1260 plpftp/ftp.cc:1343
 msgid " seconds"
 msgstr " sekunder"
 
@@ -965,17 +965,17 @@ msgstr "FTP-kommandon:"
 msgid "Known RPC commands:"
 msgstr "RPC-kommandon:"
 
-#: plpftp/ftp.cc:221 plpftp/ftp.cc:298
+#: plpftp/ftp.cc:221 plpftp/ftp.cc:297
 #, fuzzy
 msgid "Could not open command list file "
 msgstr "Kunde inte parsa sisfilen.\n"
 
-#: plpftp/ftp.cc:226
+#: plpftp/ftp.cc:226 plpftp/ftp.cc:248
 #, fuzzy
 msgid "Could not get process list, Error: "
 msgstr "Kunde inte läsa processlistan "
 
-#: plpftp/ftp.cc:245
+#: plpftp/ftp.cc:242
 msgid ""
 "Could not stop all processes. Please stop running\n"
 "programs manually on the Psion, then hit return."
@@ -983,25 +983,30 @@ msgstr ""
 "Kunde inte avsluta alla processer. Var vänlig avsluta\n"
 "programmen manuellt på Psionen, tryck sedan på return."
 
-#: plpftp/ftp.cc:304 plpftp/ftp.cc:741 plpftp/ftp.cc:751 plpftp/ftp.cc:760
-#: plpftp/ftp.cc:768 plpftp/ftp.cc:776 plpftp/ftp.cc:786 plpftp/ftp.cc:798
-#: plpftp/ftp.cc:848 plpftp/ftp.cc:854 plpftp/ftp.cc:882 plpftp/ftp.cc:924
-#: plpftp/ftp.cc:981 plpftp/ftp.cc:1004 plpftp/ftp.cc:1030 plpftp/ftp.cc:1067
-#: plpftp/ftp.cc:1095 plpftp/ftp.cc:1156 plpftp/ftp.cc:1176 plpftp/ftp.cc:1183
-#: plpftp/ftp.cc:1190 plpftp/ftp.cc:1215 plpftp/ftp.cc:1223 plpftp/ftp.cc:1306
-#: plpftp/ftp.cc:1316 plpftp/ftp.cc:1388 plpftp/ftp.cc:1414 plpftp/ftp.cc:1469
+#: plpftp/ftp.cc:303 plpftp/ftp.cc:348 plpftp/ftp.cc:742 plpftp/ftp.cc:752
+#: plpftp/ftp.cc:761 plpftp/ftp.cc:769 plpftp/ftp.cc:777 plpftp/ftp.cc:787
+#: plpftp/ftp.cc:799 plpftp/ftp.cc:849 plpftp/ftp.cc:855 plpftp/ftp.cc:883
+#: plpftp/ftp.cc:925 plpftp/ftp.cc:982 plpftp/ftp.cc:1005 plpftp/ftp.cc:1031
+#: plpftp/ftp.cc:1068 plpftp/ftp.cc:1096 plpftp/ftp.cc:1157 plpftp/ftp.cc:1177
+#: plpftp/ftp.cc:1184 plpftp/ftp.cc:1191 plpftp/ftp.cc:1216 plpftp/ftp.cc:1224
+#: plpftp/ftp.cc:1307 plpftp/ftp.cc:1317 plpftp/ftp.cc:1389 plpftp/ftp.cc:1415
+#: plpftp/ftp.cc:1470
 msgid "Error: "
 msgstr "Fel: "
 
-#: plpftp/ftp.cc:305
+#: plpftp/ftp.cc:304
 msgid " is not a process list saved with killsave"
 msgstr " är inte en processlista som killsave har skapat"
 
-#: plpftp/ftp.cc:361
+#: plpftp/ftp.cc:347
+msgid "Could not start "
+msgstr "Kunde inte starta "
+
+#: plpftp/ftp.cc:362
 msgid "Clipboard protocol not supported by Psion Series 3."
 msgstr ""
 
-#: plpftp/ftp.cc:369
+#: plpftp/ftp.cc:370
 msgid ""
 "Your Psion does not support the clipboard protocol.\n"
 "                The reason for that is usually a missing server library.\n"
@@ -1012,334 +1017,334 @@ msgid ""
 "                and copy it to your Psion manually."
 msgstr ""
 
-#: plpftp/ftp.cc:674
+#: plpftp/ftp.cc:675
 msgid "Connected to a "
 msgstr "Kopplad till en "
 
-#: plpftp/ftp.cc:674
+#: plpftp/ftp.cc:675
 msgid " at "
 msgstr " dag "
 
-#: plpftp/ftp.cc:675
+#: plpftp/ftp.cc:676
 msgid " baud, OwnerInfo:"
 msgstr " baud, ÄgarInformation:"
 
-#: plpftp/ftp.cc:681
+#: plpftp/ftp.cc:682
 msgid "OwnerInfo returned error "
 msgstr "ÄgarInformation returnerade fel "
 
-#: plpftp/ftp.cc:701
+#: plpftp/ftp.cc:702
 msgid "FATAL: Couldn't find default Drive"
 msgstr "FATALT: Kunde inte hitta någon enhet"
 
-#: plpftp/ftp.cc:710
+#: plpftp/ftp.cc:711
 msgid "Psion dir is: \""
 msgstr "Psion-mappen är: \""
 
-#: plpftp/ftp.cc:725
+#: plpftp/ftp.cc:726
 msgid "Prompting now "
 msgstr "Promptning är nu "
 
-#: plpftp/ftp.cc:725 plpftp/ftp.cc:730
+#: plpftp/ftp.cc:726 plpftp/ftp.cc:731
 msgid "on"
 msgstr "på"
 
-#: plpftp/ftp.cc:725 plpftp/ftp.cc:730 plpftp/ftp.cc:1235 plpftp/ftp.cc:1238
-#: plpftp/ftp.cc:1241
+#: plpftp/ftp.cc:726 plpftp/ftp.cc:731 plpftp/ftp.cc:1236 plpftp/ftp.cc:1239
+#: plpftp/ftp.cc:1242
 msgid "off"
 msgstr "av"
 
-#: plpftp/ftp.cc:730
+#: plpftp/ftp.cc:731
 msgid "Hash printing now "
 msgstr "Brädgårdsmarkering är nu "
 
-#: plpftp/ftp.cc:735
+#: plpftp/ftp.cc:736
 msgid "Local dir: \""
 msgstr "Lokal mapp: \""
 
-#: plpftp/ftp.cc:736
+#: plpftp/ftp.cc:737
 msgid "Psion dir: \""
 msgstr "Psion mapp: \""
 
-#: plpftp/ftp.cc:856
+#: plpftp/ftp.cc:857
 msgid " Entries"
 msgstr " Element"
 
-#: plpftp/ftp.cc:862
+#: plpftp/ftp.cc:863
 msgid "Drive Type Volname     Total     Free      UniqueID"
 msgstr "Enhet Typ  Volymnamn   Totalt    Ledigt    UniktID"
 
-#: plpftp/ftp.cc:940
+#: plpftp/ftp.cc:941
 msgid "No such directory"
 msgstr "Mappen finns inte"
 
-#: plpftp/ftp.cc:941 plpftp/ftp.cc:982
+#: plpftp/ftp.cc:942 plpftp/ftp.cc:983
 msgid "Keeping original directory \""
 msgstr "Behåller ursprungsmappen \""
 
-#: plpftp/ftp.cc:1021 plpftp/ftp.cc:1112
+#: plpftp/ftp.cc:1022 plpftp/ftp.cc:1113
 msgid "Transfer complete, ("
 msgstr "Överfringen klar, ("
 
-#: plpftp/ftp.cc:1022 plpftp/ftp.cc:1113
+#: plpftp/ftp.cc:1023 plpftp/ftp.cc:1114
 msgid " bytes in "
 msgstr " bytes på "
 
-#: plpftp/ftp.cc:1023 plpftp/ftp.cc:1114
+#: plpftp/ftp.cc:1024 plpftp/ftp.cc:1115
 msgid " secs = "
 msgstr " sekunder = "
 
-#: plpftp/ftp.cc:1043
+#: plpftp/ftp.cc:1044
 msgid "Get \""
 msgstr "Hämta \""
 
-#: plpftp/ftp.cc:1072 plpftp/ftp.cc:1161
+#: plpftp/ftp.cc:1073 plpftp/ftp.cc:1162
 msgid "Transfer complete\n"
 msgstr "Överfringen klar\n"
 
-#: plpftp/ftp.cc:1138
+#: plpftp/ftp.cc:1139
 msgid "Put \""
 msgstr "Skicka \""
 
-#: plpftp/ftp.cc:1168
+#: plpftp/ftp.cc:1169
 msgid "Error in directory name \""
 msgstr "Fel i mappnamn \""
 
-#: plpftp/ftp.cc:1204
+#: plpftp/ftp.cc:1205
 msgid "Starting subshell ...\n"
 msgstr "Startar kommandotolk ...\n"
 
-#: plpftp/ftp.cc:1227
+#: plpftp/ftp.cc:1228
 msgid "Unknown setup info received"
 msgstr ""
 
-#: plpftp/ftp.cc:1230
+#: plpftp/ftp.cc:1231
 msgid "Setup information:"
 msgstr ""
 
-#: plpftp/ftp.cc:1231
+#: plpftp/ftp.cc:1232
 msgid "  Screen contrast:                  "
 msgstr "  Skärmkontrast:                    "
 
-#: plpftp/ftp.cc:1233
+#: plpftp/ftp.cc:1234
 msgid "  Keyboard click:                   "
 msgstr "  Tangentbordsklick:                "
 
-#: plpftp/ftp.cc:1235 plpftp/ftp.cc:1238 plpftp/ftp.cc:1241
+#: plpftp/ftp.cc:1236 plpftp/ftp.cc:1239 plpftp/ftp.cc:1242
 msgid "high"
 msgstr "hög"
 
-#: plpftp/ftp.cc:1235 plpftp/ftp.cc:1238 plpftp/ftp.cc:1241
+#: plpftp/ftp.cc:1236 plpftp/ftp.cc:1239 plpftp/ftp.cc:1242
 msgid "low"
 msgstr "låg"
 
-#: plpftp/ftp.cc:1236
+#: plpftp/ftp.cc:1237
 msgid "  Screen click:                     "
 msgstr "  Skärmklick:                       "
 
-#: plpftp/ftp.cc:1239
+#: plpftp/ftp.cc:1240
 msgid "  Error sound:                      "
 msgstr "  Felljud:                          "
 
-#: plpftp/ftp.cc:1242
+#: plpftp/ftp.cc:1243
 msgid "  Auto-switch off:                  "
 msgstr "  Automatisk avstängning:           "
 
-#: plpftp/ftp.cc:1245 plpftp/ftp.cc:1271
+#: plpftp/ftp.cc:1246 plpftp/ftp.cc:1272
 msgid "never"
 msgstr "aldrig"
 
-#: plpftp/ftp.cc:1248
+#: plpftp/ftp.cc:1249
 msgid "if running on battery power"
 msgstr "om maskinen går på batteri"
 
-#: plpftp/ftp.cc:1251 plpftp/ftp.cc:1277
+#: plpftp/ftp.cc:1252 plpftp/ftp.cc:1278
 msgid "always"
 msgstr "alltid"
 
-#: plpftp/ftp.cc:1256
+#: plpftp/ftp.cc:1257
 msgid "  Switch off after:                 "
 msgstr "  Stäng av efter:                   "
 
-#: plpftp/ftp.cc:1258
+#: plpftp/ftp.cc:1259
 msgid "  Backlight off after:              "
 msgstr "  Släck bakgrundsbelysningen efter: "
 
-#: plpftp/ftp.cc:1260
+#: plpftp/ftp.cc:1261
 msgid "  Switch on when tapping on screen: "
 msgstr "  Starta när man klickar på skärmen:"
 
-#: plpftp/ftp.cc:1261 plpftp/ftp.cc:1263 plpftp/ftp.cc:1265 plpftp/ftp.cc:1267
-#: plpftp/ftp.cc:1330 plpftp/ftp.cc:1344 plpftp/ftp.cc:1362
+#: plpftp/ftp.cc:1262 plpftp/ftp.cc:1264 plpftp/ftp.cc:1266 plpftp/ftp.cc:1268
+#: plpftp/ftp.cc:1331 plpftp/ftp.cc:1345 plpftp/ftp.cc:1363
 msgid "yes"
 msgstr "ja"
 
-#: plpftp/ftp.cc:1261 plpftp/ftp.cc:1263 plpftp/ftp.cc:1265 plpftp/ftp.cc:1267
-#: plpftp/ftp.cc:1330 plpftp/ftp.cc:1344 plpftp/ftp.cc:1362
+#: plpftp/ftp.cc:1262 plpftp/ftp.cc:1264 plpftp/ftp.cc:1266 plpftp/ftp.cc:1268
+#: plpftp/ftp.cc:1331 plpftp/ftp.cc:1345 plpftp/ftp.cc:1363
 msgid "no"
 msgstr "nej"
 
-#: plpftp/ftp.cc:1262
+#: plpftp/ftp.cc:1263
 msgid "  Switch on when opening:           "
 msgstr "  Sätt på när maskinen öppnas:      "
 
-#: plpftp/ftp.cc:1264
+#: plpftp/ftp.cc:1265
 msgid "  Switch off when closing:          "
 msgstr "  Stäng av när maskinen stängs:     "
 
-#: plpftp/ftp.cc:1266
+#: plpftp/ftp.cc:1267
 msgid "  Ask for password on startup:      "
 msgstr "  Fråga efter lösenord vid start:   "
 
-#: plpftp/ftp.cc:1268
+#: plpftp/ftp.cc:1269
 msgid "  Show Owner info on startup:       "
 msgstr "  Visa ägarinformation vid start:   "
 
-#: plpftp/ftp.cc:1274
+#: plpftp/ftp.cc:1275
 msgid "once a day"
 msgstr "en gång om dagen"
 
-#: plpftp/ftp.cc:1320
+#: plpftp/ftp.cc:1321
 msgid "General:"
 msgstr "Allmänt:"
 
-#: plpftp/ftp.cc:1321
+#: plpftp/ftp.cc:1322
 msgid "  Machine Type: "
 msgstr "  Maskintyp:    "
 
-#: plpftp/ftp.cc:1322
+#: plpftp/ftp.cc:1323
 msgid "  Machine Name: "
 msgstr "  Maskinnamn:   "
 
-#: plpftp/ftp.cc:1323
+#: plpftp/ftp.cc:1324
 msgid "  Machine UID:  "
 msgstr "  Maskin UID:   "
 
-#: plpftp/ftp.cc:1324
+#: plpftp/ftp.cc:1325
 msgid "  UI Language:  "
 msgstr "  Användarspråk:"
 
-#: plpftp/ftp.cc:1325
+#: plpftp/ftp.cc:1326
 msgid "ROM:"
 msgstr ""
 
-#: plpftp/ftp.cc:1326
+#: plpftp/ftp.cc:1327
 msgid "  Version:      "
 msgstr ""
 
-#: plpftp/ftp.cc:1328 plpftp/ftp.cc:1332
+#: plpftp/ftp.cc:1329 plpftp/ftp.cc:1333
 msgid "  Size:         "
 msgstr "  Storlek:      "
 
-#: plpftp/ftp.cc:1329
+#: plpftp/ftp.cc:1330
 msgid "  Programmable: "
 msgstr "  Programmerbar:"
 
-#: plpftp/ftp.cc:1331
+#: plpftp/ftp.cc:1332
 msgid "RAM:"
 msgstr ""
 
-#: plpftp/ftp.cc:1333
+#: plpftp/ftp.cc:1334
 msgid "  Free:         "
 msgstr "  Ledigt:       "
 
-#: plpftp/ftp.cc:1334
+#: plpftp/ftp.cc:1335
 msgid "  Free max:     "
 msgstr "  Max ledigt:   "
 
-#: plpftp/ftp.cc:1335
+#: plpftp/ftp.cc:1336
 msgid "RAM disk size:  "
 msgstr "RAM-disk:       "
 
-#: plpftp/ftp.cc:1336
+#: plpftp/ftp.cc:1337
 msgid "Registry size:  "
 msgstr "Inställningar:  "
 
-#: plpftp/ftp.cc:1337
+#: plpftp/ftp.cc:1338
 msgid "Display size:   "
 msgstr "Bildskärm:      "
 
-#: plpftp/ftp.cc:1339
+#: plpftp/ftp.cc:1340
 msgid "Time:"
 msgstr "Tid: "
 
-#: plpftp/ftp.cc:1341
+#: plpftp/ftp.cc:1342
 msgid "  Current time: "
 msgstr "  Aktuell tid:  "
 
-#: plpftp/ftp.cc:1342
+#: plpftp/ftp.cc:1343
 msgid "  UTC offset:   "
 msgstr ""
 
-#: plpftp/ftp.cc:1343
+#: plpftp/ftp.cc:1344
 msgid "  DST:          "
 msgstr "  Sommartid:    "
 
-#: plpftp/ftp.cc:1345
+#: plpftp/ftp.cc:1346
 msgid "  Timezone:     "
 msgstr "  Tidszon:      "
 
-#: plpftp/ftp.cc:1346
+#: plpftp/ftp.cc:1347
 msgid "  Country Code: "
 msgstr "  Landskod:     "
 
-#: plpftp/ftp.cc:1347
+#: plpftp/ftp.cc:1348
 msgid "Main battery:"
 msgstr "Huvudbatteri:"
 
-#: plpftp/ftp.cc:1349
+#: plpftp/ftp.cc:1350
 msgid "  Changed at:   "
 msgstr "  Bytt:         "
 
-#: plpftp/ftp.cc:1350 plpftp/ftp.cc:1363
+#: plpftp/ftp.cc:1351 plpftp/ftp.cc:1364
 msgid "  Used for:     "
 msgstr "  Använt i:     "
 
-#: plpftp/ftp.cc:1351 plpftp/ftp.cc:1357
+#: plpftp/ftp.cc:1352 plpftp/ftp.cc:1358
 msgid "  Status:       "
 msgstr "  Tillstånd:    "
 
-#: plpftp/ftp.cc:1352
+#: plpftp/ftp.cc:1353
 msgid "  Current:      "
 msgstr " Aktuell åtgång:"
 
-#: plpftp/ftp.cc:1353
+#: plpftp/ftp.cc:1354
 msgid "  UsedPower:    "
 msgstr "  Använt:       "
 
-#: plpftp/ftp.cc:1354 plpftp/ftp.cc:1358
+#: plpftp/ftp.cc:1355 plpftp/ftp.cc:1359
 msgid "  Voltage:      "
 msgstr "  Spänning:     "
 
-#: plpftp/ftp.cc:1355 plpftp/ftp.cc:1359
+#: plpftp/ftp.cc:1356 plpftp/ftp.cc:1360
 msgid "  Max. voltage: "
 msgstr "  Max spänning: "
 
-#: plpftp/ftp.cc:1356
+#: plpftp/ftp.cc:1357
 msgid "Backup battery:"
 msgstr "Backupbatteri: "
 
-#: plpftp/ftp.cc:1360
+#: plpftp/ftp.cc:1361
 msgid "External power:"
 msgstr "Extern ström:  "
 
-#: plpftp/ftp.cc:1361
+#: plpftp/ftp.cc:1362
 msgid "  Supplied:     "
 msgstr "  Ikopplad:     "
 
-#: plpftp/ftp.cc:1376
+#: plpftp/ftp.cc:1377
 msgid "Error setting clipboard"
 msgstr ""
 
-#: plpftp/ftp.cc:1381
+#: plpftp/ftp.cc:1382
 msgid "Error getting clipboard"
 msgstr ""
 
-#: plpftp/ftp.cc:1407
+#: plpftp/ftp.cc:1408
 msgid "no such process"
 msgstr "ingen sådan process"
 
-#: plpftp/ftp.cc:1423
+#: plpftp/ftp.cc:1424
 msgid "syntax error. Try \"help\""
 msgstr "syntax error. Prova \"help\""
 
@@ -1552,9 +1557,6 @@ msgstr "plpprintd: kunde inte få kontakt med ncpd"
 
 #~ msgid "Try `plpnfsd --help' for more information"
 #~ msgstr "Prova 'plpnfsd --help' för mer information"
-
-#~ msgid "Could not start "
-#~ msgstr "Kunde inte starta "
 
 #~ msgid "Could not write processlist "
 #~ msgstr "Kunde inte skriva processlistan "
