@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
-"POT-Creation-Date: 2008-03-28 20:07+0000\n"
+"POT-Creation-Date: 2008-04-06 22:08+0100\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -464,13 +464,11 @@ msgid "Austrian"
 msgstr "Österreichisch"
 
 #: lib/rpcs.cc:86
-#, fuzzy
 msgid "New Zealand English"
 msgstr "Neuseeländisch"
 
 #  FIXME: not shure about ISO code
 #: lib/rpcs.cc:87
-#, fuzzy
 msgid "Canadian French"
 msgstr "Internationales Französisch"
 
@@ -540,7 +538,7 @@ msgid "try again"
 msgstr "Erneut versuchen"
 
 #: lib/rpcsfactory.cc:41 lib/rfsvfactory.cc:44
-msgid "no psion connected"
+msgid "no EPOC device connected"
 msgstr "Kein Psion angeschlossen"
 
 #: lib/rpcsfactory.cc:42 lib/rfsvfactory.cc:45
@@ -929,7 +927,7 @@ msgid "                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>"
 msgstr "                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>"
 
 #: plpftp/main.cc:92
-msgid "                   & (C) 2006-2007 Reuben Thomas <rrt@sc3d.org>"
+msgid "                   & (C) 2006-2008 Reuben Thomas <rrt@sc3d.org>"
 msgstr ""
 
 #: plpftp/main.cc:93
@@ -970,7 +968,6 @@ msgid "Could not open command list file "
 msgstr "Konnte SIS-Datei nicht parsen.\n"
 
 #: plpftp/ftp.cc:226 plpftp/ftp.cc:248
-#, fuzzy
 msgid "Could not get process list, Error: "
 msgstr "Konnte Prozessliste nicht lesen "
 
@@ -1353,7 +1350,7 @@ msgid "Error %d on line %d: %s\n"
 msgstr "Fehler %d in Zeile %d: %s\n"
 
 #: sisinstall/sismain.cpp:39
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Usage: sisinstall [OPTIONS]... SISFILE\n"
 "\n"
@@ -1372,7 +1369,6 @@ msgstr ""
 " -V, --version           Version anzeigen und beenden.\n"
 " -v, --verbose=LEVEL     Setze Log-stufe, Vorgabe ist 0.\n"
 " -n, --dry-run           Nur parsen; keine Installation.\n"
-" -w, --newt              Benutze NEWT Oberfläche.\n"
 
 #: sisinstall/sismain.cpp:81
 #, c-format
@@ -1417,7 +1413,6 @@ msgid "Got SIGINT"
 msgstr "INT Signal erhalten"
 
 #: ncpd/main.cc:149
-#, fuzzy
 msgid ""
 "Usage: ncpd [OPTIONS]...\n"
 "\n"
@@ -1566,9 +1561,8 @@ msgid "plpfuse version "
 msgstr "ncpd Version "
 
 #: plpfuse/main.cc:452 plpfuse/main.cc:457
-#, fuzzy
 msgid "plpfuse: could not connect to ncpd"
-msgstr "plpftp: Konnte ncpd nicht kontaktieren."
+msgstr "plpfuse: Konnte ncpd nicht kontaktieren."
 
 #: plpprint/plpprintd.cc:1024
 msgid "plpprintd: could not connect to ncpd"
