@@ -325,7 +325,6 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
 		// the usual \System\Apps\<AppName>\<AppName>.app
 		// on all drives.
 		if (prog.find('\\') == prog.npos) {
-                    cerr << "No name" << endl;
 		    u_int32_t devbits;
 		    if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 			int i;
@@ -334,7 +333,6 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
                                 string tmp = string();
                                 tmp += ('A' + i);
                                 tmp += ":\\System\\Apps\\" + prog + "\\" + prog + ".app";
-                                cerr << "trying " << i << " " << tmp << endl;
 				res = r.execProgram(tmp.c_str(), "");
                                 if (res == rfsv::E_PSI_GEN_NONE)
                                     break;
