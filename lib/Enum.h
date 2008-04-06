@@ -135,6 +135,8 @@ protected:
  * be tedious for large enumerations. To make the Definition easier
  * and more readable, an ENUM_DEFINITION() macro is provided.
  *
+ * FIXME: At the moment enumeration strings don't get translated by gettext
+ * 
  * @see #ENUM_DEFINITION
  * @author Henner Zeller
  */
@@ -259,7 +261,6 @@ public:
     * XXX: throw OutOfRangeException ?
     */
     static E getValueFor(const std::string &s) {
-//	return (E) staticData.stringRep.lookup(s.getCStr());
 	return (E) staticData.stringRep.lookup(s.c_str());
     }
 };
@@ -320,7 +321,7 @@ template <> Enum<EnumName>::sdata::sdata() :				\
  */
 template <typename E>
 inline std::ostream& operator << (std::ostream& out, const Enum<E> &e) {
-    return out << _(e.toString().c_str());
+    return out << e.toString().c_str();
 }
 
 #endif /* _ENUM_H_ */
