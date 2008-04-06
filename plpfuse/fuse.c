@@ -27,7 +27,7 @@
 #include "rfsv_api.h"
 
 /* Name of our extended attribute */
-#define XATTR_NAME "user.psion"
+#define XATTR_NAME "user.epoc"
 
 /* Maximum length of a generated psion xattr string */
 #define XATTR_MAXLEN 3
