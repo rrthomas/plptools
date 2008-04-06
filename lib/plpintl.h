@@ -27,18 +27,6 @@
 #include <config.h>
 #endif
 
-#ifndef HAVE_STPCPY
-#include <string.h>
-
-extern inline char * stpcpy(char *dest, const char *src) {
-    char c;
-    do {
-	c = *dest++ = *src++;
-    } while (c);
-    return dest;
-}
-#endif
-
 /* libintl.h includes locale.h only if optimized.
  * however, we need LC_ALL ...
  */
@@ -46,10 +34,8 @@ extern inline char * stpcpy(char *dest, const char *src) {
 
 #if defined(ENABLE_NLS) && defined(HAVE_GETTEXT)
 #  include <libintl.h>
-static inline const char *X_(const char *t) { return gettext(t); }
 static inline const char *_(const char *t) { return gettext(t); }
 #else
-static inline const char *X_(const char *t) { return t; }
 static inline const char *_(const char *t) { return t; }
 #  define textdomain(x)
 #endif
