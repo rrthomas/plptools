@@ -23,4 +23,4 @@ NOTES = release-notes
 release: distcheck
 	cvs diff && \
 	cvs tag rel-`echo $(VERSION) | sed -e 's/\./-/g'` && \
-	woger $(PACKAGE) $(VERSION) release-notes-$(VERSION)
+	woger sourceforge,freshmeat $(PACKAGE) $(VERSION) "" release-notes-$(VERSION)
