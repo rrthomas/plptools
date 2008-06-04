@@ -107,6 +107,7 @@ LIBHISTORY=${ac_cv_libhistory}
 AC_SUBST(LIBHISTORY)
 
 # FUSE for plpfuse
+enable_fuse=yes
 AC_CHECK_HEADER(fuse.h,, enable_fuse=no)
 AC_CHECK_LIB(fuse,fuse_new, [true], enable_fuse=no)
 
@@ -132,7 +133,7 @@ AC_RUN_IFELSE([
 AC_CHECK_HEADER(attr/attributes.h,, enable_fuse=no)
 AC_CHECK_LIB(attr, attr_set, [true], enable_fuse=no)
 
-AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_plpfuse = xyes)
+AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse = xyes)
 
 dnl these three are for Solaris
 AC_CHECK_LIB(socket, socket)
