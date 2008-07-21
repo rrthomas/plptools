@@ -28,6 +28,9 @@
 
 #include "bufferstore.h"
 
+#include <cstring>
+#include <cstdlib>
+
 // Should be iostream.h, but won't build on Sun WorkShop C++ 5.0
 #include <iomanip>
 #include <string>

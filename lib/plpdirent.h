@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 
 #include <psitime.h>
 #include <rfsv.h>

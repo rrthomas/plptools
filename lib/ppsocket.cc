@@ -29,6 +29,7 @@
 #include "ppsocket.h"
 #include "iowatch.h"
 
+#include <cstring>
 #include <iostream>
 
 #include <stdio.h>

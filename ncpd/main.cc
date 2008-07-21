@@ -26,6 +26,7 @@
 #endif
 
 #include <string>
+#include <cstring>
 #include <iostream>
 
 #include <bufferstore.h>

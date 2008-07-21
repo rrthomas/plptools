@@ -24,6 +24,8 @@
 #include <config.h>
 #endif
 
+#include <cstring>
+
 #include "Enum.h"
 
 using namespace std;

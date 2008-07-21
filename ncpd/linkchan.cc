@@ -23,6 +23,7 @@
  */
 #include <iomanip>
 #include <string>
+#include <cstring>
 
 #include <bufferstore.h>
 #include <bufferarray.h>

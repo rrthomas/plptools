@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <cstring>
 
 #include "channel.h"
 #include "ncp.h"

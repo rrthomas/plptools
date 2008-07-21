@@ -26,6 +26,7 @@
 #endif
 
 #include <string>
+#include <cstring>
 #include <fstream>
 #include <iomanip>
 
