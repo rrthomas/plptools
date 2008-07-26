@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
-"POT-Creation-Date: 2008-04-22 14:06+0100\n"
+"POT-Creation-Date: 2008-07-26 23:59+0100\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -1405,15 +1405,15 @@ msgstr "Kunde inte få kontakt med Psionen\n"
 msgid "Could not parse the sis file.\n"
 msgstr "Kunde inte parsa sisfilen.\n"
 
-#: ncpd/main.cc:81
+#: ncpd/main.cc:82
 msgid "Got SIGTERM"
 msgstr ""
 
-#: ncpd/main.cc:89
+#: ncpd/main.cc:90
 msgid "Got SIGINT"
 msgstr ""
 
-#: ncpd/main.cc:149
+#: ncpd/main.cc:150
 msgid ""
 "Usage: ncpd [OPTIONS]...\n"
 "\n"
@@ -1438,60 +1438,60 @@ msgid ""
 " -b, --baudrate=RATE     Set serial speed to BAUD.\n"
 msgstr ""
 
-#: ncpd/main.cc:174
+#: ncpd/main.cc:175
 msgid "                         Default: "
 msgstr ""
 
-#: ncpd/main.cc:176
+#: ncpd/main.cc:177
 msgid ""
 "                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n"
 msgstr ""
 
-#: ncpd/main.cc:179
+#: ncpd/main.cc:180
 msgid ""
 " -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
 "                         Default for HOST: 127.0.0.1\n"
 "                         Default for PORT: "
 msgstr ""
 
-#: ncpd/main.cc:187
+#: ncpd/main.cc:188
 msgid "Try `ncpd --help' for more information"
 msgstr "Prova `ncpd --help' för mer information"
 
-#: ncpd/main.cc:279
+#: ncpd/main.cc:280
 msgid "ncpd Version "
 msgstr ""
 
-#: ncpd/main.cc:360
+#: ncpd/main.cc:361
 msgid "daemon started. Listening at "
 msgstr "daemon startad. Lyssnar på "
 
-#: ncpd/main.cc:361
+#: ncpd/main.cc:362
 msgid " using device "
 msgstr " använder enhet "
 
-#: ncpd/main.cc:393
+#: ncpd/main.cc:394
 msgid "terminating"
 msgstr "avbruten"
 
-#: ncpd/main.cc:396
+#: ncpd/main.cc:397
 msgid "joined Link thread"
 msgstr ""
 
-#: ncpd/main.cc:398
+#: ncpd/main.cc:399
 msgid "joined Socket thread"
 msgstr ""
 
-#: ncpd/main.cc:400
+#: ncpd/main.cc:401
 msgid "shut down NCP"
 msgstr ""
 
-#: ncpd/main.cc:403
+#: ncpd/main.cc:404
 #, fuzzy
 msgid "socket closed"
 msgstr "resursen låst"
 
-#: ncpd/main.cc:411
+#: ncpd/main.cc:412
 msgid "normal exit"
 msgstr ""
 
