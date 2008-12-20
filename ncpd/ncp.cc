@@ -137,6 +137,11 @@ receive(bufferStore s) {
 	} else {
 	    int allData = s.getByte(1);
 	    s.discardFirstBytes(2);
+            
+            if (protocolVersion == PV_SERIES_3) {
+                channel = lastSentChannel;
+            }
+                
 	    if (!isValidChannel(channel)) {
 		lerr << "ncp: Got message for unknown channel\n";
 	    } else {
@@ -466,6 +471,7 @@ send(int channel, bufferStore & a)
 	a.discardFirstBytes(NCP_SENDLEN);
 	l->send(out);
     } while (!last);
+    lastSentChannel = channel;
 }
 
 void ncp::

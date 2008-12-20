@@ -113,6 +113,7 @@ private:
     linkChan *lChan;
     int maxChannels;
     std::vector<PcServer> pcServers;
+    int lastSentChannel;
 };
 
 #endif

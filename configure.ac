@@ -1,4 +1,4 @@
-AC_INIT(plptools, 1.0.5, plptools-developers@lists.sourceforge.net)
+AC_INIT(plptools, 1.0.6, plptools-developers@lists.sourceforge.net)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE
 
@@ -14,6 +14,7 @@ LIBVERSION=${maj}:${min}:${maj}
 AC_SUBST(LIBVERSION)
 
 dnl checks for programs
+AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
 AC_PROG_AWK
@@ -29,10 +30,10 @@ if test $enableval = yes; then
         if test "$GCC" = "yes"; then
           CFLAGS="$CFLAGS -ggdb"
         fi
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(DEBUG, 1, [Define this to include debugging code.])
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(DEBUG, 1, [Define this to include debugging code.])
 else
-	AC_MSG_RESULT(no)
+        AC_MSG_RESULT(no)
 fi
 ], [
 AC_MSG_RESULT(no)
@@ -48,16 +49,16 @@ ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
 dnl Additional glibc-intl checks
 if test "${USE_NLS}" = "yes" ; then
-	if test "${USE_INCLUDED_LIBINTL}" = "yes" ; then
-		plp_have_bind_textdomain_codeset=no
-	else
-		AC_CHECK_LIB(c, bind_textdomain_codeset,
-			plp_have_bind_textdomain_codeset=yes,
-			plp_have_bind_textdomain_codeset=no)
-	fi
-	if test "${plp_have_bind_textdomain_codeset}" = yes ; then
-		AC_DEFINE(HAVE_BIND_TEXTDOMAIN_CODESET)
-	fi
+        if test "${USE_INCLUDED_LIBINTL}" = "yes" ; then
+                plp_have_bind_textdomain_codeset=no
+        else
+                AC_CHECK_LIB(c, bind_textdomain_codeset,
+                        plp_have_bind_textdomain_codeset=yes,
+                        plp_have_bind_textdomain_codeset=no)
+        fi
+        if test "${plp_have_bind_textdomain_codeset}" = yes ; then
+                AC_DEFINE(HAVE_BIND_TEXTDOMAIN_CODESET)
+        fi
 fi
 
 dnl Large File Support
@@ -69,14 +70,14 @@ dnl checks for libraries
 dnl readline and history for plpftp
 ac_enable_readline=yes
 AC_ARG_ENABLE(readline,
-	[  --disable-readline      disable libreadline support [no]],
-	if test "$enableval" = "no" ; then
-		AC_MSG_RESULT([support for libreadline disabled])
-		ac_enable_readline=no
-	fi
+        [  --disable-readline      disable libreadline support [no]],
+        if test "$enableval" = "no" ; then
+                AC_MSG_RESULT([support for libreadline disabled])
+                ac_enable_readline=no
+        fi
 )
 if test "x$ac_enable_readline" = "xyes" ; then
-	AC_MSG_CHECKING(for readline in -lreadline)
+        AC_MSG_CHECKING(for readline in -lreadline)
         LIBREADLINE=
         AC_CHECK_LIB([readline], [main],
               [AC_SUBST([LIBREADLINE], ["-lreadline -lncurses"])
@@ -89,19 +90,19 @@ fi
 ac_enable_history=yes
 ac_cv_libhistory=
 AC_ARG_ENABLE(history,
-	[  --disable-history       disable libhistory support [no]],
-	if test "$enableval" = "no" ; then
-		AC_MSG_RESULT([support for libhistory disabled])
-		ac_enable_history=no
-	fi
+        [  --disable-history       disable libhistory support [no]],
+        if test "$enableval" = "no" ; then
+                AC_MSG_RESULT([support for libhistory disabled])
+                ac_enable_history=no
+        fi
 )
 if test "x$ac_enable_history" = "xyes" ; then
-	AC_CHECK_LIB(history, add_history,
-	[
-		AC_DEFINE_UNQUOTED(HAVE_LIBHISTORY,1,
-			[Define this, if you have libhistory])
-		ac_cv_libhistory=-lhistory
-	])
+        AC_CHECK_LIB(history, add_history,
+        [
+                AC_DEFINE_UNQUOTED(HAVE_LIBHISTORY,1,
+                        [Define this, if you have libhistory])
+                ac_cv_libhistory=-lhistory
+        ])
 fi
 LIBHISTORY=${ac_cv_libhistory}
 AC_SUBST(LIBHISTORY)
@@ -113,16 +114,16 @@ AC_CHECK_LIB(fuse,fuse_new, [true], enable_fuse=no)
 
 # check for a supported version of FUSE
 AC_MSG_CHECKING([for supported FUSE API version])
-AC_RUN_IFELSE([ 
+AC_RUN_IFELSE([
     AC_LANG_PROGRAM([[
     #define FUSE_USE_VERSION 26
     #include <fuse.h>]],
 [[
     if (FUSE_MAJOR_VERSION == 2 && FUSE_MINOR_VERSION >= 6)
-	return 0;
+        return 0;
     else
-	return -1;
-]])], 
+        return -1;
+]])],
     [AC_MSG_RESULT([yes])],
     [AC_MSG_RESULT([no])
     enable_fuse=no
@@ -149,8 +150,8 @@ AC_TYPE_SIGNAL
 
 dnl checks for header files
 AC_CHECK_HEADERS(
-	sys/time.h sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h \
-	sys/int_types.h stdint.h
+        sys/time.h sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h \
+        sys/int_types.h stdint.h
 )
 
 dnl special options for customization
@@ -183,7 +184,7 @@ AC_ARG_WITH(speed,
 )
 AC_DEFINE_UNQUOTED(DSPEED,$DSPEED,[Define this to your serial device speed])
 AC_DEFINE_UNQUOTED(DSNAME,$DSNAME,
-	[Define this to your serial device speed alias])
+        [Define this to your serial device speed alias])
 AC_SUBST(DSPEED)
 AC_SUBST(DSNAME)
 
@@ -196,7 +197,7 @@ AC_ARG_WITH(port,
     ]
 )
 AC_DEFINE_UNQUOTED(DPORT,$DPORT,
-	[Define this to the TCP port ncpd should listen on])
+        [Define this to the TCP port ncpd should listen on])
 AC_SUBST(DPORT)
 
 AC_ARG_WITH(drive,
@@ -208,7 +209,7 @@ AC_ARG_WITH(drive,
     ]
 )
 AC_DEFINE_UNQUOTED(DDRIVE,"$DDRIVE",
-	[Define this to your default drive on your EPOC device])
+        [Define this to your default drive on your EPOC device])
 
 AC_ARG_WITH(basedir,
     [  --with-basedir=DIR      override default EPOC directory [\\\\]],
@@ -219,7 +220,7 @@ AC_ARG_WITH(basedir,
     ]
 )
 AC_DEFINE_UNQUOTED(DBASEDIR,"$DBASEDIR",
-	[Define this to your default directory on your EPOC device])
+        [Define this to your default directory on your EPOC device])
 
 AC_ARG_WITH(initdir,
     [  --with-initdir=DIR      override default init dir [PREFIX/etc/rc.d/init.d]],
@@ -247,23 +248,23 @@ AH_BOTTOM([
 
 
 AC_CONFIG_FILES(
-	Makefile
-	intl/Makefile
-	po/Makefile.in
-	lib/Makefile
-	ncpd/Makefile
-	plpftp/Makefile
+        Makefile
+        intl/Makefile
+        po/Makefile.in
+        lib/Makefile
+        ncpd/Makefile
+        plpftp/Makefile
         plpfuse/Makefile
-	plpprint/Makefile
-	plpprint/prolog.ps
-	sisinstall/Makefile
-	doc/Makefile
-	doc/api/Makefile
-	etc/plptools
-	doc/ncpd.man
-	doc/plpfuse.man
-	doc/plpftp.man
-	doc/sisinstall.man
-	doc/plpprintd.man
+        plpprint/Makefile
+        plpprint/prolog.ps
+        sisinstall/Makefile
+        doc/Makefile
+        doc/api/Makefile
+        etc/plptools
+        doc/ncpd.man
+        doc/plpfuse.man
+        doc/plpftp.man
+        doc/sisinstall.man
+        doc/plpprintd.man
 )
 AC_OUTPUT
