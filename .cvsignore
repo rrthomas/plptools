@@ -15,7 +15,6 @@ stamp-h.in
 stamp-h1
 plptools-*.tar.gz
 intl
-m4
 ABOUT-NLS
 ChangeLog
 release-notes-*
@@ -24,3 +23,4 @@ compile
 depcomp
 missing
 install-sh
+ltmain.sh
