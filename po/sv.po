@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
-"POT-Creation-Date: 2008-07-26 23:59+0100\n"
+"POT-Creation-Date: 2009-03-05 22:01+0000\n"
 "PO-Revision-Date: 2002-07-11 09:10+0200\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
@@ -676,7 +676,6 @@ msgid "Got uid1 = %08x\n"
 msgstr ""
 
 #: lib/sisfileheader.cpp:61
-#, c-format
 msgid "Got bad uid2.\n"
 msgstr ""
 
@@ -686,7 +685,6 @@ msgid "Got uid2 = %08x\n"
 msgstr ""
 
 #: lib/sisfileheader.cpp:69
-#, c-format
 msgid "Got bad uid3.\n"
 msgstr ""
 
@@ -695,92 +693,96 @@ msgstr ""
 msgid "Got uid3 = %08x\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:83
+#: lib/sisfileheader.cpp:76
+#, c-format
+msgid "Got uid4 = %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:84
 #, c-format
 msgid "Got first crc = %08x, wanted %08x\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:87
-#, c-format
+#: lib/sisfileheader.cpp:88
 msgid "Got bad crc.\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:93
+#: lib/sisfileheader.cpp:94
 #, c-format
 msgid "Got %d languages\n"
 msgstr "Hittade %d språk\n"
 
-#: lib/sisfileheader.cpp:96
+#: lib/sisfileheader.cpp:97
 #, c-format
 msgid "Got %d files\n"
 msgstr "Hittade %d filer\n"
 
-#: lib/sisfileheader.cpp:99
+#: lib/sisfileheader.cpp:100
 #, c-format
 msgid "Got %d reqs\n"
 msgstr "Hittade %d krav\n"
 
-#: lib/sisfileheader.cpp:102
+#: lib/sisfileheader.cpp:103
 #, c-format
 msgid "Selected language is %d\n"
 msgstr "Valt språk är %d\n"
 
-#: lib/sisfileheader.cpp:105
+#: lib/sisfileheader.cpp:106
 #, c-format
 msgid "Installed files: %d / %d\n"
 msgstr "Installerade filer: %d / %d\n"
 
-#: lib/sisfileheader.cpp:108
+#: lib/sisfileheader.cpp:109
 #, c-format
 msgid "Installed on drive %c\n"
 msgstr "Installerad på enhet %c\n"
 
-#: lib/sisfileheader.cpp:111
+#: lib/sisfileheader.cpp:112
 #, c-format
 msgid "Got installer version: %08x\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:114
+#: lib/sisfileheader.cpp:115
 #, c-format
 msgid "Got options: %04x\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:117
+#: lib/sisfileheader.cpp:118
 #, c-format
 msgid "Got type: %04x\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:120
+#: lib/sisfileheader.cpp:121
 #, c-format
 msgid "Got major: %d\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:123
+#: lib/sisfileheader.cpp:124
 #, c-format
 msgid "Got minor: %d\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:126
+#: lib/sisfileheader.cpp:127
 #, c-format
 msgid "Got variant: %d\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:129
+#: lib/sisfileheader.cpp:130
 #, c-format
 msgid "Languages begin at %d\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:134
+#: lib/sisfileheader.cpp:135
 #, c-format
 msgid "Files begin at %d\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:139
+#: lib/sisfileheader.cpp:140
 #, c-format
 msgid "Requisites begin at %d\n"
 msgstr ""
 
-#: lib/sisfileheader.cpp:145
+#: lib/sisfileheader.cpp:146
 #, c-format
 msgid "Components begin at %d\n"
 msgstr ""
@@ -1345,13 +1347,12 @@ msgstr "ingen sådan process"
 msgid "syntax error. Try \"help\""
 msgstr "syntax error. Prova \"help\""
 
-#: sisinstall/sismain.cpp:23
+#: sisinstall/sismain.cpp:22
 #, c-format
 msgid "Error %d on line %d: %s\n"
 msgstr "Fel %d på rad %d: %s\n"
 
-#: sisinstall/sismain.cpp:39
-#, c-format
+#: sisinstall/sismain.cpp:38
 msgid ""
 "Usage: sisinstall [OPTIONS]... SISFILE\n"
 "\n"
@@ -1371,37 +1372,33 @@ msgstr ""
 " -v, --verbose=NIVÅ      Sätt utskriftsnivån, 0 om inget annat anges.\n"
 " -n, --dry-run           Läs bara igenom filen.\n"
 
-#: sisinstall/sismain.cpp:81
-#, c-format
+#: sisinstall/sismain.cpp:80
 msgid "sisinstall version 0.1\n"
 msgstr ""
 
-#: sisinstall/sismain.cpp:88
+#: sisinstall/sismain.cpp:87
 #, c-format
 msgid "Installing sis file %s%s.\n"
 msgstr "Installerar sisfil %s%s.\n"
 
-#: sisinstall/sismain.cpp:89
+#: sisinstall/sismain.cpp:88
 msgid ", not really"
 msgstr ", inte egentligen"
 
-#: sisinstall/sismain.cpp:93
-#, c-format
+#: sisinstall/sismain.cpp:92
 msgid "Missing SIS filename\n"
 msgstr "Saknar SIS-filnamn\n"
 
-#: sisinstall/sismain.cpp:101
+#: sisinstall/sismain.cpp:100
 #, c-format
 msgid "File is %d bytes long\n"
 msgstr "Filen är %d bytes lång\n"
 
-#: sisinstall/sismain.cpp:116
-#, c-format
+#: sisinstall/sismain.cpp:115
 msgid "Couldn't connect with the Psion\n"
 msgstr "Kunde inte få kontakt med Psionen\n"
 
-#: sisinstall/sismain.cpp:134
-#, c-format
+#: sisinstall/sismain.cpp:129
 msgid "Could not parse the sis file.\n"
 msgstr "Kunde inte parsa sisfilen.\n"
 
