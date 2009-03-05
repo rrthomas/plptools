@@ -24,6 +24,7 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
+#include <cstdio>
 #include <iostream>
 
 #include <syslog.h>
@@ -59,7 +60,7 @@ public:
     * Constructs a new instance.
     *
     * @param loglevel The log level for this instance.
-    * 	see syslog(3) for symbolic names to use.
+    *   see syslog(3) for symbolic names to use.
     * @param fd An optional file descriptor to use
     *   if switched off.
     */
@@ -74,7 +75,7 @@ public:
 
     /**
     * Modifies the loglevel of this instance.
-    * 
+    *
     * @param newlevel The new loglevel.
     */
     void setLevel(int newlevel) { _level = newlevel; }
@@ -88,7 +89,7 @@ public:
 
     /**
     * Retrieves the current loglevel.
-    * 
+    *
     * @returns The current loglevel.
     */
     int level() { return _level; }
