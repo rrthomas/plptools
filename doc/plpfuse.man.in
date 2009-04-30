@@ -14,8 +14,9 @@ plpfuse \- Daemon to mount an EPOC device as a file system
 .B [-V]
 .B [-d]
 .B [-h]
-.BI "[-p [" host :] port ]
-.BI [ long-options ]
+.BI "[-p [" HOST :] PORT ]
+.BI [ LONG-OPTIONS ]
+.BI MOUNTPOINT
 
 .SH DESCRIPTION
 plpfuse is a file system which provides file system access to your EPOC device.
