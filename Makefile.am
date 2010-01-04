@@ -20,8 +20,7 @@ dist-local:
 
 NOTES = release-notes
 
-# FIXME: Get freshmeat woger method working again
 release: distcheck
 	cvs diff && \
 	cvs tag rel-`echo $(VERSION) | sed -e 's/\./-/g'` && \
-	woger sourceforge $(PACKAGE) "$(PACKAGE_NAME)" $(VERSION) "EPOC PDA comms suite" release-notes-$(VERSION)
+	woger sourceforge,freshmeat $(PACKAGE) "$(PACKAGE_NAME)" $(VERSION) "EPOC PDA comms suite" release-notes-$(VERSION)
