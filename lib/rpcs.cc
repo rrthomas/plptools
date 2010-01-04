@@ -114,10 +114,10 @@ reset(void)
     status = rfsv::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
-	if (skt->getBufferStore(a) == 1) {
-	    if (!strcmp(a.getString(0), "Ok"))
-		status = rfsv::E_PSI_GEN_NONE;
-	}
+        if (skt->getBufferStore(a) == 1) {
+            if (!strcmp(a.getString(0), "Ok"))
+                status = rfsv::E_PSI_GEN_NONE;
+        }
     }
 }
 
@@ -140,9 +140,9 @@ bool rpcs::
 sendCommand(enum commands cc, bufferStore & data)
 {
     if (status == rfsv::E_PSI_FILE_DISC) {
-	reconnect();
-	if (status == rfsv::E_PSI_FILE_DISC)
-	    return false;
+        reconnect();
+        if (status == rfsv::E_PSI_FILE_DISC)
+            return false;
     }
     bool result;
     bufferStore a;
@@ -150,10 +150,10 @@ sendCommand(enum commands cc, bufferStore & data)
     a.addBuff(data);
     result = skt->sendBufferStore(a);
     if (!result) {
-	reconnect();
-	result = skt->sendBufferStore(a);
-	if (!result)
-	    status = rfsv::E_PSI_FILE_DISC;
+        reconnect();
+        result = skt->sendBufferStore(a);
+        if (!result)
+            status = rfsv::E_PSI_FILE_DISC;
     }
     return result;
 }
@@ -163,20 +163,20 @@ getResponse(bufferStore & data, bool statusIsFirstByte)
 {
     Enum<rfsv::errs> ret;
     if (skt->getBufferStore(data) == 1) {
-	if (statusIsFirstByte) {
-	    ret = (enum rfsv::errs)((char)data.getByte(0));
-	    data.discardFirstBytes(1);
-	} else {
-	    int l = data.getLen();
-	    if (l > 0) {
-		ret = (enum rfsv::errs)((char)data.getByte(data.getLen() - 1));
-		data.init((const unsigned char *)data.getString(), l - 1);
-	    } else
-		ret = rfsv::E_PSI_GEN_FAIL;
-	}
-	return ret;
+        if (statusIsFirstByte) {
+            ret = (enum rfsv::errs)((char)data.getByte(0));
+            data.discardFirstBytes(1);
+        } else {
+            int l = data.getLen();
+            if (l > 0) {
+                ret = (enum rfsv::errs)((char)data.getByte(data.getLen() - 1));
+                data.init((const unsigned char *)data.getString(), l - 1);
+            } else
+                ret = rfsv::E_PSI_GEN_FAIL;
+        }
+        return ret;
     } else
-	status = rfsv::E_PSI_FILE_DISC;
+        status = rfsv::E_PSI_FILE_DISC;
     return status;
 }
 
@@ -190,11 +190,11 @@ getNCPversion(int &major, int &minor)
     bufferStore a;
 
     if (!sendCommand(QUERY_NCP, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
-	return res;
+        return res;
     if (a.getLen() != 2)
-	return rfsv::E_PSI_GEN_FAIL;
+        return rfsv::E_PSI_GEN_FAIL;
     major = a.getByte(0);
     minor = a.getByte(1);
     return res;
@@ -208,7 +208,7 @@ execProgram(const char *program, const char *args)
     a.addStringT(program);
     int l = strlen(program);
     for (int i = 127; i > l; i--)
-	a.addByte(0);
+        a.addByte(0);
 
     /**
     * This is a hack for the jotter app on mx5 pro. (and probably others)
@@ -222,7 +222,7 @@ execProgram(const char *program, const char *args)
     a.addStringT(args);
 
     if (!sendCommand(EXEC_PROG, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
 
@@ -233,7 +233,7 @@ stopProgram(const char *program)
 
     a.addStringT(program);
     if (!sendCommand(STOP_PROG, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
 
@@ -244,7 +244,7 @@ queryProgram(const char *program)
 
     a.addStringT(program);
     if (!sendCommand(QUERY_PROG, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
 
@@ -260,67 +260,67 @@ queryPrograms(processList &ret)
     // First, check how many drives we need to query
     a.addStringT("M:"); // Drive M only exists on a SIBO
     if (!sendCommand(rpcs::GET_UNIQUEID, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if (getResponse(a, false) == rfsv::E_PSI_GEN_NONE)
-	// A SIBO; Must query all possible drives
-	drives = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        // A SIBO; Must query all possible drives
+        drives = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     else
-	// A Series 5; Query of C is sufficient
-	drives = "C";
+        // A Series 5; Query of C is sufficient
+        drives = "C";
 
     dptr = drives;
     ret.clear();
 
     if ((mtCacheS5mx & 4) == 0) {
-	Enum<machs> tmp;
-	if (getMachineType(tmp) != rfsv::E_PSI_GEN_NONE)
-	    return rfsv::E_PSI_GEN_FAIL;
+        Enum<machs> tmp;
+        if (getMachineType(tmp) != rfsv::E_PSI_GEN_NONE)
+            return rfsv::E_PSI_GEN_FAIL;
 
     }
     if ((mtCacheS5mx & 9) == 1) {
-	machineInfo tmp;
-	if (getMachineInfo(tmp) == rfsv::E_PSI_FILE_DISC)
-	    return rfsv::E_PSI_FILE_DISC;
+        machineInfo tmp;
+        if (getMachineInfo(tmp) == rfsv::E_PSI_FILE_DISC)
+            return rfsv::E_PSI_FILE_DISC;
     }
     bool s5mx = (mtCacheS5mx == 15);
     while (*dptr) {
-	a.init();
-	a.addByte(*dptr);
-	if (!sendCommand(rpcs::QUERY_DRIVE, a))
-	    return rfsv::E_PSI_FILE_DISC;
-	if (getResponse(a, false) == rfsv::E_PSI_GEN_NONE) {
-	    anySuccess = true;
-	    int l = a.getLen();
-	    while (l > 0) {
-		const char *s;
-		char *p;
-		int pid;
-		int sl;
+        a.init();
+        a.addByte(*dptr);
+        if (!sendCommand(rpcs::QUERY_DRIVE, a))
+            return rfsv::E_PSI_FILE_DISC;
+        if (getResponse(a, false) == rfsv::E_PSI_GEN_NONE) {
+            anySuccess = true;
+            int l = a.getLen();
+            while (l > 0) {
+                const char *s;
+                char *p;
+                int pid;
+                int sl;
 
-		s = a.getString(0);
-		sl = strlen(s) + 1;
-		l -= sl;
-		a.discardFirstBytes(sl);
-		if ((p = strstr(s, ".$"))) {
-		    *p = '\0'; p += 2;
-		    sscanf(p, "%d", &pid);
-		} else
-		    pid = 0;
-		PsiProcess proc(pid, s, a.getString(0), s5mx);
-		ret.push_back(proc);
-		sl = strlen(a.getString(0)) + 1;
-		l -= sl;
-		a.discardFirstBytes(sl);
-	    }
-	}
-	dptr++;
+                s = a.getString(0);
+                sl = strlen(s) + 1;
+                l -= sl;
+                a.discardFirstBytes(sl);
+                if ((p = strstr((char *)s, ".$"))) {
+                    *p = '\0'; p += 2;
+                    sscanf(p, "%d", &pid);
+                } else
+                    pid = 0;
+                PsiProcess proc(pid, s, a.getString(0), s5mx);
+                ret.push_back(proc);
+                sl = strlen(a.getString(0)) + 1;
+                l -= sl;
+                a.discardFirstBytes(sl);
+            }
+        }
+        dptr++;
     }
     if (anySuccess && !ret.empty())
-	for (processList::iterator i = ret.begin(); i != ret.end(); i++) {
-	    string cmdline;
-	    if (getCmdLine(i->getProcId(), cmdline) == rfsv::E_PSI_GEN_NONE)
-		i->setArgs(cmdline + " " + i->getArgs());
-	}
+        for (processList::iterator i = ret.begin(); i != ret.end(); i++) {
+            string cmdline;
+            if (getCmdLine(i->getProcId(), cmdline) == rfsv::E_PSI_GEN_NONE)
+                i->setArgs(cmdline + " " + i->getArgs());
+        }
     return anySuccess ? rfsv::E_PSI_GEN_NONE : rfsv::E_PSI_GEN_FAIL;
 }
 
@@ -334,11 +334,11 @@ formatOpen(const char drive, int &handle, int &count)
     a.addByte(':');
     a.addByte(0);
     if (!sendCommand(FORMAT_OPEN, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
-	return res;
+        return res;
     if (a.getLen() != 4)
-	return rfsv::E_PSI_GEN_FAIL;
+        return rfsv::E_PSI_GEN_FAIL;
     handle = a.getWord(0);
     count = a.getWord(2);
     return res;
@@ -351,7 +351,7 @@ formatRead(int handle)
 
     a.addWord(handle);
     if (!sendCommand(FORMAT_READ, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
 
@@ -363,11 +363,11 @@ getUniqueID(const char *device, long &id)
 
     a.addStringT(device);
     if (!sendCommand(GET_UNIQUEID, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
-	return res;
+        return res;
     if (a.getLen() != 4)
-	return rfsv::E_PSI_GEN_FAIL;
+        return rfsv::E_PSI_GEN_FAIL;
     id = a.getDWord(0);
     return res;
 }
@@ -379,24 +379,24 @@ getOwnerInfo(bufferArray &owner)
     bufferStore a;
 
     if (!sendCommand(GET_OWNERINFO, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if ((res = (enum rfsv::errs)getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
-	return res;
+        return res;
     a.addByte(0);
     string s = a.getString(0);
     owner.clear();
     int p = 0;
     int l;
     while ((l = s.find('\006', p)) != s.npos) {
-	bufferStore b;
-	b.addStringT(s.substr(p, l - p).c_str());
-	owner += b;
-	p = l + 1;
+        bufferStore b;
+        b.addStringT(s.substr(p, l - p).c_str());
+        owner += b;
+        p = l + 1;
     }
     if (s.substr(p).length()) {
-	bufferStore b;
-	b.addStringT(s.substr(p).c_str());
-	owner += b;
+        bufferStore b;
+        b.addStringT(s.substr(p).c_str());
+        owner += b;
     }
     return res;
 }
@@ -408,16 +408,16 @@ getMachineType(Enum<machs> &type)
     bufferStore a;
 
     if (!sendCommand(GET_MACHINETYPE, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
-	return res;
+        return res;
     if (a.getLen() != 2)
-	return rfsv::E_PSI_GEN_FAIL;
+        return rfsv::E_PSI_GEN_FAIL;
     type = (enum machs)a.getWord(0);
     mtCacheS5mx |= 4;
     if (res == rfsv::E_PSI_GEN_NONE) {
-	if (type == rpcs::PSI_MACH_S5)
-	    mtCacheS5mx |= 1;
+        if (type == rpcs::PSI_MACH_S5)
+            mtCacheS5mx |= 1;
     }
     return res;
 }
@@ -431,12 +431,12 @@ fuser(const char *name, char *buf, int maxlen)
 
     a.addStringT(name);
     if (!sendCommand(FUSER, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
-	return res;
+        return res;
     strncpy(buf, a.getString(0), maxlen - 1);
     while ((p = strchr(buf, 6)))
-	*p = '\0';
+        *p = '\0';
     return res;
 }
 
@@ -445,7 +445,7 @@ quitServer(void)
 {
     bufferStore a;
     if (!sendCommand(QUIT_SERVER, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
 
