@@ -4,67 +4,59 @@ Installation instructions for plptools
 Prerequisites
 -------------
 
-To build plpfuse, FUSE and libattr are required:
+To build plpfuse, the following packages are required:
 
-  http://fuse.sourceforge.net/
-  ftp://oss.sgi.com/projects/xfs/download/
+  FUSE: http://fuse.sourceforge.net/
+  libattr: ftp://oss.sgi.com/projects/xfs/download/
 
-Development packages come with most Linux distributions.
-
-If FUSE and libattr are not installed, plpfuse will not be built, but
+These packages come with most Linux distributions. To build plptools,
+the development packages (typically ending in -dev or -devel) must be
+installed. If they are not installed, plpfuse will not be built, but
 the rest of plptools will still work.
 
 
 Installation
 ------------
 
-plptools uses GNU autotools, so the usual sequence of commands work:
+plptools uses GNU autotools, so the usual sequence of commands works:
 
 ./configure
 make
 make install
 
-In addition to the usual options, configure understands the following
-stuff for customization to your environment:
+In addition to the usual options, configure understands the following:
 
   --enable-debug
 
-       Adds -g to CFLAGS, so you will get debugging-versions of the
-       programs and libplp
+       builds debugging versions of the programs and libplp
 
   --with-serial=/dev/sometty
 
-       overrides the default serial device for ncpd. Without this
-       option, configure tries to automagically find a serial device.
+       sets the default serial device for ncpd. Without this option,
+       configure tries automagically to find a serial device.
 
   --with-speed=baudrate
 
-       overrides the default serial speed of 115200 baud.
+       sets the default serial speed (normally 115200 baud).
 
   --with-port=portnum
 
-       overrides the default port number, where ncpd listens and
-       plpftp and plpfuse connect to.
+       sets the default port on which ncpd listens and to which plpftp
+       and plpfuse connect (default 7501).
 
   --with-drive=drivespec
 
-       overrides the default drive for plpftp. The default "AUTO"
+       sets the default drive for plpftp. The default "AUTO"
        triggers a drive-scan on the psion and sets the drive to the
-       first drive found. If you don't want that, specify C: for
+       first drive found. If you don't want that, specify "C:" for
        example.
 
   --with-basedir=dirspec
 
-       overrides the default directory for plpftp. The default is \\
-       which means the root-dir. Note: directory-separators have to be
-       specified as C-like backslashes and if you consider shell's
-       escape-mechanism, these in turn have to be escaped with
-       backslashes ;-)
-
-By default, the install-prefix is /usr/local, so you probably should
-add /usr/local/lib to your /etc/ld.so.conf and then run ldconfig after
-installation. Another option is to run configure with the option
---prefix=/usr
+       overrides the default directory for plpftp. The default is \
+       which means the root directory. Note: since backslashes need to
+       be doubled once for C escaping and once for shell escaping,
+       this value is actually supplied as "\\\\".
 
 
 Information for developers
