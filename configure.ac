@@ -108,27 +108,7 @@ LIBHISTORY=${ac_cv_libhistory}
 AC_SUBST(LIBHISTORY)
 
 # FUSE for plpfuse
-enable_fuse=yes
-AC_CHECK_HEADER(fuse.h,, enable_fuse=no)
-AC_CHECK_LIB(fuse,fuse_new, [true], enable_fuse=no)
-
-# check for a supported version of FUSE
-AC_MSG_CHECKING([for supported FUSE API version])
-AC_RUN_IFELSE([
-    AC_LANG_PROGRAM([[
-    #define FUSE_USE_VERSION 26
-    #include <fuse.h>]],
-[[
-    if (FUSE_MAJOR_VERSION == 2 && FUSE_MINOR_VERSION >= 6)
-        return 0;
-    else
-        return -1;
-]])],
-    [AC_MSG_RESULT([yes])],
-    [AC_MSG_RESULT([no])
-    enable_fuse=no
-    ]
-)
+PKG_CHECK_MODULES([FUSE], [fuse >= 2.6], [enable_fuse=yes], [enable_fuse=no])
 
 # check for libattr for plpfuse
 AC_CHECK_HEADER(attr/attributes.h,, enable_fuse=no)
