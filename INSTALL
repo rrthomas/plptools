@@ -33,7 +33,7 @@ In addition to the usual options, configure understands the following:
   --with-serial=/dev/sometty
 
        sets the default serial device for ncpd. Without this option,
-       configure tries automagically to find a serial device.
+       ncpd tries automagically to find a serial device.
 
   --with-speed=baudrate
 
