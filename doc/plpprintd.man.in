@@ -63,10 +63,10 @@ in /etc/services. If it is not found there, a builtin value of @DPORT@ is used.
 
 .SH FILES
 .TP
-@PKGDATA@/prolog.ps
+@pkgdatadir@/prolog.ps
 contains the Postscript(\*R) dictionary, needed for printing the jobs.
 .TP
-@PKGDATA@/fontmap
+@pkgdatadir@/fontmap
 specifies the font mapping to be used. This file is used to convert the
 Psion's font names into valid Postscript(\*R) font names. Its format is
 described at the beginning of it. If a Psion font name is received which

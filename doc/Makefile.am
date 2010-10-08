@@ -8,13 +8,19 @@ if BUILD_PLPFUSE
 man_MANS += plpfuse.8
 endif
 
-%.1: %.man
-	MANDATE=`grep CHECKIN $< | $(AWK) '{print $$4}'` ; \
-	$(SED) -e "s%@MANDATE@%$$MANDATE%g" $< > $@
+edit = sed \
+	-e 's%@MANDATE@%'`grep CHECKIN $< | $(AWK) '{print $$4}'`'%g' \
+	-e 's|@pkgdatadir[@]|$(pkgdatadir)|g'
 
-%.8: %.man
-	MANDATE=`grep CHECKIN $< | $(AWK) '{print $$4}'` ; \
-	$(SED) -e "s%@MANDATE@%$$MANDATE%g" $< > $@
+%.1: %.man Makefile
+	rm -f $@ $@.tmp
+	$(edit) '$(srcdir)/$<' >$@.tmp
+	mv $@.tmp $@
+
+%.8: %.man Makefile
+	rm -f $@ $@.tmp
+	$(edit) '$(srcdir)/$<' >$@.tmp
+	mv $@.tmp $@
 
 distclean-local:
 	rm -f *.1 *.8
