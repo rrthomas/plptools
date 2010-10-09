@@ -14,12 +14,12 @@ edit = sed \
 
 %.1: %.man Makefile
 	rm -f $@ $@.tmp
-	$(edit) '$(srcdir)/$<' >$@.tmp
+	$(edit) $< >$@.tmp
 	mv $@.tmp $@
 
 %.8: %.man Makefile
 	rm -f $@ $@.tmp
-	$(edit) '$(srcdir)/$<' >$@.tmp
+	$(edit) $< >$@.tmp
 	mv $@.tmp $@
 
 distclean-local:
