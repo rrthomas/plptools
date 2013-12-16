@@ -26,4 +26,4 @@ NOTES = release-notes
 release: distcheck
 	git diff && \
 	git tag rel-`echo $(VERSION) | sed -e 's/\./-/g'` && git push --tag \
-	woger sourceforge,freecode $(PACKAGE) "$(PACKAGE_NAME)" $(VERSION) "EPOC PDA comms suite" release-notes-$(VERSION)
+	woger sourceforge,freecode package=$(PACKAGE) package_name="$(PACKAGE_NAME)" version=$(VERSION) description="EPOC PDA comms suite" notes=release-notes-$(VERSION)
