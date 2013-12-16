@@ -440,11 +440,13 @@ int main(int argc, char**argv) {
             break;
         case 'p':
             parse_destination(optarg, &host, &sockNum);
-            for (i = oldoptind; i < argc - (optind - oldoptind); i++)
-              argv[i] = argv[i + (optind - oldoptind)];
             argc -= optind - oldoptind;
+            for (i = oldoptind; i < argc; i++)
+              argv[i] = argv[i + (optind - oldoptind)];
             break;
 	}
+        if (optind >= argc)
+            break;
     }
 
     skt = new ppsocket();
