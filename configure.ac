@@ -6,6 +6,7 @@ dnl Basic settings
 AC_GNU_SOURCE
 AM_CONFIG_HEADER(config.h)
 AM_PROG_LIBTOOL
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl Set library version
 maj=$(echo ${VERSION} | cut -d. -f1)
@@ -15,6 +16,7 @@ AC_SUBST(LIBVERSION)
 
 dnl checks for programs
 AC_PROG_CXX
+AC_PROG_CC_C99
 AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
 AC_PROG_AWK
@@ -47,6 +49,8 @@ fi
 dnl NLS support
 ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
+AM_GNU_GETTEXT_VERSION(0.18.3)
+
 dnl Additional glibc-intl checks
 if test "${USE_NLS}" = "yes" ; then
         if test "${USE_INCLUDED_LIBINTL}" = "yes" ; then

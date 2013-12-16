@@ -1,20 +1,18 @@
 /* Description of GNU message catalog format: general file layout.
-   Copyright (C) 1995, 1997, 2000-2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1995, 1997, 2000-2002, 2004, 2006 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Library General Public License as published
-   by the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-   USA.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #ifndef _GETTEXT_H
 #define _GETTEXT_H 1
@@ -124,6 +122,15 @@ struct sysdep_segment
   nls_uint32 offset;
 };
 
+/* Pair of a static and a system dependent segment, in struct sysdep_string.  */
+struct segment_pair
+{
+  /* Size of static segment.  */
+  nls_uint32 segsize;
+  /* Reference to system dependent string segment, or ~0 at the end.  */
+  nls_uint32 sysdepref;
+};
+
 /* Descriptor for system dependent string.  */
 struct sysdep_string
 {
@@ -131,13 +138,7 @@ struct sysdep_string
   nls_uint32 offset;
   /* Alternating sequence of static and system dependent segments.
      The last segment is a static segment, including the trailing NUL.  */
-  struct segment_pair
-  {
-    /* Size of static segment.  */
-    nls_uint32 segsize;
-    /* Reference to system dependent string segment, or ~0 at the end.  */
-    nls_uint32 sysdepref;
-  } segments[1];
+  struct segment_pair segments[1];
 };
 
 /* Marker for the end of the segments[] array.  This has the value 0xFFFFFFFF,

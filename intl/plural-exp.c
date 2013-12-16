@@ -1,21 +1,19 @@
 /* Expression parsing for plural form selection.
-   Copyright (C) 2000-2001, 2003, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2000-2001, 2003, 2005-2007 Free Software Foundation, Inc.
    Written by Ulrich Drepper <drepper@cygnus.com>, 2000.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Library General Public License as published
-   by the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-   USA.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -27,7 +25,7 @@
 
 #include "plural-exp.h"
 
-#if (defined __GNUC__ && !(__APPLE_CC__ > 1)) \
+#if (defined __GNUC__ && !(__APPLE_CC__ > 1) && !defined __cplusplus) \
     || (defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L)
 
 /* These structs are the constant expression for the germanic plural
@@ -96,7 +94,8 @@ init_germanic_plural ()
 
 void
 internal_function
-EXTRACT_PLURAL_EXPRESSION (const char *nullentry, struct expression **pluralp,
+EXTRACT_PLURAL_EXPRESSION (const char *nullentry,
+			   const struct expression **pluralp,
 			   unsigned long int *npluralsp)
 {
   if (nullentry != NULL)

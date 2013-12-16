@@ -1,8 +1,11 @@
 *~
+*.o
 Makefile.in
 Makefile
 .deps
 .libs
+/m4
+/intl
 /aclocal.m4
 /autom4te.cache
 /configure

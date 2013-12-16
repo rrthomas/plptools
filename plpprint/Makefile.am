@@ -1,7 +1,5 @@
-INCLUDES=-I$(top_srcdir)/lib
-
 sbin_PROGRAMS = plpprintd
-plpprintd_CPPFLAGS = -DPKGDATADIR="\"$(pkgdatadir)\""
+plpprintd_CPPFLAGS = -DPKGDATADIR="\"$(pkgdatadir)\"" -I$(top_srcdir)/lib
 plpprintd_LDADD = $(LIB_PLP) $(INTLLIBS)
 plpprintd_SOURCES = plpprintd.cc
 

@@ -1,21 +1,19 @@
 /* Handle list of needed message catalogs
-   Copyright (C) 1995-1999, 2000-2001, 2003-2006 Free Software Foundation, Inc.
+   Copyright (C) 1995-1999, 2000-2001, 2003-2007 Free Software Foundation, Inc.
    Written by Ulrich Drepper <drepper@gnu.org>, 1995.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Library General Public License as published
-   by the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-   USA.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -144,6 +142,9 @@ _nl_find_domain (const char *dirname, char *locale,
      look for the language.  Termination symbols are `_', '.', and `@'.  */
   mask = _nl_explode_name (locale, &language, &modifier, &territory,
 			   &codeset, &normalized_codeset);
+  if (mask == -1)
+    /* This means we are out of core.  */
+    return NULL;
 
   /* We need to protect modifying the _NL_LOADED_DOMAINS data.  */
   gl_rwlock_wrlock (lock);
@@ -159,7 +160,7 @@ _nl_find_domain (const char *dirname, char *locale,
 
   if (retval == NULL)
     /* This means we are out of core.  */
-    return NULL;
+    goto out;
 
   if (retval->decided <= 0)
     _nl_load_domain (retval, domainbinding);
@@ -179,6 +180,7 @@ _nl_find_domain (const char *dirname, char *locale,
   if (alias_value != NULL)
     free (locale);
 
+out:
   /* The space for normalized_codeset is dynamically allocated.  Free it.  */
   if (mask & XPG_NORM_CODESET)
     free ((void *) normalized_codeset);

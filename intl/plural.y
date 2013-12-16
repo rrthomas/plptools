@@ -1,22 +1,20 @@
 %{
 /* Expression parsing for plural form selection.
-   Copyright (C) 2000-2001, 2003, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2000-2001, 2003, 2005-2006 Free Software Foundation, Inc.
    Written by Ulrich Drepper <drepper@cygnus.com>, 2000.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Library General Public License as published
-   by the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-   USA.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* For bison < 2.0, the bison generated parser uses alloca.  AIX 3 forces us
    to put this declaration at the beginning of the file.  The declaration in
@@ -50,7 +48,7 @@
 
 %union {
   unsigned long int num;
-  enum operator op;
+  enum expression_operator op;
   struct expression *exp;
 }
 
@@ -62,7 +60,8 @@ static void yyerror (const char *str);
 /* Allocation of expressions.  */
 
 static struct expression *
-new_exp (int nargs, enum operator op, struct expression * const *args)
+new_exp (int nargs, enum expression_operator op,
+	 struct expression * const *args)
 {
   int i;
   struct expression *newp;
@@ -91,13 +90,13 @@ new_exp (int nargs, enum operator op, struct expression * const *args)
 }
 
 static inline struct expression *
-new_exp_0 (enum operator op)
+new_exp_0 (enum expression_operator op)
 {
   return new_exp (0, op, NULL);
 }
 
 static inline struct expression *
-new_exp_1 (enum operator op, struct expression *right)
+new_exp_1 (enum expression_operator op, struct expression *right)
 {
   struct expression *args[1];
 
@@ -106,7 +105,8 @@ new_exp_1 (enum operator op, struct expression *right)
 }
 
 static struct expression *
-new_exp_2 (enum operator op, struct expression *left, struct expression *right)
+new_exp_2 (enum expression_operator op, struct expression *left,
+	   struct expression *right)
 {
   struct expression *args[2];
 
@@ -116,7 +116,7 @@ new_exp_2 (enum operator op, struct expression *left, struct expression *right)
 }
 
 static inline struct expression *
-new_exp_3 (enum operator op, struct expression *bexp,
+new_exp_3 (enum expression_operator op, struct expression *bexp,
 	   struct expression *tbranch, struct expression *fbranch)
 {
   struct expression *args[3];

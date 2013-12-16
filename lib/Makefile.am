@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/intl
+AM_CPPFLAGS = -I$(top_srcdir)/intl
 AM_CFLAGS = $(THREADED_CFLAGS)
 AM_CXXFLAGS = $(THREADED_CXXFLAGS)
 
