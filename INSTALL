@@ -62,7 +62,7 @@ In addition to the usual options, configure understands the following:
 Information for developers
 --------------------------
 
-To build from CVS, you will first need to run
+To build from git, you will first need to run
 
  autoreconf -i
 
