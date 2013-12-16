@@ -12,6 +12,9 @@ EXTRA_DIST = AUTHORS COPYING INSTALL NEWS README TODO HISTORY ABOUT-NLS \
 
 DISTCLEANFILES = etc/plptools
 
+uninstall-local:
+	rm -f $(DESTDIR)$(initdir)/plptools
+
 install-exec-local:
 	install -D $(top_builddir)/etc/plptools $(DESTDIR)$(initdir)/plptools
 
