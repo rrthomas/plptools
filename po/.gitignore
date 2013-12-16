@@ -1,0 +1,5 @@
+/POTFILES
+/*.gmo
+/*.pot
+/stamp-po
+/remove-potcdate.sed
