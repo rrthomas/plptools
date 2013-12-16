@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
-"POT-Creation-Date: 2013-12-16 02:12+0000\n"
+"POT-Creation-Date: 2013-12-16 12:45+0000\n"
 "PO-Revision-Date: 2002-07-16 21:39 CET\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -1558,7 +1558,7 @@ msgstr ""
 msgid "plpfuse version "
 msgstr "ncpd Version "
 
-#: plpfuse/main.cc:452 plpfuse/main.cc:457
+#: plpfuse/main.cc:454 plpfuse/main.cc:459
 msgid "plpfuse: could not connect to ncpd"
 msgstr "plpfuse: Konnte ncpd nicht kontaktieren."
 
