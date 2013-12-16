@@ -24,6 +24,6 @@ dist-local:
 NOTES = release-notes
 
 release: distcheck
-	cvs diff && \
-	cvs tag rel-`echo $(VERSION) | sed -e 's/\./-/g'` && \
-	woger sourceforge,freshmeat $(PACKAGE) "$(PACKAGE_NAME)" $(VERSION) "EPOC PDA comms suite" release-notes-$(VERSION)
+	git diff && \
+	git tag rel-`echo $(VERSION) | sed -e 's/\./-/g'` && git push --tag \
+	woger sourceforge,freecode $(PACKAGE) "$(PACKAGE_NAME)" $(VERSION) "EPOC PDA comms suite" release-notes-$(VERSION)
