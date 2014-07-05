@@ -55,7 +55,8 @@ fopen(u_int32_t attr, const char *name, u_int32_t &handle)
     bufferStore a;
     string realName	= convertSlash(name);
 
-    a.addWord(attr & 0xFFFF);
+    // Allow random access, rather than forcing the caller to ask for it
+    a.addWord((P_FRANDOM | attr) & 0xFFFF);
     a.addStringT(realName.c_str());
     if (!sendCommand(FOPEN, a))
 	return E_PSI_FILE_DISC;
