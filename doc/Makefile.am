@@ -1,5 +1,3 @@
-SUBDIRS = api
-
 EXTRA_DIST = ncpd.man.in plpfuse.man.in plpftp.man.in sisinstall.man.in \
 	plpprintd.man.in
 

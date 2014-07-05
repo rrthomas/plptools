@@ -18,11 +18,6 @@ uninstall-local:
 install-exec-local:
 	install -D $(top_builddir)/etc/plptools $(DESTDIR)$(initdir)/plptools
 
-dist-local:
-	kdoc -d doc/api -n libplp --strip-h-path lib/*.h
-
-NOTES = release-notes
-
 release: distcheck
 	git diff && \
 	git tag rel-`echo $(VERSION) | sed -e 's/\./-/g'` && git push --tag \
