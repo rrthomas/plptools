@@ -68,7 +68,6 @@ fopen(u_int32_t attr, const char *name, u_int32_t &handle)
     return res;
 }
 
-// internal
 Enum<rfsv::errs> rfsv16::
 mktemp(u_int32_t &handle, string &tmpname)
 {
