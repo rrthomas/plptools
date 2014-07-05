@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
 "POT-Creation-Date: 2013-12-16 12:45+0000\n"
-"PO-Revision-Date: 2002-07-16 21:39 CET\n"
+"PO-Revision-Date: 2014-07-06 00:20+0100\n"
 "Last-Translator: Fritz Elfert <felfert@to.com>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "Language: de\n"
@@ -1539,24 +1539,21 @@ msgid ""
 "                            Default for HOST is 127.0.0.1\n"
 "                            Default for PORT is "
 msgstr ""
-"Anwendung: plpnfsd [OPTIONEN]...\n"
+"Anwendung: plpfuse [OPTIONEN]...\n"
 "\n"
 "Unterstützte Optionen:\n"
 "\n"
-" -d, --mountpoint=DIR    Verwende DIR als Einhängepunkt.\n"
-" -u, --user=USER         Bestimme Eigner des eingehängten Verzeichnisses.\n"
-" -v, --verbose           Erhöhe Log-Ebene\n"
-" -D, --debug             Erhöhe Debug-Ebene\n"
-" -h, --help              Zeige diesen Text.\n"
-" -V, --version           Version ausgeben und beenden.\n"
-" -p, --port=[HOST:]PORT  Verbinde mit port PORT auf host HOST.\n"
-"                         Vorgabe für HOST ist 127.0.0.1\n"
-"                         Vorgabe für PORT ist "
+"    -d, --debug             Erhöhe Debug-Ebene\n"
+"    -h, --help              Zeige diesen Text.\n"
+"    -V, --version           Version ausgeben und beenden.\n"
+"    -p, --port=[HOST:]PORT  Verbinde mit port PORT auf host HOST.\n"
+"                            Vorgabe für HOST ist 127.0.0.1\n"
+"                            Vorgabe für PORT ist "
 
 #: plpfuse/main.cc:433
 #, fuzzy
 msgid "plpfuse version "
-msgstr "ncpd Version "
+msgstr "plpfuse Version "
 
 #: plpfuse/main.cc:454 plpfuse/main.cc:459
 msgid "plpfuse: could not connect to ncpd"
@@ -1565,262 +1562,3 @@ msgstr "plpfuse: Konnte ncpd nicht kontaktieren."
 #: plpprint/plpprintd.cc:1024
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: Konnte ncpd nicht kontaktieren."
-
-#~ msgid "Got an error, Press any key to exit."
-#~ msgstr "Ein Fehler ist aufgetreten, Beenden mit beliebiger Taste."
-
-#~ msgid "Installation complete. Press any key to exit."
-#~ msgstr "Installation beendet. Beenden mit beliebiger Taste."
-
-#~ msgid "Try `plpnfsd --help' for more information"
-#~ msgstr "Versuchen Sie `plpnfsd --help' für weitere Informationen."
-
-#~ msgid "Could not write processlist "
-#~ msgstr "Konnte Prozessliste nicht schreiben "
-
-#~ msgid "Could not get user's home directory from /etc/passwd"
-#~ msgstr "Konnte das persönliche Verzeichnis nicht ermitteln"
-
-#~ msgid "Could not get machine UID"
-#~ msgstr "Konnte Geräte-UID nicht ermitteln"
-
-#~ msgid "Could not read SIBO UID file"
-#~ msgstr "Konnte SIBO UID Datei nicht lesen"
-
-#~ msgid "Could not get Psion owner info"
-#~ msgstr "Konnte Geräte-Eigner nicht ermitteln"
-
-#~ msgid "Could not write SIBO UID file "
-#~ msgstr "Konnte SIBO UID Datei nicht schreiben "
-
-#~ msgid "Got signal "
-#~ msgstr "Empfang von Signal "
-
-#~ msgid "Abort? (y/N) "
-#~ msgstr "Abbruch? (j/N) "
-
-#~ msgid "Y"
-#~ msgstr "J"
-
-#~ msgid "Stopping programs ..."
-#~ msgstr "Stoppe Programme ..."
-
-#~ msgid "plpbackup: Could not get process list: "
-#~ msgstr "plpbackup: Konnte Prozessliste nicht lesen "
-
-#~ msgid "Restarting programs ..."
-#~ msgstr "Starte Programme ..."
-
-#~ msgid "Performing "
-#~ msgstr "Ausführen von "
-
-#~ msgid "restore"
-#~ msgstr "Rücksicherung"
-
-#~ msgid "full"
-#~ msgstr "kompletter"
-
-#~ msgid "incremental"
-#~ msgstr "inkrementeller"
-
-#~ msgid " backup"
-#~ msgstr " Sicherung"
-
-#~ msgid " of "
-#~ msgstr " von "
-
-#~ msgid "all drives"
-#~ msgstr "allen Laufverken"
-
-#~ msgid "Drive "
-#~ msgstr "Laufwerk "
-
-#~ msgid " and "
-#~ msgstr " und "
-
-#~ msgid " to "
-#~ msgstr " nach "
-
-#~ msgid " from "
-#~ msgstr " von "
-
-#~ msgid "It contains Backups of drive "
-#~ msgstr "Es enthält Sicherungen von Laufwerk "
-
-#~ msgid ""
-#~ "Select (I)ndividual files, (W)hole archive, (N)one from this archive? (I/"
-#~ "W/N) "
-#~ msgstr "Wähle (I)ndividuelle Dateien, (G)esamtes Archiv, (N)ichts? (I/G/N) "
-
-#~ msgid "IWA"
-#~ msgstr "IGN"
-
-#~ msgid "Could not run external editor"
-#~ msgstr "Konnte externen Editor nicht starten"
-
-#~ msgid ""
-#~ "Archive skipped, because it does not contain any files on selected drives"
-#~ msgstr ""
-#~ "Archiv übersprungen, da es keine Dateien von den gewählten Lauferken "
-#~ "enthält"
-
-#~ msgid "(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) "
-#~ msgstr "(Ü)berschreiben, (A)lle überschreiben, Über(s)pringen? (Ü/A/S) "
-
-#~ msgid "OAS"
-#~ msgstr "ÜAS"
-
-#~ msgid "Could not get backup index"
-#~ msgstr "Konnte Sicherungs-Index nicht einlesen"
-
-#~ msgid "' is a full backup"
-#~ msgstr " ist eine Komplett-Sicherung"
-
-#~ msgid "' is an incremental backup"
-#~ msgstr " ist eine inkrementelle Sicherung"
-
-#~ msgid "' is NOT a plpbackup"
-#~ msgstr " ist KEINE mit plpbackup erzeugte Sicherung"
-
-#~ msgid "Restore aborted by user"
-#~ msgstr "Rücksicherung durch Benutzer abgebrochen"
-
-#~ msgid "Restore "
-#~ msgstr "Rücksichern "
-
-#~ msgid "Could not create directory "
-#~ msgstr "Fehler beim Anlegen von Verzeichnis "
-
-#~ msgid "Could not create "
-#~ msgstr "Konnte nicht anlegen "
-
-#~ msgid "Could not get attributes of "
-#~ msgstr "Fehler beim Lesen der Dateiattribute von "
-
-#~ msgid "Could not set attributes of"
-#~ msgstr "Fehler beim Setzen der Dateiattribute von"
-
-#~ msgid "Could not set modification time of "
-#~ msgstr "Fehler beim Setzen der Änderungszeit von "
-
-#~ msgid "Skipping "
-#~ msgstr "Überspringe "
-
-#~ msgid "Error during restore of "
-#~ msgstr "Fehler beim Rücksichern von "
-
-# This are the characters for valid answers
-# of the next message.
-#~ msgid "STAR"
-#~ msgstr "SDAW"
-
-#~ msgid "(S)kip all, Skip (t)his, (A)bort, (R)etry: "
-#~ msgstr "Über(S)pringe alle, Überspringe (D)iese, (A)bbruch, (W)iederholen: "
-
-#~ msgid "Total time elapsed:     "
-#~ msgstr "Gesamtzeit:     "
-
-#~ msgid "Backup aborted by user"
-#~ msgstr "Sicherung wegen Fehler abgebrochen"
-
-#~ msgid "Scanning Drive "
-#~ msgstr "Durchsuche Laufwerk "
-
-#~ msgid "plpbackup: Couldn't get Drive list"
-#~ msgstr "plpbackup: Konnte Laufwerks-Liste nicht ermitteln"
-
-#~ msgid "Size of backup: "
-#~ msgstr "Umfang der Sicherung: "
-
-#~ msgid " files."
-#~ msgstr " Dateien."
-
-#~ msgid "Nothing to backup"
-#~ msgstr "Nichts zu sichern"
-
-#~ msgid "Backing up "
-#~ msgstr "Sichere "
-
-#~ msgid "Error during backup of "
-#~ msgstr "Fehler beim Sichern von "
-
-#~ msgid "Writing index ..."
-#~ msgstr "Schreibe Index ..."
-
-#~ msgid "plpbackup: Could not write index "
-#~ msgstr "plpbackup: Konnte Index nicht schreiben "
-
-#~ msgid "Resetting archive attributes ..."
-#~ msgstr "Archiv-Attribute zurücksetzen ..."
-
-#~ msgid "Backup aborted due to error"
-#~ msgstr "Sicherung wegen Fehler abgebrochen"
-
-#~ msgid "Time for scanning:      "
-#~ msgstr "Zeit für Durchsuchen:     "
-
-#~ msgid "Time for transfer:      "
-#~ msgstr "Zeit für Übertragung:     "
-
-#~ msgid "Average transfer speed: "
-#~ msgstr "Durchschnittliche Übertragungsgeschwindigkeit: "
-
-#, fuzzy
-#~ msgid ""
-#~ "Usage: plpbackup OPTIONS [<drive>:] [<drive>:] ...\n"
-#~ "\n"
-#~ "  Options:\n"
-#~ "    -h, --help             Print this message and exit.\n"
-#~ "    -V, --version          Print version and exit.\n"
-#~ "    -p, --port=[HOST:]PORT Connect to ncpd on HOST, PORT.\n"
-#~ "    -v, --verbose          Increase verbosity.\n"
-#~ "    -q, --quiet            Decrease verbosity.\n"
-#~ "    -f, --full             Do a full backup (incremental otherwise).\n"
-#~ "    -b, --backup[=DIR]     Backup to specified directory DIR.\n"
-#~ "    -r, --restore=DIR      Restore from specified directory DIR.\n"
-#~ "\n"
-#~ "  <drive> A drive character. If none given, scan all drives.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Benutzung: plpbackup OPTIONEN [<laufwerk>:] [<laufwerk>:] ...\n"
-#~ "\n"
-#~ "  Optionen:\n"
-#~ "    -h, --help         Anzeige dieses Textes und beenden.\n"
-#~ "    -V, --version      Anzeige der Version und beenden.\n"
-#~ "    -p, --port=<port>  Mit ncpd über angegebenen Port verbinden.\n"
-#~ "    -v, --verbose      Ausführlichere Meldungen.\n"
-#~ "    -q, --quiet        Weniger ausführliche Meldungen.\n"
-#~ "    -f, --full         Komplettsicherung durchführen (andernfalls "
-#~ "inkrementell).\n"
-#~ "    -b, --backup[=TGZ] Sicherung in das angegebene Archiv TGZ.\n"
-#~ "    -r, --restore=TGZ  Rücksicherung vom angegebenen Archiv TGZ.\n"
-#~ "    -F, --format       Formatiere Laufwerk (kann mit restore kombiniert "
-#~ "werden).\n"
-#~ "\n"
-#~ "  <laufwerk> Ein Laufwerksbuchstabe. Wird keiner angegeben, durchsuche "
-#~ "alle Laufwerke.\n"
-#~ "\n"
-
-#~ msgid "Try 'plpbackup --help' for more information."
-#~ msgstr "Versuchen Sie 'plpbackup --help' für weitere Informationen."
-
-#~ msgid "plpbackup version "
-#~ msgstr "plpbackup Version "
-
-#~ msgid "Invalid drive argument "
-#~ msgstr "Ungültiges Laufwerk "
-
-#, fuzzy
-#~ msgid "Backup mode can not be combined with restore."
-#~ msgstr ""
-#~ "Sicherungs-Modus kann nicht mit Formatieren oder Rücksicherung kombiniert "
-#~ "werden."
-
-#~ msgid "Backup can only create one archive at a time."
-#~ msgstr "Die Sicherung kann nur jeweils ein Archiv zu einer Zeit anlegen."
-
-#~ msgid "No action specified."
-#~ msgstr "Keine Aktion angegeben."
-
-#~ msgid "plpbackup: could not connect to ncpd"
-#~ msgstr "plpbackup: Konnte ncpd nicht kontaktieren"

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plptools 0.11\n"
 "Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
 "POT-Creation-Date: 2013-12-16 12:45+0000\n"
-"PO-Revision-Date: 2002-07-11 09:10+0200\n"
+"PO-Revision-Date: 2014-07-06 00:22+0100\n"
 "Last-Translator: Daniel Brahneborg <basic@chello.se>\n"
 "Language-Team: SWEDISH <SE@li.org>\n"
 "Language: sv\n"
@@ -1514,20 +1514,16 @@ msgid ""
 "                            Default for HOST is 127.0.0.1\n"
 "                            Default for PORT is "
 msgstr ""
-"Användning: plpftp [OPTIONER]... [FTPKOMMANDO]\n"
-"\n"
-"Om FTPKOMMANDO är angivet, koppla upp; kör FTPKOMMANDO och\n"
-"avsluta efteråt. Om inget FTPKOMMANDO är angivet, starta\n"
-"i interaktivt läge. För mer information om tillgängliga\n"
-"FTPKOMMANDOn, använd `?' eller `help' som FTPKOMMANDO.\n"
+"Användning: plpfuse [OPTIONER]...\n"
 "\n"
 "Tillgängliga optioner:\n"
 "\n"
-" -h, --help          Visa den här texten.\n"
-" -V, --version       Visa versionsnummer och avsluta.\n"
-" -p, --port=[VRD:]PORT Ta kontakt med port PORT på maskin VÄRD.\n"
-"                        Om inget är angivet är VÄRD 127.0.0.1\n"
-"                        och PORT är "
+"    -d, --debug            Increase debugging level\n"
+"    -h, --help             Visa den här texten.\n"
+"    -V, --version          Visa versionsnummer och avsluta.\n"
+"    -p, --port=[VRD:]PORT  Ta kontakt med port PORT på maskin VÄRD.\n"
+"                           Om inget är angivet är VÄRD 127.0.0.1\n"
+"                           och PORT är "
 
 #: plpfuse/main.cc:433
 msgid "plpfuse version "
@@ -1540,248 +1536,3 @@ msgstr "plpfuse: kunde inte få kontakt med ncpd"
 #: plpprint/plpprintd.cc:1024
 msgid "plpprintd: could not connect to ncpd"
 msgstr "plpprintd: kunde inte få kontakt med ncpd"
-
-#~ msgid "Got an error, Press any key to exit."
-#~ msgstr "Fick ett fel, Tryck en tangent för att avsluta."
-
-#~ msgid "Installation complete. Press any key to exit."
-#~ msgstr "Installationen klar. Tryck valfri tangent för att avsluta."
-
-#~ msgid "Try `plpnfsd --help' for more information"
-#~ msgstr "Prova 'plpnfsd --help' för mer information"
-
-#~ msgid "Could not write processlist "
-#~ msgstr "Kunde inte skriva processlistan "
-
-#~ msgid "Could not get user's home directory from /etc/passwd"
-#~ msgstr "Kunde inte hitta användarens hemdirectory från /etc/passwd"
-
-#~ msgid "Could not get machine UID"
-#~ msgstr "Kunde inte hämta maskinens UID"
-
-#~ msgid "Could not read SIBO UID file"
-#~ msgstr "Kunde inte parsa uid-filen"
-
-#~ msgid "Could not get Psion owner info"
-#~ msgstr "Kunde inte hämta ägarinformationen"
-
-#~ msgid "Could not write SIBO UID file "
-#~ msgstr "Kunde inte skriva uid-filen "
-
-#~ msgid "Got signal "
-#~ msgstr "Fick signal "
-
-#~ msgid "Abort? (y/N) "
-#~ msgstr "Avbryt? (y/N) "
-
-#~ msgid "Stopping programs ..."
-#~ msgstr "Avslutar program ..."
-
-#~ msgid "plpbackup: Could not get process list: "
-#~ msgstr "plpbackup: Kunde inte hämta processlistan: "
-
-#~ msgid "Restarting programs ..."
-#~ msgstr "Startar om programmen ..."
-
-#~ msgid "Performing "
-#~ msgstr "Utför "
-
-#~ msgid "restore"
-#~ msgstr "återställning"
-
-#~ msgid "full"
-#~ msgstr "fullständig"
-
-#~ msgid "incremental"
-#~ msgstr "inkrementell"
-
-#~ msgid " backup"
-#~ msgstr " backup"
-
-#~ msgid " of "
-#~ msgstr " av "
-
-#~ msgid "all drives"
-#~ msgstr "alla enheter"
-
-#~ msgid "Drive "
-#~ msgstr "Enhet "
-
-#~ msgid " and "
-#~ msgstr " och "
-
-#~ msgid " to "
-#~ msgstr " till "
-
-#~ msgid " from "
-#~ msgstr " från "
-
-#~ msgid "It contains Backups of drive "
-#~ msgstr "Den innehåller backuper från enhet "
-
-#~ msgid ""
-#~ "Select (I)ndividual files, (W)hole archive, (N)one from this archive? (I/"
-#~ "W/N) "
-#~ msgstr "Välj (E)nstaka fil, (H)ela arkivet, (I)ngenting? (E/H/I) "
-
-#~ msgid "IWA"
-#~ msgstr "EHI"
-
-#~ msgid "Could not run external editor"
-#~ msgstr "Kunde inte starta externa editorn"
-
-#~ msgid ""
-#~ "Archive skipped, because it does not contain any files on selected drives"
-#~ msgstr ""
-#~ "Arkivet hoppas över, eftersom det inte innehåller några filer från den "
-#~ "valda enheten"
-
-#~ msgid "(O)verwrite, overwrite (A)ll, (S)kip? (O/A/S) "
-#~ msgstr "(S)kriv över, skriv över (A)lla, (H)oppa över (S/A/H) "
-
-#~ msgid "OAS"
-#~ msgstr "SAH"
-
-#~ msgid "Could not get backup index"
-#~ msgstr "Kunde inte hitta backupens index"
-
-#~ msgid "' is a full backup"
-#~ msgstr "' är en full backup"
-
-#~ msgid "' is an incremental backup"
-#~ msgstr "' är en inkrementell backup"
-
-#~ msgid "' is NOT a plpbackup"
-#~ msgstr "' är INTE en plpbackup"
-
-#~ msgid "Restore aborted by user"
-#~ msgstr "Backup avbruten av användaren"
-
-#~ msgid "Restore "
-#~ msgstr "Återställ "
-
-#~ msgid "Could not create directory "
-#~ msgstr "Kunde inte skapa mapp "
-
-#~ msgid "Could not create "
-#~ msgstr "Kunde inte skapa "
-
-#~ msgid "Could not get attributes of "
-#~ msgstr "Kunde inte läsa attributen för "
-
-#~ msgid "Could not set attributes of"
-#~ msgstr "Kunde inte sätta attributen för"
-
-#~ msgid "Could not set modification time of "
-#~ msgstr "Kunde inte sätta tiden för modifiering för "
-
-#~ msgid "Skipping "
-#~ msgstr "Hoppar över "
-
-#~ msgid "Error during restore of "
-#~ msgstr "Fel under återställning av "
-
-#~ msgid "STAR"
-#~ msgstr "HDAF"
-
-#~ msgid "(S)kip all, Skip (t)his, (A)bort, (R)etry: "
-#~ msgstr "(H)oppa över alla, hoppa över (D)en här, (A)vbryt, (F)örsök igen: "
-
-#~ msgid "Total time elapsed:     "
-#~ msgstr "Totalt åtgången tid:    "
-
-#~ msgid "Backup aborted by user"
-#~ msgstr "Backup avbruten av användaren"
-
-#~ msgid "Scanning Drive "
-#~ msgstr "Går igenom enhet "
-
-#~ msgid "plpbackup: Couldn't get Drive list"
-#~ msgstr "plpbackup: Kunde inte hämta listan på enheter"
-
-#~ msgid "Size of backup: "
-#~ msgstr "Backupens storlek: "
-
-#~ msgid " files."
-#~ msgstr " filer."
-
-#~ msgid "Nothing to backup"
-#~ msgstr "Ingenting att kopiera"
-
-#~ msgid "Backing up "
-#~ msgstr "Kopierar "
-
-#~ msgid "Error during backup of "
-#~ msgstr "Fel under kopiering av "
-
-#~ msgid "Writing index ..."
-#~ msgstr "Skriver innehållslista ..."
-
-#~ msgid "plpbackup: Could not write index "
-#~ msgstr "plpbackup: Kunde inte skriva innehållslista "
-
-#~ msgid "Resetting archive attributes ..."
-#~ msgstr "Återställer arkiveringsattribut ..."
-
-#~ msgid "Backup aborted due to error"
-#~ msgstr "Kopiering avbruten på grund av fel"
-
-#~ msgid "Time for scanning:      "
-#~ msgstr "Tid för genomgång:      "
-
-#~ msgid "Time for transfer:      "
-#~ msgstr "Tid för överföring:     "
-
-#~ msgid "Average transfer speed: "
-#~ msgstr "Överföringshastighet:   "
-
-#, fuzzy
-#~ msgid ""
-#~ "Usage: plpbackup OPTIONS [<drive>:] [<drive>:] ...\n"
-#~ "\n"
-#~ "  Options:\n"
-#~ "    -h, --help             Print this message and exit.\n"
-#~ "    -V, --version          Print version and exit.\n"
-#~ "    -p, --port=[HOST:]PORT Connect to ncpd on HOST, PORT.\n"
-#~ "    -v, --verbose          Increase verbosity.\n"
-#~ "    -q, --quiet            Decrease verbosity.\n"
-#~ "    -f, --full             Do a full backup (incremental otherwise).\n"
-#~ "    -b, --backup[=DIR]     Backup to specified directory DIR.\n"
-#~ "    -r, --restore=DIR      Restore from specified directory DIR.\n"
-#~ "\n"
-#~ "  <drive> A drive character. If none given, scan all drives.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Användning: plpbackup OPTIONER [<enhet>:] [<enhet>:] ...\n"
-#~ "\n"
-#~ "  Optioner:\n"
-#~ "    -h, --help             Skriv den här texten och avsluta.\n"
-#~ "    -V, --version          Skriv versionsnummer och avsluta.\n"
-#~ "    -p, --port=[VÄRD:]PORT Ta kontakt med ncpd på VÄRD, PORT.\n"
-#~ "    -v, --verbose          Öka mängden utskrifter.\n"
-#~ "    -q, --quiet            Minska mängden utskrifter.\n"
-#~ "    -f, --full             Kopiera allt (annars bara det som ändrats).\n"
-#~ "    -b, --backup[=TGZ]     Kopiera till arkivet TGZ.\n"
-#~ "    -r, --restore=TGZ      Återställ från arkivet TGZ.\n"
-#~ "    -F, --format           Formattera enheterna (tillsammans med "
-#~ "restore).\n"
-#~ "\n"
-#~ "  <enhet> En enhetsbokstav. Om ingen anges, gå igenom alla enheter.\n"
-#~ "\n"
-
-#~ msgid "Try 'plpbackup --help' for more information."
-#~ msgstr "Prova 'plpbackup --help' för mer information."
-
-#~ msgid "Invalid drive argument "
-#~ msgstr "Ogiltig enhetsbokstav "
-
-#, fuzzy
-#~ msgid "Backup mode can not be combined with restore."
-#~ msgstr ""
-#~ "Backup-läget kan inte kombineras med formattering eller återställning."
-
-#~ msgid "Backup can only create one archive at a time."
-#~ msgstr "Backup kan bara skapa ett arkiv i taget."
-
-#~ msgid "plpbackup: could not connect to ncpd"
-#~ msgstr "plpbackup: fick ingen kontakt med ncpd"
