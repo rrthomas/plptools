@@ -1,0 +1,15 @@
+plptools for Debian
+----------------------
+
+Built from 1.08, downloaded from Sourceforge
+
+This version defaults to connecting the Psion to /dev/ttyS0 - if you
+connect to a different serial line you will need to change the plptools
+init script (e.g. /etc/init.d/plptools if you use SV5 init)
+
+Users who wish to use plpfuse should be added to the fuse group.
+
+
+
+ -- John Lines <john@paladin.demon.co.uk>, Thu Dec 31 15:28:45 GMT 2009
+

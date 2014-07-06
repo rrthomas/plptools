@@ -1,0 +1,71 @@
+Template: plptools/customize
+Type: note
+_Description: Customize /etc/default/plptools
+ In addition to plptools' main daemon "ncpd", plptools provides two optional
+ daemons:
+ .
+  plpfuse (for mounting a Psion's drives using Filesystem in USErspace)
+  plpprintd (for printing via PC from a Psion Series 5)
+ .
+ Both daemons are disabled by default. You can enable them by editing
+ /etc/default/plptools.
+
+Template: plptools/ncpd/start
+Type: boolean
+Default: true
+_Description: Should ncpd be started during boot?
+ Normally, ncpd - the daemon which handles the serial connection to a
+ Psion - is started on boot-up. If you intend to connect your Psion to
+ another machine on the net and NEVER will use it locally, you can
+ disable this here.
+
+Template: plptools/ncpd/serial
+Type: string
+Default: /dev/ttyS0
+_Description: Specify serial line to be used
+ By default, the Psion is expected to be connected to the first serial
+ line (COM1:) of your machine. You can change this here.
+
+Template: plptools/ncpd/listenat
+Type: string
+Default: 127.0.0.1
+_Description: Specify the IP address and port for ncpd
+ If you intend to use the plptools front-ends from other machines, you
+ can specify 0.0.0.0 or the IP address of your machine here. Normal
+ users should keep the default 127.0.0.1!
+ .
+ Note, that THIS IS A SECURITY THREAT as no authentication and no
+ encryption is used! DO NOT USE THIS on machines which are accessible
+ from the Internet!
+
+Template: plptools/plpfuse/start
+Type: boolean
+Default: false
+_Description: Should plpfuse be started during boot?
+ If plpfuse is started during boot-up, it will wait for a Psion being
+ connected and then automatically mount that Psion. Since this is
+ done as root, non-privileged users will not have access to the
+ mounted directory. If you have a single-user machine, you probably
+ want to start plpfuse manually when you need it.
+
+Template: plptools/plpprintd/start
+Type: boolean
+Default: false
+_Description: Should plpprintd be started during boot?
+ If you intend to use the Psion's "Print via PC" feature, you can
+ enable this option. You must have a working print queue which
+ is capable of printing Postscript in order to use this feature.
+
+Template: plptools/plpprintd/printqueue
+Type: string
+Default: psion
+_Description: Specify the print queue to be used
+ Please enter the name of the print queue you want to use for
+ printing from the Psion.
+
+Template: plptools/frontends/remoteaddr
+Type: string
+_Description: Specify remote host to be contacted
+ Since you have ncpd either disabled or listening on a non-standard
+ address, you should specify the address for the frontends again.
+

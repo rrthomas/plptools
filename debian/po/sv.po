@@ -1,0 +1,189 @@
+# Translation of plptools debconf template to Swedish
+# Copyright (C) 2010 Martin Bagge <brother@bsnet.se>
+# This file is distributed under the same license as the XX package.
+#
+# Martin Bagge <brother@bsnet.se>, 2008, 2010
+msgid ""
+msgstr ""
+"Project-Id-Version: plptools 0.14-3\n"
+"Report-Msgid-Bugs-To: plptools@packages.debian.org\n"
+"POT-Creation-Date: 2009-12-31 16:42+0000\n"
+"PO-Revision-Date: 2010-01-07 22:36+0100\n"
+"Last-Translator: Martin Bagge <brother@bsnet.se>\n"
+"Language-Team: Swedish <debian-l10n.swedish@lists.debian.org>\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Swedish\n"
+"X-Poedit-Country: Sweden\n"
+
+#. Type: note
+#. Description
+#: ../plptools.templates:1001
+msgid "Customize /etc/default/plptools"
+msgstr "Anpassa /etc/plptools.conf"
+
+#. Type: note
+#. Description
+#: ../plptools.templates:1001
+msgid ""
+"In addition to plptools' main daemon \"ncpd\", plptools provides two "
+"optional daemons:"
+msgstr ""
+"I tillägg till plptools huvuddemon \"ncpd\", kommer plptools med två valfria "
+"demoner."
+
+#. Type: note
+#. Description
+#: ../plptools.templates:1001
+msgid ""
+" plpfuse (for mounting a Psion's drives using Filesystem in USErspace)\n"
+" plpprintd (for printing via PC from a Psion Series 5)"
+msgstr ""
+" plpfuse (för montering av Psion-diskar som filsystem i userspace)\n"
+" plpprintd (för att kunna skriva ut på PC:n från en Psion Series 5)"
+
+#. Type: note
+#. Description
+#: ../plptools.templates:1001
+msgid ""
+"Both daemons are disabled by default. You can enable them by editing /etc/"
+"default/plptools."
+msgstr ""
+"Båda demonerna är inaktiverade som standard. Du kan aktivera dem genom att "
+"redigera /etc/default/plptools.conf."
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:2001
+msgid "Should ncpd be started during boot?"
+msgstr "Ska ncpd startas vid systemets uppstart?"
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:2001
+msgid ""
+"Normally, ncpd - the daemon which handles the serial connection to a Psion - "
+"is started on boot-up. If you intend to connect your Psion to another "
+"machine on the net and NEVER will use it locally, you can disable this here."
+msgstr ""
+"Normalt sett, ncpd - demonen som hanterar serieanslutningen mot en Psion, "
+"startas vid systemets uppstart. Om du tänker ansluta din Psion till en annan "
+"maskin på nätverket och ALDRIG använda den lokalt, kan du inaktivera den här."
+
+#. Type: string
+#. Description
+#: ../plptools.templates:3001
+msgid "Specify serial line to be used"
+msgstr "Ange serieport att använda"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:3001
+msgid ""
+"By default, the Psion is expected to be connected to the first serial line "
+"(COM1:) of your machine. You can change this here."
+msgstr ""
+"Som standard förväntar sig Psion att anslutas till första serieporten "
+"(COM1:) på din maskin. Du kan ändra det här."
+
+#. Type: string
+#. Description
+#: ../plptools.templates:4001
+msgid "Specify the IP address and port for ncpd"
+msgstr "Ange IP-adress och port för ncpd"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:4001
+msgid ""
+"If you intend to use the plptools front-ends from other machines, you can "
+"specify 0.0.0.0 or the IP address of your machine here. Normal users should "
+"keep the default 127.0.0.1!"
+msgstr ""
+"Om du tänker använda gränssnitt för plptools från andra maskiner kan du ange "
+"0.0.0.0 eller IP-adressen för din maskin här. Normala användare bör behålla "
+"standarden 127.0.0.1!"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:4001
+msgid ""
+"Note, that THIS IS A SECURITY THREAT as no authentication and no encryption "
+"is used! DO NOT USE THIS on machines which are accessible from the Internet!"
+msgstr ""
+"Notera att DETTA ÄR EN SÄKERHETSRISK eftersom ingen autentisering och ingen "
+"kryptering används! ANVÄND INTE DETTA på maskiner som är nåbara från "
+"Internet!"
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:5001
+msgid "Should plpfuse be started during boot?"
+msgstr "Ska plpfuse startas vid systemets uppstart?"
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:5001
+msgid ""
+"If plpfuse is started during boot-up, it will wait for a Psion being "
+"connected and then automatically mount that Psion. Since this is done as "
+"root, non-privileged users will not have access to the mounted directory. If "
+"you have a single-user machine, you probably want to start plpfuse manually "
+"when you need it."
+msgstr ""
+"Om plpfuse startas vid systemets uppstart kommer den att vänta på att en "
+"Psion ska anslutas och sedan automatiskt montera upp den. Eftersom detta "
+"görs som root kommer inte vanliga användare ha få tillgång till den "
+"monterade katalogen. Om du har en maskin som körs med endast en användare, "
+"vill du antagligen starta plpfuse manuellt när du behöver det."
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:6001
+msgid "Should plpprintd be started during boot?"
+msgstr "Ska plpprintd startas vid systemets uppstart?"
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:6001
+msgid ""
+"If you intend to use the Psion's \"Print via PC\" feature, you can enable "
+"this option. You must have a working print queue which is capable of "
+"printing Postscript in order to use this feature."
+msgstr ""
+"Om du tänker använda Psions \"Utskrift via PC\"-funktionm kan du aktivera "
+"detta. Du måste ha en fungerande utskriftskö som är kapabel att skriva ut "
+"Postscript för att använda denna funktion."
+
+#. Type: string
+#. Description
+#: ../plptools.templates:7001
+msgid "Specify the print queue to be used"
+msgstr "Ange utskriftskö som ska användas"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:7001
+msgid ""
+"Please enter the name of the print queue you want to use for printing from "
+"the Psion."
+msgstr ""
+"Ange namnet på den utskriftskö du vill använda för att skriva ut från Psion."
+
+#. Type: string
+#. Description
+#: ../plptools.templates:8001
+msgid "Specify remote host to be contacted"
+msgstr "Ange fjärrvärd som ska kontaktas"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:8001
+msgid ""
+"Since you have ncpd either disabled or listening on a non-standard address, "
+"you should specify the address for the frontends again."
+msgstr ""
+"Eftersom du har ncpd antingen inaktiverad eller lyssnar på en icke-"
+"standardadress, bör du ange adressen för gränssnitten igen."

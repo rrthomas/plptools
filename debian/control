@@ -1,0 +1,36 @@
+Source: plptools
+Build-Depends: debhelper (>= 6), gettext, libncurses5-dev, libreadline-dev, libnewt-dev, po-debconf, libfuse-dev, libattr1-dev
+Section: otherosfs
+Priority: optional
+Maintainer: John Lines <john@paladyn.org>
+Standards-Version: 3.8.3
+
+Package: plptools
+Architecture: linux-any kfreebsd-any
+Depends: ${shlibs:Depends},${misc:Depends}, fuse [linux-any] | fuse4bsd [kfreebsd-any]
+Conflicts: klipsi, plptools-kde, kpsion
+Provides: libplpc2a
+Replaces: libplpc2a
+Homepage: http://plptools.sourceforge.net/
+Description: Access EPOC device (Psion PDA) over a serial link 
+ This package lets you access EPOC devices' drives over a serial link.
+ You can mount them NFS-style, access them FTP-style, use a local 
+ printer from the remote device (EPOC32 only) and perform
+ backup/restore.
+ .
+ The software is related to p3nfs, which is also packaged for
+ Debian, but plptools uses the native Psion protocol, whereas p3nfs
+ requires a program to be installed on the Psion.
+ .
+ Version 1.0 and later no longer provide specific KDE integration.
+
+Package: plptools-dev
+Architecture: linux-any kfreebsd-any
+Section: devel
+Depends: plptools (= ${binary:Version}),${misc:Depends}
+Homepage: http://plptools.sourceforge.net/
+Description: plptools (development files)
+ This package provides a static library, headers and API documentation
+ for plptools development. You need these files if you want to build
+ programs which use libplp.
+

@@ -1,0 +1,205 @@
+# Portuguese translation of plptools's debconf messages.
+# Copyright (C) 2007 Plptool's debian package copyright holder.
+# This file is distributed under the same license as the plptools package.
+# Ricardo Silva <ardoric@gmail.com>, 2007-2008.
+# Miguel Figueiredo <elmig@debianpt.org>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: plptools 1.0.4-2\n"
+"Report-Msgid-Bugs-To: plptools@packages.debian.org\n"
+"POT-Creation-Date: 2009-12-31 16:42+0000\n"
+"PO-Revision-Date: 2010-03-16 22:29+0000\n"
+"Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
+"Language-Team: Portuguese <traduz@debianpt.org>\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: note
+#. Description
+#: ../plptools.templates:1001
+msgid "Customize /etc/default/plptools"
+msgstr "Personalizar /etc/default/plptools"
+
+#. Type: note
+#. Description
+#: ../plptools.templates:1001
+msgid ""
+"In addition to plptools' main daemon \"ncpd\", plptools provides two "
+"optional daemons:"
+msgstr ""
+"Para além do daemon principal das plptools, o \"ncpd\", o plptools oferece "
+"mais dois daemons:"
+
+#. Type: note
+#. Description
+#: ../plptools.templates:1001
+msgid ""
+" plpfuse (for mounting a Psion's drives using Filesystem in USErspace)\n"
+" plpprintd (for printing via PC from a Psion Series 5)"
+msgstr ""
+" plpfuse (para montar uma drive Psion usando um sistema de Ficheiros em "
+"'USErspace')\n"
+" plpprintd (para imprimir através de um PC a partir de um Psion Série 5)"
+
+#. Type: note
+#. Description
+#: ../plptools.templates:1001
+msgid ""
+"Both daemons are disabled by default. You can enable them by editing /etc/"
+"default/plptools."
+msgstr ""
+"Ambos os daemons estão desactivados por omissão. Pode activá-los editando o "
+"ficheiro /etc/default/plptools."
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:2001
+msgid "Should ncpd be started during boot?"
+msgstr "Deve o ncpd ser iniciado no arranque?"
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:2001
+msgid ""
+"Normally, ncpd - the daemon which handles the serial connection to a Psion - "
+"is started on boot-up. If you intend to connect your Psion to another "
+"machine on the net and NEVER will use it locally, you can disable this here."
+msgstr ""
+"Normalmente o ncpd - o daemon que trata da ligação em série a um Psion - é "
+"iniciado no arranque. Se tenciona ligar o seu Psion a outra máquina na rede "
+"e NUNCA o utilizar localmente, pode desactivar aqui."
+
+#. Type: string
+#. Description
+#: ../plptools.templates:3001
+msgid "Specify serial line to be used"
+msgstr "Especifique a linha série a utilizar"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:3001
+msgid ""
+"By default, the Psion is expected to be connected to the first serial line "
+"(COM1:) of your machine. You can change this here."
+msgstr ""
+"Por omissão espera-se que o Psion esteja ligado à primeira linha série "
+"(COM1:) da sua máquina. Pode mudá-lo aqui."
+
+#. Type: string
+#. Description
+#: ../plptools.templates:4001
+msgid "Specify the IP address and port for ncpd"
+msgstr "Especifique o endereço IP e porto para o ncpd"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:4001
+msgid ""
+"If you intend to use the plptools front-ends from other machines, you can "
+"specify 0.0.0.0 or the IP address of your machine here. Normal users should "
+"keep the default 127.0.0.1!"
+msgstr ""
+"Se tenciona usar frontends do plptools a partir de outras máquinas, pode "
+"especificar aqui 0.0.0.0 ou o endereço IP da sua máquina. Utilizadores "
+"normais devem manter o valor predefinido, 127.0.0.1!"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:4001
+msgid ""
+"Note, that THIS IS A SECURITY THREAT as no authentication and no encryption "
+"is used! DO NOT USE THIS on machines which are accessible from the Internet!"
+msgstr ""
+"Note que, ISTO É UMA AMEAÇA À SEGURANÇA uma vez que não é usada autenticação "
+"nem criptografia! NÃO USE ISTO em máquinas que são acessíveis a partir da "
+"Internet!"
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:5001
+msgid "Should plpfuse be started during boot?"
+msgstr "Deve o plpfuse ser iniciado no arranque?"
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:5001
+msgid ""
+"If plpfuse is started during boot-up, it will wait for a Psion being "
+"connected and then automatically mount that Psion. Since this is done as "
+"root, non-privileged users will not have access to the mounted directory. If "
+"you have a single-user machine, you probably want to start plpfuse manually "
+"when you need it."
+msgstr ""
+"Se o plpfuse for iniciado durante o arranque, irá esperar que um Psion seja "
+"conectado e depois irá, automaticamente, montar esse Psion. Uma vez que isto "
+"é feito como root, os utilizadores não privilegiados não terão acesso ao "
+"directório montado. Se você tem uma máquina de um só utilizador, "
+"provavelmente quererá iniciar o plpfuse manualmente quando necessitar dele."
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:6001
+msgid "Should plpprintd be started during boot?"
+msgstr "Deve o plpprintd ser iniciado no arranque?"
+
+#. Type: boolean
+#. Description
+#: ../plptools.templates:6001
+msgid ""
+"If you intend to use the Psion's \"Print via PC\" feature, you can enable "
+"this option. You must have a working print queue which is capable of "
+"printing Postscript in order to use this feature."
+msgstr ""
+"Se tenciona usar a funcionalidade \"Imprimir através do PC\" do Psion, pode "
+"activar esta opção. Para poder utilizar esta funcionalidade tem de ter uma "
+"fila de impressão a funcionar que seja capaz de imprimir Postscript."
+
+#. Type: string
+#. Description
+#: ../plptools.templates:7001
+msgid "Specify the print queue to be used"
+msgstr "Especifique a fila de impressão a usar"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:7001
+msgid ""
+"Please enter the name of the print queue you want to use for printing from "
+"the Psion."
+msgstr ""
+"Por favor introduza o nome da fila de impressão que deseja usar para "
+"imprimir através do Psion."
+
+#. Type: string
+#. Description
+#: ../plptools.templates:8001
+msgid "Specify remote host to be contacted"
+msgstr "Especifique uma máquina remota a ser contactada"
+
+#. Type: string
+#. Description
+#: ../plptools.templates:8001
+msgid ""
+"Since you have ncpd either disabled or listening on a non-standard address, "
+"you should specify the address for the frontends again."
+msgstr ""
+"Uma vez que tem o ncpd desactivado ou a escutar num endereço não "
+"padronizado, deve especificar novamente o endereço para os frontends."
+
+#~ msgid "Set SUID-root bit of plpnfsd?"
+#~ msgstr "Activar o bit SUID-root do plpnfsd?"
+
+#~ msgid ""
+#~ "For convenience on a single-user machine, plpnfsd can be installed with "
+#~ "the setuid bit enabled. This allows any local user to mount and unmount a "
+#~ "connected Psion. Be warned, that THIS IS A SECURITY THREAT to your "
+#~ "machine. NEVER ENABLE THIS ON A MULTIUSER MACHINE."
+#~ msgstr ""
+#~ "Para conveniência numa máquina só com um utilizador, o pnpnfsd pode ser "
+#~ "instalado com o bit setuid activado. Isto permite que qualquer utilizador "
+#~ "local possa montar e desmontar um Psion conectado. Fique avisado que ISTO "
+#~ "É UM RISCO DE SEGURANÇA à sua máquina. NUNCA ACTIVE ISTO NUMA MÁQUINA COM "
+#~ "VÁRIOS UTILIZADORES."

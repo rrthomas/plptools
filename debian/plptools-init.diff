@@ -1,0 +1,37 @@
+--- /etc/init.d/plptools.init	2008-07-25 17:42:40.000000000 +0100
++++ plptools.init	2009-05-01 02:48:01.000000000 +0100
+@@ -17,6 +17,7 @@
+ DESC=plptools
+ #CONFIG=/etc/plptools.conf
+ CONFIG=/etc/default/plptools
++MOUNTPOINT=/var/lib/plptools/mnt
+ 
+ test -x $DAEMON1 || exit 0
+ test -x $DAEMON2 || exit 0
+@@ -37,9 +38,11 @@
+ 	fi
+ 	if test "$START_PLPFUSE" = "yes" ; then
+ 		echo -n "Starting $DESC ($DAEMON2): "
+-		modprobe fuse
++		if ! grep -q fuse /proc/filesystems; then
++			modprobe fuse
++		fi
+ 		start-stop-daemon --start --quiet \
+-			--exec $DAEMON2 -- $PLPFUSE_ARGS && \
++			--exec $DAEMON2 -- $PLPFUSE_ARGS $MOUNTPOINT && \
+ 			echo -n "done" || echo -n "failed"
+ 		echo "."
+ 	fi
+@@ -54,11 +57,7 @@
+   stop)
+ 	if test "$START_PLPFUSE" = "yes" ; then
+ 		echo -n "Stopping $DESC ($DAEMON2): "
+-# 	Stop the daemon more gently
+-		if test -e /var/lib/plptools/mnt/proc/exit ; then
+-		echo "stop" > /var/lib/plptools/mnt/proc/exit
+-		sleep 1
+-		fi
++		fusermount -z -u $MOUNTPOINT || true
+ 		start-stop-daemon --stop --retry HUP/5/TERM/1 --quiet \
+ 				--exec $DAEMON2 && \
+ 			echo -n "done" || echo -n "already stopped"

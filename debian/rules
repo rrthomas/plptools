@@ -1,0 +1,110 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# Set config options
+export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+# FOR AUTOCONF 2.52 AND NEWER ONLY
+ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+  confflags += --build $(DEB_HOST_GNU_TYPE)
+else
+  confflags += --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+endif
+
+tmp = $(shell pwd)/debian/tmp
+ltmp = $(tmp)/usr/share/lintian/overrides
+hdir = $(shell kde-config --expandvars -install html)
+
+%.1: %.1.in
+	MANDATE=`grep CHECKIN $< | awk '{print $$4}'` ; \
+	sed -e "s%@MANDATE@%$$MANDATE%g" $< > $@
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	./configure $(confflags) --prefix=/usr \
+		--mandir=/usr/share/man --with-initdir=none \
+		--with-serial=/dev/ttyS0 \
+		--disable-rpath
+	touch configure-stamp
+
+build: configure-stamp build-stamp
+build-stamp:
+	dh_testdir
+	# Add here commands to compile the package.
+	$(MAKE)
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	[ ! -f Makefile ] || $(MAKE) distclean
+	debconf-updatepo
+	dh_clean
+
+man-install: 
+	install -m 644 $^ $(tmp)/usr/share/man/man1
+
+install: build 
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	# install into debian/tmp.
+	$(MAKE) DESTDIR=$(tmp) kde_htmldir=$(hdir) install
+	install -d $(tmp)/etc
+	install -d $(ltmp)
+	install -T -D -m 644 debian/plptools.conf $(tmp)/etc/default/plptools
+	cp ChangeLog changelog
+#	for i in debian/*.override ; do \
+#		cp -a $$i $(ltmp)/`basename $$i .override` ; \
+#	done
+	for i in `find debian/ -type l -name "common"`; do \
+		rm -f $$i && ln -s ../common $$i ; \
+	done
+	# Split into sub-packages
+	dh_movefiles -pplptools
+	dh_movefiles -pplptools-dev
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+#	dh_testversion
+	dh_testdir
+	dh_testroot
+	dh_installdebconf -a
+	dh_installdocs -a
+#	dh_installexamples
+	dh_installmenu -a
+#	dh_installemacsen
+#	dh_installpam
+	dh_installinit -a
+#	dh_installcron
+	dh_installman -a
+#	dh_installinfo
+	dh_installchangelogs 
+	dh_icons
+	dh_link
+	dh_strip
+	dh_compress -a -X.docbook -X.css -X-license -X.dcl -X.bz2
+	dh_fixperms
+	# You may want to make some executables suid here.
+#	dh_suidregister
+	dh_makeshlibs -a -V
+	dh_installdeb
+#	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
