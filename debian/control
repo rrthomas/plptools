@@ -14,15 +14,9 @@ Replaces: libplpc2a
 Homepage: http://plptools.sourceforge.net/
 Description: Access EPOC device (Psion PDA) over a serial link 
  This package lets you access EPOC devices' drives over a serial link.
- You can mount them NFS-style, access them FTP-style, use a local 
- printer from the remote device (EPOC32 only) and perform
- backup/restore.
- .
- The software is related to p3nfs, which is also packaged for
- Debian, but plptools uses the native Psion protocol, whereas p3nfs
- requires a program to be installed on the Psion.
- .
- Version 1.0 and later no longer provide specific KDE integration.
+ You can mount them, access them FTP-style, use a local printer from
+ the remote device (EPOC32 only) and install applications from SIS
+ files.
 
 Package: plptools-dev
 Architecture: linux-any kfreebsd-any
