@@ -49,7 +49,7 @@ fi
 dnl NLS support
 ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
-AM_GNU_GETTEXT_VERSION([0.19.2])
+AM_GNU_GETTEXT_VERSION([0.18.3])
 
 dnl Additional glibc-intl checks
 if test "${USE_NLS}" = "yes" ; then
