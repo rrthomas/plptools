@@ -25,7 +25,6 @@ Makefile
 /ABOUT-NLS
 /ChangeLog
 /release-notes-*
-/out.html
 /compile
 /depcomp
 /missing
