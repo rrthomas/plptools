@@ -5,54 +5,57 @@
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: start or stop the plptools daemons
+# Short-Description: Start or stop the plptools daemons
+# Description:       Enable EPOC communication, file system and printing services
 ### END INIT INFO
 
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON1=/usr/sbin/ncpd
-DAEMON2=/usr/sbin/plpfuse
-DAEMON3=/usr/sbin/plpprintd
+NCPD=/usr/sbin/ncpd
+PLPFUSE=/usr/sbin/plpfuse
+PLPPRINTD=/usr/sbin/plpprintd
 NAME=plptools
 DESC=plptools
 CONFIG=/etc/default/plptools
 MOUNTPOINT=/var/lib/plptools/mnt
 
-test -x $DAEMON1 || exit 0
-test -x $DAEMON2 || exit 0
-test -x $DAEMON3 || exit 0
+test -x $NCPD || exit 0
+test -x $PLPFUSE || exit 0
+test -x $PLPPRINTD || exit 0
 test -f $CONFIG && . $CONFIG || exit 0
+
+. /lib/lsb/init-functions
 
 set -e
 
 case "$1" in
   start)
 	if test "$START_NCPD" = "yes" ; then
-		echo -n "Starting $DESC ($DAEMON1): "
+		echo -n "Starting $DESC ($NCPD): "
 		start-stop-daemon --start --quiet \
-			--exec $DAEMON1 -- $NCPD_ARGS && \
+			--exec $NCPD -- $NCPD_ARGS && \
 				echo -n "done" || echo -n "failed"
 		echo "."
 		sleep 1
 	fi
 	if test "$START_PLPFUSE" = "yes" ; then
-		echo -n "Starting $DESC ($DAEMON2): "
+		echo -n "Starting $DESC ($PLPFUSE): "
 		start-stop-daemon --start --quiet \
-			--exec $DAEMON2 -- $PLPFUSE_ARGS $MOUNTPOINT && \
+			--exec $PLPFUSE -- $PLPFUSE_ARGS $MOUNTPOINT && \
 			echo -n "done" || echo -n "failed"
 		echo "."
 	fi
 	if test "$START_PLPPRINTD" = "yes" ; then
-		echo -n "Starting $DESC ($DAEMON3): "
+		echo -n "Starting $DESC ($PLPPRINTD): "
 		start-stop-daemon --start --quiet \
-			--exec $DAEMON3 -- $PLPPRINTD_ARGS && \
+			--exec $PLPPRINTD -- $PLPPRINTD_ARGS && \
 			echo -n "done" || echo -n "failed"
 		echo "."
 	fi
 	;;
   stop)
 	if test "$START_PLPFUSE" = "yes" ; then
-		echo -n "Stopping $DESC ($DAEMON2): "
+		echo -n "Stopping $DESC ($PLPFUSE): "
 		if [ "$(uname)" = Linux ]; then
 			fusermount -z -u $MOUNTPOINT || true
 		elif [ "$(uname)" = GNU/kFreeBSD ]; then
@@ -62,36 +65,26 @@ case "$1" in
 			exit 1
 		fi
 		start-stop-daemon --stop --retry HUP/5/TERM/1 --quiet \
-				--exec $DAEMON2 && \
+				--exec $PLPFUSE && \
 			echo -n "done" || echo -n "already stopped"
 		echo "."
 	fi
 	if test "$START_PLPPRINTD" = "yes" ; then
-		echo -n "Stopping $DESC ($DAEMON3): "
-		start-stop-daemon --stop --quiet --exec $DAEMON3 && \
+		echo -n "Stopping $DESC ($PLPPRINTD): "
+		start-stop-daemon --stop --quiet --exec $PLPPRINTD && \
 			echo -n "done" || echo -n "already stopped"
 		echo "."
 	fi
 	if test "$START_NCPD" = "yes" ; then
-		echo -n "Stopping $DESC ($DAEMON1): "
-		start-stop-daemon --stop --quiet --exec $DAEMON1 && \
+		echo -n "Stopping $DESC ($NCPD): "
+		start-stop-daemon --stop --quiet --exec $NCPD && \
 			echo -n "done" || echo -n "already stopped"
 		echo "."
 	fi
 
 	;;
-  #reload)
-	#
-	#	If the daemon can reload its config files on the fly
-	#	for example by sending it SIGHUP, do it here.
-	#
-	#	If the daemon responds to changes in its config file
-	#	directly anyway, make this a do-nothing entry.
-	#
-	# echo "Reloading $DESC configuration files."
-	# start-stop-daemon --stop --signal 1 --quiet --pidfile \
-	#	/var/run/$NAME.pid --exec $DAEMON
-  #;;
+  reload)
+	;;
   restart|force-reload)
 	#
 	#	If the "reload" option is implemented, move the "force-reload"
@@ -101,6 +94,18 @@ case "$1" in
 	$0 stop
 	sleep 1
 	$0 start
+	;;
+  status)
+	if "$START_NCPD" = "yes" ; then
+		status_of_proc "$NCPD" ncpd || exit $?
+	fi
+	if "$START_PLPFUSE" = "yes" ; then
+		status_of_proc "$PLPFUSE" plpfuse || exit $?
+	fi
+	if "$START_PLPPRINTD" = "yes" ; then
+		status_of_proc "$PLPPRINTD" plpprintd || exit $?
+	fi
+	exit 0
 	;;
   *)
 	N=/etc/init.d/$NAME

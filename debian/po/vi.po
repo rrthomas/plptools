@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 1.0.8-1.1\n"
 "Report-Msgid-Bugs-To: plptools@packages.debian.org\n"
-"POT-Creation-Date: 2009-12-31 16:42+0000\n"
+"POT-Creation-Date: 2014-07-19 10:52+0100\n"
 "PO-Revision-Date: 2010-03-12 18:19+0930\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
@@ -36,9 +36,13 @@ msgstr ""
 #. Type: note
 #. Description
 #: ../plptools.templates:1001
+#, fuzzy
+#| msgid ""
+#| " plpfuse (for mounting a Psion's drives using Filesystem in USErspace)\n"
+#| " plpprintd (for printing via PC from a Psion Series 5)"
 msgid ""
 " plpfuse (for mounting a Psion's drives using Filesystem in USErspace)\n"
-" plpprintd (for printing via PC from a Psion Series 5)"
+" plpprintd (for printing via PC from an EPOC32 machine)"
 msgstr ""
 " • plpnfuse (để gắn những ổ đĩa của một thiết bị Psion dùng Hệ thống tập tin "
 "trong vùng người dùng)\n"
@@ -76,7 +80,9 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../plptools.templates:3001
-msgid "Specify serial line to be used"
+#, fuzzy
+#| msgid "Specify serial line to be used"
+msgid "Serial line to use:"
 msgstr "Hãy ghi rõ dây nối tiếp cần dùng"
 
 #. Type: string
@@ -92,7 +98,9 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../plptools.templates:4001
-msgid "Specify the IP address and port for ncpd"
+#, fuzzy
+#| msgid "Specify the IP address and port for ncpd"
+msgid "IP address and port for ncpd:"
 msgstr "Hãy ghi rõ địa chỉ IP và cổng cho ncpd"
 
 #. Type: string
@@ -162,7 +170,9 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../plptools.templates:7001
-msgid "Specify the print queue to be used"
+#, fuzzy
+#| msgid "Specify the print queue to be used"
+msgid "Print queue to use:"
 msgstr "Hãy ghi rõ hàng đợi in cần dùng"
 
 #. Type: string
@@ -177,7 +187,9 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../plptools.templates:8001
-msgid "Specify remote host to be contacted"
+#, fuzzy
+#| msgid "Specify remote host to be contacted"
+msgid "Remote host to be contacted:"
 msgstr "Hãy ghi rõ máy từ xa cần liên lạc"
 
 #. Type: string

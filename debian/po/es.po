@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools 1.0.4-4\n"
 "Report-Msgid-Bugs-To: plptools@packages.debian.org\n"
-"POT-Creation-Date: 2009-12-31 16:42+0000\n"
+"POT-Creation-Date: 2014-07-19 10:52+0100\n"
 "PO-Revision-Date: 2009-09-11 13:39+0100\n"
 "Last-Translator: Francisco Javier Cuadrado <fcocuadrado@gmail.com>\n"
 "Language-Team: Deian l10n Spanish <debian-l10n-spanish@lists.debian.org>\n"
@@ -60,9 +60,13 @@ msgstr ""
 #. Type: note
 #. Description
 #: ../plptools.templates:1001
+#, fuzzy
+#| msgid ""
+#| " plpfuse (for mounting a Psion's drives using Filesystem in USErspace)\n"
+#| " plpprintd (for printing via PC from a Psion Series 5)"
 msgid ""
 " plpfuse (for mounting a Psion's drives using Filesystem in USErspace)\n"
-" plpprintd (for printing via PC from a Psion Series 5)"
+" plpprintd (for printing via PC from an EPOC32 machine)"
 msgstr ""
 " plpfuse (para montar unidades Psion utilizando el sistema de archivos en "
 "espacio de usuario)\n"
@@ -99,7 +103,9 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../plptools.templates:3001
-msgid "Specify serial line to be used"
+#, fuzzy
+#| msgid "Specify serial line to be used"
+msgid "Serial line to use:"
 msgstr "Introduzca la línea serie a usar"
 
 #. Type: string
@@ -115,7 +121,9 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../plptools.templates:4001
-msgid "Specify the IP address and port for ncpd"
+#, fuzzy
+#| msgid "Specify the IP address and port for ncpd"
+msgid "IP address and port for ncpd:"
 msgstr "Introduzca la dirección IP y el puerto para ncpd"
 
 #. Type: string
@@ -185,7 +193,9 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../plptools.templates:7001
-msgid "Specify the print queue to be used"
+#, fuzzy
+#| msgid "Specify the print queue to be used"
+msgid "Print queue to use:"
 msgstr "Introduzca eL nombre de la cola de impresión a utilizar"
 
 #. Type: string
@@ -201,7 +211,9 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../plptools.templates:8001
-msgid "Specify remote host to be contacted"
+#, fuzzy
+#| msgid "Specify remote host to be contacted"
+msgid "Remote host to be contacted:"
 msgstr "Introduzca el nombre del sistema remoto a contactar"
 
 #. Type: string

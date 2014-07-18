@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plptools\n"
 "Report-Msgid-Bugs-To: plptools@packages.debian.org\n"
-"POT-Creation-Date: 2012-06-16 22:03+0000\n"
+"POT-Creation-Date: 2014-07-19 10:52+0100\n"
 "PO-Revision-Date: 2012-06-17 07:03+0900\n"
 "Last-Translator: victory <victory.deb@gmail.com>\n"
 "Language-Team: Japanese <debian-japanese@lists.debian.org>\n"
@@ -35,9 +35,13 @@ msgstr ""
 #. Type: note
 #. Description
 #: ../plptools.templates:1001
+#, fuzzy
+#| msgid ""
+#| " plpfuse (for mounting a Psion's drives using Filesystem in USErspace)\n"
+#| " plpprintd (for printing via PC from a Psion Series 5)"
 msgid ""
 " plpfuse (for mounting a Psion's drives using Filesystem in USErspace)\n"
-" plpprintd (for printing via PC from a Psion Series 5)"
+" plpprintd (for printing via PC from an EPOC32 machine)"
 msgstr ""
 " plpfuse (ユーザ空間にあるファイルシステム FUSE (Filesystem in \n"
 "         USErspace) を利用して Psion のドライブをマウントする場合)\n"
@@ -50,8 +54,8 @@ msgid ""
 "Both daemons are disabled by default. You can enable them by editing /etc/"
 "default/plptools."
 msgstr ""
-"デーモンは両方ともデフォルトで無効になっています。/etc/default/plptools を編集"
-"することで有効化できます。"
+"デーモンは両方ともデフォルトで無効になっています。/etc/default/plptools を編"
+"集することで有効化できます。"
 
 #. Type: boolean
 #. Description
@@ -68,13 +72,15 @@ msgid ""
 "machine on the net and NEVER will use it locally, you can disable this here."
 msgstr ""
 "通常、ncpd - Psion へのシリアル接続を処理するデーモン - はブート時に起動しま"
-"す。Psion をネット上の別のマシンに接続するつもりで、ローカル向けに使うことが *"
-"ない* 場合は、ここで無効化することもできます。"
+"す。Psion をネット上の別のマシンに接続するつもりで、ローカル向けに使うことが "
+"*ない* 場合は、ここで無効化することもできます。"
 
 #. Type: string
 #. Description
 #: ../plptools.templates:3001
-msgid "Specify serial line to be used"
+#, fuzzy
+#| msgid "Specify serial line to be used"
+msgid "Serial line to use:"
 msgstr "利用するシリアルラインを指定してください"
 
 #. Type: string
@@ -90,7 +96,9 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../plptools.templates:4001
-msgid "Specify the IP address and port for ncpd"
+#, fuzzy
+#| msgid "Specify the IP address and port for ncpd"
+msgid "IP address and port for ncpd:"
 msgstr "ncpd 用の IP アドレスを指定してください"
 
 #. Type: string
@@ -112,8 +120,8 @@ msgid ""
 "Note, that THIS IS A SECURITY THREAT as no authentication and no encryption "
 "is used! DO NOT USE THIS on machines which are accessible from the Internet!"
 msgstr ""
-"認証も暗号化も行われないため、*これにはセキュリティの脅威があります*! インター"
-"ネットからアクセスできるマシンでは *これを使わないでください*!"
+"認証も暗号化も行われないため、*これにはセキュリティの脅威があります*! イン"
+"ターネットからアクセスできるマシンでは *これを使わないでください*!"
 
 #. Type: boolean
 #. Description
@@ -131,10 +139,10 @@ msgid ""
 "you have a single-user machine, you probably want to start plpfuse manually "
 "when you need it."
 msgstr ""
-"ブート時に plpfuse が開始すると、Psion が接続されるのを待って自動的に Psion を"
-"マウントします。これは root により行われるため、権限のないユーザはマウントした"
-"ディレクトリにはアクセスできません。他のユーザがいないマシンの場合は、恐らく必"
-"要な時に手作業で plpfuse を開始させた方がいいでしょう。"
+"ブート時に plpfuse が開始すると、Psion が接続されるのを待って自動的に Psion "
+"をマウントします。これは root により行われるため、権限のないユーザはマウント"
+"したディレクトリにはアクセスできません。他のユーザがいないマシンの場合は、恐"
+"らく必要な時に手作業で plpfuse を開始させた方がいいでしょう。"
 
 #. Type: boolean
 #. Description
@@ -151,13 +159,15 @@ msgid ""
 "printing Postscript in order to use this feature."
 msgstr ""
 "Psion の「PC を経由した印刷」機能を利用するつもりであればこのオプションを有効"
-"にしてください。この機能を利用するには Postscript を印刷する能力を持った、機能"
-"するプリントキューが必要です。"
+"にしてください。この機能を利用するには Postscript を印刷する能力を持った、機"
+"能するプリントキューが必要です。"
 
 #. Type: string
 #. Description
 #: ../plptools.templates:7001
-msgid "Specify the print queue to be used"
+#, fuzzy
+#| msgid "Specify the print queue to be used"
+msgid "Print queue to use:"
 msgstr "利用するプリントキューを指定してください"
 
 #. Type: string
@@ -171,7 +181,9 @@ msgstr "Psion からの印刷に利用したいプリントキューの名前を
 #. Type: string
 #. Description
 #: ../plptools.templates:8001
-msgid "Specify remote host to be contacted"
+#, fuzzy
+#| msgid "Specify remote host to be contacted"
+msgid "Remote host to be contacted:"
 msgstr "接続するリモートホストを指定してください"
 
 #. Type: string
