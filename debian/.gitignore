@@ -10,5 +10,6 @@ plptools.postrm.debhelper
 plptools.prerm.debhelper
 plptools.substvars
 plptools/
+source/local-options
 tmp/
 tmpnone/
