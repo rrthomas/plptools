@@ -15,7 +15,3 @@ override_dh_auto_install:
 override_dh_clean:
 	dh_clean
 	debconf-updatepo
-
-# %.1: %.1.in
-# 	MANDATE=`grep CHECKIN $< | awk '{print $$4}'` ; \
-# 	sed -e "s%@MANDATE@%$$MANDATE%g" $< > $@
