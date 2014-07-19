@@ -7,7 +7,7 @@ man_MANS += plpfuse.8
 endif
 
 edit = sed \
-	-e 's%@MANDATE@%'`grep CHECKIN $< | $(AWK) '{print $$4}'`'%g' \
+	-e 's|@MANDATE@|'`git log --pretty=format:"%ad" --date=short -1 $<.in`'|g' \
 	-e 's|@pkgdatadir[@]|$(pkgdatadir)|g'
 
 %.1: %.man Makefile

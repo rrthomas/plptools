@@ -1,6 +1,4 @@
 .\" Manual page for plpfuse
-.\" $Id$
-.\" CHECKIN $Date$
 .\"
 .\" Process this file with
 .\" groff -man -Tascii plpfuse.8 for ASCII output, or

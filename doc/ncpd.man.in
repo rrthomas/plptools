@@ -1,6 +1,4 @@
 .\" Manual page for ncpd
-.\" $Id$
-.\" CHECKIN $Date$
 .\"
 .\" Process this file with
 .\" groff -man -Tascii ncpd.8 for ASCII output, or
