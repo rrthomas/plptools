@@ -7,6 +7,8 @@ plptools (1.0.13-0.1) unstable; urgency=low
     (Sourceforge bug #62)
   * Fix a crash in plpfuse.  (Closes: #716591)
   * Add Japanese debconf translation.  (Closes: #718756)
+  * Update packaging to debhelper 9, Debian policy 3.9.5.
+    (Closes: #727942)
 
  -- Reuben Thomas <rrt@sc3d.org>  Sun, 06 Jul 2014 23:02:57 +0100
 
