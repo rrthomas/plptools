@@ -1,7 +1,78 @@
 plptools
 --------
 
-plptools is a suite of programs for transferring files to and from
-EPOC devices, as well as backing them up, installing software, and
-setting the clock. See INSTALL for installation instructions and
-HISTORY for some history.
+http://sourceforge.net/projects/plptools/
+
+plptools is a suite of programs for transferring files to and from EPOC
+devices, as well as backing them up, installing software, and setting the
+clock. See below for build instructions and HISTORY for some history.
+
+
+Building from source
+--------------------
+
+[See below for extra instructions for developers.]
+
+To build plpfuse, the following packages are required:
+
+  FUSE: http://fuse.sourceforge.net/
+  libattr: ftp://oss.sgi.com/projects/xfs/download/
+
+These packages come with most GNU/Linux distributions. To build plptools,
+the development packages (typically ending in -dev or -devel) must be
+installed. If they are not installed, plpfuse will not be built, but the
+rest of plptools will still work.
+
+plptools uses GNU autotools, so the usual sequence of commands works:
+
+./configure
+make
+make install
+
+In addition to the usual options, configure understands the following:
+
+  --enable-debug
+
+       builds debugging versions of the programs and libplp
+
+  --with-serial=/dev/sometty
+
+       sets the default serial device for ncpd. Without this option,
+       ncpd tries automagically to find a serial device.
+
+  --with-speed=baudrate
+
+       sets the default serial speed (normally 115200 baud).
+
+  --with-port=portnum
+
+       sets the default port on which ncpd listens and to which plpftp
+       and plpfuse connect (default 7501).
+
+  --with-drive=drivespec
+
+       sets the default drive for plpftp. The default "AUTO"
+       triggers a drive-scan on the psion and sets the drive to the
+       first drive found. If you don't want that, specify "C:" for
+       example.
+
+  --with-basedir=dirspec
+
+       overrides the default directory for plpftp. The default is \
+       which means the root directory. Note: since backslashes need to
+       be doubled once for C escaping and once for shell escaping,
+       this value is actually supplied as "\\\\".
+
+
+Information for developers
+--------------------------
+
+The git repository can be cloned with:
+
+git clone git://git.code.sf.net/p/plptools/git plptools
+
+Before building:
+
+autoreconf -i
+
+To make a release you need woger, from: http://rrt.sc3d.org/Software/woger
