@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 ### BEGIN INIT INFO
 # Provides:          plptools
 # Required-Start:    $remote_fs $syslog
@@ -28,88 +28,78 @@ test -f $CONFIG && . $CONFIG || exit 0
 
 set -e
 
-case "$1" in
-  start)
-	if test "$START_NCPD" = "yes" ; then
-		echo -n "Starting $DESC ($NCPD): "
-		start-stop-daemon --start --quiet \
-			--exec $NCPD -- $NCPD_ARGS && \
-				echo -n "done" || echo -n "failed"
-		echo "."
-		sleep 1
-	fi
-	if test "$START_PLPFUSE" = "yes" ; then
-		echo -n "Starting $DESC ($PLPFUSE): "
-		start-stop-daemon --start --quiet \
-			--exec $PLPFUSE -- $PLPFUSE_ARGS $MOUNTPOINT && \
-			echo -n "done" || echo -n "failed"
-		echo "."
-	fi
-	if test "$START_PLPPRINTD" = "yes" ; then
-		echo -n "Starting $DESC ($PLPPRINTD): "
-		start-stop-daemon --start --quiet \
-			--exec $PLPPRINTD -- $PLPPRINTD_ARGS && \
-			echo -n "done" || echo -n "failed"
-		echo "."
-	fi
-	;;
-  stop)
-	if test "$START_PLPFUSE" = "yes" ; then
-		echo -n "Stopping $DESC ($PLPFUSE): "
-		if [ "$(uname)" = Linux ]; then
-			fusermount -z -u $MOUNTPOINT || true
-		elif [ "$(uname)" = GNU/kFreeBSD ]; then
-			umount $MOUNTPOINT || true
-		else
-			echo "Port me" >&2
-			exit 1
-		fi
-		start-stop-daemon --stop --retry HUP/5/TERM/1 --quiet \
-				--exec $PLPFUSE && \
-			echo -n "done" || echo -n "already stopped"
-		echo "."
-	fi
-	if test "$START_PLPPRINTD" = "yes" ; then
-		echo -n "Stopping $DESC ($PLPPRINTD): "
-		start-stop-daemon --stop --quiet --exec $PLPPRINTD && \
-			echo -n "done" || echo -n "already stopped"
-		echo "."
-	fi
-	if test "$START_NCPD" = "yes" ; then
-		echo -n "Stopping $DESC ($NCPD): "
-		start-stop-daemon --stop --quiet --exec $NCPD && \
-			echo -n "done" || echo -n "already stopped"
-		echo "."
-	fi
+plptools-run-daemon () {
+    daemon=$1
+    shift
+    # Get rid of empty first argument caused by leading white space or empty arguments
+    if test "$1" = ""; then shift; fi
+    echo -n "Starting $DESC ($daemon): "
+    start-stop-daemon --start --quiet \
+	--exec "$daemon" -- "$@" && \
+	echo -n "done" || echo -n "failed"
+    echo "."
+}
 
+case "$1" in
+    start)
+	if test "$START_NCPD" = "yes" ; then
+	    plptools-run-daemon "$NCPD" "${NCPD_ARGS[@]}"
+	    sleep 1
+	fi
+	if test "$START_PLPFUSE" = "yes" ; then
+	    plptools-run-daemon "$PLPFUSE" "${PLPFUSE_ARGS[@]}" "$MOUNTPOINT"
+	fi
+	if test "$START_PLPPRINTD" = "yes" ; then
+	    plptools-run-daemon "$PLPPRINTD" "${PLPPRINTD_ARGS[@]}"
+	fi
 	;;
-  reload)
+    stop)
+	if test "$START_PLPFUSE" = "yes" ; then
+	    echo -n "Stopping $DESC ($PLPFUSE): "
+	    if [ "$(uname)" = Linux ]; then
+		fusermount -z -u "$MOUNTPOINT" || true
+	    elif [ "$(uname)" = GNU/kFreeBSD ]; then
+		umount "$MOUNTPOINT" || true
+	    else
+		echo "I don't know how to unmount a FUSE filing system on this OS" >&2
+		exit 1
+	    fi
+	    start-stop-daemon --stop --retry HUP/5/TERM/1 --quiet \
+		--exec "$PLPFUSE" && \
+		echo -n "done" || echo -n "already stopped"
+	    echo "."
+	fi
+	if test "$START_PLPPRINTD" = "yes" ; then
+	    echo -n "Stopping $DESC ($PLPPRINTD): "
+	    start-stop-daemon --stop --quiet --exec "$PLPPRINTD" && \
+		echo -n "done" || echo -n "already stopped"
+	    echo "."
+	fi
+	if test "$START_NCPD" = "yes" ; then
+	    echo -n "Stopping $DESC ($NCPD): "
+	    start-stop-daemon --stop --quiet --exec "$NCPD" && \
+		echo -n "done" || echo -n "already stopped"
+	    echo "."
+	fi
 	;;
-  restart|force-reload)
-	#
-	#	If the "reload" option is implemented, move the "force-reload"
-	#	option to the "reload" entry above. If not, "force-reload" is
-	#	just the same as "restart".
-	#
+    restart|force-reload)
 	$0 stop
 	sleep 1
 	$0 start
 	;;
-  status)
+    status)
 	if "$START_NCPD" = "yes" ; then
-		status_of_proc "$NCPD" ncpd || exit $?
+	    status_of_proc "$NCPD" ncpd || exit $?
 	fi
 	if "$START_PLPFUSE" = "yes" ; then
-		status_of_proc "$PLPFUSE" plpfuse || exit $?
+	    status_of_proc "$PLPFUSE" plpfuse || exit $?
 	fi
 	if "$START_PLPPRINTD" = "yes" ; then
-		status_of_proc "$PLPPRINTD" plpprintd || exit $?
+	    status_of_proc "$PLPPRINTD" plpprintd || exit $?
 	fi
-	exit 0
 	;;
-  *)
+    *)
 	N=/etc/init.d/$NAME
-	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
 	echo "Usage: $N {start|stop|restart|force-reload}" >&2
 	exit 1
 	;;

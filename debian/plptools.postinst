@@ -72,10 +72,14 @@ case "$1" in
 			PLPPRINTD_ARGS="$FREM"
 			db_get plptools/plpprintd/printqueue
 			if [ "$RET" != "psion" ] ; then
-				PLPPRINTD_ARGS="$PLPPRINTD_ARGS -s \"lpr -P$RET\""
+				PLPPRINTD_ARGS="$PLPPRINTD_ARGS -c 'lpr -P$RET'"
 			fi
 		fi
-# Move /etc/plptools.conf to /etc/default/plptools if it exists
+                # Strip leading whitespace from argument lists
+                NCPD_ARGS=${NCPD_ARGS## }
+                PLPFUSE_ARGS=${PLPFUSE_ARGS## }
+                PLPPRINTD_ARGS=${PLPPRINTD_ARGS## }
+                # Move /etc/plptools.conf to /etc/default/plptools if it exists
 		if test -f /etc/plptools.conf; then
 			mv /etc/plptools.conf /etc/default/plptools
 		fi

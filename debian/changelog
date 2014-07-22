@@ -9,8 +9,11 @@ plptools (1.0.13-0.1) unstable; urgency=low
   * Add Japanese debconf translation.  (Closes: #718756)
   * Update packaging to debhelper 9, Debian policy 3.9.5.
     (Closes: #727942)
+  * Fix handling of *_ARGS variables containing spaces in
+    /etc/default/plptools, and use correct flag to plpprintd for
+    print command.  (Closes: #238921)
 
- -- Reuben Thomas <rrt@sc3d.org>  Sun, 06 Jul 2014 23:02:57 +0100
+ -- Reuben Thomas <rrt@sc3d.org>  Tue, 22 Jul 2014 15:47:33 +0100
 
 plptools (1.0.9-2.4) unstable; urgency=low
 
