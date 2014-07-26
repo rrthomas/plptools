@@ -20,5 +20,5 @@ install-exec-local:
 
 release: distcheck
 	git diff && \
-	git tag rel-`echo $(VERSION) | sed -e 's/\./-/g'` && git push --tag \
+	git tag rel-`echo $(VERSION) | sed -e 's/\./-/g'` && git push --tag && \
 	woger sourceforge package=$(PACKAGE) version=$(VERSION) notes=release-notes-$(VERSION) dist_type="tar.gz"
