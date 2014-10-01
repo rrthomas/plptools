@@ -17,12 +17,3 @@ Description: Access EPOC device (Psion PDA) over a serial link
  You can mount them, access them FTP-style, use a local printer from
  the remote device (EPOC32 only) and install applications from SIS
  files.
-
-Package: plptools-dev
-Architecture: linux-any kfreebsd-any
-Section: devel
-Depends: plptools (= ${binary:Version}),${misc:Depends}
-Description: plptools (development files)
- This package provides a static library, headers and API documentation
- for plptools development. You need these files if you want to build
- programs which use libplp.

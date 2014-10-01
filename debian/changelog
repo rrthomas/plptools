@@ -12,6 +12,7 @@ plptools (1.0.13-0.1) unstable; urgency=low
   * Fix handling of *_ARGS variables containing spaces in
     /etc/default/plptools, and use correct flag to plpprintd for
     print command.  (Closes: #238921)
+  * Remove -dev package, which is unused and has no (build-)deps.
 
  -- Reuben Thomas <rrt@sc3d.org>  Tue, 22 Jul 2014 15:47:33 +0100
 
