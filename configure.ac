@@ -212,8 +212,6 @@ AC_SUBST(initdir)
 
 LIB_PLP='$(top_builddir)/lib/libplp.la'
 AC_SUBST(LIB_PLP)
-PLP_LDFLAGS='-L$(top_builddir)/lib/.libs'
-AC_SUBST(PLP_LDFLAGS)
 
 dnl Extra definitions for config.h
 AH_BOTTOM([
