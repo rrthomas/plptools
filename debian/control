@@ -1,5 +1,5 @@
 Source: plptools
-Build-Depends: debhelper (>= 9), gettext, libncurses5-dev, libreadline-dev, po-debconf, libfuse-dev, libattr1-dev, dh-autoreconf
+Build-Depends: debhelper (>= 9), gettext, libncurses5-dev, libreadline-dev, po-debconf, libfuse-dev, libattr1-dev, dh-autoreconf, pkg-config
 Section: otherosfs
 Priority: optional
 Maintainer: John Lines <john@paladyn.org>
