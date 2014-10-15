@@ -1,12 +1,17 @@
 #!/usr/bin/make -f
 
-DEB_CONFIGURE_EXTRA_FLAGS = --with-serial=/dev/ttyS0
-
 %:
 	dh $@ --with autoreconf
 
+override_dh_auto_configure:
+	dh_auto_configure -- --with-serial=/dev/ttyS0 --with-initdir=/etc/init.d
+
 override_dh_auto_install:
 	dh_auto_install
+	for file in debian/plptools/usr/lib/*/plptools/*.la; do \
+		sed -i "/dependency_libs/ s/'.*'/''/" $$file ; \
+	done
+	rm debian/plptools/usr/lib/*/plptools/*.so
 	install -T -D -m 644 debian/plptools.conf debian/plptools/etc/default/plptools
 
 override_dh_clean:

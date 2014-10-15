@@ -2,7 +2,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/intl
 AM_CFLAGS = $(THREADED_CFLAGS)
 AM_CXXFLAGS = $(THREADED_CXXFLAGS)
 
-lib_LTLIBRARIES = libplp.la
+pkglib_LTLIBRARIES = libplp.la
 
 libplp_la_SOURCES = bufferarray.cc  bufferstore.cc iowatch.cc ppsocket.cc \
 	rfsv16.cc rfsv32.cc rfsvfactory.cc log.cc rfsv.cc rpcs32.cc rpcs16.cc \

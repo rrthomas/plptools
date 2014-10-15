@@ -1,4 +1,4 @@
 # Use this template only as a prompt
 plptools: unused-debconf-template plptools/customize
-plptools: package-name-doesnt-match-sonames libplp0
-plptools: no-symbols-control-file usr/lib/*/libplp.so.*
+plptools: postinst-has-useless-call-to-ldconfig
+plptools: postrm-has-useless-call-to-ldconfig
