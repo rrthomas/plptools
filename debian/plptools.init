@@ -64,7 +64,6 @@ case "$1" in
 		echo "I don't know how to unmount a FUSE filing system on this OS" >&2
 		exit 1
 	    fi
-	    sleep 1 # in case we're restarted immediately afterwards
 	    start-stop-daemon --stop --retry HUP/5/TERM/1 --quiet \
 		--exec "$PLPFUSE" && \
 		echo -n "done" || echo -n "already stopped"
@@ -81,6 +80,7 @@ case "$1" in
 	    start-stop-daemon --stop --quiet --exec "$NCPD" && \
 		echo -n "done" || echo -n "already stopped"
 	    echo "."
+	    sleep 5 # in case we're restarted immediately afterwards
 	fi
 	;;
     restart|force-reload)
