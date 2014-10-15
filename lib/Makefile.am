@@ -12,7 +12,7 @@ libplp_la_SOURCES = bufferarray.cc  bufferstore.cc iowatch.cc ppsocket.cc \
 	rclip.cc siscomponentrecord.cpp  sisfile.cpp sisfileheader.cpp \
 	sisfilerecord.cpp sislangrecord.cpp sisreqrecord.cpp sistypes.cpp \
 	psibitmap.cpp psiprocess.cc
-pkginclude_HEADERS = bufferarray.h bufferstore.h iowatch.h ppsocket.h \
+noinst_HEADERS = bufferarray.h bufferstore.h iowatch.h ppsocket.h \
 	rfsv.h rfsv16.h rfsv32.h rfsvfactory.h log.h rpcs32.h rpcs16.h rpcs.h \
 	rpcsfactory.h psitime.h Enum.h plpdirent.h wprt.h plpintl.h rclip.h \
 	siscomponentrecord.h sisfile.h sisfileheader.h sisfilerecord.h \
