@@ -1,8 +1,0 @@
-usr/sbin
-usr/bin
-usr/lib/*/*.so.*
-usr/share/locale/*/LC_MESSAGES/plptools.mo
-usr/share/man/man8
-usr/share/man/man1
-usr/share/plptools
-etc/default/plptools

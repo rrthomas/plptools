@@ -2,15 +2,12 @@
 
 DEB_CONFIGURE_EXTRA_FLAGS = --with-serial=/dev/ttyS0
 
-tmp = $(shell pwd)/debian/tmp
-
 %:
 	dh $@ --with autoreconf
 
 override_dh_auto_install:
 	dh_auto_install
-	install -T -D -m 644 debian/plptools.conf $(tmp)/etc/default/plptools
-	dh_install
+	install -T -D -m 644 debian/plptools.conf debian/plptools/etc/default/plptools
 
 override_dh_clean:
 	dh_clean
