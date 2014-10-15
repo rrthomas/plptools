@@ -8,12 +8,6 @@ AM_CONFIG_HEADER(config.h)
 AM_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIR([m4])
 
-dnl Set library version
-maj=$(echo ${VERSION} | cut -d. -f1)
-min=$(echo ${VERSION} | cut -d. -f2)
-LIBVERSION=${maj}:${min}:${maj}
-AC_SUBST(LIBVERSION)
-
 dnl checks for programs
 AC_PROG_CXX
 AC_PROG_CC_C99
