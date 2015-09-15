@@ -2,7 +2,7 @@ Source: plptools
 Build-Depends: debhelper (>= 9), gettext, libncurses5-dev, libreadline-dev, po-debconf, libfuse-dev, libattr1-dev, dh-autoreconf, pkg-config
 Section: otherosfs
 Priority: optional
-Maintainer: John Lines <john@paladyn.org>
+Maintainer: Reuben Thomas <rrt@sc3d.org>
 Standards-Version: 3.9.5
 Homepage: https://github.com/rrthomas/plptools/
 
