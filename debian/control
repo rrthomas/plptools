@@ -4,7 +4,7 @@ Section: otherosfs
 Priority: optional
 Maintainer: John Lines <john@paladyn.org>
 Standards-Version: 3.9.5
-Homepage: http://plptools.sourceforge.net/
+Homepage: https://github.com/rrthomas/plptools/
 
 Package: plptools
 Architecture: linux-any kfreebsd-any
