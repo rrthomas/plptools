@@ -32,6 +32,10 @@
 /* Maximum length of a generated psion xattr string */
 #define XATTR_MAXLEN 3
 
+#ifndef ENOMEDIUM
+#define ENOMEDIUM ENODEV
+#endif
+
 int debug;
 
 int
