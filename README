@@ -11,8 +11,6 @@ clock. See below for build instructions and HISTORY for some history.
 Building from source
 --------------------
 
-[See below for extra instructions for developers.]
-
 To build plpfuse, the following packages are required:
 
   FUSE: http://fuse.sourceforge.net/
@@ -22,6 +20,10 @@ These packages come with most GNU/Linux distributions. To build plptools,
 the development packages (typically ending in -dev or -devel) must be
 installed. If they are not installed, plpfuse will not be built, but the
 rest of plptools will still work.
+
+If building from a git checkout, first run:
+
+autoreconf -i
 
 plptools uses GNU autotools, so the usual sequence of commands works:
 
@@ -70,9 +72,5 @@ Information for developers
 The git repository can be cloned with:
 
 git clone git://git.code.sf.net/p/plptools/git plptools
-
-Before building:
-
-autoreconf -i
 
 To make a release you need woger, from: http://rrt.sc3d.org/Software/woger
