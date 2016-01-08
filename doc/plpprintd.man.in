@@ -23,7 +23,7 @@ plpprintd \- Daemon for printing via PC from a Psion.
 plpprintd provides a print server for a Psion, connected to the PC.
 Using plpprintd, you can use the Psion's "Print via PC" feature to
 access any printer, available on your PC. When receiving a print job,
-the data is converted to Postscript® and then send to a printer.
+the data is converted to Postscript\*[R] and then send to a printer.
 
 .SH OPTIONS
 
