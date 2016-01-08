@@ -31,7 +31,7 @@
 #include <rfsv.h>
 
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #include "socketchan.h"
 #include "ncp.h"
