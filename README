@@ -71,6 +71,6 @@ Information for developers
 
 The git repository can be cloned with:
 
-git clone git://git.code.sf.net/p/plptools/git plptools
+git clone https://github.com/rrthomas/plptools.git
 
-To make a release you need woger, from: http://rrt.sc3d.org/Software/woger
+To make a release you need woger, from: https://github.com/rrthomas/woger
