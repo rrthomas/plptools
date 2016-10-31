@@ -21,4 +21,4 @@ install-exec-local:
 release: distcheck
 	git diff && \
 	git tag rel-`echo $(VERSION) | sed -e 's/\./-/g'` && git push --tag && \
-	woger github package=$(PACKAGE) version=$(VERSION) github_user=rrthomas github_dist_type=Source dist_type="tar.gz"
+	woger github package=$(PACKAGE) version=$(VERSION) github_user=rrthomas github_dist_type=source dist_type="tar.gz"
