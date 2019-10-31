@@ -110,6 +110,7 @@ PKG_CHECK_MODULES([FUSE], [fuse >= 2.6], [enable_fuse=yes], [enable_fuse=no])
 
 # check for libattr for plpfuse
 AC_CHECK_HEADER(attr/attributes.h,, enable_fuse=no)
+AC_CHECK_HEADERS(attr/xattr.h)
 AC_CHECK_LIB(attr, attr_set, [true], enable_fuse=no)
 
 AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse = xyes)

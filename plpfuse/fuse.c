@@ -20,7 +20,11 @@
 #include <errno.h>
 #include <sys/time.h>
 #include <syslog.h>
+#ifdef HAVE_ATTR_XATTR_H
 #include <attr/xattr.h>
+#else
+#include <sys/xattr.h>
+#endif
 #include <attr/attributes.h>
 
 #include "plpfuse.h"
