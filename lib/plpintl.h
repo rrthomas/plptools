@@ -32,7 +32,7 @@
  */
 #include <locale.h>
 
-#if defined(ENABLE_NLS) && defined(HAVE_GETTEXT)
+#if defined(ENABLE_NLS)
 #  include <libintl.h>
 static inline const char *_(const char *t) { return gettext(t); }
 #else
@@ -41,10 +41,7 @@ static inline const char *_(const char *t) { return t; }
 #endif
 static inline const char *N_(const char *t) { return t; } 
 
-/* Define this, if you have gettext */
-#define HAVE_GETTEXT 1
-
-#endif /* _INTL_H_ */
+#endif /* _PLPINTL_H_ */
 
 /*
  * Local variables:
