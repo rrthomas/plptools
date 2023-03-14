@@ -177,7 +177,7 @@ function dump_drive () {
       -C "$psidir"/$drive \
       .
 #      . \
-#     2&>1 | tee -a "$localdir"/etc/dumplog
+#     2>&1 | tee -a "$localdir"/etc/dumplog
 
     # When testing, add this to the above tar command to speed up dumps
     #  --exclude ./System \
