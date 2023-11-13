@@ -1,4 +1,4 @@
-AM_CPPFLAGS=-I$(top_srcdir)/lib
+AM_CPPFLAGS=-I$(top_srcdir)/lib -I$(top_srcdir)/intl
 AM_CFLAGS = $(THREADED_CFLAGS)
 AM_CXXFLAGS = $(THREADED_CXXFLAGS)
 
