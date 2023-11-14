@@ -66,6 +66,30 @@ In addition to the usual options, configure understands the following:
        this value is actually supplied as "\\\\".
 
 
+macOS-specific instructions
+---------------------------
+
+To build plptools on macOS, you need to install the GNU readline library.
+Assuming Homebrew is your package manager:
+
+brew install readline
+
+If building from a git checkout, after running 'autoreconf -i', delete the
+'intl/VERSION' file so that it doesn't shadow a system include file when
+compiling.
+
+In order to enable readline and history support, you need to properly
+configure the build:
+
+LDFLAGS="-L$(brew --prefix readline)/lib" \
+CPPFLAGS="-I$(brew --prefix readline)/include" ./configure
+
+Then you can build and install the package:
+
+make
+make install
+
+
 Information for developers
 --------------------------
 
