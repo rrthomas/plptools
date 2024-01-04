@@ -1,4 +1,4 @@
-AM_CPPFLAGS=-I$(top_srcdir)/lib
+AM_CPPFLAGS=-I$(top_srcdir)/lib -I$(top_srcdir)/intl
 
 bin_PROGRAMS = sisinstall
 sisinstall_LDADD = ../lib/libplp.la $(INTLLIBS)

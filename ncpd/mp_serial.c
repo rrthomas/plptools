@@ -31,6 +31,7 @@
 #include <string.h>		/* for bzero() */
 #include <termios.h>
 #if defined(linux) || defined(_IBMR2) || \
+	(defined(__APPLE__) && defined(__MACH__)) || \
 	defined(__NetBSD__) || defined(__FreeBSD__)
 #include <sys/ioctl.h>		/* for ioctl() */
 #endif
@@ -146,6 +147,7 @@ init_serial(const char *dev, int speed, int debug)
     ti.c_cflag = CS8 | HUPCL | CLOCAL | CREAD;
 #endif
 #if defined(sun) || defined(linux) || defined(__sgi) || \
+	(defined(__APPLE__) && defined(__MACH__)) || \
 	defined(__NetBSD__) || defined(__FreeBSD__)
     ti.c_cflag = CS8 | HUPCL | CLOCAL | CRTSCTS | CREAD;
     ti.c_iflag = IGNBRK | IGNPAR /*| IXON | IXOFF */;
