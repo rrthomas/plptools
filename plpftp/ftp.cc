@@ -198,13 +198,13 @@ checkAbortHash(void *, u_int32_t)
     return continueRunning;
 }
 
-static RETSIGTYPE
+static void
 sigint_handler(int i) {
     continueRunning = 0;
     signal(SIGINT, sigint_handler);
 }
 
-static RETSIGTYPE
+static void
 sigint_handler2(int i) {
     continueRunning = 0;
     fclose(stdin);

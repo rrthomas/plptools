@@ -76,7 +76,7 @@ ostream linf(&ilog);
 ostream lout(&dlog);
 ostream lerr(&elog);
 
-static RETSIGTYPE
+static void
 term_handler(int)
 {
     linf << _("Got SIGTERM") << endl;
@@ -84,7 +84,7 @@ term_handler(int)
     active = false;
 };
 
-static RETSIGTYPE
+static void
 int_handler(int)
 {
     linf << _("Got SIGINT") << endl;

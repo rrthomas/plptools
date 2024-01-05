@@ -7,13 +7,7 @@
 
 #include <sys/types.h>
 
-#ifdef HAVE_STDINT_H
 #include <stdint.h>
-#endif
-
-#ifdef HAVE_SYS_INT_TYPES_H
-#include <sys/int_types.h>
-#endif
 
 #ifndef GNU_INTTYPES
 typedef uint8_t  u_int8_t;

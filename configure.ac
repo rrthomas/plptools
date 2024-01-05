@@ -1,25 +1,26 @@
-AC_INIT(plptools, 1.0.16, plptools-developers@lists.sourceforge.net)
-AC_CANONICAL_SYSTEM
+AC_PREREQ([2.71])
+
+AC_INIT([plptools],[1.0.16],[plptools-developers@lists.sourceforge.net])
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 
 dnl Basic settings
-AC_GNU_SOURCE
-AM_CONFIG_HEADER(config.h)
-AM_PROG_LIBTOOL
+AC_USE_SYSTEM_EXTENSIONS
+AC_CONFIG_HEADERS([config.h])
+LT_INIT
 AC_CONFIG_MACRO_DIR([m4])
 
 dnl checks for programs
 AC_PROG_CXX
-AC_PROG_CC_C99
-AM_PROG_CC_C_O
+AC_PROG_CC
 AC_PROG_MAKE_SET
 AC_PROG_AWK
-AC_PATH_PROG(SED,sed)
+AC_PROG_SED
 
 dnl Debugging
 AC_MSG_CHECKING([if the debugging code should be included])
 AC_ARG_ENABLE(debug,
-AC_HELP_STRING([--enable-debug], [include debugging code]),
+AS_HELP_STRING([--enable-debug],[include debugging code]),
 [
 if test $enableval = yes; then
         CFLAGS="-g"
@@ -121,16 +122,10 @@ AC_CHECK_LIB(nsl, gethostbyname)
 ac_save_LDFLAGS=$LDFLAGS; LDFLAGS="-L/usr/ucblib -R/usr/ucblib $LDFLAGS"
 AC_CHECK_LIB(rpcsoc, svcudp_create,,LDFLAGS=$ac_save_LDFLAGS)
 
-dnl Check whether both time.h and sys/time.h may be included
-AC_HEADER_TIME
-
-dnl Type of sighandlers
-AC_TYPE_SIGNAL
-
 dnl checks for header files
 AC_CHECK_HEADERS(
-        sys/time.h sys/ioctl.h sys/errno.h sys/ttold.h stdlib.h \
-        sys/int_types.h stdint.h
+        sys/time.h sys/ioctl.h sys/errno.h sys/ttold.h \
+        sys/int_types.h
 )
 
 dnl special options for customization
