@@ -42,20 +42,22 @@
 
 int debug;
 
-int
+void
 debuglog(char *fmt, ...)
 {
   va_list ap;
   char *buf;
 
   if (!debug)
-    return 0;
+    return;
   va_start(ap, fmt);
-  vasprintf(&buf, fmt, ap);
-  syslog(LOG_DEBUG, "%s", buf);
-  free(buf);
+  if (vasprintf(&buf, fmt, ap) == -1)
+    syslog(LOG_DEBUG, "vasprintf error in debuglog");
+  else {
+    syslog(LOG_DEBUG, "%s", buf);
+    free(buf);
+  }
   va_end(ap);
-  return 0;
 }
 
 static void
@@ -167,7 +169,8 @@ dirname(const char *dir)
   static char *namebuf = NULL;
   if (namebuf)
     free(namebuf);
-  asprintf(&namebuf, "%s\\", dir);
+  if (asprintf(&namebuf, "%s\\", dir) == -1)
+    return NULL;
   return namebuf;
 }
 
