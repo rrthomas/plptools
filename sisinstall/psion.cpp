@@ -86,7 +86,7 @@ Psion::devinfo(const char drive, PlpDrive& plpDrive)
 }
 
 Enum<rfsv::errs>
-Psion::devlist(u_int32_t& devbits)
+Psion::devlist(uint32_t& devbits)
 {
 	Enum<rfsv::errs> res;
 	res = m_rfsv->devlist(devbits);

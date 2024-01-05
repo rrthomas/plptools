@@ -50,7 +50,7 @@ rfsv16::rfsv16(ppsocket *_skt)
 }
 
 Enum<rfsv::errs> rfsv16::
-fopen(u_int32_t attr, const char *name, u_int32_t &handle)
+fopen(uint32_t attr, const char *name, uint32_t &handle)
 {
     bufferStore a;
     string realName	= convertSlash(name);
@@ -70,7 +70,7 @@ fopen(u_int32_t attr, const char *name, u_int32_t &handle)
 }
 
 Enum<rfsv::errs> rfsv16::
-mktemp(u_int32_t &handle, string &tmpname)
+mktemp(uint32_t &handle, string &tmpname)
 {
     bufferStore a;
 
@@ -89,25 +89,25 @@ mktemp(u_int32_t &handle, string &tmpname)
 }
 
 Enum<rfsv::errs> rfsv16::
-fcreatefile(u_int32_t attr, const char *name, u_int32_t &handle)
+fcreatefile(uint32_t attr, const char *name, uint32_t &handle)
 {
     return fopen(attr | P_FCREATE, name, handle);
 }
 
 Enum<rfsv::errs> rfsv16::
-freplacefile(u_int32_t attr, const char *name, u_int32_t &handle)
+freplacefile(uint32_t attr, const char *name, uint32_t &handle)
 {
     return fopen(attr | P_FREPLACE, name, handle);
 }
 
 Enum<rfsv::errs> rfsv16::
-fopendir(const char * const name, u_int32_t &handle)
+fopendir(const char * const name, uint32_t &handle)
 {
     return fopen(P_FDIR, name, handle);
 }
 
 Enum<rfsv::errs> rfsv16::
-fclose(u_int32_t fileHandle)
+fclose(uint32_t fileHandle)
 {
     bufferStore a;
     a.addWord(fileHandle & 0xFFFF);
@@ -117,8 +117,8 @@ fclose(u_int32_t fileHandle)
 }
 
 Enum<rfsv::errs> rfsv16::
-opendir(const u_int32_t attr, const char *name, rfsvDirhandle &dH) {
-    u_int32_t handle;
+opendir(const uint32_t attr, const char *name, rfsvDirhandle &dH) {
+    uint32_t handle;
     Enum<rfsv::errs> res = fopendir(name, handle);
     dH.h = handle;
     dH.b.init();
@@ -141,17 +141,17 @@ readdir(rfsvDirhandle &dH, PlpDirent &e) {
 	    return E_PSI_FILE_DISC;
 	res = getResponse(dH.b);
 	if (res == E_PSI_GEN_NONE) {
-	    u_int16_t bufferLen = dH.b.getWord(0);
+	    uint16_t bufferLen = dH.b.getWord(0);
 	    dH.b.discardFirstBytes(2);
 	    if (dH.b.getLen() != bufferLen)
 		return E_PSI_GEN_FAIL;
 	}
     }
     if ((res == E_PSI_GEN_NONE) && (dH.b.getLen() > 16)) {
-	u_int16_t version = dH.b.getWord(0);
+	uint16_t version = dH.b.getWord(0);
 	if (version != 2)
 	    return E_PSI_GEN_FAIL;
-	e.attr    = attr2std((u_int32_t)dH.b.getWord(2));
+	e.attr    = attr2std((uint32_t)dH.b.getWord(2));
 	e.size    = dH.b.getDWord(4);
 	e.time.setSiboTime(dH.b.getDWord(8));
 	e.name    = dH.b.getString(16);
@@ -182,10 +182,10 @@ dir(const char *name, PlpDir &files)
     return res;
 }
 
-u_int32_t rfsv16::
-opMode(u_int32_t mode)
+uint32_t rfsv16::
+opMode(uint32_t mode)
 {
-    u_int32_t ret = 0;
+    uint32_t ret = 0;
 
     ret |= ((mode & 03) == PSI_O_RDONLY) ? 0 : P_FUPDATE;
     ret |= (mode & PSI_O_TRUNC) ? P_FREPLACE : 0;
@@ -235,7 +235,7 @@ fsetmtime(const char *name, PsiTime mtime)
 }
 
 Enum<rfsv::errs> rfsv16::
-fgetattr(const char * const name, u_int32_t &attr)
+fgetattr(const char * const name, uint32_t &attr)
 {
     bufferStore a;
     string realName = convertSlash(name);
@@ -282,11 +282,11 @@ fgeteattr(const char * const name, PlpDirent &e)
 }
 
 Enum<rfsv::errs> rfsv16::
-fsetattr(const char *name, u_int32_t seta, u_int32_t unseta)
+fsetattr(const char *name, uint32_t seta, uint32_t unseta)
 {
-    u_int32_t statusword = std2attr(seta) & (~ std2attr(unseta));
+    uint32_t statusword = std2attr(seta) & (~ std2attr(unseta));
     statusword ^= 0x0000001; // r bit is inverted
-    u_int32_t bitmask = std2attr(seta) | std2attr(unseta);
+    uint32_t bitmask = std2attr(seta) | std2attr(unseta);
     bufferStore a;
     a.addWord(statusword & 0xFFFF);
     a.addWord(bitmask & 0xFFFF);
@@ -297,7 +297,7 @@ fsetattr(const char *name, u_int32_t seta, u_int32_t unseta)
 }
 
 Enum<rfsv::errs> rfsv16::
-dircount(const char * const name, u_int32_t &count)
+dircount(const char * const name, uint32_t &count)
 {
     rfsvDirhandle h;
     Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN|PSI_A_SYSTEM|PSI_A_DIR, name, h);
@@ -314,10 +314,10 @@ dircount(const char * const name, u_int32_t &count)
 }
 
 Enum<rfsv::errs> rfsv16::
-devlist(u_int32_t &devbits)
+devlist(uint32_t &devbits)
 {
     Enum<rfsv::errs> res;
-    u_int32_t fileHandle;
+    uint32_t fileHandle;
     devbits = 0;
 
     // The following is taken from a trace between a Series 3c and PsiWin.
@@ -353,7 +353,7 @@ devlist(u_int32_t &devbits)
 	res = getResponse(a);
 	if (res)
 	    break;
-	u_int16_t version = a.getWord(0);
+	uint16_t version = a.getWord(0);
 	if ((version < 1) || (version > 2)) {
 	    cerr << "devlist: not version 1 or 2" << endl;
 	    fclose(fileHandle);
@@ -494,7 +494,7 @@ getResponse(bufferStore & data)
 }
 
 Enum<rfsv::errs> rfsv16::
-fread(const u_int32_t handle, unsigned char * const buf, const u_int32_t len, u_int32_t &count)
+fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint32_t &count)
 {
     Enum<rfsv::errs> res;
     unsigned char *p = buf;
@@ -532,7 +532,7 @@ fread(const u_int32_t handle, unsigned char * const buf, const u_int32_t len, u_
 }
 
 Enum<rfsv::errs> rfsv16::
-fwrite(const u_int32_t handle, const unsigned char * const buf, const u_int32_t len, u_int32_t &count)
+fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t len, uint32_t &count)
 {
     Enum<rfsv::errs> res;
     const unsigned char *p = buf;
@@ -568,9 +568,9 @@ Enum<rfsv::errs> rfsv16::
 copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 {
     Enum<rfsv::errs> res;
-    u_int32_t handle;
-    u_int32_t len;
-    u_int32_t total = 0;
+    uint32_t handle;
+    uint32_t len;
+    uint32_t total = 0;
 
     if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != E_PSI_GEN_NONE)
 	return res;
@@ -601,9 +601,9 @@ Enum<rfsv::errs> rfsv16::
 copyFromPsion(const char *from, int fd, cpCallback_t cb)
 {
     Enum<rfsv::errs> res;
-    u_int32_t handle;
-    u_int32_t len;
-    u_int32_t total = 0;
+    uint32_t handle;
+    uint32_t len;
+    uint32_t total = 0;
 
     if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != E_PSI_GEN_NONE)
 	return res;
@@ -627,9 +627,9 @@ copyFromPsion(const char *from, int fd, cpCallback_t cb)
 Enum<rfsv::errs> rfsv16::
 copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 {
-    u_int32_t handle;
-    u_int32_t len = 0;
-    u_int32_t total = 0;
+    uint32_t handle;
+    uint32_t len = 0;
+    uint32_t total = 0;
     Enum<rfsv::errs> res;
 
     ifstream ip(from);
@@ -659,11 +659,11 @@ copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 Enum<rfsv::errs> rfsv16::
 copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 {
-    u_int32_t handle_from;
-    u_int32_t handle_to;
-    u_int32_t len;
-    u_int32_t wlen;
-    u_int32_t total = 0;
+    uint32_t handle_from;
+    uint32_t handle_to;
+    uint32_t len;
+    uint32_t wlen;
+    uint32_t total = 0;
     Enum<rfsv::errs> res;
 
     if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle_from)) != E_PSI_GEN_NONE)
@@ -694,7 +694,7 @@ copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 }
 
 Enum<rfsv::errs> rfsv16::
-fsetsize(u_int32_t handle, u_int32_t size)
+fsetsize(uint32_t handle, uint32_t size)
 {
     bufferStore a;
     a.addWord(handle & 0xffff);
@@ -710,13 +710,13 @@ fsetsize(u_int32_t handle, u_int32_t size)
  * contains garbage instead of zeroes.
  */
 Enum<rfsv::errs> rfsv16::
-fseek(const u_int32_t handle, const int32_t pos, const u_int32_t mode, u_int32_t &resultpos)
+fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &resultpos)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
-    u_int32_t savpos = 0;
-    u_int32_t realpos;
-    u_int32_t calcpos = 0;
+    uint32_t savpos = 0;
+    uint32_t realpos;
+    uint32_t calcpos = 0;
 
 /*
   seek-parameter for psion:
@@ -857,10 +857,10 @@ setVolumeName(const char drive , const char * const name)
 /*
  * Translate SIBO attributes to standard attributes.
  */
-u_int32_t rfsv16::
-attr2std(u_int32_t attr)
+uint32_t rfsv16::
+attr2std(uint32_t attr)
 {
-    u_int32_t res = 0;
+    uint32_t res = 0;
 
     // Common attributes
     if (!(attr & P_FAWRITE))
@@ -895,10 +895,10 @@ attr2std(u_int32_t attr)
 /*
  * Translate standard attributes to SIBO attributes.
  */
-u_int32_t rfsv16::
-std2attr(const u_int32_t attr)
+uint32_t rfsv16::
+std2attr(const uint32_t attr)
 {
-    u_int32_t res = 0;
+    uint32_t res = 0;
 
     // Common attributes
     if (!(attr & PSI_A_RDONLY))

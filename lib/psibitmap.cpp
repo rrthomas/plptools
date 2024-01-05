@@ -21,7 +21,7 @@
  *
  */
 
-#include <plp_inttypes.h>
+#include <stdint.h>
 #include "psibitmap.h"
 
 void
@@ -142,23 +142,23 @@ do {                                                \
 bool
 decodeBitmap(const unsigned char *p, int &width, int &height, bufferStore &out)
 {
-    u_int32_t totlen = *((const u_int32_t*)p); p += 4;
-    u_int32_t hdrlen = *((const u_int32_t*)p); p += 4;
-    u_int32_t datlen = totlen - hdrlen;
-    u_int32_t xPixels = *((const u_int32_t*)p); p += 4;
-    u_int32_t yPixels = *((const u_int32_t*)p); p += 4;
-    u_int32_t xTwips = *((const u_int32_t*)p); p += 4;
-    u_int32_t yTwips = *((const u_int32_t*)p); p += 4;
-    u_int32_t bitsPerPixel = *((const u_int32_t*)p); p += 4;
-    u_int32_t unknown1 = *((const u_int32_t*)p); p += 4;
-    u_int32_t unknown2 = *((const u_int32_t*)p); p += 4;
-    u_int32_t RLEflag = *((const u_int32_t*)p); p += 4;
+    uint32_t totlen = *((const uint32_t*)p); p += 4;
+    uint32_t hdrlen = *((const uint32_t*)p); p += 4;
+    uint32_t datlen = totlen - hdrlen;
+    uint32_t xPixels = *((const uint32_t*)p); p += 4;
+    uint32_t yPixels = *((const uint32_t*)p); p += 4;
+    uint32_t xTwips = *((const uint32_t*)p); p += 4;
+    uint32_t yTwips = *((const uint32_t*)p); p += 4;
+    uint32_t bitsPerPixel = *((const uint32_t*)p); p += 4;
+    uint32_t unknown1 = *((const uint32_t*)p); p += 4;
+    uint32_t unknown2 = *((const uint32_t*)p); p += 4;
+    uint32_t RLEflag = *((const uint32_t*)p); p += 4;
 
     width = xPixels;
     height = yPixels;
 
-    u_int32_t picsize = xPixels * yPixels;
-    u_int32_t linelen;
+    uint32_t picsize = xPixels * yPixels;
+    uint32_t linelen;
     int pixelsPerByte = (8 / bitsPerPixel);
     int nColors = 1 << bitsPerPixel;
     int grayVal = 255 / (nColors - 1);

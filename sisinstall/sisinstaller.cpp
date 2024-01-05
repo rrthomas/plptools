@@ -14,7 +14,7 @@
 static int continueRunning;
 
 static int
-checkAbortHash(void *, u_int32_t)
+checkAbortHash(void *, uint32_t)
 {
         if (continueRunning)
                 {
@@ -522,7 +522,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 void
 SISInstaller::selectDrive()
 {
-        u_int32_t devbits = 0;
+        uint32_t devbits = 0;
         Enum<rfsv::errs> res;
         char drivelist[26];
         int space[26];
@@ -536,13 +536,13 @@ SISInstaller::selectDrive()
                         if (((devbits & 1) != 0) &&
                                 (m_psion->devinfo(i + 'A', plpdrive) == rfsv::E_PSI_GEN_NONE))
                                 {
-                                u_int32_t mediaType = plpdrive.getMediaType();
+                                uint32_t mediaType = plpdrive.getMediaType();
                                 if ((mediaType == 3) || (mediaType == 5))
                                         {
                                         drivelist[ndrives] = 'A' + i;
                                         space[ndrives] = plpdrive.getSpace();
                                         size[ndrives] = plpdrive.getSize();
-                                        printf("%c: %lld bytes free, %lld bytes total\n",
+                                        printf("%c: %lud bytes free, %lud bytes total\n",
                                                'A' + i,
                                                plpdrive.getSpace(),
                                                plpdrive.getSize());

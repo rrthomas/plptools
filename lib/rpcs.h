@@ -368,12 +368,12 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<rfsv::errs> closeHandle(u_int32_t handle)
+    virtual Enum<rfsv::errs> closeHandle(uint32_t handle)
 	{ return rfsv::E_PSI_NOT_SIBO; }
 
-    virtual Enum<rfsv::errs> regOpenIter(u_int32_t, char *, u_int16_t &)
+    virtual Enum<rfsv::errs> regOpenIter(uint32_t, char *, uint16_t &)
 	{ return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regReadIter(u_int16_t)
+    virtual Enum<rfsv::errs> regReadIter(uint16_t)
 	{ return rfsv::E_PSI_NOT_SIBO;}
     virtual Enum<rfsv::errs> regWrite(void)
 	{ return rfsv::E_PSI_NOT_SIBO;}
@@ -396,7 +396,7 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<rfsv::errs> configRead(u_int32_t size, bufferStore &data)
+    virtual Enum<rfsv::errs> configRead(uint32_t size, bufferStore &data)
 	{ return rfsv::E_PSI_NOT_SIBO; }
 
     /**
@@ -486,7 +486,7 @@ protected:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<rfsv::errs> configOpen(u_int16_t &handle, u_int32_t size)
+    virtual Enum<rfsv::errs> configOpen(uint16_t &handle, uint32_t size)
 	{ return rfsv::E_PSI_NOT_SIBO; }
 
    /**

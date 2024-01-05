@@ -133,7 +133,7 @@ getMachineInfo(machineInfo &mi)
 static unsigned long hhh;
 
 Enum<rfsv::errs> rpcs32::
-regOpenIter(u_int32_t uid, char *match, u_int16_t &handle)
+regOpenIter(uint32_t uid, char *match, uint16_t &handle)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
@@ -152,7 +152,7 @@ regOpenIter(u_int32_t uid, char *match, u_int16_t &handle)
 }
 
 Enum<rfsv::errs> rpcs32::
-regReadIter(u_int16_t handle)
+regReadIter(uint16_t handle)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
@@ -198,7 +198,7 @@ setTime(time_t time)
 }
 
 Enum<rfsv::errs> rpcs32::
-configOpen(u_int16_t &handle, u_int32_t size)
+configOpen(uint16_t &handle, uint32_t size)
 {
     bufferStore a;
     Enum<rfsv::errs> res;
@@ -213,10 +213,10 @@ configOpen(u_int16_t &handle, u_int32_t size)
 }
 
 Enum<rfsv::errs> rpcs32::
-configRead(u_int32_t size, bufferStore &ret)
+configRead(uint32_t size, bufferStore &ret)
 {
     bufferStore a;
-    u_int16_t handle;
+    uint16_t handle;
     Enum<rfsv::errs> res;
 
     ret.init();
@@ -242,7 +242,7 @@ Enum<rfsv::errs> rpcs32::
 configWrite(bufferStore data)
 {
     bufferStore a;
-    u_int16_t handle;
+    uint16_t handle;
     Enum<rfsv::errs> res;
 
     return rfsv::E_PSI_GEN_NONE;
@@ -265,7 +265,7 @@ configWrite(bufferStore data)
 }
 
 Enum<rfsv::errs> rpcs32::
-closeHandle(u_int16_t handle)
+closeHandle(uint16_t handle)
 {
     bufferStore a;
 

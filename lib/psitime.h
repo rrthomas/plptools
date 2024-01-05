@@ -48,7 +48,7 @@ typedef struct psi_timeval_t {
      */
     friend std::ostream &operator<<(std::ostream &o, const psi_timeval_t &ptv) {
 	std::ostream::fmtflags old = o.flags();
-	u_int64_t micro = ptv.tv_high;
+	uint64_t micro = ptv.tv_high;
 	micro = (micro << 32) | ptv.tv_low;
 	micro /= 1000000;
 	int s = micro % 60;
@@ -76,11 +76,11 @@ typedef struct psi_timeval_t {
     /**
     * The lower 32 bits
     */
-    u_int32_t tv_low;
+    uint32_t tv_low;
     /**
     * The upper 32 bits
     */
-    u_int32_t tv_high;
+    uint32_t tv_high;
 } psi_timeval;
 
 /**
@@ -157,7 +157,7 @@ public:
     * @param _ptvHi The high 32 bits of a Psion time value for initialization.
     * @param _ptvLo The low 32 bits of a Psion time value for initialization.
     */
-    PsiTime(const u_int32_t _ptvHi, const u_int32_t _ptvLo);
+    PsiTime(const uint32_t _ptvHi, const uint32_t _ptvLo);
 
     /**
     * Constructs a new instance, initializing to now.
@@ -186,7 +186,7 @@ public:
     *
     * @param stime The new SIBO time representation.
     */
-    void setSiboTime(u_int32_t stime);
+    void setSiboTime(uint32_t stime);
 
     /**
     * Modifies the value of this instance.
@@ -194,7 +194,7 @@ public:
     * @param _ptvHi The high 32 bits of a Psion time.
     * @param _ptvLo The low 32 bits of a Psion time.
     */
-    void setPsiTime(const u_int32_t _ptvHi, const u_int32_t _ptvLo);
+    void setPsiTime(const uint32_t _ptvHi, const uint32_t _ptvLo);
 
     /**
     * Sets the Psion time zone of this instance.
@@ -245,7 +245,7 @@ public:
     *
     * @returns The instance's current time as SIBO time.
     */
-    u_int32_t getSiboTime();
+    uint32_t getSiboTime();
 
     /**
     * Retrieves the instance's current value
@@ -262,7 +262,7 @@ public:
     * @returns The instance's current time as lower 32 bits of
     * a Psion struct psi_timeval_t.
     */
-    const u_int32_t getPsiTimeLo(void);
+    const uint32_t getPsiTimeLo(void);
 
     /**
     * Retrieves the instance's current value
@@ -271,7 +271,7 @@ public:
     * @returns The instance's current time as upper 32 bits of
     * a Psion struct psi_timeval_t.
     */
-    const u_int32_t getPsiTimeHi(void);
+    const uint32_t getPsiTimeHi(void);
 
     /**
     * Prints the instance's value in human readable format.

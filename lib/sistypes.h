@@ -23,7 +23,8 @@
 #ifndef _SISTYPES_H
 #define _SISTYPES_H
 
-#include <plp_inttypes.h>
+#include <stdint.h>
+#include <sys/types.h>
 
 /**
  * Return Codes.

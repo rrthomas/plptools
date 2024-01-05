@@ -52,7 +52,7 @@ public:
     * Constructor.
     * Create an instance, presetting all thre uid values.
     */
-    PlpUID(const u_int32_t u1, const u_int32_t u2, const u_int32_t u3);
+    PlpUID(const uint32_t u1, const uint32_t u2, const uint32_t u3);
 
     /**
     * Retrieve a UID value.
@@ -60,7 +60,7 @@ public:
     * @param idx The index of the desired UID. Range must be (0..2),
     *            otherwise an assertion is triggered.
     */
-    u_int32_t operator[](int idx);
+    uint32_t operator[](int idx);
 
 private:
     long uid[3];
@@ -99,8 +99,8 @@ public:
     /**
     * Initializing Constructor
     */
-    PlpDirent(const u_int32_t size, const u_int32_t attr, const u_int32_t tHi,
-	      const u_int32_t tLo, const char * const name);
+    PlpDirent(const uint32_t size, const uint32_t attr, const uint32_t tHi,
+	      const uint32_t tLo, const char * const name);
 
     /**
     * Default destructor.
@@ -112,14 +112,14 @@ public:
     *
     * @returns The file size in bytes.
     */
-    u_int32_t getSize();
+    uint32_t getSize();
 
     /**
     * Retrieves the file attributes of a directory entry.
     *
     * @returns The generic attributes ( @ref rfsv:file_attribs ).
     */
-    u_int32_t getAttr();
+    uint32_t getAttr();
 
     /**
     * Retrieves the UIDs of a directory entry.
@@ -129,7 +129,7 @@ public:
     *
     * @returns The selected UID or 0 if the index is out of range.
     */
-    u_int32_t getUID(int uididx);
+    uint32_t getUID(int uididx);
 
     /**
     * Retrieves the @ref PlpUID object of a directory entry.
@@ -180,8 +180,8 @@ public:
     friend std::ostream &operator<<(std::ostream &o, const PlpDirent &e);
 
 private:
-    u_int32_t size;
-    u_int32_t attr;
+    uint32_t size;
+    uint32_t attr;
     PlpUID  UID;
     PsiTime time;
     std::string  attrstr;
@@ -231,7 +231,7 @@ public:
     *   8 = Remote
     * </pre>
     */
-    u_int32_t getMediaType();
+    uint32_t getMediaType();
 
     /**
     * Retrieve the media type of the drive.
@@ -259,7 +259,7 @@ public:
     *   bit 5 = removable
     * </pre>
     */
-    u_int32_t getDriveAttribute();
+    uint32_t getDriveAttribute();
 
     /**
     * Retrieve the attributes of the drive.
@@ -285,7 +285,7 @@ public:
     *   bit 3 = write protected
     * </pre>
     */
-    u_int32_t getMediaAttribute();
+    uint32_t getMediaAttribute();
 
     /**
     * Retrieve the attributes of the media.
@@ -303,21 +303,21 @@ public:
     *
     * @returns The UID of the probed drive.
     */
-    u_int32_t getUID();
+    uint32_t getUID();
 
     /**
     * Retrieve the total capacity of the drive.
     *
     * @returns The capacity of the probed drive in bytes.
     */
-    u_int64_t getSize();
+    uint64_t getSize();
 
     /**
     * Retrieve the free capacity on the drive.
     *
     * @returns The free space on the probed drive in bytes.
     */
-    u_int64_t getSpace();
+    uint64_t getSpace();
 
     /**
     * Retrieve the volume name of the drive.
@@ -334,20 +334,20 @@ public:
     char getDrivechar();
 
 private:
-    void setMediaType(u_int32_t type);
-    void setDriveAttribute(u_int32_t attr);
-    void setMediaAttribute(u_int32_t attr);
-    void setUID(u_int32_t uid);
-    void setSize(u_int32_t sizeLo, u_int32_t sizeHi);
-    void setSpace(u_int32_t spaceLo, u_int32_t spaceHi);
+    void setMediaType(uint32_t type);
+    void setDriveAttribute(uint32_t attr);
+    void setMediaAttribute(uint32_t attr);
+    void setUID(uint32_t uid);
+    void setSize(uint32_t sizeLo, uint32_t sizeHi);
+    void setSpace(uint32_t spaceLo, uint32_t spaceHi);
     void setName(char drive, const char * const volname);
 
-    u_int32_t mediatype;
-    u_int32_t driveattr;
-    u_int32_t mediaattr;
-    u_int32_t uid;
-    u_int64_t size;
-    u_int64_t space;
+    uint32_t mediatype;
+    uint32_t driveattr;
+    uint32_t mediaattr;
+    uint32_t uid;
+    uint64_t size;
+    uint64_t space;
     char drivechar;
     std::string name;
 };

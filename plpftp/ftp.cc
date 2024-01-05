@@ -184,13 +184,13 @@ Wildmat(const char *s, char *p)
 }
 
 static int
-checkAbortNoHash(void *, u_int32_t)
+checkAbortNoHash(void *, uint32_t)
 {
     return continueRunning;
 }
 
 static int
-checkAbortHash(void *, u_int32_t)
+checkAbortHash(void *, uint32_t)
 {
     if (continueRunning) {
 	printf("#"); fflush(stdout);
@@ -325,7 +325,7 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
 		// the usual \System\Apps\<AppName>\<AppName>.app
 		// on all drives.
 		if (prog.find('\\') == prog.npos) {
-		    u_int32_t devbits;
+		    uint32_t devbits;
 		    if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 			int i;
 			for (i = 0; i < 26; i++) {
@@ -432,8 +432,8 @@ int
 ftp::putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file)
 {
     Enum<rfsv::errs> res;
-    u_int32_t fh;
-    u_int32_t l;
+    uint32_t fh;
+    uint32_t l;
     const unsigned char *p;
     bufferStore b;
     char *data;
@@ -491,8 +491,8 @@ ftp::putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
 // void TopLevel::
 // putClipImage(QImage &img) {
 //     Enum<rfsv::errs> res;
-//     u_int32_t fh;
-//     u_int32_t l;
+//     uint32_t fh;
+//     uint32_t l;
 //     const unsigned char *p;
 //     bufferStore b;
 
@@ -560,13 +560,13 @@ int
 ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file) {
     Enum<rfsv::errs> res;
     PlpDirent de;
-    u_int32_t fh;
+    uint32_t fh;
     string clipText;
 
     res = a.fgeteattr(CLIPFILE, de);
     if (res == rfsv::E_PSI_GEN_NONE) {
 	if (de.getAttr() & rfsv::PSI_A_ARCHIVE) {
-	    u_int32_t len = de.getSize();
+	    uint32_t len = de.getSize();
 	    char *buf = (char *)malloc(len);
 
 	    if (!buf) {
@@ -576,14 +576,14 @@ ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
 	    res = a.fopen(a.opMode(rfsv::PSI_O_RDONLY | rfsv::PSI_O_SHARE),
 			   CLIPFILE, fh);
 	    if (res == rfsv::E_PSI_GEN_NONE) {
-		u_int32_t tmp;
+		uint32_t tmp;
 		res = a.fread(fh, (unsigned char *)buf, len, tmp);
 		a.fclose(fh);
 
 		if ((res == rfsv::E_PSI_GEN_NONE) && (tmp == len)) {
 		    char *p = buf;
 		    int lcount;
-		    u_int32_t     *ti = (u_int32_t*)buf;
+		    uint32_t     *ti = (uint32_t*)buf;
 
 		    // Check base header
 		    if (*ti++ != 0x10000037) {
@@ -608,13 +608,13 @@ ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
 		    // Length of section table (in DWords)
 		    lcount = *p++;
 
-		    u_int32_t *td = (u_int32_t*)p;
+		    uint32_t *td = (uint32_t*)p;
 		    while (lcount > 0) {
-			u_int32_t sType = *td++;
+			uint32_t sType = *td++;
 			if (sType == 0x10000033) {
 			    // An ASCII section
 			    p = buf + *td;
-			    len = *((u_int32_t*)p);
+			    len = *((uint32_t*)p);
 			    p += 4;
 			    psiText2ascii(p, len);
 			    clipText += (char *)p;
@@ -681,7 +681,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
     }
 
     if (!strcmp(DDRIVE, "AUTO")) {
-	u_int32_t devbits;
+	uint32_t devbits;
 	int i;
 
 	strcpy(defDrive, "::");
@@ -778,7 +778,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    continue;
 	}
 	if (!strcmp(argv[0], "gattr") && (argc == 2)) {
-	    u_int32_t attr;
+	    uint32_t attr;
 	    strcpy(f1, psionDir);
 	    strcat(f1, argv[1]);
 	    if ((res = a.fgetattr(f1, attr)) != rfsv::E_PSI_GEN_NONE)
@@ -848,7 +848,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    continue;
 	}
 	if (!strcmp(argv[0], "dircnt")) {
-	    u_int32_t cnt;
+	    uint32_t cnt;
 	    if ((res = a.dircount(psionDir, cnt)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else
@@ -856,7 +856,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    continue;
 	}
 	if (!strcmp(argv[0], "devs")) {
-	    u_int32_t devbits;
+	    uint32_t devbits;
 	    if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
 		cout << _("Drive Type Volname     Total     Free      UniqueID") << endl;
 		for (int i = 0; i < 26; i++) {
@@ -887,7 +887,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    char *dname = psionDir;
 
 	    if (argc > 1) {
-		u_int32_t tmp;
+		uint32_t tmp;
 		strcpy(dtmp, psionDir);
 		if (!strcmp(argv[1], "..")) {
 		    strcpy(f1, psionDir);
@@ -946,7 +946,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		strcpy(psionDir, defDrive);
 		strcat(psionDir, DBASEDIR);
 	    } else {
-		u_int32_t tmp;
+		uint32_t tmp;
 		if (!strcmp(argv[1], "..")) {
 		    strcpy(f1, psionDir);
 		    char *p = f1 + strlen(f1);

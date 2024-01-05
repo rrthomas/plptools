@@ -29,8 +29,8 @@
 
 #include <bufferstore.h>
 #include <bufferarray.h>
-#include <plp_inttypes.h>
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>

@@ -175,7 +175,7 @@ int rfsv_dir(const char *file, dentry **e) {
     return epocerr_to_errno(ret);
 }
 
-int rfsv_dircount(const char *file, u_int32_t *count) {
+int rfsv_dircount(const char *file, uint32_t *count) {
     if (!a)
 	return -ENODEV;
     return epocerr_to_errno(a->dircount(file, *count));
@@ -205,8 +205,8 @@ int rfsv_fclose(long handle) {
     return epocerr_to_errno(a->fclose(handle));
 }
 
-int rfsv_fcreate(long attr, const char *file, u_int32_t *handle) {
-    u_int32_t ph;
+int rfsv_fcreate(long attr, const char *file, uint32_t *handle) {
+    uint32_t ph;
     long ret;
 
     if (!a)
@@ -216,7 +216,7 @@ int rfsv_fcreate(long attr, const char *file, u_int32_t *handle) {
     return epocerr_to_errno(ret);
 }
 
-int rfsv_open(const char *name, long mode, u_int32_t *handle) {
+int rfsv_open(const char *name, long mode, uint32_t *handle) {
     long ret, retry;
 
     if (!a)
@@ -231,7 +231,7 @@ int rfsv_open(const char *name, long mode, u_int32_t *handle) {
 }
 
 int rfsv_read(char *buf, long offset, long len, const char *name) {
-    u_int32_t ret = 0, r_offset, handle;
+    uint32_t ret = 0, r_offset, handle;
 
     if (!a)
 	return -ENODEV;
@@ -246,7 +246,7 @@ int rfsv_read(char *buf, long offset, long len, const char *name) {
 }
 
 int rfsv_write(const char *buf, long offset, long len, const char *name) {
-    u_int32_t ret = 0, r_offset, handle;
+    uint32_t ret = 0, r_offset, handle;
 
     if (!a)
 	return -ENODEV;
@@ -267,7 +267,7 @@ int rfsv_setmtime(const char *name, long time) {
 }
 
 int rfsv_setsize(const char *name, long size) {
-    u_int32_t ph;
+    uint32_t ph;
     long ret;
 
     if (!a)
@@ -307,7 +307,7 @@ int rfsv_rename(const char *oldname, const char *newname) {
 
 int rfsv_drivelist(int *cnt, device **dlist) {
     *dlist = NULL;
-    u_int32_t devbits;
+    uint32_t devbits;
     long ret;
     int i;
 

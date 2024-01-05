@@ -42,11 +42,11 @@ class rpcs32 : public rpcs {
  public:
     Enum<rfsv::errs> getCmdLine(const char *, std::string &);
     Enum<rfsv::errs> getMachineInfo(machineInfo &);
-    Enum<rfsv::errs> configRead(u_int32_t, bufferStore &);
+    Enum<rfsv::errs> configRead(uint32_t, bufferStore &);
     Enum<rfsv::errs> configWrite(bufferStore);
-    Enum<rfsv::errs> closeHandle(u_int16_t);
-    Enum<rfsv::errs> regOpenIter(u_int32_t uid, char *match, u_int16_t &handle);
-    Enum<rfsv::errs> regReadIter(u_int16_t handle);
+    Enum<rfsv::errs> closeHandle(uint16_t);
+    Enum<rfsv::errs> regOpenIter(uint32_t uid, char *match, uint16_t &handle);
+    Enum<rfsv::errs> regReadIter(uint16_t handle);
     Enum<rfsv::errs> setTime(time_t time);
 #if 0
     Enum<rfsv::errs> regWrite(void);
@@ -58,7 +58,7 @@ class rpcs32 : public rpcs {
 #endif
 
 protected:
-    Enum<rfsv::errs> configOpen(u_int16_t &, u_int32_t);
+    Enum<rfsv::errs> configOpen(uint16_t &, uint32_t);
 
  private:
     rpcs32(ppsocket *);

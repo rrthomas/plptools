@@ -345,7 +345,7 @@ static int plp_mknod(const char *path, mode_t mode, dev_t dev)
   debuglog("plp_mknod `%s' %o", ++path, mode);
 
   if (S_ISREG(mode) && dev == 0) {
-    u_int32_t phandle;
+    uint32_t phandle;
     if ((ret = rfsv_fcreate(0x200, path, &phandle)) == 0)
       rfsv_fclose(phandle);
   }

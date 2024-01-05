@@ -30,7 +30,7 @@ FakePsion::devinfo(const char drive, PlpDrive& plpDrive)
 }
 
 Enum<rfsv::errs>
-FakePsion::devlist(u_int32_t& devbits)
+FakePsion::devlist(uint32_t& devbits)
 {
 	return rfsv::E_PSI_GEN_FAIL;
 }

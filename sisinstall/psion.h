@@ -29,7 +29,7 @@ public:
 
 	virtual Enum<rfsv::errs> devinfo(const char drive, PlpDrive& plpDrive);
 
-	virtual Enum<rfsv::errs> devlist(u_int32_t& devbits);
+	virtual Enum<rfsv::errs> devlist(uint32_t& devbits);
 
 	virtual Enum<rfsv::errs> dir(const char* dir, PlpDir& files);
 

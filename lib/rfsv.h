@@ -42,7 +42,7 @@ const int RFSV_SENDLEN = 2000;
  * Defines the callback procedure for
  * progress indication of copy operations.
  */
-typedef int (*cpCallback_t)(void *, u_int32_t);
+typedef int (*cpCallback_t)(void *, uint32_t);
 
 class rfsv16;
 class rfsv32;
@@ -58,7 +58,7 @@ class rfsvDirhandle {
     friend class rfsv32;
 
 private:
-    u_int32_t h;
+    uint32_t h;
     bufferStore b;
 };
 
@@ -236,7 +236,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> fopen(const u_int32_t attr, const char * const name, u_int32_t &handle) = 0;
+    virtual Enum<errs> fopen(const uint32_t attr, const char * const name, uint32_t &handle) = 0;
 
     /**
     * Creates a unique temporary file.
@@ -248,7 +248,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> mktemp(u_int32_t &handle, std::string &name) = 0;
+    virtual Enum<errs> mktemp(uint32_t &handle, std::string &name) = 0;
 
     /**
     * Creates a named file.
@@ -261,7 +261,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> fcreatefile(const u_int32_t attr, const char * const name, u_int32_t &handle) = 0;
+    virtual Enum<errs> fcreatefile(const uint32_t attr, const char * const name, uint32_t &handle) = 0;
 
     /**
     * Creates an named file, overwriting an existing file.
@@ -274,7 +274,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> freplacefile(const u_int32_t attr, const char * const name, u_int32_t &handle) = 0;
+    virtual Enum<errs> freplacefile(const uint32_t attr, const char * const name, uint32_t &handle) = 0;
 
     /**
     * Close a file on the Psion whih was previously opened/created by using
@@ -282,7 +282,7 @@ public:
     *
     * @param handle A valid file handle.
     */
-    virtual Enum<errs> fclose(const u_int32_t handle) = 0;
+    virtual Enum<errs> fclose(const uint32_t handle) = 0;
 
     /**
     * Reads a directory on the Psion.
@@ -324,7 +324,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> fgetattr(const char * const name, u_int32_t &attr) = 0;
+    virtual Enum<errs> fgetattr(const char * const name, uint32_t &attr) = 0;
 
     /**
     * Retrieves attributes, size and modification time of a file on the Psion.
@@ -341,7 +341,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> fsetattr(const char * const name, const u_int32_t seta, const u_int32_t unseta) = 0;
+    virtual Enum<errs> fsetattr(const char * const name, const uint32_t seta, const uint32_t unseta) = 0;
 
     /**
     * Counts number of entries in a directory.
@@ -351,7 +351,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> dircount(const char * const name, u_int32_t &count) = 0;
+    virtual Enum<errs> dircount(const char * const name, uint32_t &count) = 0;
 
     /**
     * Retrieves available drives on the Psion.
@@ -360,7 +360,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> devlist(u_int32_t &devbits) = 0;
+    virtual Enum<errs> devlist(uint32_t &devbits) = 0;
 
     /**
     * Retrieves details about a drive.
@@ -385,7 +385,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> fread(const u_int32_t handle, unsigned char * const buffer, const u_int32_t len, u_int32_t &count) = 0;
+    virtual Enum<errs> fread(const uint32_t handle, unsigned char * const buffer, const uint32_t len, uint32_t &count) = 0;
 
     /**
     * Write to a file on the Psion.
@@ -397,7 +397,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> fwrite(const u_int32_t handle, const unsigned char * const buffer, const u_int32_t len, u_int32_t &count) = 0;
+    virtual Enum<errs> fwrite(const uint32_t handle, const unsigned char * const buffer, const uint32_t len, uint32_t &count) = 0;
 
     /**
     * Copies a file from the Psion to the local machine.
@@ -461,7 +461,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> fsetsize(const u_int32_t handle, const u_int32_t size) = 0;
+    virtual Enum<errs> fsetsize(const uint32_t handle, const uint32_t size) = 0;
 
     /**
     * Sets the current file position of a file on the Psion.
@@ -473,7 +473,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> fseek(const u_int32_t handle, const int32_t offset, const u_int32_t mode, u_int32_t &resultpos) = 0;
+    virtual Enum<errs> fseek(const uint32_t handle, const int32_t offset, const uint32_t mode, uint32_t &resultpos) = 0;
 
     /**
     * Creates a directory on the Psion.
@@ -522,7 +522,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> opendir(const u_int32_t attr, const char * const name, rfsvDirhandle &handle) = 0;
+    virtual Enum<errs> opendir(const uint32_t attr, const char * const name, rfsvDirhandle &handle) = 0;
 
     /**
     * Read directory entries.
@@ -583,7 +583,7 @@ public:
     * @returns Pointer to static textual representation of file attributes.
     *
     */
-    std::string attr2String(const u_int32_t attr);
+    std::string attr2String(const uint32_t attr);
 
     /**
     * Converts an open-mode (A combination of the PSI_O_ constants.)
@@ -594,7 +594,7 @@ public:
     * @returns The machine specific representation for use with
     *          @ref fopen , @ref fcreatefile and @freplacefile.
     */
-    virtual u_int32_t opMode(const u_int32_t mode) = 0;
+    virtual uint32_t opMode(const uint32_t mode) = 0;
 
     /**
     * Utility method, converts '/' to '\'.

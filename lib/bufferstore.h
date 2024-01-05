@@ -93,7 +93,7 @@ public:
     *
     * @returns The value of the word at index <em>pos</em>
     */
-    u_int16_t getWord(long pos = 0) const;
+    uint16_t getWord(long pos = 0) const;
 
     /**
     * Retrieves the dword at index <em>pos</em>.
@@ -102,7 +102,7 @@ public:
     *
     * @returns The value of the dword at index <em>pos</em>
     */
-    u_int32_t getDWord(long pos = 0) const;
+    uint32_t getDWord(long pos = 0) const;
 
     /**
     * Retrieves the characters at index <em>pos</em>.

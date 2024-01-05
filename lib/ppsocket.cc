@@ -283,7 +283,7 @@ getBufferStore(bufferStore & a, bool wait)
     * 1 for message OK, and -1 for socket problem
     */
 
-    u_int32_t l;
+    uint32_t l;
     long count = 0;
     unsigned char *buff;
     unsigned char *bp;
@@ -316,7 +316,7 @@ bool ppsocket::
 sendBufferStore(const bufferStore & a)
 {
     long l = a.getLen();
-    u_int32_t hl = htonl(l);
+    uint32_t hl = htonl(l);
     long sent = 0;
     int retries = 0;
     int i;

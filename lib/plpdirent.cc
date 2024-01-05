@@ -30,11 +30,11 @@ PlpUID::PlpUID() {
     memset(uid, 0, sizeof(uid));
 }
 
-PlpUID::PlpUID(const u_int32_t u1, const u_int32_t u2, const u_int32_t u3) {
+PlpUID::PlpUID(const uint32_t u1, const uint32_t u2, const uint32_t u3) {
     uid[0] = u1; uid[1] = u2; uid[2] = u3;
 }
 
-u_int32_t PlpUID::
+uint32_t PlpUID::
 operator[](int idx) {
     assert ((idx > -1) && (idx < 3));
     return uid[idx];
@@ -53,8 +53,8 @@ PlpDirent::PlpDirent(const PlpDirent &e) {
     attrstr = e.attrstr;
 }
 
-PlpDirent::PlpDirent(const u_int32_t _size, const u_int32_t _attr,
-		     const u_int32_t tHi, const u_int32_t tLo,
+PlpDirent::PlpDirent(const uint32_t _size, const uint32_t _attr,
+		     const uint32_t tHi, const uint32_t tLo,
 		     const char * const _name) {
     size = _size;
     attr = _attr;
@@ -64,17 +64,17 @@ PlpDirent::PlpDirent(const u_int32_t _size, const u_int32_t _attr,
     attrstr = "";
 }
 
-u_int32_t PlpDirent::
+uint32_t PlpDirent::
 getSize() {
     return size;
 }
 
-u_int32_t PlpDirent::
+uint32_t PlpDirent::
 getAttr() {
     return attr;
 }
 
-u_int32_t PlpDirent::
+uint32_t PlpDirent::
 getUID(int uididx) {
     if ((uididx >= 0) && (uididx < 4))
 	return UID[uididx];
@@ -130,32 +130,32 @@ PlpDrive::PlpDrive(const PlpDrive &other) {
 }
 
 void PlpDrive::
-setMediaType(u_int32_t type) {
+setMediaType(uint32_t type) {
     mediatype = type;
 }
 
 void PlpDrive::
-setDriveAttribute(u_int32_t attr) {
+setDriveAttribute(uint32_t attr) {
     driveattr = attr;
 }
 
 void PlpDrive::
-setMediaAttribute(u_int32_t attr) {
+setMediaAttribute(uint32_t attr) {
     mediaattr = attr;
 }
 
 void PlpDrive::
-setUID(u_int32_t attr) {
+setUID(uint32_t attr) {
     uid = attr;
 }
 
 void PlpDrive::
-setSize(u_int32_t sizeLo, u_int32_t sizeHi) {
+setSize(uint32_t sizeLo, uint32_t sizeHi) {
     size = ((unsigned long long)sizeHi << 32) + sizeLo;
 }
 
 void PlpDrive::
-setSpace(u_int32_t spaceLo, u_int32_t spaceHi) {
+setSpace(uint32_t spaceLo, uint32_t spaceHi) {
     space = ((unsigned long long)spaceHi << 32) + spaceLo;
 }
 
@@ -166,7 +166,7 @@ setName(char drive, const char * const volname) {
     name += volname;
 }
 
-u_int32_t PlpDrive::
+uint32_t PlpDrive::
 getMediaType() {
     return mediatype;
 }
@@ -188,7 +188,7 @@ getMediaType(string &ret) {
     ret = media_types[mediatype];
 }
 
-u_int32_t PlpDrive::
+uint32_t PlpDrive::
 getDriveAttribute() {
     return driveattr;
 }
@@ -217,7 +217,7 @@ getDriveAttribute(string &ret) {
 	appendWithDelim(ret, _("removable"));
 }
 
-u_int32_t PlpDrive::
+uint32_t PlpDrive::
 getMediaAttribute() {
     return mediaattr;
 }
@@ -236,17 +236,17 @@ getMediaAttribute(string &ret) {
 	appendWithDelim(ret, _("write protected"));
 }
 
-u_int32_t PlpDrive::
+uint32_t PlpDrive::
 getUID() {
     return uid;
 }
 
-u_int64_t PlpDrive::
+uint64_t PlpDrive::
 getSize() {
     return size;
 }
 
-u_int64_t PlpDrive::
+uint64_t PlpDrive::
 getSpace() {
     return space;
 }
