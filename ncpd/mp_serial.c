@@ -41,9 +41,7 @@
 #endif
 #include <stdlib.h>
 
-#ifndef hpux
-#define mflag int
-#else				/* hpux */
+#ifdef hpux
 #include <sys/termiox.h>
 #include <sys/modem.h>
 #endif
