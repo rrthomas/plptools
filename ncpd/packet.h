@@ -3,7 +3,7 @@
  *
  * This file is part of plptools.
  *
- *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
+ *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,7 @@
 #ifndef _packet_h
 #define _packet_h
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "config.h"
 #include <stdio.h>
 #include <pthread.h>
 

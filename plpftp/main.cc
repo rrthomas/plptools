@@ -3,7 +3,7 @@
  *
  * This file is part of plptools.
  *
- *  Copyright (C) 1999  Philip Proudman <philip.proudman@btinternet.com>
+ *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -21,9 +21,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "config.h"
 
 #include <rfsv.h>
 #include <rfsvfactory.h>
@@ -86,7 +84,7 @@ void
 ftpHeader()
 {
     cout << _("PLPFTP Version ") << VERSION;
-    cout << _(" Copyright (C) 1999  Philip Proudman") << endl;
+    cout << _(" Copyright (C) 1999 Philip Proudman") << endl;
     cout << _(" Additions Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>") << endl;
     cout << _("                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>") << endl;
     cout << _("                   & (C) 2006-2008 Reuben Thomas <rrt@sc3d.org>") << endl;

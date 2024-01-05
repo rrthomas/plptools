@@ -23,9 +23,7 @@
 #ifndef _PLPINTL_H_
 #define _PLPINTL_H_
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "config.h"
 
 /* libintl.h includes locale.h only if optimized.
  * however, we need LC_ALL ...

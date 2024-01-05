@@ -23,9 +23,7 @@
 #ifndef _PSITIME_H_
 #define _PSITIME_H_
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "config.h"
 
 #include <iostream>
 
