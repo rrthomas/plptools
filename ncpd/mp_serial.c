@@ -150,7 +150,7 @@ init_serial(const char *dev, int speed, int debug)
 	(defined(__APPLE__) && defined(__MACH__)) || \
 	defined(__NetBSD__) || defined(__FreeBSD__)
     ti.c_cflag = CS8 | HUPCL | CLOCAL | CRTSCTS | CREAD;
-    ti.c_iflag = IGNBRK | IGNPAR /*| IXON | IXOFF */;
+    ti.c_iflag = IGNBRK | IGNPAR;
     ti.c_cc[VMIN] = 1;
     ti.c_cc[VTIME] = 0;
 #endif
