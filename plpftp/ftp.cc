@@ -144,9 +144,9 @@ Star(const char *s, char *p)
 static int
 Wildmat(const char *s, char *p)
 {
-    register int last;
-    register int matched;
-    register int reverse;
+    int last;
+    int matched;
+    int reverse;
 
     for (; *p; s++, p++)
 	switch (*p) {
