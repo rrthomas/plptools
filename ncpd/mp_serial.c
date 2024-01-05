@@ -143,13 +143,11 @@ init_serial(const char *dev, int speed, int debug)
 #endif
 
     memset(&ti, 0, sizeof(struct termios));
-#if defined(hpux) || defined(_IBMR2)
     ti.c_cflag = CS8 | HUPCL | CLOCAL | CREAD;
-#endif
 #if defined(sun) || defined(linux) || defined(__sgi) || \
 	(defined(__APPLE__) && defined(__MACH__)) || \
 	defined(__NetBSD__) || defined(__FreeBSD__)
-    ti.c_cflag = CS8 | HUPCL | CLOCAL | CRTSCTS | CREAD;
+    ti.c_cflag |= CRTSCTS;
     ti.c_iflag = IGNBRK | IGNPAR;
     ti.c_cc[VMIN] = 1;
     ti.c_cc[VTIME] = 0;
@@ -166,12 +164,12 @@ init_serial(const char *dev, int speed, int debug)
     if (ioctl(fd, TCSETXW, &tx) < 0)
 	perror("TCSETXW");
 #endif
-
 #if defined(_IBMR2)
     ioctl(fd, TXDELCD, "dtr");
     ioctl(fd, TXDELCD, "xon");
     ioctl(fd, TXADDCD, "rts");	/* That's how AIX does CRTSCTS */
 #endif
+
     return fd;
 }
 
