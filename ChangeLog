@@ -37,7 +37,7 @@ Changes from Version 0.6 to 0.7
 
    For every process running on the psion, a subdir in proc/ is
    created with two files "cmd" and "args" (both ro). cmd is the
-   process-name, args is it's commandline.
+   process-name, args is its commandline.
    
  - Added machinfo command in plpftp for displaying lot of interesting
    information about S5. (E.g. battery status etc.)

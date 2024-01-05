@@ -319,7 +319,7 @@ private:
 
 /**
  * A singleton wrapper for a @ref psi_timezone . This class is used
- * by @ref PsiTime to initialize it's psi_timezone variable.
+ * by @ref PsiTime to initialize its psi_timezone variable.
  * PsiZone itself is initialized from within @ref rpcs::getMachineInfo .
  * In an application, you typically call this at the very beginning, just
  * after connection setup. From then on, a single PsiZone instance is

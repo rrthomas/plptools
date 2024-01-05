@@ -212,7 +212,7 @@ execProgram(const char *program, const char *args)
 
     /**
     * This is a hack for the jotter app on mx5 pro. (and probably others)
-    * Jotter seems to read it's arguments one char past normal apps.
+    * Jotter seems to read its arguments one char past normal apps.
     * Without this hack, The Drive-Character gets lost. Other apps don't
     * seem to be hurt by the additional blank.
     */
