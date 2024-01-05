@@ -41,7 +41,7 @@
 int debug;
 
 void
-debuglog(char *fmt, ...)
+debuglog(const char *fmt, ...)
 {
   va_list ap;
   char *buf;

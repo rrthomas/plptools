@@ -40,7 +40,7 @@ typedef struct p_dentry
 
 extern int debug;
 
-extern void debuglog(char *fmt, ...);
+extern void debuglog(const char *fmt, ...);
 
 #define BLOCKSIZE      512
 #define FID            7 /* File system id */

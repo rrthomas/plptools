@@ -57,68 +57,44 @@ bool serviceLoop;
 bool debug = false;
 int verbose = 0;
 
-#define alloc_print(p)                                 \
-do {                                                   \
-    /* Guess we need no more than 100 bytes. */        \
-    int n, size = 100;                                 \
-    va_list ap;                                        \
-    if ((p = (char *)malloc(size)) == NULL)            \
-        return 0;                                      \
-    while (1) {                                        \
-        /* Try to print in the allocated space. */     \
-        va_start(ap, fmt);                             \
-        n = vsnprintf(p, size, fmt, ap);               \
-        va_end(ap);                                    \
-        /* If that worked, return the string. */       \
-        if (n > -1 && n < size)                        \
-            break;                                     \
-        /* Else try again with more space. */          \
-        if (n > -1)    /* glibc 2.1 */                 \
-            size = n+1; /* precisely what is needed */ \
-        else           /* glibc 2.0 */                 \
-            size *= 2;  /* twice the old size */       \
-        if ((p = (char *)realloc(p, size)) == NULL)    \
-            return 0;                                  \
-    }                                                  \
-} while (0)
-
-int
-debuglog(char *fmt, ...)
+static void
+_log(int priority, const char *fmt, va_list ap)
 {
     char *buf;
-    alloc_print(buf);
+    if (vasprintf(&buf, fmt, ap) == -1)
+        return;
     if (debug)
         cout << buf << endl;
     else
-        syslog(LOG_DEBUG, "%s", buf);
+        syslog(priority, "%s", buf);
     free(buf);
-    return 0;
 }
 
-int
-errorlog(char *fmt, ...)
+void
+debuglog(const char *fmt, ...)
 {
-    char *buf;
-    alloc_print(buf);
-    if (debug)
-        cerr << buf << endl;
-    else
-        syslog(LOG_ERR, "%s", buf);
-    free(buf);
-    return 0;
+    va_list ap;
+    va_start(ap, fmt);
+    _log(LOG_DEBUG, fmt, ap);
+    va_end(ap);
 }
 
-int
-infolog(char *fmt, ...)
+void
+errorlog(const char *fmt, ...)
 {
-    char *buf;
-    alloc_print(buf);
-    if (debug)
-        cout << buf << endl;
-    else
-        syslog(LOG_INFO, "%s", buf);
-    free(buf);
-    return 0;
+    va_list ap;
+    va_start(ap, fmt);
+    _log(LOG_ERR, fmt, ap);
+    va_end(ap);
+}
+
+void
+infolog(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    _log(LOG_INFO, fmt, ap);
+    va_end(ap);
 }
 
 static int minx, maxx, miny, maxy;
