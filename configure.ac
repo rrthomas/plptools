@@ -13,9 +13,6 @@ AC_CONFIG_MACRO_DIR([m4])
 dnl checks for programs
 AC_PROG_CXX
 AC_PROG_CC
-AC_PROG_MAKE_SET
-AC_PROG_AWK
-AC_PROG_SED
 
 dnl Debugging
 AC_MSG_CHECKING([if the debugging code should be included])
