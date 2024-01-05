@@ -35,7 +35,7 @@ public:
     linkChan(ncp *ncpController, int ncpChannel = -1);
 
     void ncpDataCallback(bufferStore &a);
-    char *getNcpRegisterName();
+    const char *getNcpRegisterName();
     void ncpConnectAck();
     void ncpConnectTerminate();
     void ncpConnectNak();

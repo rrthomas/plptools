@@ -1424,8 +1424,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 }
 
 #if HAVE_LIBREADLINE
-#define FUNCAST(f) f
-#define CPFUNCAST(f) f
 #define MATCHFUNCTION rl_completion_matches
 
 static const char *all_commands[] = {
@@ -1508,7 +1506,8 @@ command_generator(
 }
 
 static char * null_completion(const char *, int) {
-    return "";
+    static char null[1] = "";
+    return null;
 }
 
 static char **
@@ -1516,7 +1515,7 @@ do_completion(const char *text, int start, int end)
 {
     char **matches = NULL;
 
-    rl_completion_entry_function = FUNCAST(null_completion);
+    rl_completion_entry_function = null_completion;
     rl_completion_append_character = ' ';
     rl_attempted_completion_over = 1;
     if (start == 0)
@@ -1565,8 +1564,8 @@ initReadline(void)
 {
 #if HAVE_LIBREADLINE
     rl_readline_name = "plpftp";
-    rl_completion_entry_function = FUNCAST(null_completion);
-    rl_attempted_completion_function = CPFUNCAST(do_completion);
+    rl_completion_entry_function = null_completion;
+    rl_attempted_completion_function = do_completion;
     rl_basic_word_break_characters = " \t\n\"\\'`@><=;|&{(";
 #endif
 }

@@ -64,7 +64,7 @@ ncpDataCallback(bufferStore & a)
 	lerr << "socketchan: Connect without name!!!\n";
 }
 
-char *socketChan::
+const char *socketChan::
 getNcpRegisterName()
 {
     return registerName;

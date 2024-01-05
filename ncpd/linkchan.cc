@@ -88,7 +88,7 @@ ncpDataCallback(bufferStore & a)
     lerr << "linkchan: unknown message " << a.getByte(0) << endl;
 }
 
-char *linkChan::
+const char *linkChan::
 getNcpRegisterName()
 {
     return "LINK";

@@ -44,7 +44,7 @@ public:
     void setVerbose(short int _verbose);
     short int getVerbose();
     virtual void ncpDataCallback(bufferStore &a) = 0;
-    virtual char *getNcpRegisterName() = 0;
+    virtual const char *getNcpRegisterName() = 0;
     void ncpConnect();
     void ncpRegister();
     void ncpDoRegisterAck(int ch, const char *name);

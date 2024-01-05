@@ -99,7 +99,7 @@ private:
     bool isValidChannel(int);
     void decodeControlMessage(bufferStore &buff);
     void controlChannel(int chan, enum interControllerMessageType t, bufferStore &command);
-    char * ctrlMsgName(unsigned char);
+    const char * ctrlMsgName(unsigned char);
 
     Link *l;
     unsigned short verbose;

@@ -50,8 +50,8 @@
 
 using namespace std;
 
-char *spooldir = SPOOLDIR;
-char *printcmd = PRINTCMD;
+const char *spooldir = SPOOLDIR;
+const char *printcmd = PRINTCMD;
 wprt *wPrt;
 bool serviceLoop;
 bool debug = false;
@@ -108,27 +108,34 @@ typedef struct fontmap_entry_s {
     char *psfont;
 } fontmap_entry;
 
+typedef struct const_fontmap_entry_s {
+    const char *psifont;
+    bool bold;
+    bool italic;
+    const char *psfont;
+} const_fontmap_entry;
+
 #define FALLBACK_FONT "Courier"
 
-static fontmap_entry default_fontmap[] = {
-    // NEXT, PsionFontname, bold, italic, PSFontName
-    { NULL, "Times New Roman", false, false, "Times-Roman"},
-    { NULL, "Times New Roman", true,  false, "Times-Bold"},
-    { NULL, "Times New Roman", false, true,  "Times-Italic"},
-    { NULL, "Times New Roman", true,  true,  "Times-BoldItalic"},
-    { NULL, "Arial",           false, false, "Helvetica"},
-    { NULL, "Arial",           true,  false, "Helvetica-Bold"},
-    { NULL, "Arial",           false, true,  "Helvetica-Oblique"},
-    { NULL, "Arial",           true,  true,  "Helvetica-BoldOblique"},
-    { NULL, "Courier New",     false, false, "Courier"},
-    { NULL, "Courier New",     true,  false, "Courier-Bold"},
-    { NULL, "Courier New",     false, true,  "Courier-Oblique"},
-    { NULL, "Courier New",     true,  true,  "Courier-BoldOblique"},
-    { NULL, "Swiss",           false, false, "Courier"},
-    { NULL, "Swiss",           true,  false, "Courier-Bold"},
-    { NULL, "Swiss",           false, true,  "Courier-Oblique"},
-    { NULL, "Swiss",           true,  true,  "Courier-BoldOblique"},
-    { NULL, NULL,              false, false, NULL}
+static const_fontmap_entry default_fontmap[] = {
+    // PsionFontname, bold, italic, PSFontName
+    { "Times New Roman", false, false, "Times-Roman"},
+    { "Times New Roman", true,  false, "Times-Bold"},
+    { "Times New Roman", false, true,  "Times-Italic"},
+    { "Times New Roman", true,  true,  "Times-BoldItalic"},
+    { "Arial",           false, false, "Helvetica"},
+    { "Arial",           true,  false, "Helvetica-Bold"},
+    { "Arial",           false, true,  "Helvetica-Oblique"},
+    { "Arial",           true,  true,  "Helvetica-BoldOblique"},
+    { "Courier New",     false, false, "Courier"},
+    { "Courier New",     true,  false, "Courier-Bold"},
+    { "Courier New",     false, true,  "Courier-Oblique"},
+    { "Courier New",     true,  true,  "Courier-BoldOblique"},
+    { "Swiss",           false, false, "Courier"},
+    { "Swiss",           true,  false, "Courier-Bold"},
+    { "Swiss",           false, true,  "Courier-Oblique"},
+    { "Swiss",           true,  true,  "Courier-BoldOblique"},
+    { NULL,              false, false, NULL}
 };
 
 static fontmap_entry *fontmap = NULL;
@@ -191,15 +198,16 @@ init_fontmap() {
     else {
         errorlog("No fontmap found in %s/fontmap, using builtin mapping",
                  PKGDATADIR);
-        fe = default_fontmap;
-        while (fe->psifont) {
+        for (const_fontmap_entry *cfe = default_fontmap; cfe->psifont; cfe++) {
             fontmap_entry *nfe = (fontmap_entry *)malloc(sizeof(fontmap_entry));
             if (!nfe)
                 break;
-            memcpy(nfe, fe, sizeof(fontmap_entry));
             nfe->next = fontmap;
+            nfe->psifont = strdup(cfe->psifont);
+            nfe->bold = cfe->bold;
+            nfe->italic = cfe->italic;
+            nfe->psfont = strdup(cfe->psfont);
             fontmap = nfe;
-            fe++;
         }
     }
 #ifdef DEBUG
@@ -221,7 +229,7 @@ ps_setfont(FILE *f, const char *fname, bool bold, bool italic,
            unsigned long fsize)
 {
     fontmap_entry *fe = fontmap;
-    char *psf = NULL;
+    const char *psf = NULL;
     while (fe) {
         if ((!strcmp(fe->psifont, fname)) &&
             (fe->bold == bold) &&

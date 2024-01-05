@@ -34,7 +34,7 @@ public:
   virtual ~socketChan();
 
   void ncpDataCallback(bufferStore& a);
-  char* getNcpRegisterName();
+  const char* getNcpRegisterName();
   void ncpConnectAck();
   void ncpRegisterAck();
   void ncpDoRegisterAck(int) {}

@@ -525,7 +525,7 @@ getSpeed()
     return l->getSpeed();
 }
 
-char *ncp::
+const char *ncp::
 ctrlMsgName(unsigned char msgType)
 {
     switch (msgType) {
