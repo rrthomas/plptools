@@ -40,7 +40,7 @@ fi
 
 dnl NLS support
 ALL_LINGUAS="de sv"
-AM_GNU_GETTEXT
+AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19.6])
 
 dnl Additional glibc-intl checks
@@ -215,7 +215,6 @@ AH_BOTTOM([
 
 AC_CONFIG_FILES(
         Makefile
-        intl/Makefile
         po/Makefile.in
         lib/Makefile
         ncpd/Makefile

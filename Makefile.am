@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = intl po lib ncpd plpftp plpprint sisinstall doc
+SUBDIRS = po lib ncpd plpftp plpprint sisinstall doc
 if BUILD_PLPFUSE
 SUBDIRS += plpfuse
 endif
