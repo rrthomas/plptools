@@ -1,6 +1,6 @@
 AC_PREREQ([2.71])
 
-AC_INIT([plptools],[1.0.16],[plptools-developers@lists.sourceforge.net])
+AC_INIT([plptools],[1.0.17],[plptools-developers@lists.sourceforge.net])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 
