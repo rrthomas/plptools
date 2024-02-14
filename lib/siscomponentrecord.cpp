@@ -1,6 +1,4 @@
-/** -*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2002 Daniel Brahneborg <basic.chello@se>
@@ -119,4 +117,3 @@ SISComponentNameRecord::getName(int no)
 {
 	return m_names[no];
 }
-

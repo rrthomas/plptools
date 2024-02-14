@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
@@ -218,9 +216,3 @@ void bufferStore::prependWord(int a) {
     buff[0] = a & 0xff;
     buff[1] = (a>>8) & 0xff;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

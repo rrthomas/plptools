@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
@@ -130,9 +128,3 @@ Register(channel *ch)
     a.addByte(0);
     ncpSend(a);
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

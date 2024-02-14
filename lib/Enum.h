@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2000 Henner Zeller <hzeller@to.com>
@@ -323,9 +321,3 @@ inline std::ostream& operator << (std::ostream& out, const Enum<E> &e) {
 }
 
 #endif /* _ENUM_H_ */
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

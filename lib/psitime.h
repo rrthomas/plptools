@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2000-2002 Fritz Elfert <felfert@to.com>
@@ -362,9 +360,3 @@ private:
     psi_timezone _ptz;
 };
 #endif
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

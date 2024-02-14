@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2000 Henner Zeller <hzeller@to.com>
@@ -73,9 +71,3 @@ long EnumBase::i2sMapper::lookup (const char *s) const {
 bool EnumBase::i2sMapper::inRange (long i) const {
     return (stringMap.find(i) != stringMap.end());
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
@@ -1057,9 +1055,3 @@ main(int argc, char **argv)
     }
     return 0;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

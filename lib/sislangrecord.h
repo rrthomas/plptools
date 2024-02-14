@@ -1,6 +1,4 @@
-/* -*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2002 Daniel Brahneborg <basic.chello@se>
@@ -53,4 +51,3 @@ public:
 };
 
 #endif
-

@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
@@ -46,9 +44,3 @@ private:
     bufferArray registerStack;
 };
 #endif
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

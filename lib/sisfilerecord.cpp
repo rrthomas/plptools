@@ -1,6 +1,4 @@
-/** -*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2002 Daniel Brahneborg <basic.chello@se>
@@ -143,4 +141,3 @@ SISFileRecord::setMainDrive(char drive)
 	if (m_buf[m_destPtr] == '!')
 		m_buf[m_destPtr] = drive;
 }
-

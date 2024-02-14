@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
@@ -410,9 +408,3 @@ main(int argc, char **argv)
     linf << _("normal exit") << endl;
     return 0;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

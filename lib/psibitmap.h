@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
@@ -68,8 +66,3 @@ extern bool
 decodeBitmap(const unsigned char *p, int &width, int &height, bufferStore &out);
 
 #endif // !_PSIBITMAP_H_
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

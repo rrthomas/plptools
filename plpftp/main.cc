@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
@@ -207,9 +205,3 @@ main(int argc, char **argv)
     delete rp;
     return status;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

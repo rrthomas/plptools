@@ -1,6 +1,4 @@
-/** -*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2002 Daniel Brahneborg <basic.chello@se>
@@ -41,4 +39,3 @@ SISLangRecord::fillFrom(uint8_t* buf, int* base, off_t len)
 	*base += 2;
 	return SIS_OK;
 }
-

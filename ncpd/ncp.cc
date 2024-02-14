@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
@@ -548,9 +546,3 @@ ctrlMsgName(unsigned char msgType)
     }
     return "NCON_MSG_UNKNOWN";
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

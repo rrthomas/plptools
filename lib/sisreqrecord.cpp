@@ -1,6 +1,4 @@
-/** -*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2002 Daniel Brahneborg <basic.chello@se>
@@ -82,4 +80,3 @@ SISReqRecord::fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile)
 	*base += size;
 	return SIS_OK;
 }
-

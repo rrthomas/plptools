@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
@@ -199,9 +197,3 @@ getResponse(bufferStore & data)
 	status = rfsv::E_PSI_FILE_DISC;
     return status;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

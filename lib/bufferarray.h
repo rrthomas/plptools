@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
@@ -168,9 +166,3 @@ private:
 inline bool bufferArray::empty() const { return len == 0; }
 
 #endif
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

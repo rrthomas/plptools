@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
@@ -272,9 +270,3 @@ closeHandle(uint16_t handle)
 	return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

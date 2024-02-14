@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
@@ -80,9 +78,3 @@ bool IOWatch::watch(const long secs, const long usecs) {
     usleep(usecs);
     return false;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

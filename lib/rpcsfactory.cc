@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2000-2001 Fritz Elfert <felfert@to.com>
@@ -91,9 +89,3 @@ rpcs * rpcsfactory::create(bool reconnect)
     // No message returned.
     return NULL;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

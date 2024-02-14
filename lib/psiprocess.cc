@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
@@ -96,9 +94,3 @@ operator<<(ostream &o, const PsiProcess &p) {
     o.flags(old);
     return o;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

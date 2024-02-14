@@ -1,6 +1,4 @@
-/** -*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2002 Daniel Brahneborg <basic.chello@se>
@@ -177,4 +175,3 @@ SISFile::updateEnd(uint32_t pos)
 	if (m_end < pos)
 		m_end = pos;
 }
-

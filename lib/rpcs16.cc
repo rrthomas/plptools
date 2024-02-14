@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Matt J. Gumbley <matt@gumbley.demon.co.uk>
@@ -54,9 +52,3 @@ getCmdLine(const char *process, string &ret)
 	ret = a.getString(0);
     return res;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

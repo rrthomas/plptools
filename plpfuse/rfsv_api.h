@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
@@ -68,9 +66,3 @@ extern int rfsv_isalive(void);
 #endif
 
 #endif
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

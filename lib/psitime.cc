@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 2000-2002 Fritz Elfert <felfert@to.com>
@@ -306,9 +304,3 @@ getZone(psi_timezone &ptz) {
 	ptz = _ptz;
     return _ptzValid;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

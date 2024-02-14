@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
@@ -611,9 +609,3 @@ getHost(string *Host, int *Port)
 	*Port = ntohs(((struct sockaddr_in *)&m_HostAddr)->sin_port);
     return true;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Matt J. Gumbley <matt@gumbley.demon.co.uk>
@@ -95,9 +93,3 @@ rfsv * rfsvfactory::create(bool reconnect)
 
     return NULL;
 }
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */

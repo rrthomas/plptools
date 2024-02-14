@@ -1,6 +1,4 @@
-/*-*-c++-*-
- * $Id$
- *
+/*
  * This file is part of plptools.
  *
  *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
@@ -40,9 +38,3 @@ static inline const char *_(const char *t) { return t; }
 static inline const char *N_(const char *t) { return t; } 
 
 #endif /* _PLPINTL_H_ */
-
-/*
- * Local variables:
- * c-basic-offset: 4
- * End:
- */
