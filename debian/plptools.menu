@@ -1,2 +1,0 @@
-?package(plptools):needs="text" section="Applications/Mobile Devices"\
-  title="plpftp" command="/usr/bin/plpftp"
