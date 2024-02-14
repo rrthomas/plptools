@@ -34,4 +34,6 @@ He writes:
 Reuben Thomas has maintained plptools since version 0.13. He fixed
 many bugs, updated the KDE utilities to work with KDE 3, but finally
 removed them with the approach of KDE 4, enhanced plpftp and replaced
-the rather flaky plpnfsd with plpfuse.
+the rather flaky plpnfsd with plpfuse. He has kept the build system
+working with newer versions of GNU autotools, and gradually cleaned up
+the code and simplified the build system.
