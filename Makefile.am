@@ -6,7 +6,7 @@ SUBDIRS += plpfuse
 endif
 
 EXTRA_DIST = AUTHORS COPYING INSTALL NEWS README TODO HISTORY ABOUT-NLS \
-	etc/s5magic etc/s5kdemagic etc/plptools.in \
+	etc/plptools.in \
 	etc/ttytap.c etc/psidump etc/psidump.1 \
 	etc/udev-usbserial-plptools.rules
 
