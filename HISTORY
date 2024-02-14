@@ -26,8 +26,7 @@ He writes:
 
  Support for the RPC mechanism was added in version 0.5. This support
  was only possible because of Alexander Thoukydides' excellent
- documentation at
- http://www.btinternet.com/~thouky/software/psifs/plp.html
+ documentation: https://thoukydides.github.io/riscos-psifs/plp.html
  Thanks a lot for that.
 
  Psion 3 support was added by Matt Gumbley (matt@gumbley.demon.co.uk).
