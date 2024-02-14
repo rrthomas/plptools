@@ -11,6 +11,7 @@ LT_INIT
 AC_CONFIG_MACRO_DIR([m4])
 
 dnl checks for programs
+AC_PROG_INSTALL
 AC_PROG_CXX
 AC_PROG_CC
 

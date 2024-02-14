@@ -16,7 +16,8 @@ uninstall-local:
 	rm -f $(DESTDIR)$(initdir)/plptools
 
 install-exec-local:
-	install -D $(top_builddir)/etc/plptools $(DESTDIR)$(initdir)/plptools
+	$(INSTALL) -d $(DESTDIR)$(initdir)
+	$(INSTALL) $(top_builddir)/etc/plptools $(DESTDIR)$(initdir)/plptools
 
 # FIXME: Automatically revert .po files if they're actually clean
 # Currently, rather than run `git diff --exit-code', we simply show the
