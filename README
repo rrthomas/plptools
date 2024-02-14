@@ -7,14 +7,17 @@ plptools is a suite of programs for transferring files to and from EPOC
 devices, as well as backing them up, installing software, and setting the
 clock. See below for build instructions and HISTORY for some history.
 
+See the man pages for documentation: ncpd(8), plpftp(1), sisinstall(1),
+plpprintd(8), and, where installed, plpfuse(8).
+
 
 Building from source
 --------------------
 
 To build plpfuse, the following packages are required:
 
-  FUSE: http://fuse.sourceforge.net/
-  libattr: ftp://oss.sgi.com/projects/xfs/download/
+  FUSE: https://github.com/libfuse/libfuse
+  libattr: https://savannah.nongnu.org/projects/attr
 
 These packages come with most GNU/Linux distributions. To build plptools,
 the development packages (typically ending in -dev or -devel) must be
