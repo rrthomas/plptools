@@ -44,20 +44,6 @@ ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19.6])
 
-dnl Additional glibc-intl checks
-if test "${USE_NLS}" = "yes" ; then
-        if test "${USE_INCLUDED_LIBINTL}" = "yes" ; then
-                plp_have_bind_textdomain_codeset=no
-        else
-                AC_CHECK_LIB(c, bind_textdomain_codeset,
-                        plp_have_bind_textdomain_codeset=yes,
-                        plp_have_bind_textdomain_codeset=no)
-        fi
-        if test "${plp_have_bind_textdomain_codeset}" = yes ; then
-                AC_DEFINE(HAVE_BIND_TEXTDOMAIN_CODESET)
-        fi
-fi
-
 dnl Large File Support
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
@@ -206,9 +192,6 @@ AC_SUBST(LIB_PLP)
 
 dnl Extra definitions for config.h
 AH_BOTTOM([
-/* Define this, if libc provides bind_textdomain_codeset */
-#undef HAVE_BIND_TEXTDOMAIN_CODESET
-
 /* Select version of FUSE API */
 #define FUSE_USE_VERSION 26
 ])
