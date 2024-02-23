@@ -51,44 +51,8 @@ AC_FUNC_FSEEKO
 dnl checks for libraries
 
 dnl readline and history for plpftp
-ac_enable_readline=yes
-AC_ARG_ENABLE(readline,
-        [  --disable-readline      disable libreadline support [no]],
-        if test "$enableval" = "no" ; then
-                AC_MSG_RESULT([support for libreadline disabled])
-                ac_enable_readline=no
-        fi
-)
-if test "x$ac_enable_readline" = "xyes" ; then
-        AC_MSG_CHECKING(for readline in -lreadline)
-        LIBREADLINE=
-        AC_CHECK_LIB([readline], [main],
-              [AC_SUBST([LIBREADLINE], ["-lreadline -lncurses"])
-               AC_DEFINE([HAVE_LIBREADLINE], [1],
-                         [Define if you have libreadline])
-              ],
-              , -lncurses)
-fi
-
-ac_enable_history=yes
-ac_cv_libhistory=
-AC_ARG_ENABLE(history,
-        [  --disable-history       disable libhistory support [no]],
-        if test "$enableval" = "no" ; then
-                AC_MSG_RESULT([support for libhistory disabled])
-                ac_enable_history=no
-        fi
-)
-if test "x$ac_enable_history" = "xyes" ; then
-        AC_CHECK_LIB(history, add_history,
-        [
-                AC_DEFINE_UNQUOTED(HAVE_LIBHISTORY,1,
-                        [Define this, if you have libhistory])
-                ac_cv_libhistory=-lhistory
-        ])
-fi
-LIBHISTORY=${ac_cv_libhistory}
-AC_SUBST(LIBHISTORY)
+MIN_LIBREADLINE_VERSION=4.3
+AX_LIB_READLINE([$MIN_LIBREADLINE_VERSION])
 
 # FUSE for plpfuse
 PKG_CHECK_MODULES([FUSE], [fuse >= 2.6], [enable_fuse=yes], [enable_fuse=no])
@@ -216,3 +180,8 @@ AC_CONFIG_FILES(
         doc/plpprintd.man
 )
 AC_OUTPUT
+
+dnl Warn if readline is absent or too old
+if test "$ax_cv_lib_readline_version_ok" != "yes"; then
+   AC_MSG_WARN([To use readline, version $MIN_LIBREADLINE_VERSION or later is required!])
+fi
