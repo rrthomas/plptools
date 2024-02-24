@@ -82,11 +82,9 @@ AC_CHECK_HEADER(attr/attributes.h,, enable_fuse=no)
 AC_CHECK_HEADERS(attr/xattr.h)
 AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse = xyes)
 
-dnl these three are for Solaris
+dnl these two are for Solaris
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(nsl, gethostbyname)
-ac_save_LDFLAGS=$LDFLAGS; LDFLAGS="-L/usr/ucblib -R/usr/ucblib $LDFLAGS"
-AC_CHECK_LIB(rpcsoc, svcudp_create,,LDFLAGS=$ac_save_LDFLAGS)
 
 dnl checks for header files
 AC_CHECK_HEADERS(sys/time.h sys/ioctl.h sys/errno.h sys/ttold.h)
