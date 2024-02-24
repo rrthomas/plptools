@@ -1,7 +1,7 @@
 /*
   plpfuse: Expose EPOC's file system via FUSE
   Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
-  Copyright (C) 2007-2008  Reuben Thomas <rrt@sc3d.org>
+  Copyright (C) 2007-2024  Reuben Thomas <rrt@sc3d.org>
 
   This program can be distributed under the terms of the GNU GPL.
   See the file COPYING.
@@ -23,7 +23,9 @@
 #else
 #include <sys/xattr.h>
 #endif
+#ifdef HAVE_ATTR_ATTRIBUTES_H
 #include <attr/attributes.h>
+#endif
 
 #include "plpfuse.h"
 #include "rfsv_api.h"

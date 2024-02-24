@@ -78,7 +78,7 @@ AX_LIB_READLINE([$MIN_LIBREADLINE_VERSION])
 PKG_CHECK_MODULES([FUSE], [fuse >= 2.6], [enable_fuse=yes], [enable_fuse=no])
 
 # Check for libattr headers for plpfuse
-AC_CHECK_HEADER(attr/attributes.h,, enable_fuse=no)
+AC_CHECK_HEADER(attr/attributes.h)
 AC_CHECK_HEADERS(attr/xattr.h)
 AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse = xyes)
 
