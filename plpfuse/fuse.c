@@ -413,7 +413,11 @@ static int plp_chmod(const char *path, mode_t mode)
   return ret;
 }
 
-static int plp_getxattr(const char *path, const char *name, char *value, size_t size)
+static int plp_getxattr(const char *path, const char *name, char *value, size_t size
+#ifdef __APPLE__
+                        , [[__maybe_unused__]] uint32_t position
+#endif
+                        )
 {
   debuglog("plp_getxattr `%s' %s", ++path, name);
   if (strcmp(name, XATTR_NAME) == 0) {
@@ -434,7 +438,11 @@ static int plp_getxattr(const char *path, const char *name, char *value, size_t 
   return 0;
 }
 
-static int plp_setxattr(const char *path, const char *name, const char *value, size_t size, int flags)
+static int plp_setxattr(const char *path, const char *name, const char *value, size_t size, int flags
+#ifdef __APPLE__
+                        , [[__maybe_unused__]] uint32_t position
+#endif
+                        )
 {
   debuglog("plp_setxattr `%s'", ++path);
   if (strcmp(name, XATTR_NAME) == 0) {
@@ -448,7 +456,11 @@ static int plp_setxattr(const char *path, const char *name, const char *value, s
     strncpy(nxattr, value, size < XATTR_MAXLEN ? size : XATTR_MAXLEN);
     nxattr[XATTR_MAXLEN] = '\0';
     /* Need to undo earlier increment of path when calling plp_getxattr */
-    plp_getxattr(path - 1, name, oxattr, XATTR_MAXLEN);
+    plp_getxattr(path - 1, name, oxattr, XATTR_MAXLEN
+#ifdef __APPLE__
+                 , 0
+#endif
+                 );
     psisattr = psidattr = 0;
     xattr2pattr(&psisattr, &psidattr, oxattr, value);
     debuglog("attrs set %x delete %x; %s, %s", psisattr, psidattr, oxattr, value);
