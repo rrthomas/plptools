@@ -3,7 +3,7 @@
 # This file is part of plptools.
 #
 # Copyright (C) 2002 Fritz Elfert <felfert@to.com>
-# Copyright (C) 2007-2013 Reuben Thomas <rrt@sc3d.org>
+# Copyright (C) 2007-2024 Reuben Thomas <rrt@sc3d.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 # along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 sbin_PROGRAMS = plpprintd
-plpprintd_CPPFLAGS = -DPKGDATADIR="\"$(pkgdatadir)\"" -I$(top_srcdir)/lib -I$(top_srcdir)/intl
+plpprintd_CPPFLAGS = -DPKGDATADIR="\"$(pkgdatadir)\"" -I$(top_srcdir)/lib
 plpprintd_LDADD = $(LIB_PLP) $(INTLLIBS)
 plpprintd_SOURCES = plpprintd.cc
 
