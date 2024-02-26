@@ -1,0 +1,37 @@
+name: C/C++ CI
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            env:
+              ASAN: "yes"
+            shell: bash
+          - os: macos-latest
+            shell: bash
+            env:
+              LDFLAGS: "-L$(brew --prefix readline)/lib"
+              CPPFLAGS: "-I$(brew --prefix readline)/include"
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }} {0}
+    steps:
+    - uses: actions/checkout@v3
+      with: { submodules: true }
+    - name: Install dependencies (Ubuntu)
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: sudo apt-get -y install gettext autopoint
+    - name: Install dependencies (macOS)
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: |
+        brew install coreutils readline automake gettext
+        # Prepend optional brew binary directories to PATH
+        echo "/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/m4/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
+    - name: Build
+      run: ./build-aux/build.sh
