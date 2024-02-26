@@ -135,9 +135,7 @@ main(int argc, char **argv)
     int status = 0;
     int sockNum = DPORT;
 
-#ifdef LC_ALL
     setlocale (LC_ALL, "");
-#endif
     textdomain(PACKAGE);
 
     struct servent *se = getservbyname("psion", "tcp");
