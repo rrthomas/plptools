@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -97,7 +98,7 @@ int main(int argc, char* argv[])
                 error(__LINE__);
         off_t len = st.st_size;
         if (logLevel >= 2)
-                printf(_("File is %d bytes long\n"), len);
+                printf(_("File is %jd bytes long\n"), (intmax_t)len);
         uint8_t* buf = new uint8_t[len];
         int fd = open(filename, O_RDONLY);
         if (-1 == fd)
