@@ -207,18 +207,18 @@ init_fontmap() {
             fontmap = nfe;
         }
     }
-#ifdef DEBUG
-    debuglog("Active Font-Mapping:");
-    debuglog("%-20s%-7s%-7s%-20s", "Psion", "Bold", "Italic", "PS-Font");
-    fe = fontmap;
-    while (fe) {
-        debuglog("%-20s%-7s%-7s%-20s", fe->psifont,
-                 fe->bold ? "true" : "false",
-                 fe->italic ? "true" : "false",
-                 fe->psfont);
-        fe = fe->next;
+    if (debug) {
+        debuglog("Active Font-Mapping:");
+        debuglog("%-20s%-7s%-7s%-20s", "Psion", "Bold", "Italic", "PS-Font");
+        fe = fontmap;
+        while (fe) {
+            debuglog("%-20s%-7s%-7s%-20s", fe->psifont,
+                     fe->bold ? "true" : "false",
+                     fe->italic ? "true" : "false",
+                     fe->psfont);
+            fe = fe->next;
+        }
     }
-#endif
 }
 
 static void
@@ -289,14 +289,14 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
     unsigned long right  = 0;
     unsigned long bottom = 0;
 
-#ifdef DEBUG
-    char dumpname[128];
-    sprintf(dumpname, "/tmp/pdump_%d", page);
-    FILE *df = fopen(dumpname, "w");
-    fwrite(buf.getString(0), 1, len, df);
-    fclose(df);
-    debuglog("Saved page input to %s", dumpname);
-#endif
+    if (debug) {
+        char dumpname[128];
+        sprintf(dumpname, "/tmp/pdump_%d", page);
+        FILE *df = fopen(dumpname, "w");
+        fwrite(buf.getString(0), 1, len, df);
+        fclose(df);
+        debuglog("Saved page input to %s", dumpname);
+    }
     if (page == 0) {
         time_t now = time(NULL);
         fputs(

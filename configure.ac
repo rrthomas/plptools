@@ -38,25 +38,6 @@ AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_HEADERS([config.h])
 LT_INIT
 
-dnl Debugging
-AC_MSG_CHECKING([if the debugging code should be included])
-AC_ARG_ENABLE(debug,
-AS_HELP_STRING([--enable-debug],[include debugging code]),
-[
-if test $enableval = yes; then
-        CFLAGS="-g"
-        if test "$GCC" = "yes"; then
-          CFLAGS="$CFLAGS -ggdb"
-        fi
-        AC_MSG_RESULT(yes)
-        AC_DEFINE(DEBUG, 1, [Define this to include debugging code.])
-else
-        AC_MSG_RESULT(no)
-fi
-], [
-AC_MSG_RESULT(no)
-])
-
 dnl Extra warnings with GCC
 AC_ARG_ENABLE([gcc-warnings],
   [AS_HELP_STRING([--enable-gcc-warnings],

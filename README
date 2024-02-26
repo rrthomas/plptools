@@ -36,10 +36,6 @@ make install
 
 In addition to the usual options, configure understands the following:
 
-  --enable-debug
-
-       builds debugging versions of the programs and libplp
-
   --with-serial=/dev/sometty
 
        sets the default serial device for ncpd. Without this option,
