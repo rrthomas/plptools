@@ -57,3 +57,6 @@
 /sys_uio_h.m4
 /unistd_h.m4
 /warn-on-use.m4
+/manywarnings-c++.m4
+/manywarnings.m4
+/warnings.m4
