@@ -22,18 +22,21 @@ AC_PREREQ([2.71])
 
 AC_INIT([plptools],[1.0.19],[plptools-developers@lists.sourceforge.net])
 AC_CANONICAL_TARGET
+AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
-
-dnl Basic settings
-AC_USE_SYSTEM_EXTENSIONS
-AC_CONFIG_HEADERS([config.h])
-LT_INIT
-AC_CONFIG_MACRO_DIR([m4])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl checks for programs
 AC_PROG_INSTALL
 AC_PROG_CXX
 AC_PROG_CC
+gl_EARLY
+gl_INIT
+
+dnl Basic settings
+AC_USE_SYSTEM_EXTENSIONS
+AC_CONFIG_HEADERS([config.h])
+LT_INIT
 
 dnl Debugging
 AC_MSG_CHECKING([if the debugging code should be included])
@@ -178,6 +181,7 @@ AC_CONFIG_FILES(
         Makefile
         po/Makefile.in
         lib/Makefile
+        libgnu/Makefile
         ncpd/Makefile
         plpftp/Makefile
         plpfuse/Makefile

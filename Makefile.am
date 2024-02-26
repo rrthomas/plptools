@@ -20,7 +20,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = po lib ncpd plpftp plpprint sisinstall doc
+SUBDIRS = po libgnu lib ncpd plpftp plpprint sisinstall doc
 if BUILD_PLPFUSE
 SUBDIRS += plpfuse
 endif
@@ -28,7 +28,8 @@ endif
 EXTRA_DIST = AUTHORS COPYING INSTALL NEWS README TODO HISTORY ABOUT-NLS \
 	etc/plptools.in \
 	etc/ttytap.c etc/psidump etc/psidump.1 \
-	etc/udev-usbserial-plptools.rules
+	etc/udev-usbserial-plptools.rules \
+	m4/gnulib-cache.m4
 
 DISTCLEANFILES = etc/plptools
 

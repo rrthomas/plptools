@@ -26,7 +26,7 @@ rest of plptools will still work.
 
 If building from a git checkout, first run:
 
-autoreconf -i
+./bootstrap --skip-po
 
 plptools uses GNU autotools, so the usual sequence of commands works:
 

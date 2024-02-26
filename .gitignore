@@ -6,6 +6,8 @@ Makefile
 .libs
 /aclocal.m4
 /autom4te.cache
+/build-aux
+/libgnu
 /configure
 /config.guess
 /config.sub
