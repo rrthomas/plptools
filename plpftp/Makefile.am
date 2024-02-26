@@ -21,6 +21,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/lib
 
 bin_PROGRAMS = plpftp
-plpftp_LDADD = $(LIB_PLP) $(LIBREADLINE) $(LIBHISTORY) $(INTLLIBS)
+plpftp_LDADD = $(LIB_PLP) $(INTLLIBS)
 plpftp_SOURCES = ftp.cc main.cc
 EXTRA_DIST = ftp.h
