@@ -142,6 +142,8 @@ int main(void) {
                   [Define if your readline library has \`add_history'])
         AC_CHECK_HEADERS(history.h readline/history.h)
       fi
+    else
+      LIBS="$ORIG_LIBS"
     fi
   fi
 ])dnl
