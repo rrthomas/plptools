@@ -67,23 +67,15 @@ ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19.6])
 
-dnl checks for libraries
-
 dnl readline and history for plpftp
 MIN_LIBREADLINE_VERSION=4.3
 AX_LIB_READLINE([$MIN_LIBREADLINE_VERSION])
 
-# FUSE for plpfuse
+# FUSE and libattr for plpfuse
 PKG_CHECK_MODULES([FUSE], [fuse >= 2.6], [enable_fuse=yes], [enable_fuse=no])
-
-# Check for libattr headers for plpfuse
 AC_CHECK_HEADER(attr/attributes.h)
 AC_CHECK_HEADERS(attr/xattr.h)
 AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse = xyes)
-
-dnl these two are for Solaris
-AC_SEARCH_LIBS([socket], [socket])
-AC_SEARCH_LIBS([gethostbyname], [nsl])
 
 dnl special options for customization
 
@@ -172,7 +164,7 @@ AH_BOTTOM([
 #define FUSE_USE_VERSION 26
 ])
 
-
+dnl Create files
 AC_CONFIG_FILES(
         Makefile
         po/Makefile.in
