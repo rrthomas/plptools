@@ -52,10 +52,21 @@
 
 #if HAVE_LIBREADLINE
 extern "C"  {
+#  if defined(HAVE_READLINE_READLINE_H)
+#    include <readline/readline.h>
+#  elif defined(HAVE_READLINE_H)
+#    include <readline.h>
+#  else /* !defined(HAVE_READLINE_H) */
+extern char *readline ();
+#  endif /* !defined(HAVE_READLINE_H) */
 #include <readline/readline.h>
-#if HAVE_LIBHISTORY
-#include <readline/history.h>
-#endif
+#ifdef HAVE_READLINE_HISTORY
+#  if defined(HAVE_READLINE_HISTORY_H)
+#    include <readline/history.h>
+#  elif defined(HAVE_HISTORY_H)
+#    include <history.h>
+#  endif /* !defined(HAVE_READLINE_HISTORY_H) */
+#endif /* !defined(HAVE_READLINE_HISTORY) */
 }
 #endif
 
@@ -1584,7 +1595,7 @@ getCommand(int &argc, char **argv)
 	    cout << buf << endl;
 	} else {
 	    strcpy(buf, bp);
-#if HAVE_LIBHISTORY
+#ifdef HAVE_READLINE_HISTORY
 	    add_history(buf);
 #endif
 	    free(bp);
