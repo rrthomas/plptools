@@ -29,11 +29,13 @@
 
 #if defined(ENABLE_NLS)
 #  include <libintl.h>
-static inline const char *_(const char *t) { return gettext(t); }
+#  define _(String) gettext (String)
+#  define N_(String) (String)
 #else
-static inline const char *_(const char *t) { return t; }
-#  define textdomain(x)
+#  define _(String) (String)
+#  define N_(String) String
+#  define textdomain(Domain)
+#  define bindtextdomain(Package, Directory)
 #endif
-static inline const char *N_(const char *t) { return t; } 
 
 #endif /* _PLPINTL_H_ */
