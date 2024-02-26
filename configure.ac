@@ -67,10 +67,6 @@ ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19.6])
 
-dnl Large File Support
-AC_SYS_LARGEFILE
-AC_FUNC_FSEEKO
-
 dnl checks for libraries
 
 dnl readline and history for plpftp
