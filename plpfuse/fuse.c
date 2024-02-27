@@ -415,7 +415,7 @@ static int plp_chmod(const char *path, mode_t mode)
 
 static int plp_getxattr(const char *path, const char *name, char *value, size_t size
 #ifdef __APPLE__
-                        , [[__maybe_unused__]] uint32_t position
+                        , _GL_UNUSED uint32_t position
 #endif
                         )
 {
@@ -440,7 +440,7 @@ static int plp_getxattr(const char *path, const char *name, char *value, size_t 
 
 static int plp_setxattr(const char *path, const char *name, const char *value, size_t size, int flags
 #ifdef __APPLE__
-                        , [[__maybe_unused__]] uint32_t position
+                        , _GL_UNUSED uint32_t position
 #endif
                         )
 {
