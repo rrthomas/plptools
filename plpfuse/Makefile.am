@@ -20,6 +20,4 @@
 sbin_PROGRAMS = plpfuse
 plpfuse_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu $(FUSE_CFLAGS)
 plpfuse_LDADD = $(LIB_PLP) $(INTLLIBS) $(FUSE_LIBS) $(top_builddir)/libgnu/libgnu.a
-plpfuse_SOURCES = main.cc fuse.c
-
-EXTRA_DIST = rfsv_api.h plpfuse.h
+plpfuse_SOURCES = main.cc fuse.c rfsv_api.h plpfuse.h

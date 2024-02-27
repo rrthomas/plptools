@@ -21,5 +21,4 @@
 bin_PROGRAMS = plpftp
 plpftp_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
 plpftp_LDADD = $(LIB_PLP) $(INTLLIBS) $(top_builddir)/libgnu/libgnu.a
-plpftp_SOURCES = ftp.cc main.cc
-EXTRA_DIST = ftp.h
+plpftp_SOURCES = ftp.cc main.cc ftp.h
