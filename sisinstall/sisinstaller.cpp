@@ -282,6 +282,7 @@ SISInstaller::loadInstalled()
                         loadPsionSis(sisname);
                         files.pop_front();
                         }
+                return SIS_OK;
                 }
 }
 
