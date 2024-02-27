@@ -18,14 +18,11 @@
 # You should have received a copy of the GNU General Public License along
 # along with this program; if not, see <https://www.gnu.org/licenses/>.
 
-AM_CPPFLAGS=-I$(top_srcdir)/lib
-AM_CFLAGS = $(THREADED_CFLAGS)
-AM_CXXFLAGS = $(THREADED_CXXFLAGS)
-
 sbin_PROGRAMS = ncpd
-
-ncpd_LDADD = $(LIB_PLP) $(INTLLIBS) $(LIBPMULTITHREAD) $(LIBTHREAD) $(NANOSLEEP_LIB) $(PTHREAD_SIGMASK_LIB) $(SELECT_LIB)
-
+ncpd_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
+ncpd_CFLAGS = $(THREADED_CFLAGS)
+ncpd_CXXFLAGS = $(THREADED_CXXFLAGS)
+ncpd_LDADD = $(LIB_PLP) $(INTLLIBS) $(LIBPMULTITHREAD) $(LIBTHREAD) $(NANOSLEEP_LIB) $(PTHREAD_SIGMASK_LIB) $(SELECT_LIB) $(top_builddir)/libgnu/libgnu.a
 ncpd_SOURCES = channel.cc link.cc linkchan.cc main.cc \
 	ncp.cc packet.cc socketchan.cc mp_serial.c
 EXTRA_DIST = channel.h link.h linkchan.h main.h mp_serial.h ncp.h packet.h \

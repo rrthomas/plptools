@@ -1,3 +1,4 @@
+#include "config.h"
 
 #include "fakepsion.h"
 #include "sistypes.h"

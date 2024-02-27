@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include "sisfile.h"
 #include "sisinstaller.h"
 #include "psion.h"

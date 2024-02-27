@@ -17,10 +17,9 @@
 # You should have received a copy of the GNU General Public License along
 # along with this program; if not, see <https://www.gnu.org/licenses/>.
 
-AM_CPPFLAGS=-I$(top_srcdir)/lib $(FUSE_CFLAGS)
-
 sbin_PROGRAMS = plpfuse
-plpfuse_LDADD = $(LIB_PLP) $(INTLLIBS) $(FUSE_LIBS)
+plpfuse_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu $(FUSE_CFLAGS)
+plpfuse_LDADD = $(LIB_PLP) $(INTLLIBS) $(FUSE_LIBS) $(top_builddir)/libgnu/libgnu.a
 plpfuse_SOURCES = main.cc fuse.c
 
 EXTRA_DIST = rfsv_api.h plpfuse.h

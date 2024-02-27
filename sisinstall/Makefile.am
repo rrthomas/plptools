@@ -21,7 +21,8 @@
 AM_CPPFLAGS=-I$(top_srcdir)/lib
 
 bin_PROGRAMS = sisinstall
-sisinstall_LDADD = ../lib/libplp.la $(INTLLIBS)
+sisinstall_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
+sisinstall_LDADD = ../lib/libplp.la $(INTLLIBS) $(top_builddir)/libgnu/libgnu.a
 sisinstall_SOURCES = psion.cpp sisinstaller.cpp sismain.cpp \
 	fakepsion.cpp sisfilelink.cpp sisfilelink.h
 EXTRA_DIST = psion.h sisinstaller.h fakepsion.h

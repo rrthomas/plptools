@@ -18,9 +18,8 @@
 # You should have received a copy of the GNU General Public License along
 # along with this program; if not, see <https://www.gnu.org/licenses/>.
 
-AM_CPPFLAGS = -I$(top_srcdir)/lib
-
 bin_PROGRAMS = plpftp
-plpftp_LDADD = $(LIB_PLP) $(INTLLIBS)
+plpftp_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
+plpftp_LDADD = $(LIB_PLP) $(INTLLIBS) $(top_builddir)/libgnu/libgnu.a
 plpftp_SOURCES = ftp.cc main.cc
 EXTRA_DIST = ftp.h

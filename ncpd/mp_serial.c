@@ -20,7 +20,7 @@
    //
    //  e-mail philip.proudman@btinternet.com
  */
-
+#include "config.h"
 
 #include <stdio.h>
 #include <fcntl.h>

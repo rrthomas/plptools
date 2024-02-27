@@ -19,8 +19,8 @@
 # along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 sbin_PROGRAMS = plpprintd
-plpprintd_CPPFLAGS = -DPKGDATADIR="\"$(pkgdatadir)\"" -I$(top_srcdir)/lib
-plpprintd_LDADD = $(LIB_PLP) $(INTLLIBS)
+plpprintd_CPPFLAGS = -DPKGDATADIR="\"$(pkgdatadir)\"" -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
+plpprintd_LDADD = $(LIB_PLP) $(INTLLIBS) $(top_builddir)/libgnu/libgnu.a
 plpprintd_SOURCES = plpprintd.cc
 
 EXTRA_DIST = prolog.ps.in fontmap
