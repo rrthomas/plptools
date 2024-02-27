@@ -24,7 +24,8 @@ AM_CXXFLAGS = $(THREADED_CXXFLAGS)
 
 sbin_PROGRAMS = ncpd
 
-ncpd_LDADD = $(LIB_PLP) -lpthread $(INTLLIBS)
+ncpd_LDADD = $(LIB_PLP) $(INTLLIBS) $(LIBPMULTITHREAD) $(LIBTHREAD) $(NANOSLEEP_LIB) $(PTHREAD_SIGMASK_LIB) $(SELECT_LIB)
+
 ncpd_SOURCES = channel.cc link.cc linkchan.cc main.cc \
 	ncp.cc packet.cc socketchan.cc mp_serial.c
 EXTRA_DIST = channel.h link.h linkchan.h main.h mp_serial.h ncp.h packet.h \
