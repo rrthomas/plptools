@@ -26,11 +26,11 @@ jobs:
       with: { submodules: true }
     - name: Install dependencies (Ubuntu)
       if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: sudo apt-get -y install gettext autopoint libfuse-dev libattr1-dev
+      run: sudo apt-get -y install pkg-config gettext autopoint libfuse-dev libattr1-dev
     - name: Install dependencies (macOS)
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
-        brew install coreutils readline automake gettext macfuse
+        brew install coreutils readline pkg-config automake gettext macfuse
         # Prepend optional brew binary directories to PATH
         echo "/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/m4/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
     - name: Build

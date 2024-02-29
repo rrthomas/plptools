@@ -22,7 +22,9 @@ For command-line editing and history support in plpftp, Readline 4.3 or later or
 
 Providing detailed instructions on how to install these packages for different operating systems is beyond the scope of this README, but see the [GitHub CI workflow](.github/workflows/c-cpp.yml) for the necessary install and configuration steps for Ubuntu/Debian and macOS.
 
-If building from a git checkout, first run:
+If building from a git checkout, you’ll need the following packages installed: automake, autoconf, pkg-config.
+
+Then run:
 
 ```
 ./bootstrap --skip-po
