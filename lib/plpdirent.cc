@@ -17,6 +17,8 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
+#include "config.h"
+
 #include "plpdirent.h"
 
 #include <iomanip>

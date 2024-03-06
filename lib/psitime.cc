@@ -17,6 +17,8 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
+#include "config.h"
+
 #include "psitime.h"
 
 #include <stdint.h>

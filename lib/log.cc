@@ -18,7 +18,11 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
+#include "config.h"
+
 #include "log.h"
+
+#include "ignore-value.h"
 
 #include <unistd.h>
 
@@ -37,7 +41,7 @@ int logbuf::overflow(int c) {
 	if (_on)
 	    syslog(_level, "%s", buf);
 	else if (_fd != -1)
-	    write(_fd, buf, len + 1);
+	    ignore_value(write(_fd, buf, len + 1));
 	ptr = buf;
 	len = 0;
 	return 0;
