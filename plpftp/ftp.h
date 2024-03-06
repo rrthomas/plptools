@@ -46,7 +46,7 @@ class ftp {
 	// utilities
 	bool unixDirExists(const char *dir);
 	void getUnixDir(bufferArray & files);
-	void resetUnixPwd();
+	void resetUnixWd();
 	void usage();
 	void cd(const char *source, const char *cdto, char *dest);
 
