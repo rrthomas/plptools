@@ -48,6 +48,7 @@
 #include <signal.h>
 #include <netdb.h>
 
+#include "ignore-value.h"
 #include "xalloc.h"
 #include "xvasprintf.h"
 
@@ -1196,14 +1197,14 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		strcat(cmd, argv[i]);
 	    }
 	    if (strlen(cmd))
-		system(cmd);
+		ignore_value(system(cmd));
 	    else {
 		const char *sh;
 		cout << _("Starting subshell ...\n");
 		sh = getenv("SHELL");
 		if (!sh)
 		    sh = "/bin/sh";
-		system(sh);
+		ignore_value(system(sh));
 	    }
 	    continue;
 	}
