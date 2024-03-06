@@ -31,7 +31,6 @@ jobs:
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
         brew install coreutils readline pkg-config automake gettext macfuse
-        # Prepend optional brew binary directories to PATH
-        echo "$(brew --prefix coreutils)/libexec/gnubin:$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
+        echo "$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
     - name: Build
       run: ./build-aux/build.sh
