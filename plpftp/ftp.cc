@@ -82,8 +82,8 @@ static int continueRunning;
 void ftp::
 resetUnixWd()
 {
-    getcwd(localDir, sizeof(localDir));
-    strcat(localDir, "/");
+    localDir = getcwd(NULL, 0);
+    assert(localDir != NULL);
 }
 
 ftp::ftp()
@@ -93,6 +93,7 @@ ftp::ftp()
 
 ftp::~ftp()
 {
+    free(localDir);
 }
 
 void ftp::usage() {
@@ -1002,6 +1003,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    strcpy(f1, psionDir);
 	    strcat(f1, argv[1]);
 	    strcpy(f2, localDir);
+	    strcat(f2, "/");
 	    if (argc == 2)
 		strcat(f2, argv[1]);
 	    else
@@ -1065,6 +1067,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		    strcpy(f1, psionDir);
 		    strcat(f1, e.getName());
 		    strcpy(f2, localDir);
+		    strcat(f2, "/");
 		    strcat(f2, e.getName());
 		    if (temp[0] == 'l') {
 			for (char *p = f2; *p; p++)
@@ -1091,6 +1094,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    struct stat stbuf;
 
 	    strcpy(f1, localDir);
+	    strcat(f1, "/");
 	    strcat(f1, argv[1]);
 	    strcpy(f2, psionDir);
 	    if (argc == 2)
@@ -1139,6 +1143,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 			if (!Wildmat(de->d_name, pattern))
 			    continue;
 			strcpy(f1, localDir);
+			strcat(f1, "/");
 			strcat(f1, de->d_name);
 			if (stat(f1, &st) != 0)
 			    continue;

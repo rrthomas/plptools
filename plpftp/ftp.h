@@ -58,7 +58,7 @@ class ftp {
 	char **do_completion(char *, int, int);
 #endif
 	char defDrive[9];
-	char localDir[1024];
+	char *localDir;
 };
 
 #endif
