@@ -900,7 +900,10 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		    char *p = f1 + strlen(f1);
 		    if (p > f1)
 			p--;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
 		    *p = '\0';
+#pragma GCC diagnostic pop
 		    while ((p > f1) && (*p != '/') && (*p != '\\'))
 			p--;
 		    *(++p) = '\0';
@@ -958,7 +961,10 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		    char *p = f1 + strlen(f1);
 		    if (p > f1)
 			p--;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
 		    *p = '\0';
+#pragma GCC diagnostic pop
 		    while ((p > f1) && (*p != '/') && (*p != '\\'))
 			p--;
 		    *(++p) = '\0';
