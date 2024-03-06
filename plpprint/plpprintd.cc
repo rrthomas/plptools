@@ -35,6 +35,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "ignore-value.h"
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -1009,7 +1011,7 @@ main(int argc, char **argv)
         case 0:
             /* child */
             setsid();
-            chdir("/");
+            ignore_value(chdir("/"));
             if (!debug) {
                 openlog("plpprintd", LOG_PID|LOG_CONS, LOG_DAEMON);
                 int devnull =

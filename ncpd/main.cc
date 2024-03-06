@@ -39,6 +39,8 @@
 #include <pthread.h>
 #include <plpintl.h>
 
+#include "ignore-value.h"
+
 #include "ncp.h"
 #include "socketchan.h"
 #include "linkchan.h"
@@ -357,7 +359,7 @@ main(int argc, char **argv)
 			 << sockNum << _(" using device ") << serialDevice
 			 << endl;
 		    setsid();
-		    chdir("/");
+		    ignore_value(chdir("/"));
 		    int devnull =
 			open("/dev/null", O_RDWR, 0);
 		    if (devnull != -1) {
