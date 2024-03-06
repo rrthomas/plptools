@@ -32,6 +32,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <sys/types.h>
 
 #include "ignore-value.h"
 
@@ -156,11 +158,14 @@ SISInstaller::copyBuf(const uint8_t* buf, int len, char* name)
         Enum<rfsv::errs> res;
         if (logLevel >= 2)
                 fprintf(stderr, "Storing in %s\n", srcName);
-        write(fd, buf, len);
-        close(fd);
-        continueRunning = 1;
-        res = m_psion->copyToPsion(srcName, name, NULL, checkAbortHash);
-        if (res == rfsv::E_PSI_GEN_NONE)
+        ssize_t written = write(fd, buf, len);
+        int close_res = close(fd);
+        bool write_ok = written == len && close_res == 0;
+        if (write_ok) {
+                continueRunning = 1;
+                res = m_psion->copyToPsion(srcName, name, NULL, checkAbortHash);
+        }
+        if (write_ok && res == rfsv::E_PSI_GEN_NONE)
                 {
                 if (logLevel >= 1)
                         fprintf(stderr, " -> Success.\n");
