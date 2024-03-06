@@ -33,6 +33,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#include "ignore-value.h"
+
 static int continueRunning;
 
 static int
@@ -189,20 +191,21 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
                                         {
                                         case 0:
                                                 printf("Continue\n");
-                                                fgets(readbuf, sizeof(readbuf), stdin);
+                                                ignore_value(fgets(readbuf, sizeof(readbuf), stdin));
                                                 break;
-                                        case 1:
+                                        case 1: {
                                                 printf("(Install next file?) [Y]es/No\n");
-                                                fgets(readbuf, sizeof(readbuf), stdin);
-                                                if (strchr("Nn", readbuf[0]))
+                                                char *res = fgets(readbuf, sizeof(readbuf), stdin);
+                                                if (!res || strchr("Nn", readbuf[0]))
                                                         {
                                                         return FILE_SKIP;
                                                         }
                                                 break;
-                                        case 2:
+                                        }
+                                        case 2: {
                                                 printf("(Continue installation?) [Y]es/No\n");
-                                                fgets(readbuf, sizeof(readbuf), stdin);
-                                                if (strchr("Nn", readbuf[0]))
+                                                char *res = fgets(readbuf, sizeof(readbuf), stdin);
+                                                if (!res || strchr("Nn", readbuf[0]))
                                                         {
                                                         // Watch out if we have copied any files
                                                         // already.
@@ -210,6 +213,7 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
                                                         return FILE_ABORT;
                                                         }
                                                 break;
+                                        }
                                         }
                                 }
                         break;
@@ -597,7 +601,11 @@ SISInstaller::selectDrive()
                         char readbuf[2];
                         while (m_drive == 0)
                                 {
-                                fgets(readbuf, 2, stdin);
+                                if (fgets(readbuf, 2, stdin) == NULL)
+                                        {
+                                        printf("please enter a drive");
+                                        continue;
+                                        }
                                 ch = readbuf[0];
                                 if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
                                         {
