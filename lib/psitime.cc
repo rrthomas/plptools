@@ -36,7 +36,7 @@ PsiTime::PsiTime(void) {
 
 PsiTime::PsiTime(time_t time) {
     ptzValid = false;
-    gettimeofday(NULL, &utz);
+    gettimeofday(&utv, &utz);
     setUnixTime(time);
 }
 
@@ -51,7 +51,7 @@ PsiTime::PsiTime(psi_timeval *_ptv, psi_timezone *_ptz) {
 	tryPsiZone();
     }
     /* get our own timezone */
-    gettimeofday(NULL, &utz);
+    gettimeofday(&utv, &utz);
     psi2unix();
 }
 
@@ -61,7 +61,7 @@ PsiTime::PsiTime(const uint32_t _ptvHi, const uint32_t _ptvLo) {
     ptzValid = false;
     tryPsiZone();
     /* get our own timezone */
-    gettimeofday(NULL, &utz);
+    gettimeofday(&utv, &utz);
     psi2unix();
 }
 
