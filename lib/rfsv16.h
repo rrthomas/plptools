@@ -76,28 +76,28 @@ public:
 
 private:
     enum commands {
-	FOPEN = 0, // File Open
-	FCLOSE = 2, // File Close
-	FREAD = 4, // File Read
-	FDIRREAD = 6, // Read Directory entries
-	FDEVICEREAD = 8, // Device Information
-	FWRITE = 10, // File Write
-	FSEEK = 12, // File Seek
-	FFLUSH = 14, // Flush
-	FSETEOF = 16,
-	RENAME = 18,
-	DELETE = 20,
-	FINFO = 22,
-	SFSTAT = 24,
-	PARSE = 26,
-	MKDIR = 28,
-	OPENUNIQUE = 30,
-	STATUSDEVICE = 32,
-	PATHTEST = 34,
-	STATUSSYSTEM = 36,
-	CHANGEDIR = 38,
-	SFDATE = 40,
-	RESPONSE = 42
+	SIBO_FOPEN = 0, // File Open
+	SIBO_FCLOSE = 2, // File Close
+	SIBO_FREAD = 4, // File Read
+	SIBO_FDIRREAD = 6, // Read Directory entries
+	SIBO_FDEVICEREAD = 8, // Device Information
+	SIBO_FWRITE = 10, // File Write
+	SIBO_FSEEK = 12, // File Seek
+	SIBO_FFLUSH = 14, // Flush
+	SIBO_FSETEOF = 16,
+	SIBO_RENAME = 18,
+	SIBO_DELETE = 20,
+	SIBO_FINFO = 22,
+	SIBO_SFSTAT = 24,
+	SIBO_PARSE = 26,
+	SIBO_MKDIR = 28,
+	SIBO_OPENUNIQUE = 30,
+	SIBO_STATUSDEVICE = 32,
+	SIBO_PATHTEST = 34,
+	SIBO_STATUSSYSTEM = 36,
+	SIBO_CHANGEDIR = 38,
+	SIBO_SFDATE = 40,
+	SIBO_RESPONSE = 42
     };
 
     enum fopen_attrib {

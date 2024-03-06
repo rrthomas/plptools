@@ -55,7 +55,7 @@ fopen(uint32_t attr, const char *name, uint32_t &handle)
     // Allow random access, rather than forcing the caller to ask for it
     a.addWord((P_FRANDOM | attr) & 0xFFFF);
     a.addStringT(realName.c_str());
-    if (!sendCommand(FOPEN, a))
+    if (!sendCommand(SIBO_FOPEN, a))
 	return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
@@ -73,7 +73,7 @@ mktemp(uint32_t &handle, string &tmpname)
 
     a.addWord(P_FUNIQUE);
     a.addStringT("TMP");
-    if (!sendCommand(OPENUNIQUE, a))
+    if (!sendCommand(SIBO_OPENUNIQUE, a))
 	return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
@@ -108,7 +108,7 @@ fclose(uint32_t fileHandle)
 {
     bufferStore a;
     a.addWord(fileHandle & 0xFFFF);
-    if (!sendCommand(FCLOSE, a))
+    if (!sendCommand(SIBO_FCLOSE, a))
 	return E_PSI_FILE_DISC;
     return getResponse(a);
 }
@@ -134,7 +134,7 @@ readdir(rfsvDirhandle &dH, PlpDirent &e) {
     if (dH.b.getLen() < 17) {
 	dH.b.init();
 	dH.b.addWord(dH.h & 0xFFFF);
-	if (!sendCommand(FDIRREAD, dH.b))
+	if (!sendCommand(SIBO_FDIRREAD, dH.b))
 	    return E_PSI_FILE_DISC;
 	res = getResponse(dH.b);
 	if (res == E_PSI_GEN_NONE) {
@@ -199,7 +199,7 @@ fgetmtime(const char * const name, PsiTime &mtime)
     bufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
-    if (!sendCommand(FINFO, a))
+    if (!sendCommand(SIBO_FINFO, a))
 	return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
@@ -217,16 +217,16 @@ fgetmtime(const char * const name, PsiTime &mtime)
 Enum<rfsv::errs> rfsv16::
 fsetmtime(const char *name, PsiTime mtime)
 {
-    // According to Alexander's protocol doc, SFDATE sets the modification
+    // According to Alexander's protocol doc, SIBO_SFDATE sets the modification
     // time - and as far as I can see SIBO only keeps a modification
-    // time. So call SFDATE here.
+    // time. So call SIBO_SFDATE here.
     bufferStore a;
     string realName = convertSlash(name);
     // According to Alex's docs, Psion's file times are in
     // seconds since 13:00!!, 1.1.1970
     a.addDWord(mtime.getSiboTime());
     a.addStringT(realName.c_str());
-    if (!sendCommand(SFDATE, a))
+    if (!sendCommand(SIBO_SFDATE, a))
         return E_PSI_FILE_DISC;
     return getResponse(a);
 }
@@ -237,7 +237,7 @@ fgetattr(const char * const name, uint32_t &attr)
     bufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
-    if (!sendCommand(FINFO, a))
+    if (!sendCommand(SIBO_FINFO, a))
 	return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
@@ -256,7 +256,7 @@ fgeteattr(const char * const name, PlpDirent &e)
     bufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
-    if (!sendCommand(FINFO, a))
+    if (!sendCommand(SIBO_FINFO, a))
 	return E_PSI_FILE_DISC;
     Enum<rfsv::errs> res = getResponse(a);
     if (res != E_PSI_GEN_NONE)
@@ -288,7 +288,7 @@ fsetattr(const char *name, uint32_t seta, uint32_t unseta)
     a.addWord(statusword & 0xFFFF);
     a.addWord(bitmask & 0xFFFF);
     a.addStringT(name);
-    if (!sendCommand(SFSTAT, a))
+    if (!sendCommand(SIBO_SFSTAT, a))
 	return E_PSI_FILE_DISC;
     return getResponse(a);
 }
@@ -318,8 +318,8 @@ devlist(uint32_t &devbits)
     devbits = 0;
 
     // The following is taken from a trace between a Series 3c and PsiWin.
-    // Hope it works! We PARSE to find the correct node, then FOPEN
-    // (P_FDEVICE) this, FDEVICEREAD each entry, setting the appropriate
+    // Hope it works! We SIBO_PARSE to find the correct node, then FOPEN
+    // (P_FDEVICE) this, SIBO_FDEVICEREAD each entry, setting the appropriate
     // drive-letter-bit in devbits, then FCLOSE.
 
     bufferStore a;
@@ -327,7 +327,7 @@ devlist(uint32_t &devbits)
     a.addByte(0x00); // no Name 1
     a.addByte(0x00); // no Name 2
     a.addByte(0x00); // no Name 3
-    if (!sendCommand(PARSE, a))
+    if (!sendCommand(SIBO_PARSE, a))
 	return E_PSI_FILE_DISC;
     res = getResponse(a);
     if (res != E_PSI_GEN_NONE)
@@ -345,7 +345,7 @@ devlist(uint32_t &devbits)
     while (1) {
 	a.init();
 	a.addWord(fileHandle & 0xFFFF);
-	if (!sendCommand(FDEVICEREAD, a))
+	if (!sendCommand(SIBO_FDEVICEREAD, a))
 	    return E_PSI_FILE_DISC;
 	res = getResponse(a);
 	if (res)
@@ -389,8 +389,8 @@ devinfo(const char drive, PlpDrive &dinfo)
     Enum<rfsv::errs> res;
 
     // Again, this is taken from an exchange between PsiWin and a 3c.
-    // For each drive, we PARSE with its drive letter to get a response
-    // (which we ignore), then do a STATUSDEVICE to get the info.
+    // For each drive, we SIBO_PARSE with its drive letter to get a response
+    // (which we ignore), then do a SIBO_STATUSDEVICE to get the info.
 
     a.init();
     a.addByte(toupper(drive)); // Name 1
@@ -399,7 +399,7 @@ devinfo(const char drive, PlpDrive &dinfo)
 
     a.addByte(0x00); // No name 2
     a.addByte(0x00); // No name 3
-    if (!sendCommand(PARSE, a))
+    if (!sendCommand(SIBO_PARSE, a))
 	return E_PSI_FILE_DISC;
     if ((res = getResponse(a)) != E_PSI_GEN_NONE)
 	return res;
@@ -409,7 +409,7 @@ devinfo(const char drive, PlpDrive &dinfo)
     a.addByte(':');
     a.addByte('\\');
     a.addByte(0x00);
-    if (!sendCommand(STATUSDEVICE, a))
+    if (!sendCommand(SIBO_STATUSDEVICE, a))
 	return E_PSI_FILE_DISC;
     if ((res = getResponse(a)) != E_PSI_GEN_NONE)
 	return res;
@@ -504,7 +504,7 @@ fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint
 	// Read in blocks of 291 bytes; the maximum payload for
 	// an RFSV frame. ( As seen in traces ) - this isn't optimal:
 	// RFSV can handle fragmentation of frames, where only the
-	// first FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
+	// first SIBO_FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
 	// and RESULT field. Every subsequent frame
 	// just has data, 297 bytes (or less) of it.
 	//
@@ -512,7 +512,7 @@ fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint
 	a.addWord((len - count) > RFSV16_MAXDATALEN
 		  ? RFSV16_MAXDATALEN
 		  : (len - count));
-	if (!sendCommand(FREAD, a))
+	if (!sendCommand(SIBO_FREAD, a))
 	    return E_PSI_FILE_DISC;
 	if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
 	    if (res == E_PSI_FILE_EOF)
@@ -542,7 +542,7 @@ fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t le
 	// Write in blocks of 291 bytes; the maximum payload for
 	// an RFSV frame. ( As seen in traces ) - this isn't optimal:
 	// RFSV can handle fragmentation of frames, where only the
-	// first FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
+	// first SIBO_FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
 	// and RESULT field. Every subsequent frame
 	// just has data, 297 bytes (or less) of it.
 	nbytes = (len - count) > RFSV16_MAXDATALEN
@@ -550,7 +550,7 @@ fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t le
 	    : (len - count);
 	a.addWord(handle);
 	a.addBytes(p, nbytes);
-	if (!sendCommand(FWRITE, a))
+	if (!sendCommand(SIBO_FWRITE, a))
 	    return E_PSI_FILE_DISC;
 	if ((res = getResponse(a)) != E_PSI_GEN_NONE)
 	    return res;
@@ -697,7 +697,7 @@ fsetsize(uint32_t handle, uint32_t size)
     bufferStore a;
     a.addWord(handle & 0xffff);
     a.addDWord(size);
-    if (!sendCommand(FSETEOF, a))
+    if (!sendCommand(SIBO_FSETEOF, a))
 	return E_PSI_FILE_DISC;
     return getResponse(a);
 }
@@ -738,7 +738,7 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
 	a.addWord(handle);
 	a.addDWord(0);
 	a.addWord(PSI_SEEK_CUR);
-	if (!sendCommand(FSEEK, a))
+	if (!sendCommand(SIBO_FSEEK, a))
 	    return E_PSI_FILE_DISC;
 	if ((res = getResponse(a)) != E_PSI_GEN_NONE)
 	    return res;
@@ -754,7 +754,7 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
 	a.addWord(handle);
 	a.addDWord(0);
 	a.addWord(PSI_SEEK_END);
-	if (!sendCommand(FSEEK, a))
+	if (!sendCommand(SIBO_FSEEK, a))
 	    return E_PSI_FILE_DISC;
 	if ((res = getResponse(a)) != E_PSI_GEN_NONE)
 	    return res;
@@ -768,7 +768,7 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
     a.addWord(handle);
     a.addDWord(pos);
     a.addWord(mode);
-    if (!sendCommand(FSEEK, a))
+    if (!sendCommand(SIBO_FSEEK, a))
 	return E_PSI_FILE_DISC;
     if ((res = getResponse(a)) != 0)
 	return res;
@@ -794,7 +794,7 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
 	a.addWord(handle);
 	a.addDWord(calcpos);
 	a.addWord(PSI_SEEK_SET);
-	if (!sendCommand(FSEEK, a))
+	if (!sendCommand(SIBO_FSEEK, a))
 	    return E_PSI_FILE_DISC;
 	if ((res = getResponse(a)) != 0)
 	    return res;
@@ -810,7 +810,7 @@ mkdir(const char* dirName)
     string realName = convertSlash(dirName);
     bufferStore a;
     a.addStringT(realName.c_str());
-    sendCommand(MKDIR, a);
+    sendCommand(SIBO_MKDIR, a);
     return getResponse(a);
 }
 
@@ -830,7 +830,7 @@ rename(const char *oldName, const char *newName)
     bufferStore a;
     a.addStringT(realOldName.c_str());
     a.addStringT(realNewName.c_str());
-    sendCommand(RENAME, a);
+    sendCommand(SIBO_RENAME, a);
     return getResponse(a);
 }
 
@@ -841,7 +841,7 @@ remove(const char* psionName)
     bufferStore a;
     a.addStringT(realName.c_str());
     // and this needs sending in the length word.
-    sendCommand(DELETE, a);
+    sendCommand(SIBO_DELETE, a);
     return getResponse(a);
 }
 
