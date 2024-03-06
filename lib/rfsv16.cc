@@ -32,6 +32,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "ignore-value.h"
+
 #define	RFSV16_MAXDATALEN	852	// 640
 
 using namespace std;
@@ -606,7 +608,8 @@ copyFromPsion(const char *from, int fd, cpCallback_t cb)
 	unsigned char buf[RFSV_SENDLEN];
 	if ((res = fread(handle, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
 	    if (len > 0)
-		write(fd, buf, len);
+                // FIXME: return UNIX errors from this method.
+		ignore_value(write(fd, buf, len));
 	    total += len;
 	    if (cb && !cb(NULL, total))
 		res = E_PSI_FILE_CANCEL;

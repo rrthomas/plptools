@@ -32,6 +32,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "ignore-value.h"
+
 using namespace std;
 
 rfsv32::rfsv32(ppsocket * _skt)
@@ -515,7 +517,8 @@ copyFromPsion(const char *from, int fd, cpCallback_t cb)
     unsigned char *buff = new unsigned char[RFSV_SENDLEN];
     do {
 	if ((res = fread(handle, buff, RFSV_SENDLEN, len)) == E_PSI_GEN_NONE) {
-	    write(fd, buff, len);
+            // FIXME: return UNIX errors from this method.
+	    ignore_value(write(fd, buff, len));
 	    total += len;
 	    if (cb && !cb(NULL, total))
 		res = E_PSI_FILE_CANCEL;
