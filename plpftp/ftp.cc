@@ -82,7 +82,7 @@ static int continueRunning;
 void ftp::
 resetUnixPwd()
 {
-    getcwd(localDir, 500);
+    getcwd(localDir, sizeof(localDir));
     strcat(localDir, "/");
 }
 
@@ -942,8 +942,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		resetUnixPwd();
 	    else {
 		if (chdir(argv[1]) == 0) {
-		    getcwd(localDir, sizeof(localDir));
-		    strcat(localDir, "/");
+		    resetUnixPwd();
 		} else
 		    cerr << _("No such directory") << endl
 			 << _("Keeping original directory \"") << localDir << "\"" << endl;
