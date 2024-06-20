@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies (macOS)
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
-        brew install coreutils readline pkg-config automake gettext macfuse
+        brew install coreutils readline pkg-config libtool automake gettext macfuse
         echo "$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
     - name: Build
       run: ./build-aux/build.sh
