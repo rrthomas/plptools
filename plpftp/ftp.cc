@@ -49,8 +49,6 @@
 #include <netdb.h>
 
 #include "ignore-value.h"
-#include "xalloc.h"
-#include "xvasprintf.h"
 
 #include "ftp.h"
 
@@ -660,6 +658,8 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 {
     int argc;
     char *argv[10];
+    char f1[256];
+    char f2[256];
     Enum<rfsv::errs> res;
     bool prompt = true;
     bool hash = false;
@@ -751,56 +751,57 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 
 	}
 	if (!strcmp(argv[0], "ren") && (argc == 3)) {
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-	    char *f2 = xasprintf("%s%s", psionDir, argv[2]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
+	    strcpy(f2, psionDir);
+	    strcat(f2, argv[2]);
 	    if ((res = a.rename(f1, f2)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
-	    free(f1);
-	    free(f2);
 	    continue;
 	}
 	if (!strcmp(argv[0], "cp") && (argc == 3)) {
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-	    char *f2 = xasprintf("%s%s", psionDir, argv[2]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
+	    strcpy(f2, psionDir);
+	    strcat(f2, argv[2]);
 	    if ((res = a.copyOnPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
-	    free(f1);
-	    free(f2);
 	    continue;
 	}
 	if (!strcmp(argv[0], "touch") && (argc == 2)) {
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
 	    PsiTime pt;
 	    if ((res = a.fsetmtime(f1, pt)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
-	    free(f1);
 	    continue;
 	}
 	if (!strcmp(argv[0], "test") && (argc == 2)) {
 	    PlpDirent e;
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
 	    if ((res = a.fgeteattr(f1, e)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else
 		cout << e << endl;
-	    free(f1);
 	    continue;
 	}
 	if (!strcmp(argv[0], "gattr") && (argc == 2)) {
 	    uint32_t attr;
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
 	    if ((res = a.fgetattr(f1, attr)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else {
 		cout << hex << setw(4) << setfill('0') << attr;
 		cout << " (" << a.attr2String(attr) << ")" << endl;
 	    }
-	    free(f1);
 	    continue;
 	}
 	if (!strcmp(argv[0], "gtime") && (argc == 2)) {
 	    PsiTime mtime;
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
 	    if ((res = a.fgetmtime(f1, mtime)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else
@@ -809,7 +810,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		     << ":"
 		     << setw(8) << setfill('0') << mtime.getPsiTimeLo()
 		     << ")" << endl;
-	    free(f1);
 	    continue;
 	}
 	if (!strcmp(argv[0], "sattr") && (argc == 3)) {
@@ -817,7 +817,8 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    int aidx = 0;
 	    char *p = argv[1];
 
-	    char *f1 = xasprintf("%s%s", psionDir, argv[2]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[2]);
 
 	    attr[0] = attr[1] = 0;
 	    while (*p) {
@@ -853,7 +854,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    }
 	    if ((res = a.fsetattr(f1, attr[0], attr[1])) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
-	    free(f1);
 	    continue;
 	}
 	if (!strcmp(argv[0], "dircnt")) {
@@ -892,36 +892,42 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	}
 	if (!strcmp(argv[0], "ls") || !strcmp(argv[0], "dir")) {
 	    PlpDir files;
-	    char *dname = psionDir, *dtmp, *f1;
+	    char dtmp[1024];
+	    char *dname = psionDir;
 
 	    if (argc > 1) {
 		uint32_t tmp;
-		dtmp = psionDir;
+		strcpy(dtmp, psionDir);
 		if (!strcmp(argv[1], "..")) {
-		    char *p = psionDir + strlen(psionDir);
-		    if (p > psionDir)
+		    strcpy(f1, psionDir);
+		    char *p = f1 + strlen(f1);
+		    if (p > f1)
 			p--;
-		    while ((p > psionDir) && (*p != '/') && (*p != '\\'))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+		    *p = '\0';
+#pragma GCC diagnostic pop
+		    while ((p > f1) && (*p != '/') && (*p != '\\'))
 			p--;
-		    if (p - psionDir < 3)
-			p = psionDir + strlen(psionDir);
-		    f1 = xasprintf("%.*s", (int)(p - psionDir), psionDir);
+		    *(++p) = '\0';
+		    if (strlen(f1) < 3) {
+			strcpy(f1, psionDir);
+			f1[3] = '\0';
+		    }
 		} else {
 		    if ((argv[1][0] != '/') && (argv[1][0] != '\\') &&
 			(argv[1][1] != ':')) {
-			f1 = xasprintf("%s%s", psionDir, argv[1]);
+			strcpy(f1, psionDir);
+			strcat(f1, argv[1]);
 		    } else
-			f1 = xstrdup(argv[1]);
+			strcpy(f1, argv[1]);
 		}
-		if ((f1[strlen(f1) -1] != '/') && (f1[strlen(f1) -1] != '\\')) {
-		    char *f2 = xasprintf("%s%s", f1, "\\");
-		    free(f1);
-		    f1 = f2;
-		}
+		if ((f1[strlen(f1) -1] != '/') && (f1[strlen(f1) -1] != '\\'))
+		    strcat(f1,"\\");
 		for (char *p = f1; *p; p++)
 		    if (*p == '/')
 			*p = '\\';
-		dtmp = f1;
+		strcpy(dtmp, f1);
 		dname = dtmp;
 	    }
 
@@ -932,7 +938,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		    cout << files[0] << endl;
 		    files.pop_front();
 		}
-	    free(f1);
 	    continue;
 	}
 	if (!strcmp(argv[0], "lcd")) {
@@ -952,29 +957,33 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		strcpy(psionDir, defDrive);
 		strcat(psionDir, DBASEDIR);
 	    } else {
-		char *f1;
 		uint32_t tmp;
 		if (!strcmp(argv[1], "..")) {
-		    char *p = psionDir + strlen(psionDir);
-		    if (p > psionDir)
+		    strcpy(f1, psionDir);
+		    char *p = f1 + strlen(f1);
+		    if (p > f1)
 			p--;
-		    while ((p > psionDir) && (*p != '/') && (*p != '\\'))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+		    *p = '\0';
+#pragma GCC diagnostic pop
+		    while ((p > f1) && (*p != '/') && (*p != '\\'))
 			p--;
-		    if (p - psionDir < 3)
-			p = psionDir + strlen(psionDir);
-		    f1 = xasprintf("%.*s", (int)(p - psionDir), psionDir);
+		    *(++p) = '\0';
+		    if (strlen(f1) < 3) {
+			strcpy(f1, psionDir);
+			f1[3] = '\0';
+		    }
 		} else {
 		    if ((argv[1][0] != '/') && (argv[1][0] != '\\') &&
 			(argv[1][1] != ':')) {
-			f1 = xasprintf("%s%s", psionDir, argv[1]);
+			strcpy(f1, psionDir);
+			strcat(f1, argv[1]);
 		    } else
-			f1 = xstrdup(argv[1]);
+			strcpy(f1, argv[1]);
 		}
-		if ((f1[strlen(f1) -1] != '/') && (f1[strlen(f1) -1] != '\\')) {
-		    char *f2 = xasprintf("%s%s", f1, "\\");
-		    free(f1);
-		    f1 = f2;
-		}
+		if ((f1[strlen(f1) -1] != '/') && (f1[strlen(f1) -1] != '\\'))
+		    strcat(f1,"\\");
 		if ((res = a.dircount(f1, tmp)) == rfsv::E_PSI_GEN_NONE) {
 		    for (char *p = f1; *p; p++)
 			if (*p == '/')
@@ -985,7 +994,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		    cerr << _("Error: ") << res << endl;
 		    cerr << _("Keeping original directory \"") << psionDir << "\"" << endl;
 		}
-		free(f1);
 	    }
 	    continue;
 	}
@@ -994,8 +1002,14 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    struct timeval etime;
 	    struct stat stbuf;
 
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-	    char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? argv[1] : argv[2]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
+	    strcpy(f2, localDir);
+	    strcat(f2, "/");
+	    if (argc == 2)
+		strcat(f2, argv[1]);
+	    else
+		strcat(f2, argv[2]);
 	    gettimeofday(&stime, 0L);
 	    if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
 		if (hash)
@@ -1022,8 +1036,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		     << _(" bytes in ") << dsec << "."
 		     << dhse << _(" secs = ") << cps << " cps)\n";
 	    }
-	    free(f1);
-	    free(f2);
 	    continue;
 	} else if ((!strcmp(argv[0], "mget")) && (argc == 2)) {
 	    char *pattern = argv[1];
@@ -1054,8 +1066,11 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		    }
 		} while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
 		if (temp[0] != 'n') {
-		    char *f1 = xasprintf("%s%s", psionDir, e.getName());
-		    char *f2 = xasprintf("%s%s%s", localDir, "/", e.getName());
+		    strcpy(f1, psionDir);
+		    strcat(f1, e.getName());
+		    strcpy(f2, localDir);
+		    strcat(f2, "/");
+		    strcat(f2, e.getName());
 		    if (temp[0] == 'l') {
 			for (char *p = f2; *p; p++)
 			    *p = tolower(*p);
@@ -1071,8 +1086,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 			    cout << endl;
 			cout << _("Transfer complete\n");
 		    }
-		    free(f1);
-		    free(f2);
 		}
 	    }
 	    continue;
@@ -1082,8 +1095,14 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    struct timeval etime;
 	    struct stat stbuf;
 
-	    char *f1 = xasprintf("%s%s%s", localDir, "/", argv[1]);
-	    char *f2 = xasprintf("%s%s", psionDir, argc == 2 ? argv[1] : argv[2]);
+	    strcpy(f1, localDir);
+	    strcat(f1, "/");
+	    strcat(f1, argv[1]);
+	    strcpy(f2, psionDir);
+	    if (argc == 2)
+		strcat(f2, argv[1]);
+	    else
+		strcat(f2, argv[2]);
 	    gettimeofday(&stime, 0L);
 	    if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
 		if (hash)
@@ -1110,8 +1129,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		     << _(" bytes in ") << dsec << "."
 		     << dhse << _(" secs = ") << cps << " cps)\n";
 	    }
-	    free(f1);
-	    free(f2);
 	    continue;
 	}
 	if ((!strcmp(argv[0], "mput")) && (argc == 2)) {
@@ -1127,39 +1144,40 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 
 			if (!Wildmat(de->d_name, pattern))
 			    continue;
-			char *f1 = xasprintf("%s%s%s", localDir, "/", de->d_name);
-			if (stat(f1, &st) == 0 && !S_ISREG(st.st_mode)) {
-			    do {
-				cout << _("Put \"") << de->d_name << "\" y,n: ";
-				if (prompt) {
-				    cout.flush();
-				    cin.getline(temp, 100);
-				} else {
-				    temp[0] = 'y';
-				    temp[1] = 0;
-				    cout << "y ";
-				    cout.flush();
-				}
-			    } while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
-			    if (temp[0] == 'y') {
-				char *f2 = xasprintf("%s%s", psionDir, de->d_name);
-				if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
-				    if (hash)
-					cout << endl;
-				    continueRunning = 1;
-				    cerr << _("Error: ") << res << endl;
-				    free(f1);
-				    free(f2);
-				    break;
-				} else {
-				    if (hash)
-					cout << endl;
-				    free(f2);
-				    cout << _("Transfer complete\n");
-				}
+			strcpy(f1, localDir);
+			strcat(f1, "/");
+			strcat(f1, de->d_name);
+			if (stat(f1, &st) != 0)
+			    continue;
+			if (!S_ISREG(st.st_mode))
+			    continue;
+			do {
+			    cout << _("Put \"") << de->d_name << "\" y,n: ";
+			    if (prompt) {
+				cout.flush();
+				cin.getline(temp, 100);
+			    } else {
+				temp[0] = 'y';
+				temp[1] = 0;
+				cout << "y ";
+				cout.flush();
+			    }
+			} while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
+			if (temp[0] == 'y') {
+			    strcpy(f2, psionDir);
+			    strcat(f2, de->d_name);
+			    if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
+				if (hash)
+				    cout << endl;
+				continueRunning = 1;
+				cerr << _("Error: ") << res << endl;
+				break;
+			    } else {
+				if (hash)
+				    cout << endl;
+				cout << _("Transfer complete\n");
 			    }
 			}
-			free(f1);
 		    }
 		} while (de);
 		closedir(d);
@@ -1169,24 +1187,24 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	}
 	if ((!strcmp(argv[0], "del") ||
 	     !strcmp(argv[0], "rm")) && (argc == 2)) {
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
 	    if ((res = a.remove(f1)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
-	    free(f1);
 	    continue;
 	}
 	if (!strcmp(argv[0], "mkdir") && (argc == 2)) {
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
 	    if ((res = a.mkdir(f1)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
-	    free(f1);
 	    continue;
 	}
 	if (!strcmp(argv[0], "rmdir") && (argc == 2)) {
-	    char *f1 = xasprintf("%s%s", psionDir, argv[1]);
+	    strcpy(f1, psionDir);
+	    strcat(f1, argv[1]);
 	    if ((res = a.rmdir(f1)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
-	    free(f1);
 	    continue;
 	}
 	if (argv[0][0] == '!') {
