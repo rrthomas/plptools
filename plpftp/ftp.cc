@@ -1442,12 +1442,10 @@ static const char *remote_dir_commands[] = {
 
 static PlpDir comp_files;
 static long maskAttr;
-static char cplPath[1024];
+static char *cplPath;
 
 static char*
-filename_generator(
-				   const char *text,
-				   int state)
+filename_generator(const char *text, int state)
 {
     static int len;
     string tmp;
@@ -1456,6 +1454,8 @@ filename_generator(
 	Enum<rfsv::errs> res;
 	len = strlen(text);
 	tmp = psionDir;
+	// cplPath will always be non-NULL here, having been initialized in
+	// do_completion.
 	tmp += cplPath;
 	tmp = rfsv::convertSlash(tmp);
 	if ((res = comp_a->dir(tmp.c_str(), comp_files)) != rfsv::E_PSI_GEN_NONE) {
@@ -1533,7 +1533,8 @@ do_completion(const char *text, int start, int end)
 	}
 	maskAttr = 0xffff;
 	idx = 0;
-	strcpy(cplPath, text);
+	free(cplPath);
+	cplPath = xstrdup(text);
 	p = strrchr(cplPath, '/');
 	if (p)
 	    *(++p) = '\0';
