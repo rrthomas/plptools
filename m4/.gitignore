@@ -215,3 +215,13 @@
 /wctype_h.m4
 /wmemchr.m4
 /wmempcpy.m4
+/getdelim.m4
+/getline.m4
+/langinfo_h.m4
+/localeconv.m4
+/nl_langinfo.m4
+/pthread_rwlock_rdlock.m4
+/regex.m4
+/rpmatch.m4
+/wcrtomb.m4
+/yesno.m4
