@@ -1125,7 +1125,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    continue;
 	}
 	if ((!strcmp(argv[0], "mput")) && (argc == 2)) {
-	    char f1[256], f2[256];
 	    char *pattern = argv[1];
 	    DIR *d = opendir(localDir);
 	    if (d) {
@@ -1138,40 +1137,39 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 
 			if (!Wildmat(de->d_name, pattern))
 			    continue;
-			strcpy(f1, localDir);
-			strcat(f1, "/");
-			strcat(f1, de->d_name);
-			if (stat(f1, &st) != 0)
-			    continue;
-			if (!S_ISREG(st.st_mode))
-			    continue;
-			do {
-			    cout << _("Put \"") << de->d_name << "\" y,n: ";
-			    if (prompt) {
-				cout.flush();
-				cin.getline(temp, 100);
-			    } else {
-				temp[0] = 'y';
-				temp[1] = 0;
-				cout << "y ";
-				cout.flush();
-			    }
-			} while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
-			if (temp[0] == 'y') {
-			    strcpy(f2, psionDir);
-			    strcat(f2, de->d_name);
-			    if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
-				if (hash)
-				    cout << endl;
-				continueRunning = 1;
-				cerr << _("Error: ") << res << endl;
-				break;
-			    } else {
-				if (hash)
-				    cout << endl;
-				cout << _("Transfer complete\n");
+			char *f1 = xasprintf("%s%s%s", localDir, "/", de->d_name);
+			if (stat(f1, &st) == 0 && S_ISREG(st.st_mode)) {
+			    do {
+				cout << _("Put \"") << de->d_name << "\" y,n: ";
+				if (prompt) {
+				    cout.flush();
+				    cin.getline(temp, 100);
+				} else {
+				    temp[0] = 'y';
+				    temp[1] = 0;
+				    cout << "y ";
+				    cout.flush();
+				}
+			    } while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
+			    if (temp[0] == 'y') {
+				char *f2 = xasprintf("%s%s", psionDir, de->d_name);
+				if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
+				    if (hash)
+					cout << endl;
+				    continueRunning = 1;
+				    cerr << _("Error: ") << res << endl;
+				    free(f1);
+				    free(f2);
+				    break;
+				} else {
+				    if (hash)
+					cout << endl;
+				    free(f2);
+				    cout << _("Transfer complete\n");
+				}
 			    }
 			}
+			free(f1);
 		    }
 		} while (de);
 		closedir(d);
