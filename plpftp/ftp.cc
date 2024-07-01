@@ -49,6 +49,7 @@
 #include <netdb.h>
 
 #include "ignore-value.h"
+#include "string-buffer.h"
 #include "xalloc.h"
 #include "xvasprintf.h"
 
@@ -190,6 +191,18 @@ Wildmat(const char *s, char *p)
 		continue;
 	}
     return (*s == '\0');
+}
+
+static char *join_string_array(int argc, char **argv, const char *sep)
+{
+    struct string_buffer sb;
+    sb_init(&sb);
+    for (int i = 0; i < argc; i++) {
+	sb_append(&sb, argv[i]);
+	if (i < argc - 1)
+	    sb_append(&sb, sep);
+    }
+    return sb_dupfree(&sb);
 }
 
 static int
@@ -1187,12 +1200,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    continue;
 	}
 	if (argv[0][0] == '!') {
-	    char cmd[1024];
-	    strcpy(cmd, &argv[0][1]);
-	    for (int i=1; i<argc; i++) {
-		strcat(cmd, " ");
-		strcat(cmd, argv[i]);
-	    }
+	    char *cmd = join_string_array(argc, argv, " ");
 	    if (strlen(cmd))
 		ignore_value(system(cmd));
 	    else {
@@ -1203,6 +1211,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		    sh = "/bin/sh";
 		ignore_value(system(sh));
 	    }
+	    free(cmd);
 	    continue;
 	}
 	// RPCS commands
@@ -1277,23 +1286,15 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    continue;
 	}
 	if (!strcmp(argv[0], "run") && (argc >= 2)) {
-	    char argbuf[1024];
-	    char cmdbuf[1024];
-
-	    argbuf[0] = 0;
-	    for (int i = 2; i < argc; i++) {
-		if (i > 2) {
-		    strcat(argbuf, " ");
-		    strcat(argbuf, argv[i]);
-		} else
-		    strcpy(argbuf, argv[i]);
-	    }
-	    if (!strchr(argv[1], ':')) {
-		strcpy(cmdbuf, psionDir);
-		strcat(cmdbuf, argv[1]);
-	    } else
-		strcpy(cmdbuf, argv[1]);
-	    r.execProgram(cmdbuf, argbuf);
+	    char *arg = join_string_array(argc - 1, argv + 1, " ");
+	    char *cmd;
+	    if (!strchr(argv[1], ':'))
+		cmd = xasprintf("%s%s", psionDir, argv[1]);
+	    else
+		cmd = xstrdup(argv[1]);
+	    r.execProgram(cmd, arg);
+	    free(arg);
+	    free(cmd);
 	    continue;
 	}
 	if (!strcmp(argv[0], "ownerinfo")) {
