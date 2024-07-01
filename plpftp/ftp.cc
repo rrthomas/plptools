@@ -56,6 +56,8 @@
 #include "ftp.h"
 
 extern "C"  {
+#include "yesno.h"
+
 #if defined(HAVE_READLINE_READLINE_H)
 #  include <readline/readline.h>
 #elif defined(HAVE_READLINE_H)
@@ -979,32 +981,25 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    }
 	    for (int i = 0; i < files.size(); i++) {
 		PlpDirent e = files[i];
-		char temp[100];
 		long attr = e.getAttr();
 
 		if (attr & (rfsv::PSI_A_DIR | rfsv::PSI_A_VOLUME))
 		    continue;
 		if (fnmatch(pattern, e.getName(), FNM_NOESCAPE) == FNM_NOMATCH)
 		    continue;
-		do {
-		    cout << _("Get \"") << e.getName() << "\" (y,n): ";
-		    if (prompt) {
-			cout.flush();
-			cin.getline(temp, 100);
-		    } else {
-			temp[0] = 'y';
-			temp[1] = 0;
-			cout << "y ";
-			cout.flush();
-		    }
-		} while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
-		if (temp[0] != 'n') {
+		cout << _("Get \"") << e.getName() << "\" (y,n): ";
+		bool yes = false;
+		if (prompt) {
+		    cout.flush();
+		    yes = yesno();
+		} else {
+		    yes = true;
+		    cout << "y ";
+		    cout.flush();
+		}
+		if (yes) {
 		    char *f1 = xasprintf("%s%s", psionDir, e.getName());
 		    char *f2 = xasprintf("%s%s%s", localDir, "/", e.getName());
-		    if (temp[0] == 'l') {
-			for (char *p = f2; *p; p++)
-			    *p = tolower(*p);
-		    }
 		    if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
 			if (hash)
 			    cout << endl;
@@ -1067,26 +1062,22 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		do {
 		    de = readdir(d);
 		    if (de) {
-			char temp[100];
 			struct stat st;
 
 			if (fnmatch(pattern, de->d_name, FNM_NOESCAPE) == FNM_NOMATCH)
 			    continue;
 			char *f1 = xasprintf("%s%s%s", localDir, "/", de->d_name);
 			if (stat(f1, &st) == 0 && S_ISREG(st.st_mode)) {
-			    do {
-				cout << _("Put \"") << de->d_name << "\" y,n: ";
-				if (prompt) {
-				    cout.flush();
-				    cin.getline(temp, 100);
-				} else {
-				    temp[0] = 'y';
-				    temp[1] = 0;
-				    cout << "y ";
-				    cout.flush();
-				}
-			    } while (temp[1] != 0 || (temp[0] != 'y' && temp[0] != 'n'));
-			    if (temp[0] == 'y') {
+			    cout << _("Put \"") << de->d_name << "\" y,n: ";
+			    bool yes = false;
+			    if (prompt) {
+				cout.flush();
+				yes = yesno();
+			    } else {
+				cout << "y ";
+				cout.flush();
+			    }
+			    if (yes) {
 				char *f2 = xasprintf("%s%s", psionDir, de->d_name);
 				if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
 				    if (hash)
