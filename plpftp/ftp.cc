@@ -47,6 +47,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <netdb.h>
+#include <fnmatch.h>
 
 #include "ignore-value.h"
 #include "xalloc.h"
@@ -137,59 +138,6 @@ void ftp::usage() {
     cout << "  ownerinfo" << endl;
     cout << "  settime" << endl;
     cout << "  setupinfo" << endl;
-}
-
-static int Wildmat(const char *s, char *p);
-
-static int
-Star(const char *s, char *p)
-{
-    while (Wildmat(s, p) == 0)
-	if (*++s == '\0')
-	    return 0;
-    return 1;
-}
-
-static int
-Wildmat(const char *s, char *p)
-{
-    int last;
-    int matched;
-    int reverse;
-
-    for (; *p; s++, p++)
-	switch (*p) {
-	    case '\\':
-		/*
-		* Literal match with following character,
-		* fall through.
-		*/
-		p++;
-	    default:
-		if (*s != *p)
-		    return (0);
-		continue;
-	    case '?':
-		/* Match anything. */
-		if (*s == '\0')
-		    return (0);
-		continue;
-	    case '*':
-		/* Trailing star matches everything. */
-		return (*++p ? Star(s, p) : 1);
-	    case '[':
-		/* [^....] means inverse character class. */
-		if ((reverse = (p[1] == '^')))
-		    p++;
-		for (last = 0, matched = 0; *++p && (*p != ']'); last = *p)
-		    /* This next line requires a good C compiler. */
-		    if (*p == '-' ? *s <= *++p && *s >= last : *s == *p)
-			matched = 1;
-		if (matched == reverse)
-		    return (0);
-		continue;
-	}
-    return (*s == '\0');
 }
 
 static int
@@ -1036,7 +984,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 
 		if (attr & (rfsv::PSI_A_DIR | rfsv::PSI_A_VOLUME))
 		    continue;
-		if (!Wildmat(e.getName(), pattern))
+		if (fnmatch(pattern, e.getName(), FNM_NOESCAPE) == FNM_NOMATCH)
 		    continue;
 		do {
 		    cout << _("Get \"") << e.getName() << "\" (y,n): ";
@@ -1122,7 +1070,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 			char temp[100];
 			struct stat st;
 
-			if (!Wildmat(de->d_name, pattern))
+			if (fnmatch(pattern, de->d_name, FNM_NOESCAPE) == FNM_NOMATCH)
 			    continue;
 			char *f1 = xasprintf("%s%s%s", localDir, "/", de->d_name);
 			if (stat(f1, &st) == 0 && S_ISREG(st.st_mode)) {
