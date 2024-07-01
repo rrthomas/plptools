@@ -22,6 +22,9 @@
 #define _ftp_h_
 
 #include "config.h"
+
+#include <vector>
+
 #include "rfsv.h"
 #include "Enum.h"
 
@@ -33,11 +36,11 @@ class ftp {
 	public:
 	ftp();
 	~ftp();
-        int session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char **xargv);
+        int session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, std::vector<char *> argv);
         bool canClip;
 
 	private:
-	void getCommand(int &argc, char **argv);
+	std::vector<char *> getCommand();
 	void initReadline(void);
         int putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *data);
         int getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file);

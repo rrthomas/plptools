@@ -50,6 +50,7 @@
 #include <fnmatch.h>
 
 #include "ignore-value.h"
+#include "string-buffer.h"
 #include "xalloc.h"
 #include "xvasprintf.h"
 
@@ -140,6 +141,19 @@ void ftp::usage() {
     cout << "  ownerinfo" << endl;
     cout << "  settime" << endl;
     cout << "  setupinfo" << endl;
+}
+
+static char *join_string_vector(vector<char *> argv, const char *sep)
+{
+    struct string_buffer sb;
+    sb_init(&sb);
+    int argc = argv.size();
+    for (int i = 0; i < argc; i++) {
+	sb_append(&sb, argv[i]);
+	if (i < argc - 1)
+	    sb_append(&sb, sep);
+    }
+    return sb_dupfree(&sb);
 }
 
 static int
@@ -659,22 +673,17 @@ static char *epoc_dir_from(const char *path) {
 }
 
 int ftp::
-session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char **xargv)
+session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> argv)
 {
-    int argc;
-    char *argv[10];
     Enum<rfsv::errs> res;
     bool prompt = true;
     bool hash = false;
     cpCallback_t cab = checkAbortNoHash;
     bool once = false;
 
-    if (xargc) {
+    unsigned argc = argv.size();
+    if (argc > 0)
 	once = true;
-	argc = (xargc<10)?xargc:10;
-	for (int i = 0; i < argc; i++)
-	    argv[i] = xargv[i];
-    }
     {
 	Enum<rpcs::machs> machType;
 	bufferArray b;
@@ -724,8 +733,10 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
     continueRunning = 1;
     signal(SIGINT, sigint_handler);
     do {
-	if (!once)
-	    getCommand(argc, argv);
+	if (!once) {
+	    argv = getCommand();
+	    argc = argv.size();
+	}
 
 	if ((!strcmp(argv[0], "help")) || (!strcmp(argv[0], "?"))) {
 	    usage();
@@ -1126,12 +1137,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    continue;
 	}
 	if (argv[0][0] == '!') {
-	    char cmd[1024];
-	    strcpy(cmd, &argv[0][1]);
-	    for (int i=1; i<argc; i++) {
-		strcat(cmd, " ");
-		strcat(cmd, argv[i]);
-	    }
+	    char *cmd = join_string_vector(argv, " ");
 	    if (strlen(cmd))
 		ignore_value(system(cmd));
 	    else {
@@ -1142,6 +1148,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		    sh = "/bin/sh";
 		ignore_value(system(sh));
 	    }
+	    free(cmd);
 	    continue;
 	}
 	// RPCS commands
@@ -1216,23 +1223,16 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	    continue;
 	}
 	if (!strcmp(argv[0], "run") && (argc >= 2)) {
-	    char argbuf[1024];
-	    char cmdbuf[1024];
-
-	    argbuf[0] = 0;
-	    for (int i = 2; i < argc; i++) {
-		if (i > 2) {
-		    strcat(argbuf, " ");
-		    strcat(argbuf, argv[i]);
-		} else
-		    strcpy(argbuf, argv[i]);
-	    }
-	    if (!strchr(argv[1], ':')) {
-		strcpy(cmdbuf, psionDir);
-		strcat(cmdbuf, argv[1]);
-	    } else
-		strcpy(cmdbuf, argv[1]);
-	    r.execProgram(cmdbuf, argbuf);
+	    vector<char *> args = {argv.begin() + 1, argv.end()};
+	    char *arg = join_string_vector(args, " ");
+	    char *cmd;
+	    if (!strchr(argv[1], ':'))
+		cmd = xasprintf("%s%s", psionDir, argv[1]);
+	    else
+		cmd = xstrdup(argv[1]);
+	    r.execProgram(cmd, arg);
+	    free(arg);
+	    free(cmd);
 	    continue;
 	}
 	if (!strcmp(argv[0], "ownerinfo")) {
@@ -1500,14 +1500,14 @@ initReadline(void)
     rl_completer_quote_characters = "\"";
 }
 
-void ftp::
-getCommand(int &argc, char **argv)
+vector<char *> ftp::
+getCommand()
 {
     int ws, quote;
     static char *buf = NULL;
+    vector<char *> argv;
 
-    argc = 0;
-    while (continueRunning) {
+    while ((!buf || !strlen(buf)) && continueRunning) {
 	signal(SIGINT, sigint_handler2);
 	free(buf);
 	buf = readline("> ");
@@ -1536,7 +1536,8 @@ getCommand(int &argc, char **argv)
 		break;
 	    default:
 		if (ws)
-		    argv[argc++] = p;
+		    argv.push_back(p);
 		ws = 0;
 	}
+    return argv;
 }

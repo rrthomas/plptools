@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -185,7 +186,8 @@ main(int argc, char **argv)
         rc = new rclip(rclipSocket);
     f.canClip = rclipSocket && rc ? true : false;
     if ((a != NULL) && (r != NULL)) {
-	status = f.session(*a, *r, *rc, *rclipSocket, argc - optind, &argv[optind]);
+        vector<char *> args(argv + optind, argv + argc);
+	status = f.session(*a, *r, *rc, *rclipSocket, args);
 	delete r;
 	delete a;
 	delete skt;
