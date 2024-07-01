@@ -44,11 +44,8 @@ class ftp {
         bool checkClipConnection(rfsv &a, rclip & rc, ppsocket & rclipSocket);
 
 	// utilities
-	bool unixDirExists(const char *dir);
-	void getUnixDir(bufferArray & files);
 	void resetUnixWd();
 	void usage();
-	void cd(const char *source, const char *cdto, char *dest);
 
 	// MJG: note, this isn't actually used anywhere
 	int convertName(const char *orig, char *retVal);
