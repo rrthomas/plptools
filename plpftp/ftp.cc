@@ -54,15 +54,14 @@
 
 #include "ftp.h"
 
-#if HAVE_LIBREADLINE
 extern "C"  {
-#  if defined(HAVE_READLINE_READLINE_H)
-#    include <readline/readline.h>
-#  elif defined(HAVE_READLINE_H)
-#    include <readline.h>
-#  else /* !defined(HAVE_READLINE_H) */
+#if defined(HAVE_READLINE_READLINE_H)
+#  include <readline/readline.h>
+#elif defined(HAVE_READLINE_H)
+#  include <readline.h>
+#else /* !defined(HAVE_READLINE_H) */
 extern char *readline ();
-#  endif /* !defined(HAVE_READLINE_H) */
+#endif /* !defined(HAVE_READLINE_H) */
 #include <readline/readline.h>
 #ifdef HAVE_READLINE_HISTORY
 #  if defined(HAVE_READLINE_HISTORY_H)
@@ -72,7 +71,6 @@ extern char *readline ();
 #  endif /* !defined(HAVE_READLINE_HISTORY_H) */
 #endif /* !defined(HAVE_READLINE_HISTORY) */
 }
-#endif
 
 using namespace std;
 
@@ -1424,7 +1422,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
     return a.getStatus();
 }
 
-#if HAVE_LIBREADLINE
 #define MATCHFUNCTION rl_completion_matches
 
 static const char *all_commands[] = {
@@ -1520,11 +1517,7 @@ do_completion(const char *text, int start, int end)
     rl_completion_append_character = ' ';
     rl_attempted_completion_over = 1;
     if (start == 0)
-	{
-#if HAVE_LIBREADLINE
 	matches = MATCHFUNCTION(text, command_generator);
-#endif
-	}
     else {
 	int idx = 0;
 	const char *name;
@@ -1552,56 +1545,37 @@ do_completion(const char *text, int start, int end)
 		maskAttr = rfsv::PSI_A_DIR;
 	}
 
-#if HAVE_LIBREADLINE
 	matches = MATCHFUNCTION(text, filename_generator);
-#endif
     }
     return matches;
 }
-#endif
 
 void ftp::
 initReadline(void)
 {
-#if HAVE_LIBREADLINE
     rl_readline_name = "plpftp";
     rl_completion_entry_function = null_completion;
     rl_attempted_completion_function = do_completion;
     rl_basic_word_break_characters = " \t\n\"\\'`@><=;|&{(";
-#endif
 }
 
 void ftp::
 getCommand(int &argc, char **argv)
 {
     int ws, quote;
+    static char *buf = NULL;
 
-    static char buf[1024];
-
-    buf[0] = 0; argc = 0;
-    while (!strlen(buf) && continueRunning) {
+    argc = 0;
+    while (continueRunning) {
 	signal(SIGINT, sigint_handler2);
-#if HAVE_LIBREADLINE
-	char *bp = readline("> ");
-	if (!bp) {
-	    strcpy(buf, "bye");
-	    cout << buf << endl;
-	} else {
-	    strcpy(buf, bp);
-#ifdef HAVE_READLINE_HISTORY
+	free(buf);
+	buf = readline("> ");
+	if (!buf)
+	    cout << "bye" << endl;
+	else {
 	    add_history(buf);
-#endif
-	    free(bp);
+	    break;
 	}
-#else
-	cout << "> ";
-	cout.flush();
-	cin.getline(buf, 1023);
-	if (cin.eof()) {
-	    strcpy(buf, "bye");
-	    cout << buf << endl;
-	}
-#endif
 	signal(SIGINT, sigint_handler);
     }
     ws = 1; quote = 0;
@@ -1620,9 +1594,8 @@ getCommand(int &argc, char **argv)
 		    *p = 0;
 		break;
 	    default:
-		if (ws) {
+		if (ws)
 		    argv[argc++] = p;
-		}
 		ws = 0;
 	}
 }

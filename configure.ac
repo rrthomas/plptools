@@ -81,6 +81,9 @@ AM_GNU_GETTEXT_VERSION([0.19.6])
 dnl readline and history for plpftp
 MIN_LIBREADLINE_VERSION=4.3
 AX_LIB_READLINE([$MIN_LIBREADLINE_VERSION])
+if test "$ax_cv_lib_readline_version_ok" != "yes"; then
+   AC_MSG_ERROR([readline version $MIN_LIBREADLINE_VERSION or later is required])
+fi
 
 # FUSE and libattr for plpfuse
 PKG_CHECK_MODULES([FUSE], [fuse >= 2.6], [enable_fuse=yes], [enable_fuse=no])
@@ -196,8 +199,3 @@ AC_CONFIG_FILES(
         doc/plpprintd.man
 )
 AC_OUTPUT
-
-dnl Warn if readline is absent or too old
-if test "$ax_cv_lib_readline_version_ok" != "yes"; then
-   AC_MSG_WARN([To use readline, version $MIN_LIBREADLINE_VERSION or later is required!])
-fi
