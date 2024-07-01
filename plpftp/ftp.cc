@@ -3,7 +3,7 @@
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
- *  Copyright (C) 2006-2008 Reuben Thomas <rrt@sc3d.org>
+ *  Copyright (C) 2006-2024 Reuben Thomas <rrt@sc3d.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ extern char *readline ();
 
 using namespace std;
 
-static char psionDir[1024];
+static char *psionDir;
 static rfsv *comp_a;
 static int continueRunning;
 
@@ -655,6 +655,61 @@ ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
     return 0;
 }
 
+/* Compute parent directory of an EPOC directory. */
+static char *epoc_dirname(const char *path) {
+    char *f1 = xstrdup(path);
+    char *p = f1 + strlen(f1);
+
+    /* Skip trailing slash. */
+    if (p > f1)
+	*--p = '\0';
+
+    /* Skip backwards to next slash. */
+    while ((p > f1) && (*p != '/') && (*p != '\\'))
+	p--;
+
+    /* If we have just a drive letter, colon and slash, keep exactly that. */
+    if (p - f1 < 3)
+	p = f1 + 3;
+
+    /* Truncate the string at the current point, and return it. */
+    *p = '\0';
+
+    return f1;
+}
+
+/* Compute new directory from path, which may be absolute or relative, and
+   cwd. */
+static char *epoc_dir_from(const char *path) {
+    char *f1;
+
+    /* If we have asked for parent dir, get dirname of cwd. */
+    if (!strcmp(path, "..")) {
+	f1 = epoc_dirname(psionDir);
+    } else {
+	/* If path is relative, append it to cwd. */
+	if ((path[0] != '/') && (path[0] != '\\') && (path[1] != ':'))
+	    f1 = xasprintf("%s%s", psionDir, path);
+	/* Otherwise, path is absolute, so duplicate it. */
+	else
+	    f1 = xstrdup(path);
+    }
+
+    /* Ensure path ends with a slash. */
+    if ((f1[strlen(f1) - 1] != '/') && (f1[strlen(f1) - 1] != '\\')) {
+	char *f2 = xasprintf("%s%s", f1, "\\");
+	free(f1);
+	f1 = f2;
+    }
+
+    /* Convert forward slashes in new path to backslashes. */
+    for (char *p = f1; *p; p++)
+	if (*p == '/')
+	    *p = '\\';
+
+    return f1;
+}
+
 int ftp::
 session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char **xargv)
 {
@@ -711,8 +766,8 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	}
     } else
 	strcpy(defDrive, DDRIVE);
-    strcpy(psionDir, defDrive);
-    strcat(psionDir, DBASEDIR);
+    free(psionDir);
+    psionDir = xasprintf("%s%s", defDrive, DBASEDIR);
     comp_a = &a;
     if (!once) {
 	cout << _("Psion dir is: \"") << psionDir << "\"" << endl;
@@ -892,46 +947,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	}
 	if (!strcmp(argv[0], "ls") || !strcmp(argv[0], "dir")) {
 	    PlpDir files;
-	    char dtmp[1024];
-	    char f1[256], f2[256];
-	    char *dname = psionDir;
-
-	    if (argc > 1) {
-		uint32_t tmp;
-		strcpy(dtmp, psionDir);
-		if (!strcmp(argv[1], "..")) {
-		    strcpy(f1, psionDir);
-		    char *p = f1 + strlen(f1);
-		    if (p > f1)
-			p--;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-overflow"
-		    *p = '\0';
-#pragma GCC diagnostic pop
-		    while ((p > f1) && (*p != '/') && (*p != '\\'))
-			p--;
-		    *(++p) = '\0';
-		    if (strlen(f1) < 3) {
-			strcpy(f1, psionDir);
-			f1[3] = '\0';
-		    }
-		} else {
-		    if ((argv[1][0] != '/') && (argv[1][0] != '\\') &&
-			(argv[1][1] != ':')) {
-			strcpy(f1, psionDir);
-			strcat(f1, argv[1]);
-		    } else
-			strcpy(f1, argv[1]);
-		}
-		if ((f1[strlen(f1) -1] != '/') && (f1[strlen(f1) -1] != '\\'))
-		    strcat(f1,"\\");
-		for (char *p = f1; *p; p++)
-		    if (*p == '/')
-			*p = '\\';
-		strcpy(dtmp, f1);
-		dname = dtmp;
-	    }
-
+	    char *dname = argc > 1 ? epoc_dir_from(argv[1]) : xstrdup(psionDir);
 	    if ((res = a.dir(dname, files)) != rfsv::E_PSI_GEN_NONE)
 		cerr << _("Error: ") << res << endl;
 	    else
@@ -939,6 +955,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 		    cout << files[0] << endl;
 		    files.pop_front();
 		}
+	    free(dname);
 	    continue;
 	}
 	if (!strcmp(argv[0], "lcd")) {
@@ -955,46 +972,18 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, int xargc, char 
 	}
 	if (!strcmp(argv[0], "cd")) {
 	    if (argc == 1) {
-		strcpy(psionDir, defDrive);
-		strcat(psionDir, DBASEDIR);
+		free(psionDir);
+		psionDir = xasprintf("%s%s", defDrive, DBASEDIR);
 	    } else {
-		char f1[256], f2[256];
+		char *newDir = epoc_dir_from(argv[1]);
 		uint32_t tmp;
-		if (!strcmp(argv[1], "..")) {
-		    strcpy(f1, psionDir);
-		    char *p = f1 + strlen(f1);
-		    if (p > f1)
-			p--;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-overflow"
-		    *p = '\0';
-#pragma GCC diagnostic pop
-		    while ((p > f1) && (*p != '/') && (*p != '\\'))
-			p--;
-		    *(++p) = '\0';
-		    if (strlen(f1) < 3) {
-			strcpy(f1, psionDir);
-			f1[3] = '\0';
-		    }
-		} else {
-		    if ((argv[1][0] != '/') && (argv[1][0] != '\\') &&
-			(argv[1][1] != ':')) {
-			strcpy(f1, psionDir);
-			strcat(f1, argv[1]);
-		    } else
-			strcpy(f1, argv[1]);
-		}
-		if ((f1[strlen(f1) -1] != '/') && (f1[strlen(f1) -1] != '\\'))
-		    strcat(f1,"\\");
-		if ((res = a.dircount(f1, tmp)) == rfsv::E_PSI_GEN_NONE) {
-		    for (char *p = f1; *p; p++)
-			if (*p == '/')
-			    *p = '\\';
-		    strcpy(psionDir, f1);
-		}
-		else {
+		if ((res = a.dircount(newDir, tmp)) != rfsv::E_PSI_GEN_NONE) {
 		    cerr << _("Error: ") << res << endl;
 		    cerr << _("Keeping original directory \"") << psionDir << "\"" << endl;
+		    free(newDir);
+		} else {
+		    free(psionDir);
+		    psionDir = newDir;
 		}
 	    }
 	    continue;
