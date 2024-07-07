@@ -1558,6 +1558,7 @@ initReadline(void)
     rl_completion_entry_function = null_completion;
     rl_attempted_completion_function = do_completion;
     rl_basic_word_break_characters = " \t\n\"\\'`@><=;|&{(";
+    rl_completer_quote_characters = "\"";
 }
 
 void ftp::
