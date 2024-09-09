@@ -738,6 +738,9 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
 	    argc = argv.size();
 	}
 
+	if (argc == 0) {
+	    continue;
+	}
 	if ((!strcmp(argv[0], "help")) || (!strcmp(argv[0], "?"))) {
 	    usage();
 	    continue;
@@ -1504,24 +1507,23 @@ vector<char *> ftp::
 getCommand()
 {
     int ws, quote;
-    static char *buf = NULL;
+    static char *buf;
     vector<char *> argv;
 
-    while ((!buf || !strlen(buf)) && continueRunning) {
-	signal(SIGINT, sigint_handler2);
-	free(buf);
-	buf = readline("> ");
-	if (!buf)
-	    cout << "bye" << endl;
-	else {
-	    add_history(buf);
-	    break;
-	}
-	signal(SIGINT, sigint_handler);
-    }
-    ws = 1; quote = 0;
-    for (char *p = buf; *p; p++)
-	switch (*p) {
+    // Free existing buffer, and reinitialize it.
+    free(buf);
+    buf = NULL;
+
+    // Get new command.
+    signal(SIGINT, sigint_handler2);
+    buf = readline("> ");
+    if (buf) {
+	add_history(buf);
+
+	// Parse command into argv.
+	ws = 1; quote = 0;
+	for (char *p = buf; *p; p++)
+	    switch (*p) {
 	    case ' ':
 	    case '\t':
 		if (!quote) {
@@ -1538,6 +1540,11 @@ getCommand()
 		if (ws)
 		    argv.push_back(p);
 		ws = 0;
-	}
+	    }
+    } else {
+	cout << "bye" << endl;
+    }
+    signal(SIGINT, sigint_handler);
+
     return argv;
 }
