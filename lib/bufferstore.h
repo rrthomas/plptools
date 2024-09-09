@@ -22,6 +22,7 @@
 #define _BUFFERSTORE_H_
 
 #include <iostream>
+#include <cstdint>
 
 #include <sys/types.h>
 

@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <iostream>
+#include <cstdint>
 
 #include <sys/time.h>
 #include <time.h>
