@@ -23,6 +23,9 @@
 #else
 #include <sys/xattr.h>
 #endif
+#ifndef ENOATTR
+#define ENOATTR ENODATA
+#endif
 #ifdef HAVE_ATTR_ATTRIBUTES_H
 #include <attr/attributes.h>
 #endif
