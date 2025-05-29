@@ -23,7 +23,7 @@ jobs:
       with: { submodules: true }
     - name: Install dependencies (Ubuntu)
       if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: sudo apt-get -y install pkg-config gettext autopoint libfuse-dev libattr1-dev
+      run: sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
     - name: Install dependencies (macOS)
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
