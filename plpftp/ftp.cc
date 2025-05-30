@@ -245,10 +245,11 @@ get_upto(FILE *fp, const char *term, size_t *final_len)
         l = (char *)realloc(l, len + 1);
         assert(l);
     }
-    *s++ = '\0';
     
     if (final_len)
         *final_len = s - l;
+
+    *s++ = '\0';
     l = (char *)realloc(l, s - l);
     assert(l);
     return l;
