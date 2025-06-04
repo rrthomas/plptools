@@ -66,4 +66,4 @@ The git repository can be cloned with:
 
 git clone https://github.com/plptools/plptools.git
 
-To make a release you need woger: https://github.com/rrthomas/woger
+To make a release you need gh: https://cli.github.com

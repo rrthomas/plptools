@@ -46,4 +46,4 @@ install-exec-local:
 # the .po files.
 release: distcheck
 	git diff && \
-	woger github package=$(PACKAGE) version=$(VERSION) github_user=plptools github_dist_type=source dist_type="tar.gz"
+	gh release create v$(VERSION) --title "Release v$(VERSION)" $(DIST_ARCHIVES)
