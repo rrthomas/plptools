@@ -225,3 +225,5 @@
 /rpmatch.m4
 /wcrtomb.m4
 /yesno.m4
+/servent.m4
+/strsep.m4
