@@ -29,10 +29,11 @@
 #include <termios.h>
 #if defined(linux) || defined(_IBMR2) || \
 	(defined(__APPLE__) && defined(__MACH__)) || \
-	defined(__NetBSD__) || defined(__FreeBSD__)
+	defined(__NetBSD__) || defined(__FreeBSD__) || \
+	defined(__HAIKU__)
 #include <sys/ioctl.h>		/* for ioctl() */
 #endif
-#include <sys/errno.h>
+#include <errno.h>
 #ifdef sun
 #include <sys/ttold.h>		/* sun has TIOCEXCL there */
 #endif
@@ -141,7 +142,8 @@ init_serial(const char *dev, int speed, int debug)
     ti.c_cflag = CS8 | HUPCL | CLOCAL | CREAD;
 #if defined(sun) || defined(linux) || defined(__sgi) || \
 	(defined(__APPLE__) && defined(__MACH__)) || \
-	defined(__NetBSD__) || defined(__FreeBSD__)
+	defined(__NetBSD__) || defined(__FreeBSD__) || \
+	defined(__HAIKU__)
     ti.c_cflag |= CRTSCTS;
     ti.c_iflag = IGNBRK | IGNPAR;
     ti.c_cc[VMIN] = 1;
