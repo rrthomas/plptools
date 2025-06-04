@@ -20,7 +20,7 @@
 
 sbin_PROGRAMS = plpprintd
 plpprintd_CPPFLAGS = -DPKGDATADIR="\"$(pkgdatadir)\"" -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
-plpprintd_LDADD = $(LIB_PLP) $(INTLLIBS) $(top_builddir)/libgnu/libgnu.a
+plpprintd_LDADD = $(LIB_PLP) $(INTLLIBS) $(SERVENT_LIB) $(top_builddir)/libgnu/libgnu.a
 plpprintd_SOURCES = plpprintd.cc
 
 EXTRA_DIST = prolog.ps.in fontmap
