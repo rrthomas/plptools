@@ -32,7 +32,7 @@
 	defined(__NetBSD__) || defined(__FreeBSD__)
 #include <sys/ioctl.h>		/* for ioctl() */
 #endif
-#include <sys/errno.h>
+#include <errno.h>
 #ifdef sun
 #include <sys/ttold.h>		/* sun has TIOCEXCL there */
 #endif
