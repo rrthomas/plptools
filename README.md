@@ -1,6 +1,6 @@
 # plptools
 
-https://github.com/rrthomas/plptools/
+https://github.com/plptools/plptools/
 
 plptools is a suite of programs for transferring files to and from EPOC
 (Psion) devices, as well as backing them up, installing software, and
@@ -64,6 +64,6 @@ In addition to the usual options, `configure` understands the following:
 
 The git repository can be cloned with:
 
-git clone https://github.com/rrthomas/plptools.git
+git clone https://github.com/plptools/plptools.git
 
 To make a release you need woger: https://github.com/rrthomas/woger
