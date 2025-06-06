@@ -344,7 +344,7 @@ main(int argc, char **argv)
 		cerr << "listen on " << host << ":" << sockNum << ": "
 		     << strerror(errno) << endl;
 	    else {
-		if (dofork || autoexit) {
+		if (dofork) {
 		    openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
 		    dlog.setOn(true);
 		    elog.setOn(true);
