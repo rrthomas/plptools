@@ -328,14 +328,8 @@ main(int argc, char **argv)
 	return -1;
     }
 
-    if (serialDevice == NULL) {
-	// If started with -e, assume being started from mgetty and
-	// use the tty opened by mgetty instead of the builtin default.
-	if (autoexit)
-	    serialDevice = ttyname(0);
-	else
-	    serialDevice = DDEV;
-    }
+    if (serialDevice == NULL)
+        serialDevice = DDEV;
 
     if (dofork)
 	pid = fork();
