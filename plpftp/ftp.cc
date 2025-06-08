@@ -66,7 +66,6 @@ extern "C"  {
 #else /* !defined(HAVE_READLINE_H) */
 extern char *readline ();
 #endif /* !defined(HAVE_READLINE_H) */
-#include <readline/readline.h>
 #ifdef HAVE_READLINE_HISTORY
 #  if defined(HAVE_READLINE_HISTORY_H)
 #    include <readline/history.h>
