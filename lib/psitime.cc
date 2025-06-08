@@ -193,61 +193,60 @@ ostream &operator<<(ostream &s, const PsiTime &t) {
  */
 #define EPOCH_DIFF 0x00dcddb30f2f8000ULL
 
-static unsigned long long
-evalOffset(psi_timezone ptz, time_t time, bool valid) {
-    int64_t offset = 0;
+/* evalOffset()
+ * Returns the difference between the Psion's timezone and the PC's timezone, in
+ * microseconds
+ */
+static long long evalOffset(psi_timezone ptz, time_t time, bool valid) {
+  int64_t offset = 0;
+  bool flg = false;
 
-    if (valid) {
-	offset = ptz.utc_offset;
-    } else {
-	/**
-	* Fallback. If no Psion zone given, use
-	* environment variable PSI_TZ
-	*/
-	const char *offstr = getenv("PSI_TZ");
-	if (offstr != 0L) {
-	    char *err = 0L;
-	    offset = strtoul(offstr, &err, 0);
-	    if (err != 0L && *err != '\0')
-		offset = 0;
-	} else {
-	    /**
-	    * Fallback. If PSI_TZ is not set,
-	    * use the local timezone. This assumes,
-	    * that both Psion and local machine are
-	    * configured for the same timezone and
-	    * daylight saving.
-	    */
-	    struct tm *tm = localtime(&time);
-	    offset = timezone;
-	    if (tm->tm_isdst)
-		offset += 3600;
-	}
+  if (valid) {
+    offset = ptz.utc_offset;
+    flg = true;
+  } else {
+    /**
+     * Fallback. If no Psion zone given, use
+     * environment variable PSI_TZ
+     */
+    const char *offstr = getenv("PSI_TZ");
+    if (offstr != 0) {
+      char *err = 0;
+      offset = strtol(offstr, &err, 0);
+      if (err != 0 && *err != '\0') {
+        offset = 0;
+      } else {
+        flg = true;
+      }
     }
-    // Substract out local timezone, it gets added
-    // later
-    time_t now = ::time(0);
-    struct tm *now_tm = localtime(&now);
-    offset -= timezone;
+  }
 
-    offset *= 1000000;
-    return offset;
+  // If all else fails, we assume that PC Timezone == Psion Timezone;
+  // offset should still be 0 at this point.
+
+  if (flg) {
+    struct tm *tm = localtime(&time);
+    offset -= tm->tm_gmtoff; // Subtract out local timezone
+    offset *= 1000000;       // Turn it into microseconds
+  }
+
+  return offset;
 }
 
 void PsiTime::setSiboTime(uint32_t stime) {
-    unsigned long long micro = evalOffset(ptz, time(0), false);
+    long long micro = evalOffset(ptz, time(0), false);
 
     micro /= 1000000;
-    utv.tv_sec = stime + OnePM - micro;
+    utv.tv_sec = stime + OnePM + micro;
     utv.tv_usec = 0;
 //    unix2psi();
 }
 
 uint32_t PsiTime::getSiboTime(void) {
-    unsigned long long micro = evalOffset(ptz, time(0), false);
+    long long micro = evalOffset(ptz, time(0), false);
 
     micro /= 1000000;
-    return utv.tv_sec - OnePM + micro;
+    return utv.tv_sec - OnePM - micro;
 }
 
 void PsiTime::psi2unix(void) {
