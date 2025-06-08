@@ -1445,6 +1445,8 @@ command_generator(
     return NULL;
 }
 
+extern "C" {
+
 static char * null_completion(const char *, int) {
     static char null[1] = "";
     return null;
@@ -1491,6 +1493,8 @@ do_completion(const char *text, int start, int end)
 	matches = MATCHFUNCTION(text, filename_generator);
     }
     return matches;
+}
+
 }
 
 void ftp::

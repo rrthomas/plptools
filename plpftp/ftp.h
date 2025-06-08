@@ -3,6 +3,7 @@
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2025 Reuben Thomas <rrt@sc3d.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -50,13 +51,6 @@ class ftp {
 	void resetUnixWd();
 	void usage();
 
-	// MJG: note, this isn't actually used anywhere
-	int convertName(const char *orig, char *retVal);
-#ifdef HAVE_READLINE
-	char *filename_generator(char *, int);
-	char *command_generator(char *, int);
-	char **do_completion(char *, int, int);
-#endif
 	char defDrive[9];
 	char *localDir;
 };
