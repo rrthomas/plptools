@@ -684,6 +684,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
     unsigned argc = argv.size();
     if (argc > 0)
 	once = true;
+
     {
 	Enum<rpcs::machs> machType;
 	bufferArray b;
