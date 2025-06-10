@@ -1358,10 +1358,11 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
 	    }
 	    continue;
 	}
-	if (strcmp(argv[0], "bye") && strcmp(argv[0], "quit"))
+	if (strcmp(argv[0], "bye") == 0 || strcmp(argv[0], "quit") == 0)
+            continueRunning = 0;
+        else
 	    cerr << _("syntax error. Try \"help\"") << endl;
-    } while (strcmp(argv[0], "bye") && strcmp(argv[0], "quit") && !once &&
-	     continueRunning);
+    } while (!once && continueRunning);
     return a.getStatus();
 }
 
