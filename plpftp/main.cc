@@ -85,7 +85,7 @@ ftpHeader()
     cout << _(" Copyright (C) 1999 Philip Proudman") << endl;
     cout << _(" Additions Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>") << endl;
     cout << _("                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>") << endl;
-    cout << _("                   & (C) 2006-2008 Reuben Thomas <rrt@sc3d.org>") << endl;
+    cout << _("                   & (C) 2006-2025 Reuben Thomas <rrt@sc3d.org>") << endl;
     cout << _("PLPFTP comes with ABSOLUTELY NO WARRANTY.") << endl;
     cout << _("This is free software, and you are welcome to redistribute it") << endl;
     cout << _("under GPL conditions; see the COPYING file in the distribution.") << endl;
